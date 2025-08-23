@@ -5,6 +5,7 @@ import numbers
 import os
 import warnings
 from collections.abc import MutableSequence
+from typing import Self
 
 import numpy as np
 from scipy import special
@@ -22,6 +23,7 @@ from desc.compute.utils import (
     get_profiles,
     get_transforms,
 )
+
 from desc.geometry import (
     FourierRZCurve,
     FourierRZToroidalSurface,
@@ -39,7 +41,13 @@ from desc.objectives import (
 from desc.optimizable import Optimizable, optimizable_parameter
 from desc.optimize import LinearConstraintProjection, Optimizer
 from desc.perturbations import perturb
-from desc.profiles import HermiteSplineProfile, PowerSeriesProfile, SplineProfile
+from desc.profiles import (
+    HermiteSplineProfile,
+    PowerSeriesProfile,
+    SplineProfile,
+    FourierZernikeProfile
+)
+
 from desc.transform import Transform
 from desc.utils import (
     ResolutionWarning,
@@ -550,7 +558,7 @@ class Equilibrium(IOAble, Optimizable):
         """
         set_initial_guess(self, *args, ensure_nested=ensure_nested)
 
-    def copy(self, deepcopy=True):
+    def copy(self, deepcopy=True) -> Self:
         """Return a (deep)copy of this equilibrium."""
         if deepcopy:
             new = copy.deepcopy(self)
@@ -645,7 +653,8 @@ class Equilibrium(IOAble, Optimizable):
         self._L_lmn = copy_coeffs(self.L_lmn, old_modes_L, self.L_basis.modes)
 
     @execute_on_cpu
-    def get_surface_at(self, rho=None, theta=None, zeta=None):
+    def get_surface_at(self, rho=None, theta=None, zeta=None) \
+            -> FourierRZToroidalSurface|ZernikeRZToroidalSection:
         """Return a representation for a given coordinate surface.
 
         Parameters
@@ -667,6 +676,11 @@ class Equilibrium(IOAble, Optimizable):
             ValueError,
             f"Only one coordinate can be specified, got {rho}, {theta}, {zeta}",
         )
+        # errorif(
+        #     rho is None and theta is None and zeta is None,
+        #     ValueError,
+        #     f"At least one of rho, theta, or zeta must be specified.",
+        # )
         errorif(
             theta is not None,
             NotImplementedError,
@@ -720,7 +734,7 @@ class Equilibrium(IOAble, Optimizable):
             surface.Z_lmn = Zb
             return surface
 
-        if zeta is not None:
+        else:
             assert (zeta >= 0) and (zeta <= 2 * np.pi)
             surface = ZernikeRZToroidalSection(sym=self.sym, zeta=zeta)
             surface.change_resolution(self.L, self.M)
@@ -751,7 +765,9 @@ class Equilibrium(IOAble, Optimizable):
             surface.Z_lmn = Zb
             return surface
 
-    def get_profile(self, name, grid=None, kind="spline", **kwargs):
+    def get_profile(
+            self, name, grid=None, kind="spline", **kwargs
+        ) -> SplineProfile|PowerSeriesProfile|FourierZernikeProfile:
         """Return a SplineProfile of the desired quantity.
 
         Parameters
@@ -2519,7 +2535,7 @@ class EquilibriaFamily(IOAble, MutableSequence):
         maxiter=100,
         verbose=1,
         checkpoint_path=None,
-    ):
+    ) -> Self:
         """Solve for an equilibrium by continuation method.
 
         Steps through an EquilibriaFamily, solving each equilibrium, and uses
@@ -2587,7 +2603,7 @@ class EquilibriaFamily(IOAble, MutableSequence):
         verbose=1,
         checkpoint_path=None,
         **kwargs,
-    ):
+    ) -> Self:
         """Solve for an equilibrium using an automatic continuation method.
 
         By default, the method first solves for a no pressure tokamak, then a finite
@@ -2649,7 +2665,7 @@ class EquilibriaFamily(IOAble, MutableSequence):
         )
 
     @property
-    def equilibria(self):
+    def equilibria(self) -> list[Equilibrium]:
         """list: Equilibria contained in the family."""
         return self._equilibria
 
@@ -2667,7 +2683,7 @@ class EquilibriaFamily(IOAble, MutableSequence):
             )
         self._equilibria = list(equil)
 
-    def __getitem__(self, i):
+    def __getitem__(self, i) -> Equilibrium:
         return self._equilibria[i]
 
     def __setitem__(self, i, new_item):
