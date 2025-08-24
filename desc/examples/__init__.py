@@ -1,12 +1,11 @@
 """Module for getting precomputed example equilibria."""
 
 import os
-from multiprocessing.managers import Array
 
 import desc.io
 from desc.backend import execute_on_cpu
 from desc.equilibrium import EquilibriaFamily
-from desc.geometry import Surface
+
 
 
 def listall():
@@ -49,7 +48,7 @@ def listall():
 
 
 
- @execute_on_cpu
+@execute_on_cpu
 def get(name, data=None):
     """Get example equilibria and data.
 

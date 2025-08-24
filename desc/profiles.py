@@ -64,7 +64,7 @@ class _Profile(IOAble, ABC):
     def compute(self, grid, params=None, dr=0, dt=0, dz=0):
         """Compute values on specified nodes, default to using self.params."""
 
-    def to_powerseries(self, order=6, xs=100, sym="auto", rcond=None, w=None) -> "PowerSeriesProfile":
+    def to_powerseries(self, order=6, xs=100, sym="auto", rcond=None, w=None):
         """Convert this profile to a PowerSeriesProfile.
 
         Parameters
@@ -98,7 +98,7 @@ class _Profile(IOAble, ABC):
         p.name = self.name
         return p
 
-    def to_fourierzernike(self, L=6, M=0, N=0, NFP=1, xs=100, w=None) -> "FourierZernikeProfile":
+    def to_fourierzernike(self, L=6, M=0, N=0, NFP=1, xs=100, w=None):
         """Convert this profile to a FourierZernikeProfile.
 
         Parameters
@@ -129,7 +129,7 @@ class _Profile(IOAble, ABC):
         p = FourierZernikeProfile.from_values(r, t, z, f, L, M, N, NFP, w, self.name)
         return p
 
-    def to_spline(self, knots=20, method="cubic2") -> "SplineProfile":
+    def to_spline(self, knots=20, method="cubic2"):
         """Convert this profile to a SplineProfile.
 
         Parameters
@@ -158,7 +158,7 @@ class _Profile(IOAble, ABC):
 
     def to_mtanh(
         self, order=4, xs=100, w=None, p0=None, pmax=None, pmin=None, **kwargs
-    ) -> "MTanhProfile":
+    ):
         """Convert this profile to modified hyperbolic tangent + poly form.
 
         Parameters

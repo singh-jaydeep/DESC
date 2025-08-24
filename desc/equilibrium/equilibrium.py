@@ -6,7 +6,7 @@ import os
 import warnings
 from collections.abc import MutableSequence
 from typing import Self, Dict
-from jax import Array
+from jax import Array as jaxArray
 
 import numpy as np
 from scipy import special
@@ -849,7 +849,7 @@ class Equilibrium(IOAble, Optimizable):
         data=None,
         override_grid=True,
         **kwargs,
-    ) -> Dict[str, Array]:
+    ) -> Dict[str, jaxArray]:
         """Compute the quantity given by name on grid.
 
         If ``grid.coordinates!="rtz"`` then this method may take longer to run
