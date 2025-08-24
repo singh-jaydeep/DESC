@@ -1,10 +1,12 @@
 """Module for getting precomputed example equilibria."""
 
 import os
+from multiprocessing.managers import Array
 
 import desc.io
 from desc.backend import execute_on_cpu
 from desc.equilibrium import EquilibriaFamily
+from desc.geometry import Surface
 
 
 def listall():
@@ -15,7 +17,39 @@ def listall():
     return names_stripped
 
 
-@execute_on_cpu
+
+
+
+# For the get() function below, a few different possibilities.
+# (1) Leave as is, but make the docstring more detailed.
+# e.g.
+# Returns
+#     -------
+#     data : varies
+#         name=None -> return type Equilibrium
+#         name="all" -> return type EquilibriaFamily
+#         name="boundary" -> return type Surface
+#         name="pressure"|"iota"|"current" -> return type Profile|None
+#  )
+#
+# (2) Union type hint
+# def get(name, data=Literal[None, "all", "boundary", "pressure", "iota", "current"]) -> Equilibrium|EquilibriaFamily
+#                                                                                        |Surface|Profile|None
+#
+# (3) Overloading for different "data" inputs
+# @overload
+# def get(name, data:None=None) -> Equilibrium:
+#
+# @overload
+# def get(name, data: Literal["any"]) -> EquilibriaFamily:
+#
+# etc...
+#
+#
+
+
+
+ @execute_on_cpu
 def get(name, data=None):
     """Get example equilibria and data.
 
