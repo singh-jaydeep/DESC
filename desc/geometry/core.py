@@ -2,6 +2,8 @@
 
 import numbers
 from abc import ABC, abstractmethod
+from typing import Dict
+from jax import Array as jaxArray
 
 import numpy as np
 
@@ -485,7 +487,7 @@ class Surface(IOAble, Optimizable, ABC):
         data=None,
         override_grid=True,
         **kwargs,
-    ):
+    ) -> Dict[str, jaxArray]:
         """Compute the quantity given by name on grid.
 
         Parameters

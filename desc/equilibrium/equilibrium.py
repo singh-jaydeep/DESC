@@ -43,6 +43,7 @@ from desc.optimizable import Optimizable, optimizable_parameter
 from desc.optimize import LinearConstraintProjection, Optimizer
 from desc.perturbations import perturb
 from desc.profiles import (
+    _Profile,
     HermiteSplineProfile,
     PowerSeriesProfile,
     SplineProfile,
@@ -1710,7 +1711,7 @@ class Equilibrium(IOAble, Optimizable):
         self.axis.Z_n = Za_n
 
     @property
-    def pressure(self):
+    def pressure(self) -> _Profile:
         """Profile: Pressure (Pa) profile."""
         return self._pressure
 
@@ -1734,7 +1735,7 @@ class Equilibrium(IOAble, Optimizable):
         self.pressure.params = p_l
 
     @property
-    def anisotropy(self):
+    def anisotropy(self) -> _Profile:
         """Profile: Anisotropy profile."""
         return self._anisotropy
 
@@ -1758,7 +1759,7 @@ class Equilibrium(IOAble, Optimizable):
         self.anisotropy.params = a_lmn
 
     @property
-    def electron_temperature(self):
+    def electron_temperature(self) -> _Profile:
         """Profile: Electron temperature (eV) profile."""
         return self._electron_temperature
 
@@ -1786,7 +1787,7 @@ class Equilibrium(IOAble, Optimizable):
         self.electron_temperature.params = Te_l
 
     @property
-    def electron_density(self):
+    def electron_density(self) -> _Profile:
         """Profile: Electron density (m^-3) profile."""
         return self._electron_density
 
@@ -1814,7 +1815,7 @@ class Equilibrium(IOAble, Optimizable):
         self.electron_density.params = ne_l
 
     @property
-    def ion_temperature(self):
+    def ion_temperature(self) -> _Profile:
         """Profile: ion temperature (eV) profile."""
         return self._ion_temperature
 
@@ -1840,7 +1841,7 @@ class Equilibrium(IOAble, Optimizable):
         self.ion_temperature.params = Ti_l
 
     @property
-    def atomic_number(self):
+    def atomic_number(self) -> _Profile:
         """Profile: Effective atomic number (Z_eff) profile."""
         return self._atomic_number
 
@@ -1864,7 +1865,7 @@ class Equilibrium(IOAble, Optimizable):
         self.atomic_number.params = Zeff_l
 
     @property
-    def iota(self):
+    def iota(self) -> _Profile:
         """Profile: Rotational transform (iota) profile."""
         return self._iota
 
@@ -1899,7 +1900,7 @@ class Equilibrium(IOAble, Optimizable):
         self.iota.params = i_l
 
     @property
-    def current(self):
+    def current(self) -> _Profile:
         """Profile: Toroidal current profile (I)."""
         return self._current
 

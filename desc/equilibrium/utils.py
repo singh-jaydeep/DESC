@@ -14,7 +14,7 @@ from desc.geometry import (
 from desc.profiles import PowerSeriesProfile, _Profile
 
 
-def parse_profile(prof, name="", **kwargs):
+def parse_profile(prof, name="", **kwargs) -> _Profile|None:
     """Parse an object into a Profile.
 
     Parameters
@@ -117,7 +117,7 @@ def parse_surface(surface, NFP=1, sym=True, spectral_indexing="ansi"):
     return surface, bdry_mode
 
 
-def parse_axis(axis, NFP=1, sym=True, surface=None):
+def parse_axis(axis, NFP=1, sym=True, surface=None) -> FourierRZCurve:
     """Parse axis input into Curve object.
 
     Parameters
