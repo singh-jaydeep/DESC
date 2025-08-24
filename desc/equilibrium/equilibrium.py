@@ -5,7 +5,8 @@ import numbers
 import os
 import warnings
 from collections.abc import MutableSequence
-from typing import Self
+from typing import Self, Dict
+from jax import Array
 
 import numpy as np
 from scipy import special
@@ -558,7 +559,7 @@ class Equilibrium(IOAble, Optimizable):
         """
         set_initial_guess(self, *args, ensure_nested=ensure_nested)
 
-    def copy(self, deepcopy=True) -> Self:
+    def copy(self, deepcopy=True):
         """Return a (deep)copy of this equilibrium."""
         if deepcopy:
             new = copy.deepcopy(self)
@@ -653,8 +654,7 @@ class Equilibrium(IOAble, Optimizable):
         self._L_lmn = copy_coeffs(self.L_lmn, old_modes_L, self.L_basis.modes)
 
     @execute_on_cpu
-    def get_surface_at(self, rho=None, theta=None, zeta=None) \
-            -> FourierRZToroidalSurface|ZernikeRZToroidalSection:
+    def get_surface_at(self, rho=None, theta=None, zeta=None) -> FourierRZToroidalSurface|ZernikeRZToroidalSection:
         """Return a representation for a given coordinate surface.
 
         Parameters
@@ -767,7 +767,7 @@ class Equilibrium(IOAble, Optimizable):
 
     def get_profile(
             self, name, grid=None, kind="spline", **kwargs
-        ) -> SplineProfile|PowerSeriesProfile|FourierZernikeProfile:
+        )-> SplineProfile|PowerSeriesProfile|FourierZernikeProfile:
         """Return a SplineProfile of the desired quantity.
 
         Parameters
@@ -849,7 +849,7 @@ class Equilibrium(IOAble, Optimizable):
         data=None,
         override_grid=True,
         **kwargs,
-    ):
+    ) -> Dict[str, Array]:
         """Compute the quantity given by name on grid.
 
         If ``grid.coordinates!="rtz"`` then this method may take longer to run
@@ -1497,7 +1497,7 @@ class Equilibrium(IOAble, Optimizable):
         return to_sfl(self, L, M, N, L_grid, M_grid, N_grid, rcond, copy)
 
     @property
-    def surface(self):
+    def surface(self) -> FourierRZToroidalSurface|ZernikeRZToroidalSection:
         """Surface: Geometric surface defining boundary conditions."""
         return self._surface
 
@@ -1514,7 +1514,7 @@ class Equilibrium(IOAble, Optimizable):
         self._surface = new
 
     @property
-    def axis(self):
+    def axis(self) -> FourierRZCurve:
         """Curve: object representing the magnetic axis."""
         return self._axis
 
@@ -2535,7 +2535,7 @@ class EquilibriaFamily(IOAble, MutableSequence):
         maxiter=100,
         verbose=1,
         checkpoint_path=None,
-    ) -> Self:
+    ):
         """Solve for an equilibrium by continuation method.
 
         Steps through an EquilibriaFamily, solving each equilibrium, and uses
@@ -2603,7 +2603,7 @@ class EquilibriaFamily(IOAble, MutableSequence):
         verbose=1,
         checkpoint_path=None,
         **kwargs,
-    ) -> Self:
+    ):
         """Solve for an equilibrium using an automatic continuation method.
 
         By default, the method first solves for a no pressure tokamak, then a finite
