@@ -1,11 +1,13 @@
 """Module for getting precomputed example equilibria."""
 
 import os
+from typing import Literal, overload
 
 import desc.io
 from desc.backend import execute_on_cpu
-from desc.equilibrium import EquilibriaFamily
-
+from desc.equilibrium import EquilibriaFamily, Equilibrium
+from desc.geometry.surface import Surface
+from desc.profiles import _Profile
 
 
 def listall():
@@ -16,40 +18,22 @@ def listall():
     return names_stripped
 
 
-
-
-
-# For the get() function below, a few different possibilities.
-# (1) Leave as is, but make the docstring more detailed.
-# e.g.
-# Returns
-#     -------
-#     data : varies
-#         name=None -> return type Equilibrium
-#         name="all" -> return type EquilibriaFamily
-#         name="boundary" -> return type Surface
-#         name="pressure"|"iota"|"current" -> return type Profile|None
-#  )
-#
-# (2) Union type hint
-# def get(name, data=Literal[None, "all", "boundary", "pressure", "iota", "current"]) -> Equilibrium|EquilibriaFamily
-#                                                                                        |Surface|Profile|None
-#
-# (3) Overloading for different "data" inputs
-# @overload
-# def get(name, data:None=None) -> Equilibrium:
-#
-# @overload
-# def get(name, data: Literal["any"]) -> EquilibriaFamily:
-#
-# etc...
-#
-#
-
+## Typing is somewhat awkward for get(),
+## given its various return types
+@overload
+def get(name, data=None) -> Equilibrium: ...
+@overload
+def get(name, data="all") -> EquilibriaFamily: ...
+@overload
+def get(name, data="boundary") -> Surface: ...
+@overload
+def get(name, data=Literal["pressure", "iota", "current"]) -> _Profile: ...
 
 
 @execute_on_cpu
-def get(name, data=None):
+def get(
+    name, data: None | Literal["all", "boundary", "pressure", "iota", "current"] = None
+) -> Equilibrium | EquilibriaFamily | Surface | _Profile:
     """Get example equilibria and data.
 
     Returns a solved equilibrium or selected attributes for one of several examples.

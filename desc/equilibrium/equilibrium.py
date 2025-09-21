@@ -5,8 +5,6 @@ import numbers
 import os
 import warnings
 from collections.abc import MutableSequence
-from typing import Self, Dict
-from jax import Array as jaxArray
 
 import numpy as np
 from scipy import special
@@ -24,7 +22,6 @@ from desc.compute.utils import (
     get_profiles,
     get_transforms,
 )
-
 from desc.geometry import (
     FourierRZCurve,
     FourierRZToroidalSurface,
@@ -43,13 +40,12 @@ from desc.optimizable import Optimizable, optimizable_parameter
 from desc.optimize import LinearConstraintProjection, Optimizer
 from desc.perturbations import perturb
 from desc.profiles import (
-    _Profile,
+    FourierZernikeProfile,
     HermiteSplineProfile,
     PowerSeriesProfile,
     SplineProfile,
-    FourierZernikeProfile
+    _Profile,
 )
-
 from desc.transform import Transform
 from desc.utils import (
     ResolutionWarning,
@@ -655,7 +651,9 @@ class Equilibrium(IOAble, Optimizable):
         self._L_lmn = copy_coeffs(self.L_lmn, old_modes_L, self.L_basis.modes)
 
     @execute_on_cpu
-    def get_surface_at(self, rho=None, theta=None, zeta=None) -> FourierRZToroidalSurface|ZernikeRZToroidalSection:
+    def get_surface_at(
+        self, rho=None, theta=None, zeta=None
+    ) -> FourierRZToroidalSurface | ZernikeRZToroidalSection:
         """Return a representation for a given coordinate surface.
 
         Parameters
@@ -677,11 +675,6 @@ class Equilibrium(IOAble, Optimizable):
             ValueError,
             f"Only one coordinate can be specified, got {rho}, {theta}, {zeta}",
         )
-        # errorif(
-        #     rho is None and theta is None and zeta is None,
-        #     ValueError,
-        #     f"At least one of rho, theta, or zeta must be specified.",
-        # )
         errorif(
             theta is not None,
             NotImplementedError,
@@ -767,8 +760,8 @@ class Equilibrium(IOAble, Optimizable):
             return surface
 
     def get_profile(
-            self, name, grid=None, kind="spline", **kwargs
-        )-> SplineProfile|PowerSeriesProfile|FourierZernikeProfile:
+        self, name, grid=None, kind="spline", **kwargs
+    ) -> SplineProfile | PowerSeriesProfile | FourierZernikeProfile:
         """Return a SplineProfile of the desired quantity.
 
         Parameters
@@ -850,7 +843,7 @@ class Equilibrium(IOAble, Optimizable):
         data=None,
         override_grid=True,
         **kwargs,
-    ) -> Dict[str, jaxArray]:
+    ):
         """Compute the quantity given by name on grid.
 
         If ``grid.coordinates!="rtz"`` then this method may take longer to run
@@ -1498,7 +1491,7 @@ class Equilibrium(IOAble, Optimizable):
         return to_sfl(self, L, M, N, L_grid, M_grid, N_grid, rcond, copy)
 
     @property
-    def surface(self) -> FourierRZToroidalSurface|ZernikeRZToroidalSection:
+    def surface(self) -> FourierRZToroidalSurface | ZernikeRZToroidalSection:
         """Surface: Geometric surface defining boundary conditions."""
         return self._surface
 

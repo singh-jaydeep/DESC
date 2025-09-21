@@ -1,9 +1,19 @@
 """Base classes for curves and surfaces."""
 
+from __future__ import annotations
+
 import numbers
 from abc import ABC, abstractmethod
-from typing import Dict
-from jax import Array as jaxArray
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .curve import (  # noqa 401
+        FourierXYZCurve,
+        SplineXYZCurve,
+        FourierRZCurve,
+        FourierPlanarCurve,
+        FourierXYCurve,
+    )
 
 import numpy as np
 
@@ -235,7 +245,7 @@ class Curve(IOAble, Optimizable, ABC):
             New representation of the curve parameterized by Fourier series for X,Y,Z.
 
         """
-        from .curve import FourierXYZCurve
+        from .curve import FourierXYZCurve  # noqa 811
 
         if (grid is None) and (s is not None) and (not isinstance(s, str)):
             grid = LinearGrid(zeta=s)
@@ -277,7 +287,7 @@ class Curve(IOAble, Optimizable, ABC):
             New representation of the curve parameterized by a spline for X,Y,Z.
 
         """
-        from .curve import SplineXYZCurve
+        from .curve import SplineXYZCurve  # noqa 811
 
         if (grid is None) and (knots is not None) and (not isinstance(knots, str)):
             grid = LinearGrid(zeta=knots)
@@ -312,7 +322,7 @@ class Curve(IOAble, Optimizable, ABC):
             New representation of the curve parameterized by Fourier series for R,Z.
 
         """
-        from .curve import FourierRZCurve
+        from .curve import FourierRZCurve  # noqa 811
 
         NFP = 1 or NFP
         if grid is None:
@@ -349,7 +359,7 @@ class Curve(IOAble, Optimizable, ABC):
             vector.
 
         """
-        from .curve import FourierPlanarCurve
+        from .curve import FourierPlanarCurve  # noqa 811
 
         if grid is None:
             grid = LinearGrid(N=2 * N + 1)
@@ -388,7 +398,7 @@ class Curve(IOAble, Optimizable, ABC):
             vector.
 
         """
-        from .curve import FourierXYCurve
+        from .curve import FourierXYCurve  # noqa 811
 
         if (grid is None) and (s is not None) and (not isinstance(s, str)):
             grid = LinearGrid(zeta=s)
@@ -487,7 +497,7 @@ class Surface(IOAble, Optimizable, ABC):
         data=None,
         override_grid=True,
         **kwargs,
-    ) -> Dict[str, jaxArray]:
+    ):
         """Compute the quantity given by name on grid.
 
         Parameters
