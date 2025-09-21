@@ -728,7 +728,7 @@ class Equilibrium(IOAble, Optimizable):
             surface.Z_lmn = Zb
             return surface
 
-        else:
+        if zeta is not None:
             assert (zeta >= 0) and (zeta <= 2 * np.pi)
             surface = ZernikeRZToroidalSection(sym=self.sym, zeta=zeta)
             surface.change_resolution(self.L, self.M)
