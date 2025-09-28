@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 from interpax import CubicHermiteSpline, PPoly
 from orthax.legendre import leggauss
 
-from desc.backend import jnp, rfft2
+from desc.backend import jnp, rfft2, vmap
 from desc.batching import batch_map
 from desc.integrals._bounce_utils import (
     _check_bounce_points,
@@ -24,8 +24,11 @@ from desc.integrals._interp_utils import (
     ifft_non_uniform,
     interp1d_Hermite_vec,
     interp1d_vec,
+    interp_rfft2,
     irfft_non_uniform,
     polyder_vec,
+    polyroot_vec,
+    polyval_vec,
     rfft2_modes,
     rfft2_vander,
 )
@@ -40,7 +43,7 @@ from desc.integrals.quad_utils import (
     uniform,
 )
 from desc.io import IOAble
-from desc.utils import atleast_nd, errorif, flatten_matrix, setdefault
+from desc.utils import atleast_nd, errorif, flatten_matrix, setdefault, take_mask
 
 
 class Bounce(IOAble, ABC):
@@ -964,6 +967,46 @@ class Bounce2D(Bounce):
         kwargs.setdefault("vlabel", r"$\theta$")
         fig, ax = T.plot1d(T.cheb, **_set_default_plot_kwargs(kwargs, l, m))
         return fig, ax
+
+    def interp_to_magnetic_ridge(self, f):
+        """Interpolates f to local maxima along field lines.
+
+        Parameters
+        ----------
+        f : jnp.ndarray
+            Shape (num rho, num zeta, num theta).
+            Real scalar-valued periodic function in (θ, ζ) ∈ [0, 2π) × [0, 2π/NFP)
+            evaluated on the ``grid`` supplied to construct this object.
+            Use the method ``Bounce2D.reshape`` to reshape the data into the
+            expected shape.
+
+        Returns
+        -------
+        f_j : jnp.ndarray
+            Shape (num rho, num alpha, num max).
+            ``f`` interpolated to the deepest point between ``points``.
+
+        """
+        dgdz = polyder_vec(self._c["B(z)"])
+        dgddz = polyder_vec(dgdz)
+        roots = polyroot_vec(
+            c=dgdz,
+            a_min=jnp.array([0.0]),
+            a_max=jnp.diff(self._c["knots"]),
+            sentinel=jnp.inf,
+            sort=True,
+            distinct=True,
+        )
+        signs = polyval_vec(c=dgddz[..., jnp.newaxis, :], x=roots)
+        mask = flatten_matrix((signs <= 0) & (signs > -jnp.inf))
+        roots_loc = flatten_matrix(roots + self._c["knots"][:-1, jnp.newaxis])
+
+        _sentinel = -100000.0
+        zeta_max = take_mask(roots_loc, mask, size=10, fill_value=_sentinel)
+        theta_max = self._c["T(z)"].eval1d(zeta_max)
+        return vmap(interp_rfft2, in_axes=(1, 1, 0), out_axes=-2)(
+            zeta_max, theta_max, f
+        )
 
 
 class Bounce1D(Bounce):
