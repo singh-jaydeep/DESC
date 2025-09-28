@@ -7,11 +7,13 @@ from orthax.legendre import leggauss
 
 from desc.backend import jnp
 from desc.compute import get_profiles, get_transforms
+from desc.compute import get_params, get_profiles, get_transforms
 from desc.compute.utils import _compute as compute_fun
 from desc.grid import LinearGrid
 from desc.integrals._interp_utils import bijection_from_disc, cheb_pts, fourier_pts
 from desc.utils import parse_argname_change, setdefault, warnif
 
+from ..integrals.bounce_integral import Bounce2D
 from ..integrals.quad_utils import chebgauss2
 from .objective_funs import _Objective, collect_docs
 from .utils import _parse_callable_target_bounds
@@ -424,3 +426,179 @@ def _vander_dft_cfl(x, grid):
 
 def _vander_dct_cfl(x, Y):
     return jnp.cos(jnp.arange(Y) * jnp.arccos(x)[:, jnp.newaxis])
+
+
+class Isoprominence(_Objective):
+    """Normalized isoprominence error.
+
+    On a flux surface, promotes a flat magnetic ridge
+    (points satisfying (B dot nabla) |B| = 0).
+    Computes the average value of 1/|B| partial_alpha |B|
+    restricted to this submanifold.
+
+    Parameters
+    ----------
+    eq : Equilibrium
+        Equilibrium that will be optimized to satisfy the Objective.
+    grid : Grid
+        Tensor-product grid in (ρ, θ, ζ) with uniformly spaced nodes
+        (θ, ζ) ∈ [0, 2π) × [0, 2π/NFP).
+        Default grid samples the boundary surface at ρ=1.
+    X : int
+        Poloidal Fourier grid resolution to interpolate the poloidal coordinate.
+        Preferably rounded down to power of 2.
+    Y : int
+        Toroidal Chebyshev grid resolution to interpolate the poloidal coordinate.
+        Preferably rounded down to power of 2.
+    Y_M : int
+        Desired resolution for algorithm to compute maxima.
+        Default is double ``Y``. Something like 100 is usually sufficient.
+    alpha : np.ndarray
+        Shape (num alpha, ).
+        Starting field line poloidal labels.
+        Default is single field line.
+    num_transit : int
+        Number of toroidal transits to follow field line.
+    num_max : int
+        Number of maxima to locate on each fieldline.
+    """
+
+    __doc__ = __doc__.rstrip() + collect_docs(
+        target_default="``target=0``.", bounds_default="``target=0``."
+    )
+
+    _units = "~"
+    _print_value_fmt = "Average Isoprominence error: "
+    _static_attrs = _Objective._static_attrs + ["_hyperparam"]
+
+    def __init__(
+        self,
+        eq,
+        target=None,
+        bounds=None,
+        weight=1,
+        normalize=True,
+        normalize_target=True,
+        loss_function=None,
+        deriv_mode="auto",
+        jac_chunk_size=None,
+        name="Isoprominence",
+        grid=None,
+        X=32,
+        Y=64,
+        Y_M=None,
+        alpha=np.array([0.0]),
+        num_transit=20,
+        num_max=None,
+    ):
+        if target is None and bounds is None:
+            target = 0.0
+
+        self._grid = grid
+        self._constants = {
+            "alpha": alpha,
+            "X": fourier_pts(X),
+            "Y": cheb_pts(Y, (0, 2 * np.pi))[::-1],
+        }
+        Y_M = setdefault(Y_M, 2 * Y)
+        self._hyperparam = {
+            "Y_M": Y_M,
+            "num_transit": num_transit,
+            "num_well": setdefault(num_max, Y_M * num_transit),
+        }
+        super().__init__(
+            things=eq,
+            target=target,
+            bounds=bounds,
+            weight=weight,
+            normalize=normalize,
+            normalize_target=normalize_target,
+            loss_function=loss_function,
+            deriv_mode=deriv_mode,
+            name=name,
+            jac_chunk_size=jac_chunk_size,
+        )
+
+    def build(self, use_jit=True, verbose=1):
+        """Build constant arrays.
+
+        Parameters
+        ----------
+        use_jit : bool, optional
+            Whether to just-in-time compile the objective and derivatives.
+        verbose : int, optional
+            Level of output.
+
+        """
+        eq = self.things[0]
+        if self._grid is None:
+            self._grid = LinearGrid(M=eq.M_grid, N=eq.N_grid, NFP=eq.NFP, sym=False)
+        assert self._grid.can_fft2
+
+        rho = self._grid.compress(self._grid.nodes[:, 0])
+
+        timer = Timer()
+        if verbose > 0:
+            print("Precomputing transforms")
+        timer.start("Precomputing transforms")
+        self._constants["profiles"] = get_profiles("isoprominence", eq, grid=self._grid)
+        self._constants["transforms"] = get_transforms(
+            "isoprominence", eq, grid=self._grid
+        )
+        timer.stop("Precomputing transforms")
+        if verbose > 1:
+            timer.disp("Precomputing transforms")
+
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", "Unequal number of field periods")
+            self._constants["lambda"] = get_transforms(
+                "lambda",
+                eq,
+                grid=LinearGrid(rho=rho, M=eq.L_basis.M, zeta=self._constants["Y"]),
+            )["L"]
+        assert self._constants["lambda"].basis.NFP == eq.NFP
+
+        self._dim_f = self._grid.num_rho
+        self._target, self._bounds = _parse_callable_target_bounds(
+            self._target, self._bounds, rho
+        )
+        super().build(use_jit=use_jit, verbose=verbose)
+
+    def compute(self, params, constants=None):
+        """Compute the isoprominence.
+
+        Parameters
+        ----------
+        params : dict
+            Dictionary of equilibrium degrees of freedom, e.g.
+            ``Equilibrium.params_dict``.
+        constants : dict
+            Dictionary of constant data, e.g. transforms, profiles etc.
+            Defaults to ``self.constants``.
+
+        Returns
+        -------
+        f : ndarray
+            Average isoprominence error as a function of the flux surface label.
+
+        """
+        eq = self.things[0]
+        grid = self._grid
+        if constants is None:
+            constants = self.constants
+        if params is None:
+            params = get_params("isoprominence", eq)
+        rho_grid = grid.compress(grid.nodes, "rho")[:, 0]
+        theta = Bounce2D.compute_theta(eq, rho=rho_grid)
+
+        data = compute_fun(
+            eq,
+            "isoprominence",
+            params,
+            constants["transforms"],
+            constants["profiles"],
+            theta=theta,
+            alpha=constants["alpha"],
+            **self._hyperparam,
+        )
+        return data["isoprominence"]

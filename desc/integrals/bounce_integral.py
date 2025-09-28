@@ -21,6 +21,9 @@ from desc.integrals._bounce_utils import (
     fast_chebyshev,
     fast_cubic_spline,
     fourier_chebyshev,
+    interp_fft_to_argmin,
+    interp_fft_to_magnetic_ridge,
+    interp_to_argmin,
     get_extrema,
     plot_ppoly,
 )
@@ -35,6 +38,8 @@ from desc.integrals._interp_utils import (
     irfft_mmt,
     nufft2d2r,
     polyder_vec,
+    polyroot_vec,
+    polyval_vec,
     rfft2_modes,
     rfft2_vander,
 )
@@ -50,6 +55,7 @@ from desc.integrals.quad_utils import (
 )
 from desc.io import IOAble
 from desc.utils import apply, atleast_nd, errorif, flatten_mat, setdefault
+from desc.utils import atleast_nd, errorif, flatten_matrix, setdefault, take_mask
 
 
 class Bounce(IOAble, ABC):
@@ -995,6 +1001,48 @@ class Bounce2D(Bounce):
         )
         kwargs.setdefault("vlabel", r"$\theta$")
         return T.plot1d(T.cheb, **_set_default_plot_kwargs(kwargs, l, m))
+
+    def interp_to_magnetic_ridge(self, f, num_max=None, *, is_fourier=False):
+        """Interpolates f to local maxima along field lines.
+
+        Parameters
+        ----------
+        f : jnp.ndarray
+            Shape (num rho, num zeta, num theta).
+            Real scalar-valued periodic function in (θ, ζ) ∈ [0, 2π) × [0, 2π/NFP)
+            evaluated on the ``grid`` supplied to construct this object.
+            Use the method ``Bounce2D.reshape`` to reshape the data into the
+            expected shape.
+        num_max: int
+            Number of maxima to identify along each magnetic field line.
+        is_fourier : bool
+            If true, then it is assumed that ``f`` is the Fourier transforms
+            as returned by ``Bounce2D.fourier``. Default is false.
+
+        Returns
+        -------
+        f_j : jnp.ndarray
+            Shape (num rho, num alpha, num max).
+            ``f`` interpolated to the local maxima of |B|.
+
+        """
+        errorif(
+            isinstance(self._c["B(z)"], PiecewiseChebyshevSeries),
+            NotImplementedError,
+            msg="Set spline to true until implemented.",
+        )
+        return _swap_shape(
+            interp_fft_to_magnetic_ridge(
+                self._c["T(z)"],
+                f if is_fourier else Bounce2D.fourier(f),
+                self._c["knots"],
+                polyder_vec(self._c["B(z)"]),
+                m=self._m,
+                n=self._n,
+                size=num_max,
+                NFP=self._NFP,
+            )
+        )
 
 
 class Bounce1D(Bounce):

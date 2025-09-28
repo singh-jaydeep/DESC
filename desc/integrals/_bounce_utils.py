@@ -14,6 +14,7 @@ from desc.integrals._interp_utils import (
     nufft1d2r,
     polyroot_vec,
     polyval_vec,
+    quadroot_vec,
 )
 from desc.integrals.basis import (
     FourierChebyshevSeries,
@@ -467,6 +468,87 @@ def argmin(z1, z2, f, ext, g_ext):
     return jnp.take_along_axis(f[..., None, None, :], where, axis=-1).squeeze(-1)
 
 
+def interp_fft_to_magnetic_ridge(T, h, knots, dg_dz, m, n, size=None, NFP=1):
+    """Interpolate ``h`` to the local maxima of ``g``.
+
+    Parameters
+    ----------
+    T : PiecewiseChebyshevSeries
+        Set of 1D Chebyshev spectral coefficients of θ on field lines.
+        {θ_αᵢⱼ : ζ ↦ θ(αᵢⱼ, ζ) | αᵢⱼ ∈ Aᵢ} where Aᵢ = (αᵢ₀, αᵢ₁, ..., αᵢ₍ₘ₋₁₎)
+        enumerates field line ``alpha[i]``. Each Chebyshev series approximates
+        θ over one toroidal transit.
+        Assumed that T.domain = (0, 2*jnp.pi)
+    h : jnp.ndarray
+        Shape (..., 1, num zeta, num theta // 2 + 1)
+        Fourier coefficients as returned by ``Bounce2D.fourier``.
+    knots : jnp.ndarray
+        Shape (knots.size, ).
+        z coordinates of spline knots. Must be strictly increasing.
+    dg_dz : jnp.ndarray
+        Shape (..., knots.size - 1, g.shape[-1] - 1).
+        Polynomial coefficients of the spline of ∂g/∂z in local power basis.
+        Last axis enumerates the coefficients of power series. Second to
+        last axis enumerates the polynomials that compose a particular spline.
+    m : int
+        Fourier resolution in poloidal direction; num theta.
+    n : int
+        Fourier resolution in toroidal direction; num zeta.
+    size : int
+
+    NFP : int
+        Number of field periods.
+
+    Returns
+    -------
+    f : jnp.ndarray
+        Shape (..., size) if size is not None. Otherwise, defaults to
+        shape (...,knots.size-1).
+
+    """
+    _sent = -1.0
+    _tol = 1e-9
+    roots = quadroot_vec(
+        c=dg_dz,
+        a_min=jnp.array([0.0]),
+        a_max=jnp.diff(knots),
+        sort=True,
+        sentinel=jnp.float32(_sent),
+        distinct=True,
+    )
+
+    dg_dz2 = polyder_vec(dg_dz)
+    signs = polyval_vec(c=dg_dz2[..., jnp.newaxis, :], x=roots)
+
+    root_mask = flatten_matrix((signs < 0) & (jnp.abs(roots - _sent) > _tol))
+    roots_loc = flatten_matrix(roots + knots[:-1, jnp.newaxis])
+    # roots_loc shape is (...,..., 2*(knots-1))
+
+    zeta_max = take_mask(roots_loc, root_mask, size=size, fill_value=_sent)
+
+    # A record of the entries mapped to _sent
+    zeta_mask = jnp.abs(zeta_max - _sent) > _tol
+    zeta_max = jnp.where(zeta_mask, zeta_max, 0.0)
+
+    # Enforce separation between zeta_max and endpoints of T.domain
+    zeta_idx, zeta_remainder = jnp.divmod(zeta_max, T.domain[1])
+    zeta_remainder = jnp.where(jnp.abs(zeta_remainder) < _tol, _tol, zeta_remainder)
+    zeta_remainder = jnp.where(
+        jnp.abs(zeta_remainder - T.domain[1]) < _tol, T.domain[1] - _tol, zeta_remainder
+    )
+    zeta_max = jnp.multiply(T.domain[1], zeta_idx) + zeta_remainder
+
+    theta_max = T.eval1d(zeta_max)
+
+    # zeta_max, theta_max shapes are (..., ..., size)
+    f = _irfft2_non_uniform(
+        zeta_max, theta_max, h, n0=n, n1=m, domain0=(0, 2 * jnp.pi / NFP)
+    )
+    f = jnp.where(zeta_mask, f, jnp.nan)
+    return f
+
+
+# TODO (#568): Generalize this beyond ζ = ϕ
 def get_fieldline(alpha, iota, num_transit):
     """Get set of field line poloidal coordinates {Aᵢ | Aᵢ = (αᵢ₀, αᵢ₁, ..., αᵢ₍ₘ₋₁₎)}.
 
