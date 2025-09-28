@@ -433,54 +433,6 @@ def _get_extrema(knots, g, dg_dz, sentinel=jnp.nan):
     return ext, g_ext
 
 
-def _get_maxima(knots, g, dg_dz, dg_ddz, sentinel=jnp.nan):
-    """Return local maxima (z*, g(z*)).
-
-    Parameters
-    ----------
-    knots : jnp.ndarray
-        Shape (N, ).
-        ζ coordinates of spline knots. Must be strictly increasing.
-    g : jnp.ndarray
-        Shape (..., N - 1, g.shape[-1]).
-        Polynomial coefficients of the spline of g in local power basis.
-        Last axis enumerates the coefficients of power series. Second to
-        last axis enumerates the polynomials that compose a particular spline.
-    dg_dz : jnp.ndarray
-        Shape (..., N - 1, g.shape[-1] - 1).
-        Polynomial coefficients of the spline of ∂g/∂z in local power basis.
-        Last axis enumerates the coefficients of power series. Second to
-        last axis enumerates the polynomials that compose a particular spline.
-    dg_ddz : jnp.ndarray
-        Shape (..., N - 1, g.shape[-1] - 2).
-        Polynomial coefficients of the spline of ∂^2g/∂z^2 in local power basis.
-        Last axis enumerates the coefficients of power series. Second to
-        last axis enumerates the polynomials that compose a particular spline.
-    sentinel : float
-        Value with which to pad array to return fixed shape.
-
-    Returns
-    -------
-    ext, g_ext : jnp.ndarray
-        Shape (..., (N - 1) * (g.shape[-1] - 2)).
-        First array enumerates z*. Second array enumerates g(z*)
-        Sorting order of extrema is arbitrary.
-
-    """
-    ext = polyroot_vec(
-        c=dg_dz, a_min=jnp.array([0.0]), a_max=jnp.diff(knots), sentinel=sentinel
-    )
-    signs = polyval_vec(c=dg_ddz[..., jnp.newaxis], x=ext)
-    ext = jnp.where(signs[..., :] <= 0, ext[:], jnp.inf)
-
-    g_ext = flatten_matrix(polyval_vec(x=ext, c=g[..., jnp.newaxis, :]))
-    # Transform out of local power basis expansion.
-    ext = flatten_matrix(ext + knots[:-1, jnp.newaxis])
-    assert ext.shape == g_ext.shape
-    assert ext.shape[-1] == g.shape[-2] * (g.shape[-1] - 2)
-    return ext, g_ext
-
-
 # We can use the non-differentiable argmin because we actually want the gradients
 # to accumulate through only the minimum since we are differentiating how our
 # physics objective changes wrt equilibrium perturbations not wrt which of the
