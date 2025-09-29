@@ -13,6 +13,7 @@ from desc.integrals._interp_utils import (
     ifft_non_uniform,
     interp1d_vec,
     irfft_non_uniform,
+    polyder_vec,
     polyroot_vec,
     polyval_vec,
 )
@@ -575,6 +576,69 @@ def interp_fft_to_argmin(T, h, points, knots, g, dg_dz, m, n, NFP=1):
         h = h[jnp.newaxis]  # to broadcast with num pitch axis
     # add axis to broadcast with num well axis
     return jnp.take_along_axis(h[..., jnp.newaxis, :], where, axis=-1).squeeze(axis=-1)
+
+
+def interp_fft_to_magnetic_ridge(T, h, knots, dg_dz, m, n, size=None, NFP=1):
+    """Interpolate ``h`` to the local maxima of ``g``.
+
+    Parameters
+    ----------
+    T : PiecewiseChebyshevSeries
+        Set of 1D Chebyshev spectral coefficients of θ on field lines.
+        {θ_αᵢⱼ : ζ ↦ θ(αᵢⱼ, ζ) | αᵢⱼ ∈ Aᵢ} where Aᵢ = (αᵢ₀, αᵢ₁, ..., αᵢ₍ₘ₋₁₎)
+        enumerates field line ``alpha[i]``. Each Chebyshev series approximates
+        θ over one toroidal transit.
+    h : jnp.ndarray
+        Shape (..., 1, num zeta, num theta // 2 + 1)
+        Fourier coefficients as returned by ``Bounce2D.fourier``.
+    knots : jnp.ndarray
+        Shape (knots.size, ).
+        z coordinates of spline knots. Must be strictly increasing.
+    dg_dz : jnp.ndarray
+        Shape (..., knots.size - 1, g.shape[-1] - 1).
+        Polynomial coefficients of the spline of ∂g/∂z in local power basis.
+        Last axis enumerates the coefficients of power series. Second to
+        last axis enumerates the polynomials that compose a particular spline.
+    m : int
+        Fourier resolution in poloidal direction; num theta.
+    n : int
+        Fourier resolution in toroidal direction; num zeta.
+    size : int
+
+    NFP : int
+        Number of field periods.
+
+    Returns
+    -------
+    h : jnp.ndarray
+        Shape (..., size) if size is not None. Otherwise, defaults to
+        shape (...,knots.size-1).
+
+    """
+    roots = polyroot_vec(
+        c=dg_dz,
+        a_min=jnp.array([0.0]),
+        a_max=jnp.diff(knots),
+        sentinel=jnp.inf,
+        sort=True,
+        distinct=True,
+    )
+    # roots shape is (..., ..., knots-1, 2)
+
+    dg_dz2 = polyder_vec(dg_dz)
+    signs = polyval_vec(c=dg_dz2[..., jnp.newaxis, :], x=roots)
+    mask = flatten_matrix((signs <= 0) & (signs > -jnp.inf))
+
+    roots_loc = flatten_matrix(roots + knots[:-1, jnp.newaxis])
+    # roots_loc shape is (...,..., 2*(knots-1))
+
+    zeta_max = take_mask(roots_loc, mask, size=size, fill_value=_sentinel)
+    theta_max = T.eval1d(zeta_max)
+    # zeta_max, theta_max shapes are (..., ..., size)
+
+    return _irfft2_non_uniform(
+        zeta_max, theta_max, h, n0=n, n1=m, domain0=(0, 2 * jnp.pi / NFP)
+    )
 
 
 # TODO (#568): Generalize this beyond ζ = ϕ

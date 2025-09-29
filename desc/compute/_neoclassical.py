@@ -332,11 +332,14 @@ def _isoprom(params, transforms, profiles, data, **kwargs):
     Y_M = kwargs.get("Y_M", theta.shape[-1] * 2)
     alpha = kwargs.get("alpha", jnp.array([0.0]))
     num_transit = kwargs.get("num_transit", 20)
+    num_max = kwargs.get("num_max", Y_M * num_transit)
     grid = transforms["grid"]
 
     err = data["|B|_a"] / data["|B|"]
     err = Bounce2D.reshape(grid, err)
     bounce_obj = Bounce2D(grid, data, theta, Y_M, alpha, num_transit, is_fourier=False)
-    err = bounce_obj.interp_to_magnetic_ridge(err)
+
+    err = bounce_obj.interp_to_magnetic_ridge(err, num_max=num_max)
+    err = err.reshape((err.shape[0], -1))
     data["isoprominence"] = jnp.nanmean(err, axis=-1)
     return data

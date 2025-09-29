@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 from interpax import CubicHermiteSpline, PPoly
 from orthax.legendre import leggauss
 
-from desc.backend import jnp, rfft2, vmap
+from desc.backend import jnp, rfft2
 from desc.batching import batch_map
 from desc.integrals._bounce_utils import (
     _check_bounce_points,
@@ -16,6 +16,7 @@ from desc.integrals._bounce_utils import (
     cubic_spline,
     fourier_chebyshev,
     interp_fft_to_argmin,
+    interp_fft_to_magnetic_ridge,
     interp_to_argmin,
     plot_ppoly,
 )
@@ -24,11 +25,8 @@ from desc.integrals._interp_utils import (
     ifft_non_uniform,
     interp1d_Hermite_vec,
     interp1d_vec,
-    interp_rfft2,
     irfft_non_uniform,
     polyder_vec,
-    polyroot_vec,
-    polyval_vec,
     rfft2_modes,
     rfft2_vander,
 )
@@ -43,7 +41,7 @@ from desc.integrals.quad_utils import (
     uniform,
 )
 from desc.io import IOAble
-from desc.utils import atleast_nd, errorif, flatten_matrix, setdefault, take_mask
+from desc.utils import atleast_nd, errorif, flatten_matrix, setdefault
 
 
 class Bounce(IOAble, ABC):
@@ -968,7 +966,7 @@ class Bounce2D(Bounce):
         fig, ax = T.plot1d(T.cheb, **_set_default_plot_kwargs(kwargs, l, m))
         return fig, ax
 
-    def interp_to_magnetic_ridge(self, f):
+    def interp_to_magnetic_ridge(self, f, num_max=None, *, is_fourier=False):
         """Interpolates f to local maxima along field lines.
 
         Parameters
@@ -979,33 +977,28 @@ class Bounce2D(Bounce):
             evaluated on the ``grid`` supplied to construct this object.
             Use the method ``Bounce2D.reshape`` to reshape the data into the
             expected shape.
+        is_fourier : bool
+            If true, then it is assumed that ``f`` is the Fourier transforms
+            as returned by ``Bounce2D.fourier``. Default is false.
 
         Returns
         -------
         f_j : jnp.ndarray
             Shape (num rho, num alpha, num max).
-            ``f`` interpolated to the deepest point between ``points``.
+            ``f`` interpolated to the local maxima of |B|.
 
         """
-        dgdz = polyder_vec(self._c["B(z)"])
-        dgddz = polyder_vec(dgdz)
-        roots = polyroot_vec(
-            c=dgdz,
-            a_min=jnp.array([0.0]),
-            a_max=jnp.diff(self._c["knots"]),
-            sentinel=jnp.inf,
-            sort=True,
-            distinct=True,
-        )
-        signs = polyval_vec(c=dgddz[..., jnp.newaxis, :], x=roots)
-        mask = flatten_matrix((signs <= 0) & (signs > -jnp.inf))
-        roots_loc = flatten_matrix(roots + self._c["knots"][:-1, jnp.newaxis])
-
-        _sentinel = -100000.0
-        zeta_max = take_mask(roots_loc, mask, size=10, fill_value=_sentinel)
-        theta_max = self._c["T(z)"].eval1d(zeta_max)
-        return vmap(interp_rfft2, in_axes=(1, 1, 0), out_axes=-2)(
-            zeta_max, theta_max, f
+        return _swap_shape(
+            interp_fft_to_magnetic_ridge(
+                self._c["T(z)"],
+                f if is_fourier else Bounce2D.fourier(f),
+                self._c["knots"],
+                polyder_vec(self._c["B(z)"]),
+                m=self._m,
+                n=self._n,
+                size=num_max,
+                NFP=self._NFP,
+            )
         )
 
 

@@ -380,9 +380,10 @@ class EffectiveRipple(_Objective):
 class Isoprominence(_Objective):
     """Normalized isoprominence error.
 
-    On a flux surface, this function computes
-    the average value of 1/|B| partial_alpha |B| restricted to points satisfying
-    (B dot nabla) |B| = 0, i.e. the magnetic ridge.
+    On a flux surface, promotes a flat magnetic ridge
+    (points satisfying (B dot nabla) |B| = 0).
+    Computes the average value of 1/|B| partial_alpha |B|
+    restricted to this submanifold.
 
     Parameters
     ----------
@@ -407,6 +408,8 @@ class Isoprominence(_Objective):
         Default is single field line.
     num_transit : int
         Number of toroidal transits to follow field line.
+    num_max : int
+        Number of maxima to locate on each fieldline.
     """
 
     __doc__ = __doc__.rstrip() + collect_docs(
@@ -435,6 +438,7 @@ class Isoprominence(_Objective):
         Y_M=None,
         alpha=np.array([0.0]),
         num_transit=20,
+        num_max=None,
     ):
         if target is None and bounds is None:
             target = 0.0
@@ -446,7 +450,11 @@ class Isoprominence(_Objective):
             "Y": cheb_pts(Y, (0, 2 * np.pi))[::-1],
         }
         Y_M = setdefault(Y_M, 2 * Y)
-        self._hyperparam = {"Y_M": Y_M, "num_transit": num_transit}
+        self._hyperparam = {
+            "Y_M": Y_M,
+            "num_transit": num_transit,
+            "num_well": setdefault(num_max, Y_M * num_transit),
+        }
         super().__init__(
             things=eq,
             target=target,
@@ -517,11 +525,13 @@ class Isoprominence(_Objective):
 
         """
         eq = self.things[0]
+        grid = self._grid
         if constants is None:
             constants = self.constants
         if params is None:
             params = get_params("isoprominence", eq)
-        theta = Bounce2D.compute_theta(eq)
+        rho_grid = grid.compress(grid.nodes, "rho")[:, 0]
+        theta = Bounce2D.compute_theta(eq, rho=rho_grid)
 
         data = compute_fun(
             eq,
