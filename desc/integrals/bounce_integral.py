@@ -977,6 +977,8 @@ class Bounce2D(Bounce):
             evaluated on the ``grid`` supplied to construct this object.
             Use the method ``Bounce2D.reshape`` to reshape the data into the
             expected shape.
+        num_max: int
+            Number of maxima to identify along each magnetic field line.
         is_fourier : bool
             If true, then it is assumed that ``f`` is the Fourier transforms
             as returned by ``Bounce2D.fourier``. Default is false.
@@ -988,6 +990,11 @@ class Bounce2D(Bounce):
             ``f`` interpolated to the local maxima of |B|.
 
         """
+        errorif(
+            isinstance(self._c["B(z)"], PiecewiseChebyshevSeries),
+            NotImplementedError,
+            msg="Set spline to true until implemented.",
+        )
         return _swap_shape(
             interp_fft_to_magnetic_ridge(
                 self._c["T(z)"],

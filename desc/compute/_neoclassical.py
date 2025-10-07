@@ -307,6 +307,7 @@ def _effective_ripple(params, transforms, profiles, data, **kwargs):
 @register_compute_fun(
     name="isoprominence",
     label=(
+        "f_{isoprom} = "
         "\\frac{1}{N_{max}}\\sum_{i=1}^{N_{max}}"
         "\\frac{|\\partial_{\\alpha}|B| |}{|B|}\\Big|_{\\zeta_i} "
     ),
@@ -324,7 +325,7 @@ def _effective_ripple(params, transforms, profiles, data, **kwargs):
 )
 @partial(
     jit,
-    static_argnames=["Y_M", "num_transit"],
+    static_argnames=["Y_M", "num_transit", "num_max"],
 )
 def _isoprom(params, transforms, profiles, data, **kwargs):
     """Computes average isoprominence error."""
@@ -337,8 +338,8 @@ def _isoprom(params, transforms, profiles, data, **kwargs):
 
     err = data["|B|_a"] / data["|B|"]
     err = Bounce2D.reshape(grid, err)
-    bounce_obj = Bounce2D(grid, data, theta, Y_M, alpha, num_transit, is_fourier=False)
 
+    bounce_obj = Bounce2D(grid, data, theta, Y_M, alpha, num_transit, is_fourier=False)
     err = bounce_obj.interp_to_magnetic_ridge(err, num_max=num_max)
     err = err.reshape((err.shape[0], -1))
     data["isoprominence"] = jnp.nanmean(err, axis=-1)

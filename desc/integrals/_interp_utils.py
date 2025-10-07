@@ -13,7 +13,7 @@ import numpy as np
 from interpax import interp1d
 from orthax.chebyshev import chebroots
 
-from desc.backend import dct, jnp, rfft, rfft2, take
+from desc.backend import custom_jvp, dct, jnp, rfft, rfft2, sign, take
 from desc.integrals.quad_utils import bijection_from_disc
 from desc.utils import Index, errorif, safediv
 
@@ -695,6 +695,98 @@ def polyroot_vec(
     return r
 
 
+@partial(custom_jvp, nondiff_argnums=(4, 7))
+def quadroot_vec(
+    c,
+    k=0.0,
+    a_min=-1.0,
+    a_max=1.0,
+    sort=False,
+    sentinel=-1.0,
+    eps=1e-9,
+    distinct=False,
+):
+    """Real roots of quadatic polynomials with given coefficients.
+
+    Wrapper for polyroot_vec in the case of quadratic polynomials,
+    for use with jax.custom_jvp.
+
+    Parameters
+    ----------
+    c : jnp.ndarray
+        Last axis should store coefficients of a polynomial. For a polynomial given by
+        ∑ᵢ^2 cᵢ xⁱ, where n=2=``c.shape[-1]-1``, coefficient cᵢ should be stored at
+        ``c[...,2-i]``.
+    k : jnp.ndarray
+        Shape (..., *c.shape[:-1]).
+        Specify to find solutions to ∑ᵢ^2 cᵢ xⁱ = ``k``.
+    a_min : jnp.ndarray
+        Shape (..., *c.shape[:-1]).
+        Minimum ``a_min`` and maximum ``a_max`` value to return roots between.
+        If specified only real roots are returned, otherwise returns all complex roots.
+    a_max : jnp.ndarray
+        Shape (..., *c.shape[:-1]).
+        Minimum ``a_min`` and maximum ``a_max`` value to return roots between.
+        If specified only real roots are returned, otherwise returns all complex roots.
+    sort : bool
+        Whether to sort the roots.
+    sentinel : float
+        Value with which to pad array in place of filtered elements.
+        Anything less than ``a_min`` or greater than ``a_max`` plus some floating point
+        error buffer will work just like nan while avoiding ``nan`` gradient.
+    eps : float
+        Absolute tolerance with which to consider value as zero.
+    distinct : bool
+        Whether to only return the distinct roots. If true, when the multiplicity is
+        greater than one, the repeated roots are set to ``sentinel``.
+
+    Returns
+    -------
+    r : jnp.ndarray
+        Shape (..., *c.shape[:-1], 2).
+        The roots of the polynomial, iterated over the last axis.
+
+    """
+    return polyroot_vec(c, k, a_min, a_max, sort, sentinel, eps, distinct)
+
+
+@quadroot_vec.defjvp
+def quadroot_vec_jvp(sort, distinct, primals, tangents):
+    """Custom jvp for quadroot_vec.
+
+    Given coefficients c (N,1;1,3) of the quadratic polynomials,
+    roots r(c) (N,2;1,1), and tangents dc (N,1;1,3), compute [r(c)**2 r(c) 1]
+    (N,2;1,3). [In this notation, the indices before semicolon are for
+    broadcasting. Transposes and matrix multiplication
+    apply  to indices after the semicolon.] Then
+    c[r(c)**2 r(c) 1]^T = k = (N,2;1). Differentiate to get
+    dc[r(c)**2 r(c) 1]^T +  c[2r(c) 1  0]^T dr  = 0, where
+    dr (N,2;1,1) and [2r(c) 1  0]^T (N,2;3,1). Then
+    dr = (-[r(c)**2 r(c) 1] dc^T)/( c[2r(c) 1  0]^T ).
+    The denominator is just the derivative of the polynomial
+    evaluated at the roots.
+    """
+    _tol = 1e-9
+    (c, k, a_min, a_max, sentinel, eps) = primals
+    dc = tangents[0]
+
+    roots = quadroot_vec(c, k, a_min, a_max, sort, sentinel, eps, distinct)
+
+    mask = jnp.abs(roots - sentinel) > _tol
+
+    num = jnp.stack([-(roots**2), -roots, -(roots**0)], axis=-1)
+    num = jnp.where(mask[..., jnp.newaxis], num, 0.0)
+
+    dc_dz = polyder_vec(c)
+    den = polyval_vec(c=dc_dz[..., jnp.newaxis, :], x=roots)
+    den = den[..., jnp.newaxis]
+
+    J = safediv(num, den, fill=0)
+
+    droots = jnp.squeeze(J @ dc[..., jnp.newaxis], axis=-1)
+    return roots, droots
+
+
 def _root_cubic(C, sentinel, eps, distinct):
     """Return real cubic root assuming real coefficients."""
     # numerical.recipes/book.html, page 228
@@ -763,7 +855,7 @@ def _root_quadratic(C, sentinel, eps, distinct):
     c = C[..., 2]
 
     discriminant = b**2 - 4 * a * c
-    q = -0.5 * (b + jnp.sign(b) * jnp.sqrt(jnp.abs(discriminant)))
+    q = -0.5 * (b + sign(b) * jnp.sqrt(jnp.abs(discriminant)))
     r1 = jnp.where(
         discriminant < 0,
         sentinel,

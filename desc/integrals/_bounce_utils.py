@@ -16,6 +16,7 @@ from desc.integrals._interp_utils import (
     polyder_vec,
     polyroot_vec,
     polyval_vec,
+    quadroot_vec,
 )
 from desc.integrals.basis import (
     FourierChebyshevSeries,
@@ -588,6 +589,7 @@ def interp_fft_to_magnetic_ridge(T, h, knots, dg_dz, m, n, size=None, NFP=1):
         {θ_αᵢⱼ : ζ ↦ θ(αᵢⱼ, ζ) | αᵢⱼ ∈ Aᵢ} where Aᵢ = (αᵢ₀, αᵢ₁, ..., αᵢ₍ₘ₋₁₎)
         enumerates field line ``alpha[i]``. Each Chebyshev series approximates
         θ over one toroidal transit.
+        Assumed that T.domain = (0, 2*jnp.pi)
     h : jnp.ndarray
         Shape (..., 1, num zeta, num theta // 2 + 1)
         Fourier coefficients as returned by ``Bounce2D.fourier``.
@@ -610,35 +612,51 @@ def interp_fft_to_magnetic_ridge(T, h, knots, dg_dz, m, n, size=None, NFP=1):
 
     Returns
     -------
-    h : jnp.ndarray
+    f : jnp.ndarray
         Shape (..., size) if size is not None. Otherwise, defaults to
         shape (...,knots.size-1).
 
     """
-    roots = polyroot_vec(
+    _sent = -1.0
+    _tol = 1e-9
+    roots = quadroot_vec(
         c=dg_dz,
         a_min=jnp.array([0.0]),
         a_max=jnp.diff(knots),
-        sentinel=jnp.inf,
         sort=True,
+        sentinel=jnp.float32(_sent),
         distinct=True,
     )
-    # roots shape is (..., ..., knots-1, 2)
 
     dg_dz2 = polyder_vec(dg_dz)
     signs = polyval_vec(c=dg_dz2[..., jnp.newaxis, :], x=roots)
-    mask = flatten_matrix((signs <= 0) & (signs > -jnp.inf))
 
+    root_mask = flatten_matrix((signs < 0) & (jnp.abs(roots - _sent) > _tol))
     roots_loc = flatten_matrix(roots + knots[:-1, jnp.newaxis])
     # roots_loc shape is (...,..., 2*(knots-1))
 
-    zeta_max = take_mask(roots_loc, mask, size=size, fill_value=_sentinel)
-    theta_max = T.eval1d(zeta_max)
-    # zeta_max, theta_max shapes are (..., ..., size)
+    zeta_max = take_mask(roots_loc, root_mask, size=size, fill_value=_sent)
 
-    return _irfft2_non_uniform(
+    # A record of the entries mapped to _sent
+    zeta_mask = jnp.abs(zeta_max - _sent) > _tol
+    zeta_max = jnp.where(zeta_mask, zeta_max, 0.0)
+
+    # Enforce separation between zeta_max and endpoints of T.domain
+    zeta_idx, zeta_remainder = jnp.divmod(zeta_max, T.domain[1])
+    zeta_remainder = jnp.where(jnp.abs(zeta_remainder) < _tol, _tol, zeta_remainder)
+    zeta_remainder = jnp.where(
+        jnp.abs(zeta_remainder - T.domain[1]) < _tol, T.domain[1] - _tol, zeta_remainder
+    )
+    zeta_max = jnp.multiply(T.domain[1], zeta_idx) + zeta_remainder
+
+    theta_max = T.eval1d(zeta_max)
+
+    # zeta_max, theta_max shapes are (..., ..., size)
+    f = _irfft2_non_uniform(
         zeta_max, theta_max, h, n0=n, n1=m, domain0=(0, 2 * jnp.pi / NFP)
     )
+    f = jnp.where(zeta_mask, f, jnp.nan)
+    return f
 
 
 # TODO (#568): Generalize this beyond ζ = ϕ

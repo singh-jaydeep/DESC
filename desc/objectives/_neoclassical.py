@@ -9,7 +9,7 @@ from desc.compute import get_params, get_profiles, get_transforms
 from desc.compute.utils import _compute as compute_fun
 from desc.grid import LinearGrid
 from desc.integrals._interp_utils import cheb_pts, fourier_pts
-from desc.utils import setdefault
+from desc.utils import Timer, setdefault
 
 from ..integrals.bounce_integral import Bounce2D
 from ..integrals.quad_utils import chebgauss2
@@ -426,15 +426,15 @@ class Isoprominence(_Objective):
         target=None,
         bounds=None,
         weight=1,
-        normalize=True,
+        normalize=True,  # what is this doing?
         normalize_target=True,
         loss_function=None,
-        deriv_mode="auto",
-        jac_chunk_size=None,
+        deriv_mode="auto",  # same
+        jac_chunk_size=None,  # same
         name="Isoprominence",
         grid=None,
-        X=16,
-        Y=32,
+        X=32,
+        Y=64,
         Y_M=None,
         alpha=np.array([0.0]),
         num_transit=20,
@@ -486,10 +486,17 @@ class Isoprominence(_Objective):
 
         rho = self._grid.compress(self._grid.nodes[:, 0])
 
+        timer = Timer()
+        if verbose > 0:
+            print("Precomputing transforms")
+        timer.start("Precomputing transforms")
         self._constants["profiles"] = get_profiles("isoprominence", eq, grid=self._grid)
         self._constants["transforms"] = get_transforms(
             "isoprominence", eq, grid=self._grid
         )
+        timer.stop("Precomputing transforms")
+        if verbose > 1:
+            timer.disp("Precomputing transforms")
 
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", "Unequal number of field periods")
