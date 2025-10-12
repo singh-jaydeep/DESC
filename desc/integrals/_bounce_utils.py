@@ -470,7 +470,7 @@ def argmin(z1, z2, f, ext, g_ext):
     return jnp.take_along_axis(f[..., None, None, :], where, axis=-1).squeeze(-1)
 
 
-def interp_fft_to_magnetic_ridge(T, h, knots, dg_dz, m, n, size=None, NFP=1):
+def interp_fft_to_magnetic_ridge(T, h, knots, dg_dz, size=None, NFP=1):
     """Interpolate ``h`` to the local maxima of ``g``.
 
     Parameters
@@ -543,7 +543,7 @@ def interp_fft_to_magnetic_ridge(T, h, knots, dg_dz, m, n, size=None, NFP=1):
     theta_max = T.eval1d(zeta_max)
 
     # zeta_max, theta_max shapes are (..., ..., size)
-    f = interp_rfft2(zeta_max, theta_max, h, n0=n, n1=m, domain0=(0, 2 * jnp.pi / NFP))
+    f = interp_rfft2(zeta_max, theta_max, h, domain0=(0, 2 * jnp.pi / NFP))
     f = jnp.where(zeta_mask, f, jnp.nan)
     return f
 

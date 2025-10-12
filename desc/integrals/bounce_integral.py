@@ -1032,8 +1032,6 @@ class Bounce2D(Bounce):
                 f if is_fourier else Bounce2D.fourier(f),
                 self._c["knots"],
                 polyder_vec(self._c["B(z)"]),
-                m=self._m,
-                n=self._n,
                 size=num_max,
                 NFP=self._NFP,
             )
