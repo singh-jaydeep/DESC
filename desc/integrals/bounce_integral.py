@@ -21,10 +21,8 @@ from desc.integrals._bounce_utils import (
     fast_chebyshev,
     fast_cubic_spline,
     fourier_chebyshev,
-    interp_fft_to_argmin,
-    interp_fft_to_magnetic_ridge,
-    interp_to_argmin,
     get_extrema,
+    interp_fft_to_magnetic_ridge,
     plot_ppoly,
 )
 from desc.integrals._interp_utils import (
@@ -38,8 +36,6 @@ from desc.integrals._interp_utils import (
     irfft_mmt,
     nufft2d2r,
     polyder_vec,
-    polyroot_vec,
-    polyval_vec,
     rfft2_modes,
     rfft2_vander,
 )
@@ -55,7 +51,6 @@ from desc.integrals.quad_utils import (
 )
 from desc.io import IOAble
 from desc.utils import apply, atleast_nd, errorif, flatten_mat, setdefault
-from desc.utils import atleast_nd, errorif, flatten_matrix, setdefault, take_mask
 
 
 class Bounce(IOAble, ABC):
@@ -1031,7 +1026,7 @@ class Bounce2D(Bounce):
             NotImplementedError,
             msg="Set spline to true until implemented.",
         )
-        return _swap_shape(
+        return _move(
             interp_fft_to_magnetic_ridge(
                 self._c["T(z)"],
                 f if is_fourier else Bounce2D.fourier(f),

@@ -6,12 +6,11 @@ import numpy as np
 from orthax.legendre import leggauss
 
 from desc.backend import jnp
-from desc.compute import get_profiles, get_transforms
 from desc.compute import get_params, get_profiles, get_transforms
 from desc.compute.utils import _compute as compute_fun
 from desc.grid import LinearGrid
 from desc.integrals._interp_utils import bijection_from_disc, cheb_pts, fourier_pts
-from desc.utils import parse_argname_change, setdefault, warnif
+from desc.utils import Timer, parse_argname_change, setdefault, warnif
 
 from ..integrals.bounce_integral import Bounce2D
 from ..integrals.quad_utils import chebgauss2
