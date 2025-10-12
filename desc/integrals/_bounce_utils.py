@@ -10,8 +10,10 @@ from desc.integrals._interp_utils import (
     cheb_pts,
     idct_mmt,
     ifft_mmt,
+    interp_rfft2,
     irfft_mmt,
     nufft1d2r,
+    polyder_vec,
     polyroot_vec,
     polyval_vec,
     quadroot_vec,
@@ -520,8 +522,8 @@ def interp_fft_to_magnetic_ridge(T, h, knots, dg_dz, m, n, size=None, NFP=1):
     dg_dz2 = polyder_vec(dg_dz)
     signs = polyval_vec(c=dg_dz2[..., jnp.newaxis, :], x=roots)
 
-    root_mask = flatten_matrix((signs < 0) & (jnp.abs(roots - _sent) > _tol))
-    roots_loc = flatten_matrix(roots + knots[:-1, jnp.newaxis])
+    root_mask = flatten_mat((signs < 0) & (jnp.abs(roots - _sent) > _tol))
+    roots_loc = flatten_mat(roots + knots[:-1, jnp.newaxis])
     # roots_loc shape is (...,..., 2*(knots-1))
 
     zeta_max = take_mask(roots_loc, root_mask, size=size, fill_value=_sent)
@@ -541,9 +543,7 @@ def interp_fft_to_magnetic_ridge(T, h, knots, dg_dz, m, n, size=None, NFP=1):
     theta_max = T.eval1d(zeta_max)
 
     # zeta_max, theta_max shapes are (..., ..., size)
-    f = _irfft2_non_uniform(
-        zeta_max, theta_max, h, n0=n, n1=m, domain0=(0, 2 * jnp.pi / NFP)
-    )
+    f = interp_rfft2(zeta_max, theta_max, h, n0=n, n1=m, domain0=(0, 2 * jnp.pi / NFP))
     f = jnp.where(zeta_mask, f, jnp.nan)
     return f
 
