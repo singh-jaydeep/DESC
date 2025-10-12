@@ -12,7 +12,6 @@ from desc.grid import LinearGrid
 from desc.integrals._interp_utils import bijection_from_disc, cheb_pts, fourier_pts
 from desc.utils import Timer, parse_argname_change, setdefault, warnif
 
-from ..integrals.bounce_integral import Bounce2D
 from ..integrals.quad_utils import chebgauss2
 from .objective_funs import _Objective, collect_docs
 from .utils import _parse_callable_target_bounds
@@ -503,7 +502,7 @@ class Isoprominence(_Objective):
         self._hyperparam = {
             "Y_M": Y_M,
             "num_transit": num_transit,
-            "num_well": setdefault(num_max, Y_M * num_transit),
+            "num_max": setdefault(num_max, Y_M * num_transit),
         }
         super().__init__(
             things=eq,
@@ -582,13 +581,21 @@ class Isoprominence(_Objective):
 
         """
         eq = self.things[0]
-        grid = self._grid
         if constants is None:
             constants = self.constants
         if params is None:
             params = get_params("isoprominence", eq)
-        rho_grid = grid.compress(grid.nodes, "rho")[:, 0]
-        theta = Bounce2D.compute_theta(eq, rho=rho_grid)
+        data = compute_fun(
+            eq, "iota", params, constants["transforms"], constants["profiles"]
+        )
+        theta = eq._map_clebsch_coordinates(
+            iota=constants["transforms"]["grid"].compress(data["iota"]),
+            alpha=constants["X"],
+            zeta=constants["Y"],
+            L_lmn=params["L_lmn"],
+            lmbda=constants["lambda"],
+            tol=1e-7,
+        )[..., ::-1]
 
         data = compute_fun(
             eq,

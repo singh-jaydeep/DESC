@@ -1021,20 +1021,21 @@ class Bounce2D(Bounce):
             ``f`` interpolated to the local maxima of |B|.
 
         """
+        # To do: Add support for nufft
         errorif(
             isinstance(self._c["B(z)"], PiecewiseChebyshevSeries),
             NotImplementedError,
             msg="Set spline to true until implemented.",
         )
-        return _move(
-            interp_fft_to_magnetic_ridge(
-                self._c["T(z)"],
-                f if is_fourier else Bounce2D.fourier(f),
-                self._c["knots"],
-                polyder_vec(self._c["B(z)"]),
-                size=num_max,
-                NFP=self._NFP,
-            )
+        return interp_fft_to_magnetic_ridge(
+            self._c["T(z)"],
+            f if is_fourier else Bounce2D.fourier(f),
+            self._c["knots"],
+            polyder_vec(self._c["B(z)"]),
+            self._num_theta,
+            self._num_zeta,
+            size=num_max,
+            NFP=self._NFP,
         )
 
 

@@ -5,6 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="437298fb-3cf7-4219-b0de-2ddc57c03aef" name="Changes" comment="Handle merge conflicts">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/desc/compute/_neoclassical.py" beforeDir="false" afterPath="$PROJECT_DIR$/desc/compute/_neoclassical.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/desc/integrals/_bounce_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/desc/integrals/_bounce_utils.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/desc/integrals/bounce_integral.py" beforeDir="false" afterPath="$PROJECT_DIR$/desc/integrals/bounce_integral.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/desc/objectives/_neoclassical.py" beforeDir="false" afterPath="$PROJECT_DIR$/desc/objectives/_neoclassical.py" afterDir="false" />
     </list>
@@ -58,7 +61,7 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "Merging isoprominence",
+    "git-widget-placeholder": "isoprominence",
     "last_opened_file_path": "/Users/singh/PycharmProjects/DESC",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
@@ -150,7 +153,23 @@
       <option name="project" value="LOCAL" />
       <updated>1760302145968</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="Handle merge conflicts">
+      <option name="closed" value="true" />
+      <created>1760302456488</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1760302456488</updated>
+    </task>
+    <task id="LOCAL-00010" summary="Handle merge conflicts">
+      <option name="closed" value="true" />
+      <created>1760302612524</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1760302612524</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
