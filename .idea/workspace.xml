@@ -4,11 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="437298fb-3cf7-4219-b0de-2ddc57c03aef" name="Changes" comment="Increase codecov (hopefully)">
-      <change beforePath="$PROJECT_DIR$/desc/compute/_neoclassical.py" beforeDir="false" afterPath="$PROJECT_DIR$/desc/compute/_neoclassical.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/desc/integrals/_bounce_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/desc/integrals/_bounce_utils.py" afterDir="false" />
+    <list default="true" id="437298fb-3cf7-4219-b0de-2ddc57c03aef" name="Changes" comment="Add smoothing parameters to isoprominence compute function">
       <change beforePath="$PROJECT_DIR$/desc/integrals/bounce_integral.py" beforeDir="false" afterPath="$PROJECT_DIR$/desc/integrals/bounce_integral.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/desc/objectives/_neoclassical.py" beforeDir="false" afterPath="$PROJECT_DIR$/desc/objectives/_neoclassical.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/desc/plotting.py" beforeDir="false" afterPath="$PROJECT_DIR$/desc/plotting.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -168,7 +166,15 @@
       <option name="project" value="LOCAL" />
       <updated>1760302612524</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="Add smoothing parameters to isoprominence compute function">
+      <option name="closed" value="true" />
+      <created>1760373867039</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1760373867039</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -204,6 +210,7 @@
     <MESSAGE value="Undoing some type hints which the IDE can already guess." />
     <MESSAGE value="Added return types for various getter functions in Equilibrium which return _Profile objects (e.g. iota)" />
     <MESSAGE value="Handle merge conflicts" />
-    <option name="LAST_COMMIT_MESSAGE" value="Handle merge conflicts" />
+    <MESSAGE value="Add smoothing parameters to isoprominence compute function" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add smoothing parameters to isoprominence compute function" />
   </component>
 </project>

@@ -1495,3 +1495,129 @@ class Bounce1D(Bounce):
             PPoly(B.T, self._zeta), **_set_default_plot_kwargs(kwargs, l, m)
         )
         return fig, ax
+
+
+def plot_magnetic_ridge(eq, rho=1.0):
+    """3D plot of |B| with field lines and local maxima displayed."""
+    # Currently only for plotting rho=1, and a number of other limitations.
+    # Also incredibly ugly
+    import plotly.graph_objects as go
+
+    from desc.integrals._interp_utils import polyval_vec, quadroot_vec
+    from desc.utils import take_mask
+
+    num_max = 100
+    num_transit = 100
+    Y_M = 64
+    rho = setdefault(rho, 1.0)
+    rho = jnp.array(rho)
+    alpha = jnp.array([0.0])
+    grid_2d = LinearGrid(M=60, N=60, rho=rho)
+    b_mag = eq.compute("|B|", grid=grid_2d)["|B|"]
+    b = grid_2d.meshgrid_reshape(b_mag, "rzt")
+    b = b[0, :, :]
+    theta_grid = jnp.linspace(0, 2 * jnp.pi, 2 * grid_2d.M + 1, endpoint=False)
+    zeta_grid = jnp.linspace(0, 2 * jnp.pi, 2 * grid_2d.N + 1, endpoint=False)
+
+    grid_bounce = LinearGrid(M=5, N=5, rho=rho, NFP=eq.NFP, sym=False)
+    theta = Bounce2D.compute_theta(eq, grid=grid_bounce)
+    data_req = eq.compute(names=["|B|", "|B|_a", "B^zeta", "iota"], grid=grid_bounce)
+
+    bounce_obj = Bounce2D(
+        grid_bounce, data_req, theta, Y_M, alpha, num_transit, is_fourier=False
+    )
+
+    knots = bounce_obj._c["knots"]
+    T = bounce_obj._c["T(z)"]
+    g = bounce_obj._c["B(z)"]
+    dg_dz = polyder_vec(g)
+
+    _sent = -1.0
+    _tol = 1e-9
+    roots = quadroot_vec(
+        c=dg_dz,
+        a_min=jnp.array([0.0]),
+        a_max=jnp.diff(knots),
+        sort=True,
+        sentinel=_sent,
+        distinct=True,
+    )
+    size = num_max
+
+    dg_dz2 = polyder_vec(dg_dz)
+    signs = polyval_vec(c=dg_dz2[..., jnp.newaxis, :], x=roots)
+
+    root_mask = flatten_mat((signs < 0) & (jnp.abs(roots - _sent) > _tol))
+    roots_loc = flatten_mat(roots + knots[:-1, jnp.newaxis])
+
+    zeta_max = take_mask(roots_loc, root_mask, size=size, fill_value=_sent)
+
+    zeta_mask = jnp.abs(zeta_max - _sent) > _tol
+    zeta_max = jnp.where(zeta_mask, zeta_max, 0.0)
+
+    theta_max = T.eval1d(zeta_max)
+
+    zeta_mod = zeta_max % (2 * jnp.pi)
+    theta_mod = theta_max % (2 * jnp.pi)
+
+    stack = jnp.vstack((theta_mod[0, :], zeta_mod[0, :])).T
+
+    num_transit_field_line = 1
+    density_per_transit_field_line = 100
+    field_line_zeta = jnp.linspace(
+        0,
+        2 * jnp.pi * num_transit_field_line,
+        density_per_transit_field_line * num_transit_field_line,
+        endpoint=False,
+    )
+    field_line_zeta = field_line_zeta[jnp.newaxis, jnp.newaxis, :]
+    field_line_theta = T.eval1d(field_line_zeta)
+    fl_zeta_mod = field_line_zeta % (2 * jnp.pi)
+    fl_theta_mod = field_line_theta % (2 * jnp.pi)
+    fl_stack = jnp.vstack((fl_theta_mod[0, :], fl_zeta_mod[0, :])).T
+
+    def closest_grid_points(input, grid_points):
+        diffs = input[:, jnp.newaxis, :] - grid_points[jnp.newaxis, :, :]
+        dists = jnp.linalg.norm(diffs, axis=-1)
+        argmins = jnp.argmin(dists, axis=-1)
+        return jnp.array([grid_points[i] for i in argmins]), jnp.array(
+            [b_mag[i] for i in argmins]
+        )
+
+    stack_grid, b_stack = closest_grid_points(stack, grid_2d.nodes[:, 1:3])
+    fl_stack_grid, fl_b_stack = closest_grid_points(fl_stack, grid_2d.nodes[:, 1:3])
+
+    trace1 = go.Surface(
+        z=b, x=theta_grid, y=zeta_grid, colorscale="Mint", opacity=0.9, showscale=False
+    )
+    trace2 = go.Scatter3d(
+        x=stack_grid[:, 0],
+        y=stack_grid[:, 1],
+        z=b_stack,
+        mode="markers",
+        marker=dict(size=3, color="yellow"),
+        name="Magnetic ridge",
+    )
+    trace3 = go.Scatter3d(
+        x=fl_stack_grid[:, 0],
+        y=fl_stack_grid[:, 1],
+        z=fl_b_stack,
+        mode="lines",
+        line=dict(width=5, color="red"),
+        name="Field line alpha = 0.0",
+    )
+    fig = go.Figure(data=[trace1, trace2, trace3])
+    fig.update_layout(
+        autosize=False, width=800, height=800, margin=dict(l=25, r=20, b=25, t=50)
+    )
+    title = f"Magnetic topography at rho={rho[0]}"
+    fig.update_layout(
+        scene=dict(
+            xaxis=dict(title=dict(text="theta")),
+            yaxis=dict(title=dict(text="zeta")),
+            zaxis=dict(title=dict(text="|B|")),
+        ),
+        title=dict(text=title, y=0.9, x=0.5, xanchor="center", yanchor="top"),
+        font=dict(family="Times"),
+    ),
+    fig.show()
