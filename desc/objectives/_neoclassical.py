@@ -5,7 +5,7 @@ import warnings
 import numpy as np
 from orthax.legendre import leggauss
 
-from desc.backend import jnp
+from desc.backend import jnp, put
 from desc.compute import get_params, get_profiles, get_transforms
 from desc.compute.utils import _compute as compute_fun
 from desc.grid import LinearGrid
@@ -459,6 +459,14 @@ class Isoprominence(_Objective):
         Number of toroidal transits to follow field line.
     num_max : int
         Number of maxima to locate on each fieldline.
+    eps_smooth: float in [0,1]
+        Measure of smoothing of isoprominence error. If equal to 0,
+        error is calculated only at the maxima of |B|. Increasing this
+        corresponds to averaging over larger neighborhoods of the maxima.
+    res_smooth: int
+        Grid resolution for neighborhoods used in smoothing operation.
+        Only relevant for eps_smooth > 0. Will be rounded up to the nearest
+        odd integer if needed.
     """
 
     __doc__ = __doc__.rstrip() + collect_docs(
@@ -486,8 +494,10 @@ class Isoprominence(_Objective):
         Y=64,
         Y_M=None,
         alpha=np.array([0.0]),
-        num_transit=20,
-        num_max=None,
+        num_transit=10,
+        num_max=10,
+        eps_smooth=0.2,
+        res_smooth=13,
     ):
         if target is None and bounds is None:
             target = 0.0
@@ -499,10 +509,14 @@ class Isoprominence(_Objective):
             "Y": cheb_pts(Y, (0, 2 * np.pi))[::-1],
         }
         Y_M = setdefault(Y_M, 2 * Y)
+        res_smooth = setdefault(res_smooth, 13)
+        res_smooth = 2 * (res_smooth // 2) + 1
         self._hyperparam = {
             "Y_M": Y_M,
             "num_transit": num_transit,
             "num_max": setdefault(num_max, Y_M * num_transit),
+            "eps_smooth": setdefault(eps_smooth, 0.5),
+            "res_smooth": res_smooth,
         }
         super().__init__(
             things=eq,
@@ -534,6 +548,26 @@ class Isoprominence(_Objective):
         assert self._grid.can_fft2
 
         rho = self._grid.compress(self._grid.nodes[:, 0])
+
+        # kernels for smoothing
+        eps_smooth = self._hyperparam["eps_smooth"]
+        res_smooth = self._hyperparam["res_smooth"]
+        dzeta = jnp.linspace(-1, 1, res_smooth, endpoint=True)
+        if eps_smooth > 0:
+            kernel_symm = (
+                1
+                / jnp.sqrt(jnp.pi * (eps_smooth / 10))
+                * jnp.exp(-1 / (eps_smooth / 10) * jnp.power(dzeta, 2))
+            )
+            kernel_right = 2 * jnp.where(dzeta < 0, 0.0, kernel_symm)
+        else:
+            kernel_symm = jnp.zeros_like(dzeta)
+            kernel_symm = put(kernel_symm, res_smooth // 2, 1.0)
+            kernel_right = kernel_symm
+        self._constants["smoothing_kernels"] = {
+            "kernel_symm": kernel_symm,
+            "kernel_right": kernel_right,
+        }
 
         timer = Timer()
         if verbose > 0:
@@ -605,6 +639,7 @@ class Isoprominence(_Objective):
             constants["profiles"],
             theta=theta,
             alpha=constants["alpha"],
+            smoothing_kernels=constants["smoothing_kernels"],
             **self._hyperparam,
         )
         return data["isoprominence"]

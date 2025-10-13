@@ -997,7 +997,9 @@ class Bounce2D(Bounce):
         kwargs.setdefault("vlabel", r"$\theta$")
         return T.plot1d(T.cheb, **_set_default_plot_kwargs(kwargs, l, m))
 
-    def interp_to_magnetic_ridge(self, f, num_max=None, *, is_fourier=False):
+    def interp_to_magnetic_ridge(
+        self, f, num_max=None, *, is_fourier=False, smoothing=None
+    ):
         """Interpolates f to local maxima along field lines.
 
         Parameters
@@ -1013,6 +1015,10 @@ class Bounce2D(Bounce):
         is_fourier : bool
             If true, then it is assumed that ``f`` is the Fourier transforms
             as returned by ``Bounce2D.fourier``. Default is false.
+        smoothing: dict of jnp.ndarray
+            Kernels on [-1,1] evaluated on a set of evenly spaced points.
+            One should be symmetric, one supported on x geq 0. Positive
+            and integrate to 1.
 
         Returns
         -------
@@ -1036,6 +1042,7 @@ class Bounce2D(Bounce):
             self._num_zeta,
             size=num_max,
             NFP=self._NFP,
+            smoothing=smoothing,
         )
 
 

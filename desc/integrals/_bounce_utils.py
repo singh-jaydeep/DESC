@@ -470,7 +470,9 @@ def argmin(z1, z2, f, ext, g_ext):
     return jnp.take_along_axis(f[..., None, None, :], where, axis=-1).squeeze(-1)
 
 
-def interp_fft_to_magnetic_ridge(T, h, knots, dg_dz, m, n, size=None, NFP=1):
+def interp_fft_to_magnetic_ridge(
+    T, h, knots, dg_dz, m, n, size=None, NFP=1, smoothing=None
+):
     """Interpolate ``h`` to the local maxima of ``g``.
 
     Parameters
@@ -497,9 +499,13 @@ def interp_fft_to_magnetic_ridge(T, h, knots, dg_dz, m, n, size=None, NFP=1):
     n : int
         Fourier resolution in toroidal direction; num zeta.
     size : int
-
+        Number of maxima to interpolate to.
     NFP : int
         Number of field periods.
+    smoothing: dict of jnp.ndarray
+        Kernels on [-1,1] evaluated on a set of evenly spaced points.
+        One should be symmetric, one supported on x geq 0. Positive
+        and integrate to 1.
 
     Returns
     -------
@@ -510,6 +516,19 @@ def interp_fft_to_magnetic_ridge(T, h, knots, dg_dz, m, n, size=None, NFP=1):
     """
     _sent = -1.0
     _tol = 1e-9
+    if smoothing is None:
+        kernel_symm = jnp.array([0.0, 1.0, 0.0])
+        kernel_right = kernel_symm
+    else:
+        kernel_symm = smoothing["kernel_symm"]
+        kernel_right = smoothing["kernel_right"]
+    res_smooth = kernel_symm.shape[-1]
+    dzeta = jnp.linspace(0.0, 1.0, num=res_smooth, endpoint=True)
+    dzeta = dzeta[jnp.newaxis, jnp.newaxis, ..., jnp.newaxis]
+    dzeta_right = jnp.where(dzeta < 0, 0.0, dzeta)
+    kernel_symm = kernel_symm.reshape(dzeta.shape)
+    kernel_right = kernel_right.reshape(dzeta.shape)
+
     roots = quadroot_vec(
         c=dg_dz,
         a_min=jnp.array([0.0]),
@@ -532,27 +551,48 @@ def interp_fft_to_magnetic_ridge(T, h, knots, dg_dz, m, n, size=None, NFP=1):
     zeta_mask = jnp.abs(zeta_max - _sent) > _tol
     zeta_max = jnp.where(zeta_mask, zeta_max, 0.0)
 
+    # Expand various arrays to add smoothing axis
+    exp_zeta_max = zeta_max[..., jnp.newaxis, :]
+    exp_zeta_max = jnp.repeat(exp_zeta_max, res_smooth, axis=-2)
+    exp_zeta_mask = zeta_mask[..., jnp.newaxis, :]
+    exp_zeta_mask = jnp.repeat(exp_zeta_mask, res_smooth, axis=-2)
+
+    # Fill out smoothing axis with zeta values in a neighborhood of maxima
+    translated_zeta_max = jnp.where(
+        exp_zeta_mask,
+        jnp.where(exp_zeta_max <= 1, exp_zeta_max + dzeta_right, exp_zeta_max + dzeta),
+        exp_zeta_max,
+    )
+
     # Enforce separation between zeta_max and endpoints of T.domain
-    zeta_idx, zeta_remainder = jnp.divmod(zeta_max, T.domain[1])
+    zeta_idx, zeta_remainder = jnp.divmod(translated_zeta_max, T.domain[1])
     zeta_remainder = jnp.where(jnp.abs(zeta_remainder) < _tol, _tol, zeta_remainder)
     zeta_remainder = jnp.where(
         jnp.abs(zeta_remainder - T.domain[1]) < _tol, T.domain[1] - _tol, zeta_remainder
     )
-    zeta_max = jnp.multiply(T.domain[1], zeta_idx) + zeta_remainder
-
-    theta_max = T.eval1d(zeta_max)
+    translated_zeta_max = jnp.multiply(T.domain[1], zeta_idx) + zeta_remainder
+    translated_zeta_max = jnp.moveaxis(translated_zeta_max, -2, 0)
+    theta_max = T.eval1d(translated_zeta_max)
 
     # zeta_max, theta_max shapes are (..., ..., size)
     f = _irfft2_mmt(
-        zeta_max,
+        translated_zeta_max,
         theta_max,
         h[..., None, :, :],
         n0=n,
         n1=m,
         domain0=(0, 2 * jnp.pi / NFP),
     )
-    f = jnp.where(zeta_mask, f, jnp.nan)
-    return f
+    f = jnp.moveaxis(f, 0, -2)
+
+    # Apply the smoothing kernel
+    f_convolved = jnp.where(
+        exp_zeta_max <= 1, jnp.multiply(f, kernel_right), jnp.multiply(f, kernel_symm)
+    )
+    f_convolved = jnp.where(exp_zeta_mask, f_convolved, jnp.nan)
+    f_convolved = jnp.nansum(f_convolved, axis=-2)
+
+    return f_convolved
 
 
 # TODO (#568): Generalize this beyond ζ = ϕ
