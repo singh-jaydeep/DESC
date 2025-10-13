@@ -1497,7 +1497,15 @@ class Bounce1D(Bounce):
         return fig, ax
 
 
-def plot_magnetic_ridge(eq, rho=1.0):
+def plot_magnetic_ridge(
+    eq,
+    rho=1.0,
+    fl_num_transit=1,
+    num_max=100,
+    num_transit=100,
+    alpha=jnp.array([0.0]),
+    Y_M=128,
+):
     """3D plot of |B| with field lines and local maxima displayed."""
     # Currently only for plotting rho=1, and a number of other limitations.
     # Also incredibly ugly
@@ -1506,12 +1514,8 @@ def plot_magnetic_ridge(eq, rho=1.0):
     from desc.integrals._interp_utils import polyval_vec, quadroot_vec
     from desc.utils import take_mask
 
-    num_max = 100
-    num_transit = 100
-    Y_M = 64
     rho = setdefault(rho, 1.0)
-    rho = jnp.array(rho)
-    alpha = jnp.array([0.0])
+    rho = jnp.array([rho])
     grid_2d = LinearGrid(M=60, N=60, rho=rho)
     b_mag = eq.compute("|B|", grid=grid_2d)["|B|"]
     b = grid_2d.meshgrid_reshape(b_mag, "rzt")
@@ -1531,7 +1535,6 @@ def plot_magnetic_ridge(eq, rho=1.0):
     T = bounce_obj._c["T(z)"]
     g = bounce_obj._c["B(z)"]
     dg_dz = polyder_vec(g)
-
     _sent = -1.0
     _tol = 1e-9
     roots = quadroot_vec(
@@ -1562,7 +1565,7 @@ def plot_magnetic_ridge(eq, rho=1.0):
 
     stack = jnp.vstack((theta_mod[0, :], zeta_mod[0, :])).T
 
-    num_transit_field_line = 1
+    num_transit_field_line = fl_num_transit
     density_per_transit_field_line = 100
     field_line_zeta = jnp.linspace(
         0,
@@ -1598,13 +1601,14 @@ def plot_magnetic_ridge(eq, rho=1.0):
         marker=dict(size=3, color="yellow"),
         name="Magnetic ridge",
     )
+    trace3_name = f"Field line alpha = {alpha[0]}"
     trace3 = go.Scatter3d(
         x=fl_stack_grid[:, 0],
         y=fl_stack_grid[:, 1],
         z=fl_b_stack,
         mode="lines",
         line=dict(width=5, color="red"),
-        name="Field line alpha = 0.0",
+        name=trace3_name,
     )
     fig = go.Figure(data=[trace1, trace2, trace3])
     fig.update_layout(
