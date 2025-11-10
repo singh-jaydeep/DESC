@@ -523,7 +523,7 @@ def interp_fft_to_magnetic_ridge(
         kernel_symm = smoothing["kernel_symm"]
         kernel_right = smoothing["kernel_right"]
     res_smooth = kernel_symm.shape[-1]
-    dzeta = jnp.linspace(0.0, 1.0, num=res_smooth, endpoint=True)
+    dzeta = jnp.linspace(-1.0, 1.0, num=res_smooth, endpoint=True)
     dzeta = dzeta[jnp.newaxis, jnp.newaxis, ..., jnp.newaxis]
     dzeta_right = jnp.where(dzeta < 0, 0.0, dzeta)
     kernel_symm = kernel_symm.reshape(dzeta.shape)
