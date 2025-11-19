@@ -7,6 +7,7 @@ import warnings
 from itertools import combinations_with_replacement, permutations
 
 import numpy as np
+from interpax import interp1d
 from scipy.special import factorial
 from termcolor import colored
 
@@ -1215,3 +1216,88 @@ def apply(d, fun=identity, subset=None, exclude=None):
         subset = d.keys()
     exclude = () if (exclude is None) else exclude
     return {k: fun(d[k]) for k in subset if k not in exclude}
+
+
+def resample_1d_spline(
+    in_values,
+    in_knots=None,
+    out_knots=None,
+    out_res=None,
+    in_domain=None,
+    out_domain=None,
+    method="cubic",
+):
+    """
+    Interpolates/extrapolates given 1d spline(s) to a new 1d grid.
+
+    Parameters
+    ----------
+    in_values : nd.array
+        Values of the spline(s) on a set of knots. Has shape (..., N_knots),
+        where N_knots is the number of knots.
+    in_knots: nd.array [optional]
+        Array of shape (N_knots,) containing monotonically increasing values
+        (not necessarily evenly spaced). Locations of knots. If omitted, assumed
+        that N_knots = in_values.shape[-1], and the knots are evenly spaced in the
+        interval in_domain.
+    out_knots: nd.array [optional]
+        Array of shape (M_knots,) containing monotonically increasing values
+        (not necessarily evenly spaced). Locations of knots. If omitted, assumed that
+        M_knots = out_res and are evenly spaced in the interval out_domain.
+    out_res: int [optional]
+        Number of knots for the output spline. Required if out_knots=None;
+        otherwise this parameter is ignored.
+    in_domain: tuple [optional]
+        Tuple (x_min, x_max) with x_min < x_max, representing the domain on
+        which the input spline is sampled. Required if in_knots=None;
+        otherwise this parameter is ignored.
+    out_domain: tuple [optional]
+        Tuple (y_min, y_max) with y_min < y_max, representing the domain on
+        which the output spline is sampled. Only used if out_knots=None;
+        if out_domain=None as well, defaults to using the domain of the input spline.
+
+
+    Returns
+    -------
+    out_values : ndarray
+        Values of the spline(s) on the new set of knots. Has shape (..., M_knots),
+        where M_knots is the number of output knots.
+    out_knots: ndarray
+        Values of the knots on which the output spline is evaluated. If given as
+        an input parameter, this is returned without change.
+    """
+    assert (
+        in_knots is not None
+    ) or in_domain, (
+        "Either specify the original spline knots, or if monotonic, the domain."
+    )
+    assert (
+        out_knots is not None
+    ) or out_res, (
+        "Either specify the new spline knots, or if monotonic, the desired resolution."
+    )
+    n_in_knots = in_values.shape[-1]
+    if in_knots is not None:
+        assert (
+            len(in_knots) == n_in_knots
+        ), "Given spline values and knots have incompatible shapes."
+        in_domain = (in_knots[0], in_knots[-1])
+    else:  # in this case in_domain is already given
+        in_knots = np.linspace(in_domain[0], in_domain[1], n_in_knots)
+
+    in_res = len(in_knots)
+    if out_knots is not None:  # in this case, ignore out_res, out_domain
+        out_res = len(out_knots)
+    else:  # else out_res exists
+        out_domain = setdefault(out_domain, in_domain)
+        out_knots = np.linspace(out_domain[0], out_domain[1], out_res)
+
+    in_values_resized = in_values.reshape((-1, in_res))
+    out_values = np.zeros((in_values_resized.shape[0], out_res))
+    for i in range(out_values.shape[0]):
+        out_values[i, :] = interp1d(
+            out_knots, in_knots, in_values_resized[i, :], method=method
+        )
+
+    out_values = out_values.reshape((*in_values.shape[:-1], out_res))
+    return out_values, out_knots
