@@ -20,6 +20,36 @@ from .data_index import register_compute_fun
 
 
 @register_compute_fun(
+    name="div(J_perp)",
+    label="\\nabla \\cdot \\mathbf{J}_{\\perp}",
+    units="A \\cdot m^{-4}",
+    units_long="Amperes per meter^4",
+    description="Divergence of perpendicular current density, "
+    "equal to -div(J_parallel). Non-zero resonant Fourier modes indicate "
+    "potential for magnetic island formation at rational surfaces.",
+    dim=1,
+    params=[],
+    transforms={},
+    profiles=[],
+    coordinates="rtz",
+    data=["J^rho", "|B|", "|B|_t", "|B|_z", "B_theta", "B_zeta", "sqrt(g)"],
+    parameterization="desc.equilibrium.equilibrium.Equilibrium",
+)
+def _div_J_perp(params, transforms, profiles, data, **kwargs):
+    # div J_perp = μ₀|B|^{-2}J^ρ - 2|B|^{-3}/√g (B_ζ ∂_θ|B| - B_θ ∂_ζ|B|)
+    # This quantity, when Fourier transformed on a rational surface with
+    # iota = p/q, has resonant modes (m,n) = (r*q, -r*p) for integer r.
+    # Non-zero resonant modes indicate the potential for magnetic islands.
+    data["div(J_perp)"] = (
+        mu_0 * data["J^rho"] / data["|B|"] ** 2
+        - 2
+        / (data["|B|"] ** 3 * data["sqrt(g)"])
+        * (data["B_zeta"] * data["|B|_t"] - data["B_theta"] * data["|B|_z"])
+    )
+    return data
+
+
+@register_compute_fun(
     name="J^rho",
     label="J^{\\rho}",
     units="A \\cdot m^{-3}",

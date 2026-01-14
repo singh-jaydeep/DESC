@@ -4,7 +4,7 @@ import warnings
 
 import numpy as np
 
-from desc.backend import jnp
+from desc.backend import jnp, vmap
 from desc.compute import get_profiles, get_transforms
 from desc.compute.utils import _compute as compute_fun
 from desc.grid import LinearGrid
@@ -195,7 +195,7 @@ class MagneticIslandPenalty(_Objective):
         weight=1,
         normalize=True,
         normalize_target=True,
-        loss_function=None,
+        loss_function=None, ## ONLY IMPLEMENTED FOR OBJECTIVES INVARIANT UNDER PADDING
         deriv_mode="auto",
         grid=None,
         max_denominator=10,
@@ -467,48 +467,73 @@ class MagneticIslandPenalty(_Objective):
         sorted_rational_indices = jnp.argsort(sort_score)
         selected_rational_indices = sorted_rational_indices[:num_surfaces]
 
-        # Preallocate output array
-        # Shape: (num_surfaces, max_surfaces_per_rational, num_modes_per_surface, 2)
-        # Flattened to 1D for output
-        all_modes = []
+        # Gather the data for selected rationals (vectorized indexing)
+        selected_iota_targets = rational_iota_vals[selected_rational_indices]
+        selected_in_range = in_range_mask[selected_rational_indices]
+        selected_m_indices = fft_mode_indices_m[selected_rational_indices]
+        selected_n_indices = fft_mode_indices_n[selected_rational_indices]
 
-        # Loop over selected rationals (fixed size loop for JAX)
-        for i in range(num_surfaces):
-            rational_idx = selected_rational_indices[i]
-            iota_target = rational_iota_vals[rational_idx]
-            is_in_range = in_range_mask[rational_idx]
-            m_indices = fft_mode_indices_m[rational_idx]
-            n_indices = fft_mode_indices_n[rational_idx]
-
-            # Find multiple surfaces for this rational
-            surface_indices, valid_mask = _find_surfaces_for_rational_jax(
+        # Vectorized surface finding for all selected rationals at once
+        # vmap over the rational dimension
+        def find_surfaces_single(iota_target):
+            return _find_surfaces_for_rational_jax(
                 iota_profile, iota_target, max_surfaces_per_rational
             )
 
-            # Combined validity: rational in range AND surface is valid
-            combined_valid = is_in_range & valid_mask
+        # Shape: (num_surfaces, max_surfaces_per_rational)
+        all_surface_indices, all_valid_masks = vmap(find_surfaces_single)(
+            selected_iota_targets
+        )
 
-            # Loop over surfaces (fixed size loop for JAX)
-            for s in range(max_surfaces_per_rational):
-                rho_idx = surface_indices[s]
-                surface_valid = combined_valid[s]
+        # Combined validity: rational in range AND surface is valid
+        # Shape: (num_surfaces, max_surfaces_per_rational)
+        combined_valid = selected_in_range[:, None] & all_valid_masks
 
-                # Get div(J_perp) on this surface
-                div_J_2d = div_J_perp_3d[rho_idx, :, :]
+        # Vectorized FFT and mode extraction
+        # For each (rational, surface) pair, we need to:
+        # 1. Get the rho index
+        # 2. Extract the 2D surface data
+        # 3. Compute FFT
+        # 4. Extract the resonant modes
 
-                # Compute 2D FFT
-                fft_result = jnp.fft.fft2(div_J_2d)
+        def process_single_surface(rho_idx, m_indices, n_indices, is_valid):
+            """Process a single surface: FFT and extract modes."""
+            # Get div(J_perp) on this surface
+            div_J_2d = div_J_perp_3d[rho_idx, :, :]
 
-                # Extract resonant modes using precomputed indices
-                for j in range(num_modes_per_surface):
-                    m_idx = m_indices[j]
-                    n_idx = n_indices[j]
-                    coeff = fft_result[m_idx, n_idx]
-                    # Apply mask: zero out if rational is outside range or surface invalid
-                    coeff = jnp.where(surface_valid, coeff, 0.0 + 0.0j)
-                    all_modes.extend([jnp.real(coeff), jnp.imag(coeff)])
+            # Compute 2D FFT
+            fft_result = jnp.fft.fft2(div_J_2d)
 
-        return jnp.array(all_modes)
+            # Extract all resonant modes at once using advanced indexing
+            # m_indices and n_indices have shape (num_modes_per_surface,)
+            coeffs = fft_result[m_indices, n_indices]
+
+            # Apply validity mask: zero out if surface is invalid
+            coeffs = jnp.where(is_valid, coeffs, 0.0 + 0.0j)
+
+            # Stack real and imaginary parts: shape (num_modes_per_surface * 2,)
+            return jnp.stack([jnp.real(coeffs), jnp.imag(coeffs)], axis=-1).flatten()
+
+        def process_rational(surface_indices, m_indices, n_indices, valid_mask):
+            """Process all surfaces for a single rational."""
+            # vmap over the max_surfaces_per_rational dimension
+            return vmap(
+                lambda rho_idx, is_valid: process_single_surface(
+                    rho_idx, m_indices, n_indices, is_valid
+                )
+            )(surface_indices, valid_mask)
+
+        # vmap over all selected rationals
+        # all_surface_indices: (num_surfaces, max_surfaces_per_rational)
+        # selected_m_indices: (num_surfaces, num_modes_per_surface)
+        # combined_valid: (num_surfaces, max_surfaces_per_rational)
+        all_modes = vmap(process_rational)(
+            all_surface_indices, selected_m_indices, selected_n_indices, combined_valid
+        )
+
+        # Shape: (num_surfaces, max_surfaces_per_rational, num_modes_per_surface * 2)
+        # Flatten to 1D for output
+        return all_modes.flatten()
 
     @property
     def max_denominator(self):

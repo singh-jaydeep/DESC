@@ -45,6 +45,7 @@ from ._geometry import (
     PrincipalCurvature,
     Volume,
 )
+from ._islands import MagneticIslandPenalty
 from ._neoclassical import EffectiveRipple
 from ._omnigenity import (
     Isodynamicity,
