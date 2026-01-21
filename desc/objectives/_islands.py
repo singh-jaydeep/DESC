@@ -195,7 +195,7 @@ class MagneticIslandPenalty(_Objective):
         weight=1,
         normalize=True,
         normalize_target=True,
-        loss_function=None, ## ONLY IMPLEMENTED FOR OBJECTIVES INVARIANT UNDER PADDING
+        loss_function=None, ## ONLY IMPLEMENTED FOR LOSS FNS INVARIANT UNDER PADDING
         deriv_mode="auto",
         grid=None,
         max_denominator=10,

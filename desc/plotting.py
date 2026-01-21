@@ -2224,6 +2224,9 @@ def poincare_plot(
         figsize = (figw, figh)
     fig, ax = _format_ax(ax, rows=rows, cols=cols, figsize=figsize, equal=True)
 
+    # Ensure ax is an array so ax.flat works even for single subplot
+    ax = np.atleast_1d(ax)
+
     for i in range(nplanes):
         ax.flat[i].scatter(
             rs[:, i, :],
@@ -2242,6 +2245,10 @@ def poincare_plot(
         )
 
     _set_tight_layout(fig)
+
+    # Unwrap single axes for consistency with matplotlib conventions
+    if ax.size == 1:
+        ax = ax.flat[0]
 
     if return_data:
         return fig, ax, data

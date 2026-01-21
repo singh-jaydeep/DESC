@@ -36,6 +36,8 @@ from .data_index import register_compute_fun
     parameterization="desc.equilibrium.equilibrium.Equilibrium",
 )
 def _div_J_perp(params, transforms, profiles, data, **kwargs):
+    # This isn't quite true, as its really true up to a pressure term, which
+    # vanishes for vacuum equilibria. So what's a good measure in this case?
     # div J_perp = μ₀|B|^{-2}J^ρ - 2|B|^{-3}/√g (B_ζ ∂_θ|B| - B_θ ∂_ζ|B|)
     # This quantity, when Fourier transformed on a rational surface with
     # iota = p/q, has resonant modes (m,n) = (r*q, -r*p) for integer r.
