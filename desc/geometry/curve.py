@@ -322,6 +322,25 @@ def _unclose_curve(X, Y, Z):
         flag = False
     return X, Y, Z, closedX, closedY, closedZ, flag
 
+def _unclose_surfacecurve(theta,zeta,surface):
+
+    nodes=np.vstack((np.oneslike(theta),theta,zeta)).T
+    grid = Grid(nodes)
+    data = surface.compute(names=["X", "Y", "Z"], grid=grid)
+    _,_,_,_,_,_,flag = _unclose_curve(data["X"], data["Y"], data["Z"])
+
+    if flag:
+        closedtheta, closedzeta = theta.copy(), zeta.copy()
+        theta, zeta = theta[:-1], zeta[:-1]
+        flag = True
+    else:
+        closedtheta, closedzeta = (
+            np.append(theta,theta[0]),
+            np.append(zeta,zeta[0]),
+        )
+        flag = False
+    return theta, zeta, closedtheta, closedzeta, flag
+
 
 class FourierXYZCurve(Curve):
     """Curve parameterized by Fourier series for X,Y,Z in terms of arbitrary angle s.
@@ -1132,30 +1151,24 @@ class SplineXYZCurve(Curve):
         )
 
 
-# TODO: make this subclass from surface as well somehow?
-# or no no, just give it Rlmn Zlmn and then have its x thing compute x
-# using the Rlmn Zlmn, yes that will work and allow the deriv
-# to propagate correctly I think.
-class FourierRZWindingSurfaceCurve(Curve):
-    """Curve parameterized by Fourier series for theta,zeta in terms of parameter s.
+class SurfaceCurve(Curve):
+    """Closed curve parameterized by Fourier series for theta,zeta in terms of parameter s.
 
-    This curve will lie on the given winding surface, parameterized by a
-    Fourier series given by Rb_mn and Zb_mn.
-
+    The curve is constrained to lie on a surface, given by a Fourier series Rb_mn and Zb_mn.
     Based off of work by Joao Biu and Rogerio Jorge
-    https://github.com/hiddenSymmetries/simsopt/pull/289
+    https://github.com/hiddenSymmetries/simsopt/pull/289.
 
     Parameters
     ----------
     surface : FourierRZToroidalSurface
-        Winding surface that the curve will lie on.
+        Surface that the curve will lie on.
     theta_n, zeta_n: array-like
         Fourier coefficients for theta, zeta in terms of curve parameter s.
-    secular_theta : float, optional
+    secular_theta : int, optional
         secular term in theta(s) series, defaults to 1
         if 0, curve will not close poloidally, only toroidally.
-    secular_zeta : float, optional
-        secular term in zeta(s) series, defaults to 0.0
+    secular_zeta : int, optional
+        secular term in zeta(s) series, defaults to 0
         if 0, curve will not close toroidally, only poloidally
         # FIXME: secular terms must be integers I think...
         # change this and dont allow them to change during optimization
@@ -1163,11 +1176,11 @@ class FourierRZWindingSurfaceCurve(Curve):
     modes_theta : array-like, optional
         Mode numbers associated with theta_n. If not given defaults to [-n:n].
     modes_zeta : array-like, optional
-        Mode numbers associated with zeta_n, If not given defaults to [-n:n]].
+        Mode numbers associated with zeta_n, If not given defaults to [-n:n].
     sym_theta : {"cos", "sin", False}, optional
-        Whether to enforce symmetry for the theta(t) Fourier series. Defaults to "sin"
+        Whether to enforce symmetry for the theta(t) Fourier series. Defaults to False.
     sym_zeta : {"cos", "sin", False}, optional
-        Whether to enforce symmetry for the zeta(t) Fourier series. Defaults to "sin"
+        Whether to enforce symmetry for the zeta(t) Fourier series. Defaults to False.
     name : str
         Name for this curve.
 
@@ -1188,12 +1201,12 @@ class FourierRZWindingSurfaceCurve(Curve):
         surface=None,
         theta_n=[0],
         zeta_n=[0],
-        secular_theta=1.0,
-        secular_zeta=0.0,
+        secular_theta=1,
+        secular_zeta=0,
         modes_theta=None,
         modes_zeta=None,
-        sym_theta="sin",
-        sym_zeta="sin",
+        sym_theta=False,
+        sym_zeta=False,
         name="",
     ):
         super().__init__(name)
@@ -1232,20 +1245,22 @@ class FourierRZWindingSurfaceCurve(Curve):
 
         assert issubclass(modes_theta.dtype.type, np.integer)
         assert issubclass(modes_zeta.dtype.type, np.integer)
+        assert issubclass(secular_theta, int)
+        assert issubclass(secular_zeta, int)
 
         self._sym_theta = sym_theta
         self._sym_zeta = sym_zeta
         Ntheta = np.max(abs(modes_theta))
         Nzeta = np.max(abs(modes_zeta))
         N = max(Ntheta, Nzeta)
-        NFP = surface.NFP
-        self._theta_basis = FourierSeries(N, int(NFP), sym=sym_theta)
-        self._zeta_basis = FourierSeries(N, int(NFP), sym=sym_zeta)
+        #NFP = surface.NFP # TODO: subclass should be able to pass in a NFP if so desired. hmm
+        self._theta_basis = FourierSeries(N, sym=sym_theta)
+        self._zeta_basis = FourierSeries(N, sym=sym_zeta)
 
         self._theta_n = copy_coeffs(theta_n, modes_theta, self.theta_basis.modes[:, 2])
         self._zeta_n = copy_coeffs(zeta_n, modes_zeta, self.zeta_basis.modes[:, 2])
-        self._secular_theta = float(secular_theta)
-        self._secular_zeta = float(secular_zeta)
+        self._secular_theta = secular_theta
+        self._secular_zeta = secular_zeta
 
     @property
     def surface(self):
@@ -1277,10 +1292,10 @@ class FourierRZWindingSurfaceCurve(Curve):
         """Spectral basis for zeta Fourier series."""
         return self._zeta_basis
 
-    @property
-    def NFP(self):
-        """Number of field periods."""
-        return self.surface.NFP
+    # @property
+    # def NFP(self):
+    #     """Number of field periods."""
+    #     return self.surface.NFP
 
     @property
     def N(self):
@@ -1404,7 +1419,7 @@ class FourierRZWindingSurfaceCurve(Curve):
                 + f"basis with {self.zeta_basis.num_modes} modes"
             )
 
-    @optimizable_parameter
+    # @optimizable_parameter
     @property
     def secular_theta(self):
         """Secular (in t) coefficient for theta."""
@@ -1412,9 +1427,10 @@ class FourierRZWindingSurfaceCurve(Curve):
 
     @secular_theta.setter
     def secular_theta(self, new):
-        self._secular_theta = float(np.squeeze(new))
+        assert(issubclass(type(new), int))
+        self._secular_theta = new
 
-    @optimizable_parameter
+    # @optimizable_parameter
     @property
     def secular_zeta(self):
         """Secular (in t) coefficient for zeta."""
@@ -1422,7 +1438,8 @@ class FourierRZWindingSurfaceCurve(Curve):
 
     @secular_zeta.setter
     def secular_zeta(self, new):
-        self._secular_zeta = float(np.squeeze(new))
+        assert(issubclass(type(new), int))
+        self._secular_zeta = new
 
     # TODO: add symmetry? I think for modular coils to be not
     # all at the same zeta angle, the zeta basis must
@@ -1439,7 +1456,7 @@ class FourierRZWindingSurfaceCurve(Curve):
         secular_zeta=None,
         name="",
     ):
-        """Fit given angles on surface to a FourierRZWindingSurfaceCurve representation.
+        """Fit given angles on surface to a SurfaceCurve representation.
 
             The given theta and zeta will be fit as a function of a curve parameter s.
             If not provided, the secular terms in theta and zeta will also be
@@ -1451,9 +1468,9 @@ class FourierRZWindingSurfaceCurve(Curve):
         ----------
         theta: ndarray
             Poloidal angles (with the poloidal angle defined by the given surface)
-            to fit a FourierRZWindingSurfaceCurve object to.
+            to fit a SurfaceCurve object to.
         zeta: ndarray
-            Toroidal angles to fit a FourierRZWindingSurfaceCurve object to.
+            Toroidal angles to fit a SurfaceCurve object to.
         secular_theta : int, optional
             secular term in theta(s) series, defaults to 1.0
             i.e. if 0, curve will not close poloidally, only toroidally.
@@ -1478,17 +1495,18 @@ class FourierRZWindingSurfaceCurve(Curve):
 
         Returns
         -------
-        curve : FourierRZWindingSurfaceCurve
+        curve : SurfaceCurve
             New representation of the curve lying on the given surface,
             parameterized by Fourier series (in s) for theta,zeta.
 
         """
-        input_curve_was_closed = np.isclose(
-            theta[0] - theta[-1] % (2 * np.pi), 0, atol=1e-12
-        ) and np.isclose(zeta[0] - zeta[-1] % (2 * np.pi / surface.NFP), 0, atol=1e-12)
-        if input_curve_was_closed:
-            theta = theta[0:-1]
-            zeta = zeta[0:-1]
+        # input_curve_was_closed = np.isclose(
+        #     theta[0] - theta[-1] % (2 * np.pi), 0, atol=1e-12
+        # ) and np.isclose(zeta[0] - zeta[-1] % (2 * np.pi / surface.NFP), 0, atol=1e-12)
+        # if input_curve_was_closed:
+        #     theta = theta[0:-1]
+        #     zeta = zeta[0:-1]
+        theta,zeta,_,_,_ = _unclose_surfacecurve(theta,zeta,surface)
         if s is None:
             s = np.linspace(0, 2 * np.pi, theta.size, endpoint=False)
         else:
@@ -1526,7 +1544,7 @@ class FourierRZWindingSurfaceCurve(Curve):
         # secular term is prescribed, so subtract that from the RHS
         zeta_n = np.linalg.lstsq(A, zeta - s * secular_zeta, rcond=None)[0]
 
-        return FourierRZWindingSurfaceCurve(
+        return SurfaceCurve(
             surface,
             theta_n,
             zeta_n,
