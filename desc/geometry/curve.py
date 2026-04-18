@@ -322,12 +322,13 @@ def _unclose_curve(X, Y, Z):
         flag = False
     return X, Y, Z, closedX, closedY, closedZ, flag
 
-def _unclose_surfacecurve(theta,zeta,surface):
 
-    nodes=np.vstack((np.oneslike(theta),theta,zeta)).T
+def _unclose_surfacecurve(theta, zeta, surface):
+
+    nodes = np.vstack((np.oneslike(theta), theta, zeta)).T
     grid = Grid(nodes)
     data = surface.compute(names=["X", "Y", "Z"], grid=grid)
-    _,_,_,_,_,_,flag = _unclose_curve(data["X"], data["Y"], data["Z"])
+    _, _, _, _, _, _, flag = _unclose_curve(data["X"], data["Y"], data["Z"])
 
     if flag:
         closedtheta, closedzeta = theta.copy(), zeta.copy()
@@ -335,8 +336,8 @@ def _unclose_surfacecurve(theta,zeta,surface):
         flag = True
     else:
         closedtheta, closedzeta = (
-            np.append(theta,theta[0]),
-            np.append(zeta,zeta[0]),
+            np.append(theta, theta[0]),
+            np.append(zeta, zeta[0]),
         )
         flag = False
     return theta, zeta, closedtheta, closedzeta, flag
@@ -1158,6 +1159,9 @@ class SurfaceCurve(Curve):
     Based off of work by Joao Biu and Rogerio Jorge
     https://github.com/hiddenSymmetries/simsopt/pull/289.
 
+    This class does not assume any properties about the curve, besides closedness. For
+    example, it does not inherit the surface NFP.
+
     Parameters
     ----------
     surface : FourierRZToroidalSurface
@@ -1178,12 +1182,11 @@ class SurfaceCurve(Curve):
     modes_zeta : array-like, optional
         Mode numbers associated with zeta_n, If not given defaults to [-n:n].
     sym_theta : {"cos", "sin", False}, optional
-        Whether to enforce symmetry for the theta(t) Fourier series. Defaults to False.
+        Whether to enforce symmetry for the theta(s) Fourier series. Defaults to False.
     sym_zeta : {"cos", "sin", False}, optional
-        Whether to enforce symmetry for the zeta(t) Fourier series. Defaults to False.
+        Whether to enforce symmetry for the zeta(s) Fourier series. Defaults to False.
     name : str
         Name for this curve.
-
     """
 
     _io_attrs_ = Curve._io_attrs_ + [
@@ -1252,10 +1255,17 @@ class SurfaceCurve(Curve):
         self._sym_zeta = sym_zeta
         Ntheta = np.max(abs(modes_theta))
         Nzeta = np.max(abs(modes_zeta))
-        N = max(Ntheta, Nzeta)
-        #NFP = surface.NFP # TODO: subclass should be able to pass in a NFP if so desired. hmm
-        self._theta_basis = FourierSeries(N, sym=sym_theta)
-        self._zeta_basis = FourierSeries(N, sym=sym_zeta)
+        # N = max(Ntheta, Nzeta)
+        # NFP = surface.NFP # TODO: subclass should be able to pass in a NFP if so desired. hmm
+
+        # general class sets these two bases to have the same mode numbers
+        # for the subclass don't necessarily want this, since theta basis is where all the
+        # actual optimizable parameters are.
+        if not hasattr(self, "_theta_basis") or not hasattr(
+            self, "_zeta_basis"
+        ):  # so subclasses can define bases however they want
+            self._theta_basis = FourierSeries(Ntheta, sym=sym_theta)
+            self._zeta_basis = FourierSeries(Nzeta, sym=sym_zeta)
 
         self._theta_n = copy_coeffs(theta_n, modes_theta, self.theta_basis.modes[:, 2])
         self._zeta_n = copy_coeffs(zeta_n, modes_zeta, self.zeta_basis.modes[:, 2])
@@ -1302,6 +1312,16 @@ class SurfaceCurve(Curve):
         """Maximum mode number."""
         return max(self.theta_basis.N, self.zeta_basis.N)
 
+    @property
+    def N_theta(self):
+        """Maximum poloidal mode number."""
+        return self.theta_basis.N
+
+    @property
+    def N_zeta(self):
+        """Maximum poloidal zeta number."""
+        return self.zeta_basis.N
+
     @optimizable_parameter
     @property
     def R_lmn(self):
@@ -1336,30 +1356,57 @@ class SurfaceCurve(Curve):
                 + f" for basis with {self.surface.Z_basis.num_modes} modes."
             )
 
-    # todo: need a change_surf_resolutoin that just calls underlying surf?
-    def change_resolution(self, N=None, NFP=None, sym=None):
-        """Change the maximum toroidal resolution for the curve."""
+    def change_resolution(
+        self, N_theta=None, N_zeta=None, sym_theta=None, sym_zeta=None
+    ):
+        """Change the resolution of the curve."""
         if (
-            ((N is not None) and (N != self.N))
-            or ((NFP is not None) and (NFP != self.NFP))
-            or (sym is not None)
-            and (sym != self.sym)
+            (N_theta is not None and N_theta != self.N_theta)
+            or (N_zeta is not None and N_zeta != self.N_zeta)
+            or (sym_theta is not None and sym_theta != self.sym_theta)
+            or (sym_zeta is not None and sym_zeta != self.sym_zeta)
         ):
-            self._surface.change_resolution(
-                NFP=int(NFP if NFP is not None else self.NFP)
-            )
-            self._sym = sym if sym is not None else self.sym
-            N = int(N if N is not None else self.N)
             theta_modes_old = self.theta_basis.modes
             zeta_modes_old = self.zeta_basis.modes
-            self.theta_basis.change_resolution(N=N, NFP=self.NFP, sym=self.sym_theta)
-            self.zeta_basis.change_resolution(N=N, NFP=self.NFP, sym=self.sym_zeta)
+            self._sym_theta = sym_theta if sym_theta is not None else self.sym_theta
+            self._sym_zeta = sym_zeta if sym_zeta is not None else self.sym_zeta
+            N_theta = int(N_theta if N_theta is not None else self.N_theta)
+            N_zeta = int(N_zeta if N_zeta is not None else self.N_zeta)
+            self.theta_basis.change_resolution(N=N_theta, sym=self.sym_theta)
+            self.zeta_basis.change_resolution(N=N_zeta, sym=self.sym_zeta)
             self.theta_n = copy_coeffs(
                 self.theta_n, theta_modes_old, self.theta_basis.modes
             )
             self.zeta_n = copy_coeffs(
                 self.zeta_n, zeta_modes_old, self.zeta_basis.modes
             )
+        else:
+            print("you didn't actually change anything lol")  # eventually remove
+
+    # # todo: need a change_surf_resolutoin that just calls underlying surf?
+    # def change_resolution(self, N=None, NFP=None, sym=None):
+    #     """Change the maximum toroidal resolution for the curve."""
+    #     if (
+    #         ((N is not None) and (N != self.N))
+    #         or ((NFP is not None) and (NFP != self.NFP))
+    #         or (sym is not None)
+    #         and (sym != self.sym)
+    #     ):
+    #         self._surface.change_resolution(
+    #             NFP=int(NFP if NFP is not None else self.NFP)
+    #         )
+    #         self._sym = sym if sym is not None else self.sym
+    #         N = int(N if N is not None else self.N)
+    #         theta_modes_old = self.theta_basis.modes
+    #         zeta_modes_old = self.zeta_basis.modes
+    #         self.theta_basis.change_resolution(N=N, NFP=self.NFP, sym=self.sym_theta)
+    #         self.zeta_basis.change_resolution(N=N, NFP=self.NFP, sym=self.sym_zeta)
+    #         self.theta_n = copy_coeffs(
+    #             self.theta_n, theta_modes_old, self.theta_basis.modes
+    #         )
+    #         self.zeta_n = copy_coeffs(
+    #             self.zeta_n, zeta_modes_old, self.zeta_basis.modes
+    #         )
 
     def get_coeffs(self, n):
         """Get Fourier coefficients for given mode number(s)."""
@@ -1427,7 +1474,7 @@ class SurfaceCurve(Curve):
 
     @secular_theta.setter
     def secular_theta(self, new):
-        assert(issubclass(type(new), int))
+        assert issubclass(type(new), int)
         self._secular_theta = new
 
     # @optimizable_parameter
@@ -1438,7 +1485,7 @@ class SurfaceCurve(Curve):
 
     @secular_zeta.setter
     def secular_zeta(self, new):
-        assert(issubclass(type(new), int))
+        assert issubclass(type(new), int)
         self._secular_zeta = new
 
     # TODO: add symmetry? I think for modular coils to be not
@@ -1450,7 +1497,8 @@ class SurfaceCurve(Curve):
         theta,
         zeta,
         surface,
-        N=10,
+        N_theta=10,
+        N_zeta=10,
         s=None,
         secular_theta=None,
         secular_zeta=None,
@@ -1480,7 +1528,7 @@ class SurfaceCurve(Curve):
             i.e. if 0, curve will not close toroidally, only poloidally
             If not given, will be fit to the given curve.
         surface: FourierRZToroidalSurface
-            Winding surface that the curve will lie on.
+            Surface that the curve will lie on.
         N : int
             Fourier resolution (in curve parameter s) of the new curve representation.
             Default is 10.
@@ -1506,12 +1554,12 @@ class SurfaceCurve(Curve):
         # if input_curve_was_closed:
         #     theta = theta[0:-1]
         #     zeta = zeta[0:-1]
-        theta,zeta,_,_,_ = _unclose_surfacecurve(theta,zeta,surface)
+        theta, zeta, _, _, flag = _unclose_surfacecurve(theta, zeta, surface)
         if s is None:
             s = np.linspace(0, 2 * np.pi, theta.size, endpoint=False)
         else:
             s = np.atleast_1d(s)
-            s = s[:-1] if input_curve_was_closed else s
+            s = s[:-1] if flag else s
             errorif(
                 not np.all(np.diff(s) > 0),
                 ValueError,
@@ -1521,12 +1569,17 @@ class SurfaceCurve(Curve):
             errorif(s[-1] > 2 * np.pi, ValueError, "s must lie in [0, 2pi]")
 
         grid = LinearGrid(zeta=s, NFP=1, sym=False)
-        basis = FourierSeries(N=N, NFP=1, sym=False)
-        transform = Transform(grid, basis, build_pinv=True, method="direct1")
+        basis_theta = FourierSeries(N=N_theta, NFP=1, sym=sym_theta)
+        basis_zeta = FourierSeries(N=N_zeta, NFP=1, sym=sym_zeta)
+        transform_theta = Transform(
+            grid, basis_theta, build_pinv=True, method="direct1"
+        )
+        transform_zeta = Transform(grid, basis_zeta, build_pinv=True, method="direct1")
         # need to form linear system
         # A * [secular_theta,theta_n] = theta
         # A * [secular_zeta,zeta_n] = zeta
-        A = transform.matrices["direct1"][0][0][0]
+        A_theta = transform_theta.matrices["direct1"][0][0][0]
+        A_zeta = transform_zeta.matrices["direct1"][0][0][0]
         # the secular terms must be integers for the curves to close,
         # so we round the answer of the division of the total angle
         # traversed by the curve divided by 2pi
@@ -1540,9 +1593,9 @@ class SurfaceCurve(Curve):
         # A * zeta_n = zeta  - secular_zeta * s
 
         # secular term is prescribed, so subtract that from the RHS
-        theta_n = np.linalg.lstsq(A, theta - s * secular_theta, rcond=None)[0]
+        theta_n = np.linalg.lstsq(A_theta, theta - s * secular_theta, rcond=None)[0]
         # secular term is prescribed, so subtract that from the RHS
-        zeta_n = np.linalg.lstsq(A, zeta - s * secular_zeta, rcond=None)[0]
+        zeta_n = np.linalg.lstsq(A_zeta, zeta - s * secular_zeta, rcond=None)[0]
 
         return SurfaceCurve(
             surface,
@@ -1550,5 +1603,30 @@ class SurfaceCurve(Curve):
             zeta_n,
             secular_theta=secular_theta,
             secular_zeta=secular_zeta,
+            sym_theta=sym_theta,
+            sym_zeta=sym_zeta,
             name=name,
         )
+
+
+class SurfaceCurveToroidal(SurfaceCurve):
+    """
+    Closed curves on surfaces for which zeta serves as a parameter, i.e. d/ds zeta(s)>0.
+
+    This class fixes the zeta(s) modes, leaving only the theta(s) modes as optimizable
+    parameters. Curves also inherit NFP periodicity from the input surface.
+
+    """
+
+    def __init__(self):
+        # build theta, zeta basis with NFP
+        # call super.init()
+        pass
+
+    @property
+    def NFP(self):
+        return self.surface.NFP
+
+    @classmethod
+    def from_values(cls):
+        pass
