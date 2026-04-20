@@ -1618,10 +1618,67 @@ class SurfaceCurveToroidal(SurfaceCurve):
 
     """
 
-    def __init__(self):
-        # build theta, zeta basis with NFP
-        # call super.init()
-        pass
+    _io_attrs_ = SurfaceCuve._io_attrs_ + ["_NFP"]
+
+    def __init__(
+        self,
+        surface=None,
+        theta_n=[0],
+        zeta_n=[0],
+        secular_theta=1,
+        secular_zeta=0,
+        modes_theta=None,
+        sym_theta=False,
+        NFP=None,
+        name="",
+    ):
+
+        zeta_n = np.atleast_1d(zeta_n)
+        theta_n = np.atleast_1d(theta_n)
+        assert (
+            zeta_n.size == 1
+        ), "Can only set the n=0 mode for zeta(s), receieved a list of length {zeta_n.size}"
+        if surface is None:
+            import FourierRZToroidalSurface
+
+            surface = FourierRZToroidalSurface()
+        self._surface = surface
+        self._NFP = setdefault(NFP, surface.NFP)
+        assert (
+            self.NFP == surface.NFP
+        ), "Expect same NFP for curve and surface, received {NFP}, {surface.NFP} respectively."
+
+        if modes_theta is None:
+            modes_theta = np.arange(-(theta_n.size // 2), theta_n.size // 2 + 1)
+
+        modes_theta = np.asarray(modes_theta)
+
+        assert (
+            theta_n.size == modes_theta.size
+        ), "theta_n size and modes_theta must be the same size"
+
+        assert issubclass(modes_theta.dtype.type, np.integer)
+        Ntheta = np.max(abs(modes_theta))
+
+        # If the curve takes multiple toroidal transits to close,
+        # then NFP in zeta vs. NFP in the s parameter are different.
+        # The latter is used to build the Fourier basis.
+        self._basisNFP = self.NFP * self.secular_zeta
+
+        self._theta_basis = FourierSeries(Ntheta, NFP=self._basisNFP, sym=sym_theta)
+        self._zeta_basis = FourierSeries(0)
+
+        super().__init__(
+            surface,
+            theta_n,
+            zeta_n,
+            secular_theta=secular_theta,
+            secular_zeta=secular_zeta,
+            sym_theta=sym_theta,
+            modes_theta=modes_theta,
+            modes_zeta=[0],
+            name=name,
+        )
 
     @property
     def NFP(self):
