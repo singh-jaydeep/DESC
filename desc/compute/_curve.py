@@ -875,6 +875,7 @@ def _splinexyz_helper(f, transforms, s_query_pts, method, derivative):
     """
     f = jnp.asarray(f)
     intervals = jnp.asarray(transforms["intervals"])
+    min_interval_idx = intervals[0][1]
     has_break_points = len(intervals[0])
     s_query_pts += transforms["knots"][0]
 
@@ -895,7 +896,7 @@ def _splinexyz_helper(f, transforms, s_query_pts, method, derivative):
         """Body used if there are break points."""
         istart, istop = interval
         # catch end-point
-        istop = jnp.where(istop == 0, -1, istop)
+        istop = jnp.where(istop == min_interval_idx, -1, istop)
 
         # fill f values outside of interval with break point values so that
         # interpolation only takes into consideration the interval

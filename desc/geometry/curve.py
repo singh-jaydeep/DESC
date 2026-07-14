@@ -1522,6 +1522,12 @@ class SplineXYZCurve(Curve):
                 ValueError,
                 "break_indices must be monotonic",
             )
+            errorif(
+                unique_ordered_indices[0] < 0
+                or unique_ordered_indices[-1] > len(knots) - 1,
+                ValueError,
+                "break_indices must lie in the range [0, len(knots) - 1]",
+            )
             intervals = np.array(
                 [
                     [break_indices[i - 1], break_indices[i]]
@@ -1608,7 +1614,7 @@ class SplineXYZCurve(Curve):
     def intervals(self):
         """Intervals for spline determined from the inputted break indices."""
         if not (hasattr(self, "_intervals")) or self._intervals is None:
-            self.intervals = None
+            self._intervals = [[]]
         return self._intervals
 
     @property
@@ -1688,8 +1694,8 @@ class SplineXYZCurve(Curve):
         coords,
         knots=None,
         method="cubic",
-        name="",
         basis="xyz",
+        name="",
         break_indices=None,
     ):
         """Create SplineXYZCurve from coordinate values.
