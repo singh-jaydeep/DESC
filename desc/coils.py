@@ -26,6 +26,7 @@ from desc.compute.utils import _compute as compute_fun
 from desc.geometry import (
     FourierPlanarCurve,
     FourierRZCurve,
+    FourierRZWindingCurve,
     FourierXYCurve,
     FourierXYZCurve,
     SplineXYZCurve,
@@ -1435,6 +1436,61 @@ class SplineXYZCoil(_Coil, SplineXYZCurve):
         )
 
 
+class FourierRZWindingCoil(_Coil, FourierRZWindingCurve):
+    """Coil that lies on a surface, parameterized by theta(s), zeta(s) Fourier series.
+
+    Parameters
+    ----------
+    current : float
+        Current through the coil, in Amperes.
+    surface : FourierRZToroidalSurface
+        Host surface the coil lies on (a private copy is carried; tie it with
+        ``surface_consistency`` or hold it fixed with ``fix_surface``).
+    theta_n, zeta_n : array-like
+        Fourier coefficients of theta, zeta in the curve parameter ``s``.
+    secular_theta, secular_zeta : int
+        Fixed integer secular terms setting the coil topology. Defaults ``1``, ``0``.
+    modes_theta, modes_zeta : array-like, optional
+        Mode numbers for ``theta_n``/``zeta_n``. Default ``[-N:N]``.
+    sym_theta, sym_zeta : {"sin", "cos", False}, optional
+        Symmetry of the theta/zeta series. Default ``"sin"``.
+    name : str
+        Name for this coil.
+
+    """
+
+    _io_attrs_ = _Coil._io_attrs_ + FourierRZWindingCurve._io_attrs_
+    _static_attrs = _Coil._static_attrs + FourierRZWindingCurve._static_attrs
+
+    def __init__(
+        self,
+        current=1,
+        surface=None,
+        theta_n=[0],
+        zeta_n=[0],
+        secular_theta=1,
+        secular_zeta=0,
+        modes_theta=None,
+        modes_zeta=None,
+        sym_theta="sin",
+        sym_zeta="sin",
+        name="",
+    ):
+        super().__init__(
+            current,
+            surface,
+            theta_n,
+            zeta_n,
+            secular_theta,
+            secular_zeta,
+            modes_theta,
+            modes_zeta,
+            sym_theta,
+            sym_zeta,
+            name,
+        )
+
+
 def _check_type(coil0, coil):
     errorif(
         not isinstance(coil, coil0.__class__),
@@ -1458,6 +1514,15 @@ def _check_type(coil0, coil):
         FourierXYCoil: ["X_basis", "Y_basis"],
         FourierXYZCoil: ["X_basis", "Y_basis", "Z_basis"],
         SplineXYZCoil: ["method", "N", "knots"],
+        FourierRZWindingCoil: [
+            "theta_basis",
+            "zeta_basis",
+            "R_basis",
+            "Z_basis",
+            "NFP",
+            "secular_theta",
+            "secular_zeta",
+        ],
     }
 
     for attr in attrs[coil0.__class__]:

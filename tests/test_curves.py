@@ -7,6 +7,8 @@ from desc.equilibrium import Equilibrium
 from desc.geometry import (
     FourierPlanarCurve,
     FourierRZCurve,
+    FourierRZToroidalSurface,
+    FourierRZWindingCurve,
     FourierXYCurve,
     FourierXYZCurve,
     SplineXYZCurve,
@@ -1270,3 +1272,137 @@ class TestSplineXYZCurve:
         c = SplineXYZCurve(X=R * np.cos(phi), Y=R * np.sin(phi), Z=np.zeros_like(phi))
         with pytest.raises(TypeError):
             c.compute("length", grid=np.linspace(0, 1, 10))
+
+
+class TestFourierRZWindingCurve:
+    """Tests for FourierRZWindingCurve (curve constrained to a surface)."""
+
+    @pytest.mark.unit
+    def test_construction(self):
+        """Test DOFs, metadata, and that shift/rotmat/secular are not optimized."""
+        c = FourierRZWindingCurve()
+        # only the surface copy and the angle series are DOFs
+        assert c.optimizable_params == ["R_lmn", "Z_lmn", "theta_n", "zeta_n"]
+        assert c.secular_theta == 1 and c.secular_zeta == 0
+        assert c.NFP == 1
+        # carries a private surface copy exposing the borrower interface
+        assert "R_lmn" in c.dimensions and "Z_lmn" in c.dimensions
+        assert hasattr(c, "R_basis") and hasattr(c, "Z_basis")
+        # secular terms must be integers
+        with pytest.raises(ValueError, match="must be integers"):
+            FourierRZWindingCurve(secular_theta=1.5)
+
+    @pytest.mark.unit
+    def test_compute_geometry(self):
+        """A default modular curve is the unit poloidal circle on the R0=10 surface."""
+        c = FourierRZWindingCurve()  # theta=s, zeta=0, minor radius a=1
+        grid = LinearGrid(N=40)
+        d = c.compute(["length", "curvature", "torsion"], grid=grid)
+        np.testing.assert_allclose(d["length"], 2 * np.pi, rtol=1e-10)
+        np.testing.assert_allclose(d["curvature"], 1.0, rtol=1e-10)
+        np.testing.assert_allclose(d["torsion"], 0.0, atol=1e-10)
+
+    @pytest.mark.unit
+    def test_derivatives_finite_difference(self):
+        """x_s, x_ss, x_sss match finite differences (fixes #844 x_ss/x_sss)."""
+        c = FourierRZWindingCurve(
+            theta_n=[0.1, 0, 0.2],
+            zeta_n=[0, 0, 0.1],
+            secular_theta=1,
+            secular_zeta=1,
+        )
+
+        def xyz_at(s):
+            g = Grid(np.array([[0.0, 0.0, s]]), sort=False)
+            R, phi, Z = c.compute("x", grid=g)["x"][0]
+            return np.array([R * np.cos(phi), R * np.sin(phi), Z])
+
+        def rpz2xyzvec(v, phi):
+            return np.array(
+                [
+                    v[0] * np.cos(phi) - v[1] * np.sin(phi),
+                    v[0] * np.sin(phi) + v[1] * np.cos(phi),
+                    v[2],
+                ]
+            )
+
+        s = 0.55
+        g = Grid(np.array([[0.0, 0.0, s]]), sort=False)
+        da = c.compute(["x", "x_s", "x_ss", "x_sss"], grid=g)
+        phi = float(da["x"][0, 1])
+        h = 1e-4
+        fd_s = (xyz_at(s + h) - xyz_at(s - h)) / (2 * h)
+        fd_ss = (xyz_at(s + h) - 2 * xyz_at(s) + xyz_at(s - h)) / h**2
+        np.testing.assert_allclose(
+            rpz2xyzvec(np.asarray(da["x_s"][0]), phi), fd_s, atol=1e-6
+        )
+        np.testing.assert_allclose(
+            rpz2xyzvec(np.asarray(da["x_ss"][0]), phi), fd_ss, atol=1e-5
+        )
+        # x_sss: check O(h^2) convergence of the 5-point stencil to the analytic value
+        analytic_sss = rpz2xyzvec(np.asarray(da["x_sss"][0]), phi)
+        errs = []
+        for hh in [1e-2, 5e-3]:
+            fd = (
+                xyz_at(s + 2 * hh)
+                - 2 * xyz_at(s + hh)
+                + 2 * xyz_at(s - hh)
+                - xyz_at(s - 2 * hh)
+            ) / (2 * hh**3)
+            errs.append(np.max(np.abs(fd - analytic_sss)))
+        # halving h should cut the O(h^2) error by ~4x
+        assert errs[1] < errs[0] / 3
+
+    @pytest.mark.unit
+    def test_change_resolution(self):
+        """change_resolution grows the angle bases and preserves coefficients."""
+        c = FourierRZWindingCurve(
+            theta_n=[0.3], modes_theta=[0], sym_theta=False, sym_zeta=False
+        )
+        c.change_resolution(N=3)
+        assert c.N == 3
+        assert c.theta_basis.N == 3 and c.zeta_basis.N == 3
+        # the original constant coefficient is retained
+        np.testing.assert_allclose(c.get_coeffs(0)[0], 0.3)
+
+    @pytest.mark.unit
+    def test_surface_consistency_tie(self):
+        """The curve is a valid CurveSurfaceConsistency borrower (PR1)."""
+        src = FourierRZToroidalSurface()
+        c = FourierRZWindingCurve(surface=src)  # carries a copy of src
+        con = c.surface_consistency(src)
+        con.build(verbose=0)
+        assert con.dim_f == c.R_basis.num_modes + c.Z_basis.num_modes
+        # copy starts consistent -> zero residual
+        f = con.compute(src.params_dict, c.params_dict)
+        np.testing.assert_allclose(f, 0.0, atol=1e-12)
+
+
+class TestFourierRZWindingCoil:
+    """Tests for FourierRZWindingCoil."""
+
+    @pytest.mark.unit
+    def test_field_of_circular_loop(self):
+        """A unit-radius modular coil gives B = mu0 I / (2a) at its center."""
+        from desc.coils import CoilSet, FourierRZWindingCoil
+
+        mu0 = 4 * np.pi * 1e-7
+        I = 1e6
+        coil = FourierRZWindingCoil(current=I)  # unit poloidal loop at R=10, zeta=0
+        assert coil.optimizable_params == [
+            "R_lmn",
+            "Z_lmn",
+            "current",
+            "theta_n",
+            "zeta_n",
+        ]
+        # field at the loop center (R=10, phi=0, Z=0)
+        B = coil.compute_magnetic_field(np.array([[10.0, 0.0, 0.0]]), basis="rpz")
+        np.testing.assert_allclose(np.linalg.norm(B), mu0 * I / (2 * 1.0), rtol=1e-4)
+        # a homogeneous CoilSet builds and doubles the field (two identical loops
+        # overlap, which trips the near-intersection warning -- expected here)
+        with pytest.warns(UserWarning, match="intersecting"):
+            cs = CoilSet([coil, coil.copy()])
+        assert cs.num_coils == 2
+        B2 = cs.compute_magnetic_field(np.array([[10.0, 0.0, 0.0]]), basis="rpz")
+        np.testing.assert_allclose(np.linalg.norm(B2), 2 * np.linalg.norm(B), rtol=1e-6)

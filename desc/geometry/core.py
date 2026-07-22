@@ -396,6 +396,123 @@ class Curve(IOAble, Optimizable, ABC):
         return FourierXYCurve.from_values(coords, N=N, s=s, basis=basis, name=name)
 
 
+class SurfaceCurve(Curve):
+    """Abstract base class for a closed curve constrained to lie on a surface.
+
+    A ``SurfaceCurve`` carries a read-only double-Fourier copy of the surface it lies
+    on (its ``R_lmn``/``Z_lmn``), so it can ``compute()`` its lab-frame geometry
+    standalone. That copy is a :class:`~desc.objectives.CurveSurfaceConsistency`
+    borrower: tie it to a live source (a ``Surface`` or ``Equilibrium``) with
+    ``surface_consistency`` when the source is free, or hold it fixed with
+    ``fix_surface``.
+
+    Subclasses parameterize the on-surface angles ``theta``, ``zeta`` as functions of a
+    curve parameter ``s``; this base supplies the embedding ``(theta, zeta) + surface ->
+    x`` and its ``s``-derivatives, and inherits ``length``/``curvature``/``torsion``/
+    Frenet from ``Curve``. Unlike a generic ``Curve`` it has no free rigid-body
+    transform (``shift``/``rotmat`` are fixed) -- the source surface already positions
+    it.
+    """
+
+    _io_attrs_ = Curve._io_attrs_ + ["_surface"]
+
+    def __init__(self, surface=None, name=""):
+        super().__init__(name)
+        from .surface import FourierRZToroidalSurface
+
+        if surface is None:
+            surface = FourierRZToroidalSurface()
+        errorif(
+            not isinstance(surface, FourierRZToroidalSurface),
+            TypeError,
+            "surface must be a FourierRZToroidalSurface, got " f"{type(surface)}.",
+        )
+        # private copy of the host surface -- the CurveSurfaceConsistency borrower
+        self._surface = surface.copy()
+
+    # -- no free rigid-body transform: the surface positions the curve (shift/rotmat
+    #    are redefined without @optimizable_parameter so they drop out of the DOFs) --
+    @property
+    def shift(self):
+        """Displacement of curve in X, Y, Z (fixed for a SurfaceCurve)."""
+        return self.__dict__.setdefault("_shift", jnp.array([0, 0, 0], dtype=float))
+
+    @shift.setter
+    def shift(self, new):
+        self._shift = jnp.asarray(new)
+
+    @property
+    def rotmat(self):
+        """Rotation matrix of curve in X, Y, Z (fixed identity for a SurfaceCurve)."""
+        return self.__dict__.setdefault("_rotmat", jnp.eye(3, dtype=float).flatten())
+
+    @rotmat.setter
+    def rotmat(self, new):
+        self._rotmat = jnp.asarray(new).flatten()
+
+    # -- the carried surface copy (delegated to the private FourierRZToroidalSurface) --
+    @property
+    def surface(self):
+        """FourierRZToroidalSurface: the curve's private copy of its host surface."""
+        return self._surface
+
+    @optimizable_parameter
+    @property
+    def R_lmn(self):
+        """ndarray: spectral coefficients of the surface copy's R."""
+        return self._surface.R_lmn
+
+    @R_lmn.setter
+    def R_lmn(self, new):
+        self._surface.R_lmn = new
+
+    @optimizable_parameter
+    @property
+    def Z_lmn(self):
+        """ndarray: spectral coefficients of the surface copy's Z."""
+        return self._surface.Z_lmn
+
+    @Z_lmn.setter
+    def Z_lmn(self, new):
+        self._surface.Z_lmn = new
+
+    @property
+    def R_basis(self):
+        """DoubleFourierSeries: basis for the surface copy's R."""
+        return self._surface.R_basis
+
+    @property
+    def Z_basis(self):
+        """DoubleFourierSeries: basis for the surface copy's Z."""
+        return self._surface.Z_basis
+
+    @property
+    def NFP(self):
+        """Number of field periods of the host surface."""
+        return self._surface.NFP
+
+    def surface_consistency(self, source, rho=None):
+        """Return a CurveSurfaceConsistency tying the surface copy to ``source``.
+
+        Parameters
+        ----------
+        source : Surface or Equilibrium
+            Live surface the copy should track. See
+            :class:`~desc.objectives.CurveSurfaceConsistency`.
+        rho : float, optional
+            Flux-surface label for an ``Equilibrium`` source (default the boundary).
+        """
+        from desc.objectives import CurveSurfaceConsistency
+
+        return CurveSurfaceConsistency(self, source, rho=rho)
+
+    def fix_surface(self):
+        """Return a FixParameters holding this curve's surface copy fixed."""
+        from desc.objectives import FixParameters
+
+        return FixParameters(self, {"R_lmn": True, "Z_lmn": True})
+
+
 class Surface(IOAble, Optimizable, ABC):
     """Abstract base class for 2d surfaces in 3d space."""
 
