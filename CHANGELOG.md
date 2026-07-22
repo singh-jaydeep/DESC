@@ -1,6 +1,16 @@
 Changelog
 =========
 
+New Features
+
+- Adds ``desc.objectives.CurveSurfaceConsistency``, a linear constraint that ties the
+  read-only double-Fourier surface copy a borrower carries (a curve-on-surface, or a
+  ``Surface`` for testing) to a live source surface: a separate ``Surface``, an
+  ``Equilibrium`` boundary (``rho=1``, proximal-safe), or an ``Equilibrium`` interior
+  flux surface (``rho<1``, via ``zernike_radial``). This collapses the copy and source
+  into a single reduced degree of freedom so the borrower can ``compute()`` standalone
+  while staying exactly on the source during optimization.
+
 Performance Improvements
 
 - Speeds up the ``"qr"`` trust-region subproblem and Newton-step solves in the least-squares optimizers by reusing the Jacobian QR factorization across the Levenberg-Marquardt parameter sweep. On ``jax >= 0.10.0`` this uses ``qr_multiply`` to additionally avoid forming ``Q`` explicitly; on older versions a fallback preserves the same results.

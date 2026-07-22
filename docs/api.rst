@@ -209,6 +209,7 @@ Objective Functions
     desc.objectives.CoilSetMinDistance
     desc.objectives.CoilTorsion
     desc.objectives.CurrentDensity
+    desc.objectives.CurveSurfaceConsistency
     desc.objectives.EffectiveRipple
     desc.objectives.Elongation
     desc.objectives.Energy

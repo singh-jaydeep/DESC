@@ -36,6 +36,7 @@ from desc.objectives import (
     BoundaryRSelfConsistency,
     BoundaryZSelfConsistency,
     CoilLength,
+    CurveSurfaceConsistency,
     Energy,
     FixBoundaryR,
     FixBoundaryZ,
@@ -699,6 +700,20 @@ def test_wrappers():
         ob.bounds_scaled[1], con[0].target / con[0].normalization
     )
     np.testing.assert_allclose(ob.weights, con[0].weight)
+
+
+@pytest.mark.unit
+def test_curve_surface_consistency_proximal_guard():
+    """Test CurveSurfaceConsistency with rho<1 under a proximal optimizer errors."""
+    eq = Equilibrium(L=2, M=2, N=0)
+    bor = eq.surface.copy()
+    objective = ObjectiveFunction(Volume(bor, target=100))
+    optimizer = Optimizer("proximal-lsq-exact")
+
+    # rho<1 ties the interior R_lmn/Z_lmn, which proximal strips -> loud error
+    constraints = (ForceBalance(eq), CurveSurfaceConsistency(bor, eq, rho=0.7))
+    with pytest.raises(ValueError, match="rho < 1"):
+        optimizer.optimize((eq, bor), objective, constraints, verbose=0, maxiter=1)
 
 
 class TestAllOptimizers:

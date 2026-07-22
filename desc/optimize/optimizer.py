@@ -10,6 +10,7 @@ from termcolor import colored
 from desc.backend import jnp
 from desc.io import IOAble
 from desc.objectives import (
+    CurveSurfaceConsistency,
     FixCurrent,
     FixIota,
     ObjectiveFunction,
@@ -635,6 +636,25 @@ def get_combined_constraint_objectives(  # noqa: C901
         eq, objective, nonlinear_constraints, opt_method, options
     )
     is_prox = isinstance(objective, ProximalProjection)
+    if is_prox:
+        # A CurveSurfaceConsistency tied to the interior (rho < 1) of the proximally
+        # projected equilibrium would fail silently: proximal strips the interior
+        # R_lmn/Z_lmn from the outer state vector (retaining only Rb_lmn/Zb_lmn), so
+        # the constraint's source DOFs are solved internally rather than exposed. Fail
+        # loudly instead. rho=1 (boundary) is proximal-safe and allowed.
+        for con in linear_constraints:
+            if (
+                isinstance(con, CurveSurfaceConsistency)
+                and objective._eq is con.things[0]
+                and con._rho not in (None, 1.0)
+            ):
+                raise ValueError(
+                    "CurveSurfaceConsistency with rho < 1 ties the interior "
+                    "R_lmn/Z_lmn of a proximally-projected equilibrium, which are "
+                    "solved internally rather than exposed as outer degrees of "
+                    "freedom. Use rho=1.0 (the boundary, which is proximal-safe) or a "
+                    "non-proximal optimizer."
+                )
     for t in things:
         if isinstance(t, Equilibrium) and is_prox:
             # don't add Equilibrium self-consistency if proximal is used

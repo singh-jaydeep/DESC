@@ -17,6 +17,7 @@ from desc.objectives import (
     AxisZSelfConsistency,
     BoundaryRSelfConsistency,
     BoundaryZSelfConsistency,
+    CurveSurfaceConsistency,
     FixAtomicNumber,
     FixAxisR,
     FixAxisZ,
@@ -51,14 +52,15 @@ from desc.objectives import (
     LinearObjectiveFromUser,
     ObjectiveFunction,
     ShareParameters,
+    Volume,
     get_equilibrium_objective,
     get_fixed_axis_constraints,
     get_fixed_boundary_constraints,
     get_NAE_constraints,
     maybe_add_self_consistency,
 )
-from desc.objectives.utils import factorize_linear_constraints
-from desc.optimize import LinearConstraintProjection
+from desc.objectives.utils import combine_args, factorize_linear_constraints
+from desc.optimize import LinearConstraintProjection, Optimizer
 from desc.profiles import PowerSeriesProfile
 
 
@@ -1152,6 +1154,146 @@ def test_share_parameters_two_optimizable_collections_CoilSet():
     abs_J_row_sums = np.abs(J).sum(axis=1)
     np.testing.assert_allclose(abs_J_row_sums, 2)
     np.testing.assert_allclose(J_row_sums, 0)
+
+
+@pytest.mark.unit
+def test_curve_surface_consistency_separate_surface():
+    """Test CurveSurfaceConsistency ties a borrower copy to a separate source."""
+    src = FourierRZToroidalSurface(
+        R_lmn=[10, 1, 0.2],
+        Z_lmn=[-1, -0.1],
+        modes_R=[[0, 0], [1, 0], [1, 1]],
+        modes_Z=[[-1, 0], [-1, 1]],
+    )
+    bor = src.copy()  # the copy starts consistent and shares the basis
+
+    con = CurveSurfaceConsistency(bor, src)
+    con.build(verbose=0)
+
+    # dim_f is one residual per borrower R and Z mode; A is the identity
+    assert con.dim_f == bor.R_basis.num_modes + bor.Z_basis.num_modes
+    np.testing.assert_allclose(con._A["R_lmn"], np.eye(src.R_basis.num_modes))
+    np.testing.assert_allclose(con._A["Z_lmn"], np.eye(src.Z_basis.num_modes))
+
+    # consistent copy -> zero residual; perturbing the copy shows up one-for-one
+    np.testing.assert_allclose(con.compute(src.params_dict, bor.params_dict), 0)
+    bor2 = src.copy()
+    d = np.zeros(bor2.R_lmn.size)
+    d[1] = 0.5
+    bor2.R_lmn = np.asarray(bor2.R_lmn) + d
+    f = con.compute(src.params_dict, bor2.params_dict)
+    np.testing.assert_allclose(np.max(np.abs(f)), 0.5)
+
+    # jacobian rows are [+I | -I]: each row sums to 0 with two unit entries
+    obj = ObjectiveFunction((Volume(src), Volume(bor)))
+    con_of = ObjectiveFunction(CurveSurfaceConsistency(bor, src))
+    obj.build(verbose=0)
+    con_of.build(verbose=0)
+    obj, con_of = combine_args(obj, con_of)
+    J = con_of.jac_unscaled(obj.x(src, bor))
+    np.testing.assert_allclose(J.sum(axis=1), 0)
+    np.testing.assert_allclose(np.abs(J).sum(axis=1), 2)
+
+    # factorize collapses the copy and source into a single reduced coordinate
+    out = factorize_linear_constraints(obj, con_of)
+    Z = out[3]
+    assert Z.shape[1] == obj.dim_x - con_of.objectives[0].dim_f
+
+
+@pytest.mark.unit
+def test_curve_surface_consistency_equilibrium():
+    """Test CurveSurfaceConsistency against an Equilibrium boundary and interior."""
+    from desc.basis import zernike_radial
+
+    eq = desc.examples.get("DSHAPE")
+
+    # rho=1 -> identity link to the boundary DOFs Rb_lmn / Zb_lmn
+    bor = eq.surface.copy()
+    con = CurveSurfaceConsistency(bor, eq, rho=1.0)
+    con.build(verbose=0)
+    assert con._src_R_key == "Rb_lmn" and con._src_Z_key == "Zb_lmn"
+    np.testing.assert_allclose(con._A["R_lmn"], np.eye(bor.R_basis.num_modes))
+    np.testing.assert_allclose(con.compute(eq.params_dict, bor.params_dict), 0)
+    # rho=None behaves like rho=1
+    con_none = CurveSurfaceConsistency(eq.surface.copy(), eq)
+    con_none.build(verbose=0)
+    assert con_none._src_R_key == "Rb_lmn"
+
+    # rho<1 -> interior link via A = zernike_radial(rho)
+    rho = 0.7
+    bor2 = eq.surface.copy()
+    con2 = CurveSurfaceConsistency(bor2, eq, rho=rho)
+    con2.build(verbose=0)
+    assert con2._src_R_key == "R_lmn" and con2._src_Z_key == "Z_lmn"
+    # build a reference projection matrix and compare
+    src_modes = eq.R_basis.modes
+    w = zernike_radial(rho, src_modes[:, 0], src_modes[:, 1])
+    ref = np.zeros_like(con2._A["R_lmn"])
+    dst = bor2.R_basis.modes
+    for j, (_, m, n) in enumerate(src_modes):
+        i = np.argwhere((dst[:, 1:] == [m, n]).all(axis=1)).flatten()
+        ref[i, j] = w[j]
+    np.testing.assert_allclose(con2._A["R_lmn"], ref)
+
+
+@pytest.mark.unit
+def test_curve_surface_consistency_errors():
+    """Test CurveSurfaceConsistency rejects malformed pairings at build."""
+    from desc.geometry import FourierRZCurve
+
+    surf = FourierRZToroidalSurface()
+    eq = Equilibrium(L=2, M=2, N=0)
+
+    # a plain curve has no surface copy
+    with pytest.raises(ValueError, match="double-Fourier surface"):
+        CurveSurfaceConsistency(FourierRZCurve(), surf).build(verbose=0)
+
+    # mismatched (m, n) content between source and borrower
+    other = FourierRZToroidalSurface(
+        R_lmn=[10, 1, 0.1],
+        Z_lmn=[-1, -0.1],
+        modes_R=[[0, 0], [1, 0], [2, 0]],
+        modes_Z=[[-1, 0], [-2, 0]],
+    )
+    with pytest.raises(ValueError, match="different .m, n. mode content"):
+        CurveSurfaceConsistency(other, surf).build(verbose=0)
+
+    # rho only applies to an Equilibrium source
+    with pytest.raises(ValueError, match="rho only applies"):
+        CurveSurfaceConsistency(surf.copy(), surf, rho=0.5).build(verbose=0)
+
+    # rho must be in (0, 1]
+    with pytest.raises(ValueError, match="rho must be in"):
+        CurveSurfaceConsistency(eq.surface.copy(), eq, rho=1.5).build(verbose=0)
+
+
+@pytest.mark.unit
+@pytest.mark.optimize
+def test_curve_surface_consistency_optimize():
+    """A short optimize keeps the borrower copy exactly equal to the source."""
+    src = FourierRZToroidalSurface(
+        R_lmn=[10, 1],
+        Z_lmn=[-1],
+        modes_R=[[0, 0], [1, 0]],
+        modes_Z=[[-1, 0]],
+    )
+    # start the copy inconsistent to check it snaps onto the source
+    bor = src.copy()
+    bor.R_lmn = np.asarray(bor.R_lmn) + np.array([0.0, 0.3])
+
+    V0 = src.compute("V")["V"]
+    objective = ObjectiveFunction(Volume(src, target=2 * V0))
+    constraints = (CurveSurfaceConsistency(bor, src),)
+
+    optimizer = Optimizer("fmintr")
+    (src, bor), _ = optimizer.optimize(
+        (src, bor), objective, constraints, verbose=0, maxiter=25
+    )
+    # the copy tracks the source exactly at the solution
+    np.testing.assert_allclose(bor.R_lmn, src.R_lmn, atol=1e-12)
+    np.testing.assert_allclose(bor.Z_lmn, src.Z_lmn, atol=1e-12)
+    # and the objective actually moved the source
+    np.testing.assert_allclose(src.compute("V")["V"], 2 * V0, rtol=1e-3)
 
 
 @pytest.mark.unit

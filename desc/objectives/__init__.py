@@ -69,6 +69,7 @@ from .linear_objectives import (
     AxisZSelfConsistency,
     BoundaryRSelfConsistency,
     BoundaryZSelfConsistency,
+    CurveSurfaceConsistency,
     FixAnisotropy,
     FixAtomicNumber,
     FixAxisR,

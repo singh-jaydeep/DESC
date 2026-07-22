@@ -20,7 +20,7 @@ from desc.backend import (
     tree_structure,
 )
 from desc.basis import zernike_radial
-from desc.geometry import FourierRZCurve
+from desc.geometry import FourierRZCurve, Surface
 from desc.utils import broadcast_tree, errorif, setdefault
 
 from .normalization import compute_scaling_factors
@@ -659,6 +659,226 @@ class BoundaryZSelfConsistency(_Objective):
 
         """
         return jnp.dot(self._A, params["Z_lmn"]) - params["Zb_lmn"]
+
+
+def _surface_projection(src_basis, dst_basis, rho=None):
+    """Build the matrix mapping a source's spectral coeffs to a surface copy.
+
+    Rows are indexed by ``dst_basis`` (the borrower's double-Fourier surface copy) and
+    columns by ``src_basis`` (the source). Entry ``(i, j)`` is nonzero only where the
+    ``(m, n)`` of source mode ``j`` matches borrower mode ``i``:
+
+    - ``rho is None`` (source is itself a double-Fourier surface: a ``Surface`` or an
+      ``Equilibrium`` boundary at rho=1): the coefficient passes straight through, so
+      the matrix is a permutation (the identity when the bases are in the same order).
+    - ``rho in (0, 1)`` (source is a Fourier-Zernike ``Equilibrium`` volume): the
+      surface at fixed rho is ``R_mn(rho) = sum_l zernike_radial(rho, l, m) * R_lmn``,
+      so each borrower mode sums its matching source modes weighted by the radial
+      polynomial.
+
+    Requires the ``(m, n)`` content of the two bases to be identical; otherwise the copy
+    could not equal the source and a ``ValueError`` is raised.
+    """
+    src_modes = src_basis.modes
+    dst_modes = dst_basis.modes
+    src_mn = set(map(tuple, src_modes[:, 1:].tolist()))
+    dst_mn = set(map(tuple, dst_modes[:, 1:].tolist()))
+    errorif(
+        src_mn != dst_mn,
+        ValueError,
+        "source and borrower surfaces have different (m, n) mode content, so the copy "
+        "cannot be made equal to the source. Match their poloidal/toroidal "
+        "resolution.\n"
+        f"  only in source:   {sorted(src_mn - dst_mn)}\n"
+        f"  only in borrower: {sorted(dst_mn - src_mn)}",
+    )
+    if rho is None:
+        weights = np.ones(src_basis.num_modes)
+    else:
+        weights = zernike_radial(rho, src_modes[:, 0], src_modes[:, 1])
+    A = np.zeros((dst_basis.num_modes, src_basis.num_modes))
+    for j, (_, m, n) in enumerate(src_modes):
+        i = np.argwhere((dst_modes[:, 1:] == [m, n]).all(axis=1)).flatten()
+        A[i, j] = weights[j]
+    return A
+
+
+class CurveSurfaceConsistency(_Objective):
+    """Tie a borrower's stored surface copy to a live source surface.
+
+    Enforces ``A @ source[R] - borrower[R_lmn] = 0`` (and likewise for Z), where the
+    read-only double-Fourier copy the borrower carries is constrained to equal a source
+    surface. Because it is linear, ``LinearConstraintProjection`` collapses the copy and
+    the source into a single reduced degree of freedom, so the borrower can
+    ``compute()`` standalone (it owns its surface params) while staying exactly on the
+    source during optimization.
+
+    Three regimes, all linear (``A`` is intrinsic to the pairing, not a knob):
+
+    - separate ``Surface`` source: ``A`` maps ``source.R_lmn`` through by matching
+      modes;
+    - ``Equilibrium`` boundary (``rho=1``, default): ties the copy to
+      ``Rb_lmn``/``Zb_lmn`` (proximal-safe, since proximal retains the boundary DOFs);
+    - ``Equilibrium`` interior (``rho<1``): ties the copy to the volume
+      ``R_lmn``/``Z_lmn`` via ``A = zernike_radial(rho)`` (not usable under
+      ``ProximalProjection``, which strips the interior DOFs -- an explicit error is
+      raised there).
+
+    Parameters
+    ----------
+    borrower : Optimizable
+        Object carrying the surface copy: a curve-on-surface or (for testing) a
+        ``Surface``. Must expose ``R_lmn``/``Z_lmn`` and ``R_basis``/``Z_basis``. A
+        plain curve (``R_n``/``Z_n`` or ``X_n``/``Y_n``/``Z_n``) has no surface copy and
+        is rejected at ``build``.
+    source : Surface or Equilibrium
+        Object supplying the reference surface.
+    rho : float, optional
+        ``Equilibrium`` source only. ``1.0`` (default, or ``None``) -> boundary DOFs
+        ``Rb_lmn``/``Zb_lmn`` (proximal-safe); ``rho < 1`` -> interior
+        ``R_lmn``/``Z_lmn`` via ``A = zernike_radial(rho)``. Must be ``None``/``1.0``
+        for a ``Surface`` source.
+    name : str, optional
+        Name of the objective function.
+
+    """
+
+    __doc__ = __doc__.rstrip() + collect_docs(
+        overwrite={
+            "target": "",
+            "bounds": "",
+            "normalize": "",
+            "normalize_target": "",
+            "weight": "",
+        }
+    )
+    _static_attrs = _Objective._static_attrs + ["_src_R_key", "_src_Z_key", "_rho"]
+    _scalar = False
+    _linear = True
+    _fixed = False  # not "diagonal", since it is fixing a sum
+    _units = "(m)"
+    _print_value_fmt = "Curve-surface consistency error: "
+
+    def __init__(
+        self,
+        borrower,
+        source,
+        rho=None,
+        name="curve-surface consistency",
+    ):
+        self._rho = rho
+        # things order is [source, borrower]; compute() relies on it.
+        super().__init__(
+            things=[source, borrower],
+            target=0,
+            bounds=None,
+            weight=1,
+            normalize=False,
+            normalize_target=False,
+            name=name,
+        )
+
+    @execute_on_cpu
+    def build(self, use_jit=False, verbose=1):
+        """Build constant arrays.
+
+        Parameters
+        ----------
+        use_jit : bool, optional
+            Whether to just-in-time compile the objective and derivatives.
+        verbose : int, optional
+            Level of output.
+
+        """
+        from desc.equilibrium import Equilibrium
+
+        source, borrower = self.things
+
+        # borrower must carry a double-Fourier surface copy
+        errorif(
+            ("R_lmn" not in borrower.dimensions)
+            or ("Z_lmn" not in borrower.dimensions),
+            ValueError,
+            "borrower must carry a double-Fourier surface (expose R_lmn / Z_lmn); a "
+            "plain curve does not -- did you mean a curve-on-surface?",
+        )
+        errorif(
+            not (hasattr(borrower, "R_basis") and hasattr(borrower, "Z_basis")),
+            ValueError,
+            "borrower must expose R_basis / Z_basis for its surface copy.",
+        )
+
+        if isinstance(source, Equilibrium):
+            if self._rho is None or self._rho == 1.0:
+                self._src_R_key, self._src_Z_key = "Rb_lmn", "Zb_lmn"
+                src_R_basis = source.surface.R_basis
+                src_Z_basis = source.surface.Z_basis
+                rho = None
+            else:
+                errorif(
+                    not (0.0 < self._rho < 1.0),
+                    ValueError,
+                    f"rho must be in (0, 1], got {self._rho}.",
+                )
+                self._src_R_key, self._src_Z_key = "R_lmn", "Z_lmn"
+                src_R_basis = source.R_basis
+                src_Z_basis = source.Z_basis
+                rho = self._rho
+        elif isinstance(source, Surface):
+            errorif(
+                self._rho not in (None, 1.0),
+                ValueError,
+                "rho only applies to an Equilibrium source; leave it None (or 1.0) for "
+                "a Surface source.",
+            )
+            self._src_R_key, self._src_Z_key = "R_lmn", "Z_lmn"
+            src_R_basis = source.R_basis
+            src_Z_basis = source.Z_basis
+            rho = None
+        else:
+            raise ValueError(
+                f"source must be a Surface or Equilibrium, got {type(source)}."
+            )
+
+        self._A = {
+            "R_lmn": _surface_projection(src_R_basis, borrower.R_basis, rho),
+            "Z_lmn": _surface_projection(src_Z_basis, borrower.Z_basis, rho),
+        }
+        self._dim_f = borrower.R_basis.num_modes + borrower.Z_basis.num_modes
+
+        super().build(use_jit=use_jit, verbose=verbose)
+
+    def compute(self, params_source, params_borrower, constants=None):
+        """Compute curve-surface consistency errors.
+
+        The mismatch between the source surface (projected to the borrower's basis) and
+        the double-Fourier copy the borrower carries, for R and Z stacked together.
+
+        Parameters
+        ----------
+        params_source : dict
+            Degrees of freedom of the source (a Surface or Equilibrium).
+        params_borrower : dict
+            Degrees of freedom of the borrower carrying the surface copy.
+        constants : dict
+            Dictionary of constant data, eg transforms, profiles etc. Defaults to
+            self.constants. (Deprecated)
+
+        Returns
+        -------
+        f : ndarray
+            Curve-surface consistency errors.
+
+        """
+        R_err = (
+            jnp.dot(self._A["R_lmn"], params_source[self._src_R_key])
+            - params_borrower["R_lmn"]
+        )
+        Z_err = (
+            jnp.dot(self._A["Z_lmn"], params_source[self._src_Z_key])
+            - params_borrower["Z_lmn"]
+        )
+        return jnp.concatenate([R_err, Z_err])
 
 
 class AxisRSelfConsistency(_Objective):
