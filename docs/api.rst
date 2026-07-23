@@ -123,6 +123,7 @@ Geometry
     desc.geometry.FourierRZCurve
     desc.geometry.FourierRZToroidalSurface
     desc.geometry.FourierRZWindingCurve
+    desc.geometry.FourierUmbilicCurve
     desc.geometry.FourierXYCurve
     desc.geometry.FourierXYZCurve
     desc.geometry.SplineXYZCurve
@@ -283,6 +284,7 @@ Objective Functions
     desc.objectives.SurfaceQuadraticFlux
     desc.objectives.ToroidalCurrent
     desc.objectives.ToroidalFlux
+    desc.objectives.UmbilicHighCurvature
     desc.objectives.VacuumBoundaryError
     desc.objectives.Volume
 

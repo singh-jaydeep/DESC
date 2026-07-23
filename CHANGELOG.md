@@ -17,7 +17,21 @@ New Features
   ``Equilibrium`` boundary (``rho=1``, proximal-safe), or an ``Equilibrium`` interior
   flux surface (``rho<1``, via ``zernike_radial``). This collapses the copy and source
   into a single reduced degree of freedom so the borrower can ``compute()`` standalone
-  while staying exactly on the source during optimization.
+  while staying exactly on the source during optimization. The borrower may also be a
+  ``CoilSet`` of curve-on-surface coils, in which case the single constraint fans out to
+  tie every member's copy to the one source.
+- Adds ``desc.geometry.FourierUmbilicCurve``: a closed umbilic curve on a surface, with
+  poloidal angle ``theta(zeta) = (m*NFP/n)*zeta + (1/n) * sum_k a_n[k] sin(k*NFP*zeta)``
+  (arXiv:2505.04211, eq. 6) where ``gcd(m, n) = 1`` and the curve closes after
+  ``n/gcd(n, NFP)`` toroidal transits. Like the winding curve it is a ``SurfaceCurve``
+  (carries a surface copy, inherits the lab-frame embedding and
+  ``length``/``curvature``/``torsion``), and it shares the ``CurveSurfaceConsistency``
+  coupling. ``FourierUmbilicCurve.from_values`` fits sampled ``theta(zeta)`` and infers
+  the ``(m, n)`` topology.
+- Adds ``desc.objectives.UmbilicHighCurvature``, which drives an ``Equilibrium`` or
+  ``FourierRZToroidalSurface`` boundary's minimum principal curvature strongly negative
+  along a ``FourierUmbilicCurve``, sharpening the plasma boundary into a high-curvature
+  umbilic edge (normalized by the minor radius, so a circular boundary reads ``-1``).
 
 Performance Improvements
 
