@@ -7,7 +7,7 @@ import numpy as np
 
 from desc.backend import jnp, put
 from desc.basis import FourierSeries
-from desc.grid import LinearGrid
+from desc.grid import Grid, LinearGrid
 from desc.io import InputReader
 from desc.optimizable import optimizable_parameter
 from desc.transform import Transform
@@ -2013,4 +2013,236 @@ class FourierRZWindingCurve(SurfaceCurve):
             sym_theta=False,
             sym_zeta=False,
             name=name,
+        )
+
+
+class FourierUmbilicCurve(SurfaceCurve):
+    """Closed umbilic curve on a surface, parameterized by theta(zeta).
+
+    The curve lies on its host surface; its poloidal angle follows the umbilic
+    parametrization (arXiv:2505.04211, eq. 6 -- "Form A"):
+
+        theta(zeta) = (m*NFP/n)*zeta + (1/n) * sum_k a_n[k] sin(k*NFP*zeta)
+
+    with the toroidal angle ``zeta`` itself the curve parameter and ``gcd(m, n) = 1``.
+    The secular slope ``m*NFP/n`` and the ``1/n`` amplitude prefactor are the only place
+    the integer ``n = n_umbilic`` enters; the modulation ``UC = sum_k a_n[k]
+    sin(k*NFP*zeta)`` is a standard ``FourierSeries(N, NFP)`` at frequency ``k*NFP``
+    (NFP-periodic, because the umbilic locus of an NFP-symmetric surface is). The curve
+    closes after ``n/gcd(n, NFP)`` toroidal transits, so ``zeta`` runs over
+    ``[0, 2*pi*n/gcd(n, NFP))``. Lab-frame position and derivatives come from the
+    carried surface copy (see :class:`~desc.geometry.core.SurfaceCurve`).
+
+    Parameters
+    ----------
+    surface : FourierRZToroidalSurface
+        Host surface the curve lies on. A private copy is carried; tie it to a live
+        source with ``surface_consistency`` or hold it fixed with ``fix_surface``.
+    a_n : array-like
+        Fourier coefficients of the umbilic modulation ``UC(zeta)``. With the default
+        ``sym="sin"``, coefficient ``a_n[k]`` multiplies ``sin(k*NFP*zeta)`` and lives
+        at basis mode ``-k``.
+    modes : array-like, optional
+        Mode numbers for ``a_n``. Default ``[-N:N]`` (only modes present in the
+        symmetric basis are kept).
+    m_umbilic, n_umbilic : int
+        Umbilic integers; ``theta`` has secular slope ``m_umbilic*NFP/n_umbilic`` and
+        the curve closes after ``n_umbilic/gcd(n_umbilic, NFP)`` transits. Coprime.
+        Fixed integer metadata, not optimized. Defaults ``1``, ``1`` (ordinary
+        single-transit flux-surface curve).
+    sym : {"sin", "cos", False}, optional
+        Symmetry of the modulation series. Default ``"sin"`` enforces stellarator
+        symmetry of the umbilic locus.
+    name : str
+        Name for this curve.
+
+    """
+
+    _io_attrs_ = SurfaceCurve._io_attrs_ + [
+        "_a_n",
+        "_m_umbilic",
+        "_n_umbilic",
+        "_UC_basis",
+        "_sym",
+    ]
+    _static_attrs = SurfaceCurve._static_attrs + [
+        "_UC_basis",
+        "_m_umbilic",
+        "_n_umbilic",
+        "_sym",
+    ]
+
+    def __init__(
+        self,
+        surface=None,
+        a_n=[0],
+        modes=None,
+        m_umbilic=1,
+        n_umbilic=1,
+        sym="sin",
+        name="",
+    ):
+        super().__init__(surface, name)
+
+        a_n = np.atleast_1d(a_n)
+        if modes is None:
+            modes = np.arange(-(a_n.size // 2), a_n.size // 2 + 1)
+        else:
+            modes = np.asarray(modes)
+        if a_n.size == 0:
+            raise ValueError("At least 1 coefficient for a_n must be supplied")
+        errorif(
+            a_n.size != modes.size,
+            ValueError,
+            "a_n size and modes must be the same size",
+        )
+        errorif(
+            m_umbilic != int(m_umbilic) or n_umbilic != int(n_umbilic),
+            ValueError,
+            "m_umbilic and n_umbilic must be integers (curve topology), got "
+            f"{m_umbilic}, {n_umbilic}.",
+        )
+        m_umbilic, n_umbilic = int(m_umbilic), int(n_umbilic)
+        errorif(
+            n_umbilic < 1,
+            ValueError,
+            f"n_umbilic must be a positive integer, got {n_umbilic}.",
+        )
+        errorif(
+            np.gcd(m_umbilic, n_umbilic) != 1,
+            ValueError,
+            "m_umbilic and n_umbilic must be coprime (gcd == 1), got gcd("
+            f"{m_umbilic}, {n_umbilic}) = {np.gcd(m_umbilic, n_umbilic)}.",
+        )
+        self._m_umbilic = m_umbilic
+        self._n_umbilic = n_umbilic
+        self._sym = sym
+
+        N = int(np.max(np.abs(modes)))
+        # NFP from the surface copy: the umbilic modulation is NFP-periodic.
+        self._UC_basis = FourierSeries(N, int(self.NFP), sym=sym)
+        self._a_n = copy_coeffs(a_n, modes, self.UC_basis.modes[:, 2])
+
+    @property
+    def sym(self):
+        """Symmetry of the umbilic modulation series."""
+        return self._sym
+
+    @property
+    def UC_basis(self):
+        """Spectral basis for the umbilic modulation UC(zeta)."""
+        return self._UC_basis
+
+    @property
+    def N(self):
+        """Maximum mode number of the modulation series."""
+        return self.UC_basis.N
+
+    @property
+    def m_umbilic(self):
+        """int: poloidal winding numerator (theta slope = m_umbilic*NFP/n_umbilic)."""
+        return self._m_umbilic
+
+    @property
+    def n_umbilic(self):
+        """int: closure/period denominator, coprime with m_umbilic."""
+        return self._n_umbilic
+
+    @property
+    def num_transits(self):
+        """int: toroidal transits the curve spans before closing, n/gcd(n, NFP)."""
+        return int(self.n_umbilic // np.gcd(self.n_umbilic, int(self.NFP)))
+
+    @optimizable_parameter
+    @property
+    def a_n(self):
+        """ndarray: Fourier coefficients of the umbilic modulation UC(zeta)."""
+        return self._a_n
+
+    @a_n.setter
+    def a_n(self, new):
+        if len(new) == self.UC_basis.num_modes:
+            self._a_n = jnp.asarray(new)
+        else:
+            raise ValueError(
+                f"a_n should have the same size as the basis, got {len(new)} for "
+                + f"basis with {self.UC_basis.num_modes} modes."
+            )
+
+    def change_resolution(self, N=None, sym=None):
+        """Change the maximum mode number of the modulation Fourier series."""
+        if (N is not None and N != self.N) or (sym is not None and sym != self.sym):
+            sym = self.sym if sym is None else sym
+            N = int(self.N if N is None else N)
+            modes_old = self.UC_basis.modes
+            self.UC_basis.change_resolution(N=N, NFP=int(self.NFP), sym=sym)
+            self._a_n = copy_coeffs(
+                self.a_n, modes_old[:, 2], self.UC_basis.modes[:, 2]
+            )
+            self._sym = sym
+
+    def get_coeffs(self, n):
+        """Get Fourier coefficients for given mode number(s)."""
+        n = np.atleast_1d(n).astype(int)
+        a = np.zeros_like(n).astype(float)
+        idx = np.where(n[:, np.newaxis] == self.UC_basis.modes[:, 2])
+        a[idx[0]] = self.a_n[idx[1]]
+        return a
+
+    def set_coeffs(self, n, a_n=None):
+        """Set specific Fourier coefficients."""
+        n, a_n = np.atleast_1d(n), np.atleast_1d(a_n)
+        a_n = np.broadcast_to(a_n, n.shape)
+        for nn, aa in zip(n, a_n):
+            if aa is not None:
+                self.a_n = put(self.a_n, self.UC_basis.get_idx(0, 0, nn), aa)
+
+    def _loop_grid(self):
+        """Base Grid over the whole closure loop zeta in [0, 2*pi*num_transits).
+
+        Uniform nodes with explicit ``spacing[:, 2] = L/Nz`` so ``length`` integrates
+        over every toroidal transit. A ``LinearGrid`` cannot be used: it caps zeta at
+        one field period and re-weights modulo ``2*pi/NFP`` (see ``surface_curve_plan``,
+        "Grid & closure").
+        """
+        p = self.num_transits
+        NFP = int(self.NFP)
+        L = 2 * np.pi * p
+        # resolve the surface + modulation over each transit, scaled by transit count
+        Msurf, Nsurf = self._surface.M, self._surface.N
+        per_transit = 2 * (self.N + Nsurf + Msurf * abs(self.m_umbilic)) * NFP + 5
+        Nz = int(per_transit * p)
+        zeta = np.linspace(0, L, Nz, endpoint=False)
+        nodes = np.column_stack([np.ones(Nz), np.zeros(Nz), zeta])
+        spacing = np.column_stack([np.ones(Nz), np.ones(Nz), np.full(Nz, L / Nz)])
+        return Grid(nodes, spacing=spacing, sort=False, jitable=False)
+
+    def compute(
+        self,
+        names,
+        grid=None,
+        params=None,
+        transforms=None,
+        data=None,
+        override_grid=True,
+        **kwargs,
+    ):
+        """Compute quantities, injecting umbilic metadata and the closure-loop grid."""
+        kwargs.setdefault("m_umbilic", self.m_umbilic)
+        kwargs.setdefault("n_umbilic", self.n_umbilic)
+        kwargs.setdefault("NFP", int(self.NFP))
+        if grid is None:
+            # our loop grid already spans the full closure at full resolution, so there
+            # is nothing to override -- and the base 0d path would otherwise recompute
+            # length/center on a single-period LinearGrid (wrong for multi-transit).
+            grid = self._loop_grid()
+            override_grid = False
+        return super().compute(
+            names,
+            grid=grid,
+            params=params,
+            transforms=transforms,
+            data=data,
+            override_grid=override_grid,
+            **kwargs,
         )

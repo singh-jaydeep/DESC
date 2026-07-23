@@ -1418,6 +1418,189 @@ def _zeta_sss_FourierRZWindingCurve(params, transforms, profiles, data, **kwargs
 
 
 # ---------------------------------------------------------------------------
+# FourierUmbilicCurve: on-surface angles theta(zeta), parameter s == zeta
+# ---------------------------------------------------------------------------
+# Form A (arXiv:2505.04211, eq. 6):
+#     theta(zeta) = (m*NFP/n)*zeta + (1/n) * sum_k a_n[k] sin(k*NFP*zeta),  gcd(m,n)=1
+# The curve parameter IS zeta, so zeta_s=1, zeta_ss=zeta_sss=0. The umbilic integers
+# m_umbilic, n_umbilic and NFP are fixed metadata, injected as kwargs by
+# FourierUmbilicCurve.compute (mirroring the winding curve's secular kwargs). The
+# modulation UC = sum_k a_n[k] sin(k*NFP*zeta) is a standard FourierSeries(N, NFP) --
+# NOT rescaled by n (no N_scaling); the n factor lives only in the secular slope and
+# the 1/n amplitude prefactor here.
+_umbilic_doc = {
+    "m_umbilic": "int : poloidal winding numerator; theta secular slope is m*NFP/n.",
+    "n_umbilic": "int : closure/period denominator, coprime with m (gcd(m,n)=1).",
+    "NFP": "int : number of field periods of the host surface.",
+}
+
+
+@register_compute_fun(
+    name="theta",
+    label="\\theta",
+    units="~",
+    units_long="None",
+    description="Poloidal angle along the curve",
+    dim=1,
+    params=["a_n"],
+    transforms={"UC": [[0, 0, 0]], "grid": []},
+    profiles=[],
+    coordinates="s",
+    data=[],
+    parameterization="desc.geometry.curve.FourierUmbilicCurve",
+    **_umbilic_doc,
+)
+def _theta_FourierUmbilicCurve(params, transforms, profiles, data, **kwargs):
+    zeta = transforms["grid"].nodes[:, 2]
+    m, n, NFP = kwargs["m_umbilic"], kwargs["n_umbilic"], kwargs["NFP"]
+    UC = transforms["UC"].transform(params["a_n"], dz=0)
+    data["theta"] = (m * NFP * zeta + UC) / n
+    return data
+
+
+@register_compute_fun(
+    name="theta_s",
+    label="\\partial_s \\theta",
+    units="~",
+    units_long="None",
+    description="Poloidal angle along the curve, first derivative wrt s",
+    dim=1,
+    params=["a_n"],
+    transforms={"UC": [[0, 0, 1]], "grid": []},
+    profiles=[],
+    coordinates="s",
+    data=[],
+    parameterization="desc.geometry.curve.FourierUmbilicCurve",
+    **_umbilic_doc,
+)
+def _theta_s_FourierUmbilicCurve(params, transforms, profiles, data, **kwargs):
+    zeta = transforms["grid"].nodes[:, 2]
+    m, n, NFP = kwargs["m_umbilic"], kwargs["n_umbilic"], kwargs["NFP"]
+    UC_z = transforms["UC"].transform(params["a_n"], dz=1)
+    data["theta_s"] = (m * NFP * jnp.ones_like(zeta) + UC_z) / n
+    return data
+
+
+@register_compute_fun(
+    name="theta_ss",
+    label="\\partial_{ss} \\theta",
+    units="~",
+    units_long="None",
+    description="Poloidal angle along the curve, second derivative wrt s",
+    dim=1,
+    params=["a_n"],
+    transforms={"UC": [[0, 0, 2]]},
+    profiles=[],
+    coordinates="s",
+    data=[],
+    parameterization="desc.geometry.curve.FourierUmbilicCurve",
+    **{"n_umbilic": _umbilic_doc["n_umbilic"]},
+)
+def _theta_ss_FourierUmbilicCurve(params, transforms, profiles, data, **kwargs):
+    UC_zz = transforms["UC"].transform(params["a_n"], dz=2)
+    data["theta_ss"] = UC_zz / kwargs["n_umbilic"]
+    return data
+
+
+@register_compute_fun(
+    name="theta_sss",
+    label="\\partial_{sss} \\theta",
+    units="~",
+    units_long="None",
+    description="Poloidal angle along the curve, third derivative wrt s",
+    dim=1,
+    params=["a_n"],
+    transforms={"UC": [[0, 0, 3]]},
+    profiles=[],
+    coordinates="s",
+    data=[],
+    parameterization="desc.geometry.curve.FourierUmbilicCurve",
+    **{"n_umbilic": _umbilic_doc["n_umbilic"]},
+)
+def _theta_sss_FourierUmbilicCurve(params, transforms, profiles, data, **kwargs):
+    UC_zzz = transforms["UC"].transform(params["a_n"], dz=3)
+    data["theta_sss"] = UC_zzz / kwargs["n_umbilic"]
+    return data
+
+
+@register_compute_fun(
+    name="zeta",
+    label="\\zeta",
+    units="~",
+    units_long="None",
+    description="Toroidal angle along the curve",
+    dim=1,
+    params=[],
+    transforms={"grid": []},
+    profiles=[],
+    coordinates="s",
+    data=[],
+    parameterization="desc.geometry.curve.FourierUmbilicCurve",
+)
+def _zeta_FourierUmbilicCurve(params, transforms, profiles, data, **kwargs):
+    # the curve parameter is zeta itself
+    data["zeta"] = transforms["grid"].nodes[:, 2]
+    return data
+
+
+@register_compute_fun(
+    name="zeta_s",
+    label="\\partial_s \\zeta",
+    units="~",
+    units_long="None",
+    description="Toroidal angle along the curve, first derivative wrt s",
+    dim=1,
+    params=[],
+    transforms={"grid": []},
+    profiles=[],
+    coordinates="s",
+    data=[],
+    parameterization="desc.geometry.curve.FourierUmbilicCurve",
+)
+def _zeta_s_FourierUmbilicCurve(params, transforms, profiles, data, **kwargs):
+    data["zeta_s"] = jnp.ones_like(transforms["grid"].nodes[:, 2])
+    return data
+
+
+@register_compute_fun(
+    name="zeta_ss",
+    label="\\partial_{ss} \\zeta",
+    units="~",
+    units_long="None",
+    description="Toroidal angle along the curve, second derivative wrt s",
+    dim=1,
+    params=[],
+    transforms={"grid": []},
+    profiles=[],
+    coordinates="s",
+    data=[],
+    parameterization="desc.geometry.curve.FourierUmbilicCurve",
+)
+def _zeta_ss_FourierUmbilicCurve(params, transforms, profiles, data, **kwargs):
+    data["zeta_ss"] = jnp.zeros_like(transforms["grid"].nodes[:, 2])
+    return data
+
+
+@register_compute_fun(
+    name="zeta_sss",
+    label="\\partial_{sss} \\zeta",
+    units="~",
+    units_long="None",
+    description="Toroidal angle along the curve, third derivative wrt s",
+    dim=1,
+    params=[],
+    transforms={"grid": []},
+    profiles=[],
+    coordinates="s",
+    data=[],
+    parameterization="desc.geometry.curve.FourierUmbilicCurve",
+)
+def _zeta_sss_FourierUmbilicCurve(params, transforms, profiles, data, **kwargs):
+    data["zeta_sss"] = jnp.zeros_like(transforms["grid"].nodes[:, 2])
+    return data
+
+
+# ---------------------------------------------------------------------------
 # SurfaceCurve embedding: (theta, zeta) + surface copy -> lab x and s-derivatives
 # ---------------------------------------------------------------------------
 # The carried copy is a FourierRZToroidalSurface, so phi == zeta exactly (phi' = zeta_s,

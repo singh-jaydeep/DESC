@@ -253,6 +253,10 @@ _class_inheritance = {
         "desc.geometry.core.SurfaceCurve",
         "desc.geometry.core.Curve",
     ],
+    "desc.geometry.curve.FourierUmbilicCurve": [
+        "desc.geometry.core.SurfaceCurve",
+        "desc.geometry.core.Curve",
+    ],
     "desc.geometry.surface.FourierRZToroidalSurface": [
         "desc.geometry.core.Surface",
     ],

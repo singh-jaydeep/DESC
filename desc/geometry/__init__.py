@@ -5,6 +5,7 @@ from .curve import (
     FourierPlanarCurve,
     FourierRZCurve,
     FourierRZWindingCurve,
+    FourierUmbilicCurve,
     FourierXYCurve,
     FourierXYZCurve,
     SplineXYZCurve,
