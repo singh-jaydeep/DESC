@@ -3,6 +3,14 @@ Changelog
 
 New Features
 
+- Adds ``desc.geometry.SurfaceCurve`` (abstract base) and the concrete
+  ``desc.geometry.FourierRZWindingCurve`` / ``desc.coils.FourierRZWindingCoil``: a closed
+  curve constrained to lie on a surface, parameterized by ``theta(s)``, ``zeta(s)`` Fourier
+  series with integer secular terms setting the topology (modular / toroidal / helical).
+  The curve carries a read-only copy of its host surface (a
+  ``CurveSurfaceConsistency`` borrower), so it computes standalone and inherits
+  ``length``/``curvature``/``torsion`` from ``Curve``; tie the copy to a live surface with
+  ``curve.surface_consistency(source)`` or hold it fixed with ``curve.fix_surface()``.
 - Adds ``desc.objectives.CurveSurfaceConsistency``, a linear constraint that ties the
   read-only double-Fourier surface copy a borrower carries (a curve-on-surface, or a
   ``Surface`` for testing) to a live source surface: a separate ``Surface``, an

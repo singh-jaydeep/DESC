@@ -1377,6 +1377,46 @@ class TestFourierRZWindingCurve:
         f = con.compute(src.params_dict, c.params_dict)
         np.testing.assert_allclose(f, 0.0, atol=1e-12)
 
+    @pytest.mark.unit
+    def test_from_values(self):
+        """from_values round-trips theta/zeta and infers the secular topology."""
+        surf = FourierRZToroidalSurface()
+        c = FourierRZWindingCurve(
+            surface=surf,
+            theta_n=[0.3, 0.0, -0.2],
+            modes_theta=[-1, 0, 1],
+            zeta_n=[0.1, 0.0, 0.0],
+            modes_zeta=[-1, 0, 1],
+            secular_theta=1,
+            secular_zeta=0,
+            sym_theta=False,
+            sym_zeta=False,
+        )
+        grid = LinearGrid(N=30, endpoint=False)
+        s = grid.nodes[:, 2]
+        d = c.compute(["theta", "zeta"], grid=grid)
+        c2 = FourierRZWindingCurve.from_values(
+            surf, np.asarray(d["theta"]), np.asarray(d["zeta"]), N=4, s=s
+        )
+        d2 = c2.compute(["theta", "zeta"], grid=grid)
+        np.testing.assert_allclose(d["theta"], d2["theta"], atol=1e-12)
+        np.testing.assert_allclose(d["zeta"], d2["zeta"], atol=1e-12)
+        assert c2.secular_theta == 1 and c2.secular_zeta == 0
+        # topology inference for the three closure types
+        for st, sz in [(1, 0), (0, 1), (1, 1)]:
+            cc = FourierRZWindingCurve(
+                surface=surf,
+                secular_theta=st,
+                secular_zeta=sz,
+                sym_theta=False,
+                sym_zeta=False,
+            )
+            dd = cc.compute(["theta", "zeta"], grid=grid)
+            fit = FourierRZWindingCurve.from_values(
+                surf, np.asarray(dd["theta"]), np.asarray(dd["zeta"]), N=2, s=s
+            )
+            assert fit.secular_theta == st and fit.secular_zeta == sz
+
 
 class TestFourierRZWindingCoil:
     """Tests for FourierRZWindingCoil."""

@@ -31,6 +31,7 @@ Coils
     desc.coils.CoilSet
     desc.coils.FourierPlanarCoil
     desc.coils.FourierRZCoil
+    desc.coils.FourierRZWindingCoil
     desc.coils.FourierXYCoil
     desc.coils.FourierXYZCoil
     desc.coils.MixedCoilSet
@@ -121,6 +122,7 @@ Geometry
     desc.geometry.FourierPlanarCurve
     desc.geometry.FourierRZCurve
     desc.geometry.FourierRZToroidalSurface
+    desc.geometry.FourierRZWindingCurve
     desc.geometry.FourierXYCurve
     desc.geometry.FourierXYZCurve
     desc.geometry.SplineXYZCurve

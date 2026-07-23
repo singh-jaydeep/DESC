@@ -1926,3 +1926,91 @@ class FourierRZWindingCurve(SurfaceCurve):
                 self.theta_n = put(self.theta_n, self.theta_basis.get_idx(0, 0, nn), tt)
             if zz is not None:
                 self.zeta_n = put(self.zeta_n, self.zeta_basis.get_idx(0, 0, nn), zz)
+
+    @classmethod
+    def from_values(
+        cls,
+        surface,
+        theta,
+        zeta,
+        N=10,
+        s=None,
+        secular_theta=None,
+        secular_zeta=None,
+        name="",
+    ):
+        """Fit on-surface angles theta(s), zeta(s) to a FourierRZWindingCurve.
+
+        The integer secular terms set the curve topology (whether it links the plasma
+        poloidally, toroidally, both, or neither). If not supplied they are inferred
+        from the total angle the samples traverse.
+
+        Parameters
+        ----------
+        surface : FourierRZToroidalSurface
+            Host surface the curve lies on.
+        theta, zeta : ndarray
+            Poloidal and toroidal angles (in the surface's coordinates) sampled along
+            the curve, as functions of the curve parameter ``s``.
+        N : int
+            Fourier resolution (in ``s``) of the new representation. Default 10.
+        s : ndarray, optional
+            Monotonic curve parameter in ``[0, 2pi)`` for the samples. Defaults to
+            linearly spaced.
+        secular_theta, secular_zeta : int, optional
+            Secular (linear-in-s) terms. If not given, inferred and rounded to the
+            nearest integer (required for closure).
+        name : str
+            Name for the curve.
+
+        Returns
+        -------
+        curve : FourierRZWindingCurve
+            New curve on ``surface``, parameterized by Fourier series in ``s``.
+
+        """
+        theta, zeta = np.atleast_1d(theta), np.atleast_1d(zeta)
+        closed = np.isclose(
+            (theta[0] - theta[-1]) % (2 * np.pi), 0, atol=1e-12
+        ) and np.isclose(
+            (zeta[0] - zeta[-1]) % (2 * np.pi / surface.NFP), 0, atol=1e-12
+        )
+        if closed:
+            theta, zeta = theta[:-1], zeta[:-1]
+        if s is None:
+            s = np.linspace(0, 2 * np.pi, theta.size, endpoint=False)
+        else:
+            s = np.atleast_1d(s)
+            s = s[:-1] if closed else s
+            errorif(
+                not np.all(np.diff(s) > 0),
+                ValueError,
+                "supplied s must be monotonically increasing",
+            )
+            errorif(s[0] < 0 or s[-1] > 2 * np.pi, ValueError, "s must lie in [0, 2pi]")
+
+        # secular terms must be integers for the curve to close
+        if secular_theta is None:
+            secular_theta = int(np.round((theta[-1] - theta[0]) / (2 * np.pi)))
+        if secular_zeta is None:
+            secular_zeta = int(np.round((zeta[-1] - zeta[0]) / (2 * np.pi)))
+
+        grid = LinearGrid(zeta=s, NFP=1, sym=False)
+        basis = FourierSeries(N=N, NFP=1, sym=False)
+        transform = Transform(grid, basis, build_pinv=True)
+        # fit the periodic part after removing the secular ramp
+        theta_n = transform.fit(np.asarray(theta) - s * secular_theta)
+        zeta_n = transform.fit(np.asarray(zeta) - s * secular_zeta)
+
+        return cls(
+            surface=surface,
+            theta_n=theta_n,
+            zeta_n=zeta_n,
+            modes_theta=basis.modes[:, 2],
+            modes_zeta=basis.modes[:, 2],
+            secular_theta=secular_theta,
+            secular_zeta=secular_zeta,
+            sym_theta=False,
+            sym_zeta=False,
+            name=name,
+        )

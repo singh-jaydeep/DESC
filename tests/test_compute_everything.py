@@ -9,6 +9,7 @@ import pytest
 from desc.coils import (
     FourierPlanarCoil,
     FourierRZCoil,
+    FourierRZWindingCoil,
     FourierXYCoil,
     FourierXYZCoil,
     SplineXYZCoil,
@@ -20,6 +21,7 @@ from desc.geometry import (
     FourierPlanarCurve,
     FourierRZCurve,
     FourierRZToroidalSurface,
+    FourierRZWindingCurve,
     FourierXYCurve,
     FourierXYZCurve,
     ZernikeRZToroidalSection,
@@ -136,6 +138,17 @@ def test_compute_everything():
         "desc.geometry.curve.SplineXYZCurve": FourierXYZCurve(
             X_n=[5, 10, 2], Y_n=[1, 2, 3], Z_n=[-4, -5, -6]
         ).to_SplineXYZ(grid=LinearGrid(N=50)),
+        "desc.geometry.curve.FourierRZWindingCurve": FourierRZWindingCurve(
+            surface=FourierRZToroidalSurface(**elliptic_cross_section_with_torsion),
+            theta_n=[0.5, 0.5, 0.5],
+            modes_theta=[-1, 0, 1],
+            zeta_n=[0.5, 0.5, 0.5],
+            modes_zeta=[-1, 0, 1],
+            secular_theta=1,
+            secular_zeta=2,
+            sym_theta=False,
+            sym_zeta=False,
+        ),
         # surfaces
         "desc.geometry.surface.FourierRZToroidalSurface": FourierRZToroidalSurface(
             **elliptic_cross_section_with_torsion
@@ -192,6 +205,18 @@ def test_compute_everything():
         "desc.coils.SplineXYZCoil": SplineXYZCoil(
             current=5, X=[5, 10, 2, 5], Y=[1, 2, 3, 1], Z=[-4, -5, -6, -4]
         ),
+        "desc.coils.FourierRZWindingCoil": FourierRZWindingCoil(
+            current=5,
+            surface=FourierRZToroidalSurface(**elliptic_cross_section_with_torsion),
+            theta_n=[0.5, 0.5, 0.5],
+            modes_theta=[-1, 0, 1],
+            zeta_n=[0.5, 0.5, 0.5],
+            modes_zeta=[-1, 0, 1],
+            secular_theta=1,
+            secular_zeta=2,
+            sym_theta=False,
+            sym_zeta=False,
+        ),
     }
     assert things.keys() == data_index.keys(), (
         f"Missing the parameterization {data_index.keys() - things.keys()}"
@@ -223,6 +248,7 @@ def test_compute_everything():
         "desc.geometry.curve.FourierPlanarCurve": {"grid": curvegrid1},
         "desc.geometry.curve.FourierXYCurve": {"grid": curvegrid1},
         "desc.geometry.curve.SplineXYZCurve": {"grid": curvegrid1},
+        "desc.geometry.curve.FourierRZWindingCurve": {"grid": curvegrid1},
         "desc.magnetic_fields._core.OmnigenousField": {"grid": fieldgrid},
     }
 
