@@ -6,7 +6,7 @@ from qsc import Qsc
 
 import desc.examples
 from desc.backend import jnp, put
-from desc.coils import CoilSet, FourierXYZCoil
+from desc.coils import CoilSet, FourierRZWindingCoil, FourierXYZCoil, MixedCoilSet
 from desc.equilibrium import Equilibrium
 from desc.geometry import FourierRZToroidalSurface
 from desc.io import load
@@ -1172,8 +1172,8 @@ def test_curve_surface_consistency_separate_surface():
 
     # dim_f is one residual per borrower R and Z mode; A is the identity
     assert con.dim_f == bor.R_basis.num_modes + bor.Z_basis.num_modes
-    np.testing.assert_allclose(con._A["R_lmn"], np.eye(src.R_basis.num_modes))
-    np.testing.assert_allclose(con._A["Z_lmn"], np.eye(src.Z_basis.num_modes))
+    np.testing.assert_allclose(con._A_R[0], np.eye(src.R_basis.num_modes))
+    np.testing.assert_allclose(con._A_Z[0], np.eye(src.Z_basis.num_modes))
 
     # consistent copy -> zero residual; perturbing the copy shows up one-for-one
     np.testing.assert_allclose(con.compute(src.params_dict, bor.params_dict), 0)
@@ -1212,7 +1212,7 @@ def test_curve_surface_consistency_equilibrium():
     con = CurveSurfaceConsistency(bor, eq, rho=1.0)
     con.build(verbose=0)
     assert con._src_R_key == "Rb_lmn" and con._src_Z_key == "Zb_lmn"
-    np.testing.assert_allclose(con._A["R_lmn"], np.eye(bor.R_basis.num_modes))
+    np.testing.assert_allclose(con._A_R[0], np.eye(bor.R_basis.num_modes))
     np.testing.assert_allclose(con.compute(eq.params_dict, bor.params_dict), 0)
     # rho=None behaves like rho=1
     con_none = CurveSurfaceConsistency(eq.surface.copy(), eq)
@@ -1228,12 +1228,12 @@ def test_curve_surface_consistency_equilibrium():
     # build a reference projection matrix and compare
     src_modes = eq.R_basis.modes
     w = zernike_radial(rho, src_modes[:, 0], src_modes[:, 1])
-    ref = np.zeros_like(con2._A["R_lmn"])
+    ref = np.zeros_like(con2._A_R[0])
     dst = bor2.R_basis.modes
     for j, (_, m, n) in enumerate(src_modes):
         i = np.argwhere((dst[:, 1:] == [m, n]).all(axis=1)).flatten()
         ref[i, j] = w[j]
-    np.testing.assert_allclose(con2._A["R_lmn"], ref)
+    np.testing.assert_allclose(con2._A_R[0], ref)
 
 
 @pytest.mark.unit
@@ -1265,6 +1265,58 @@ def test_curve_surface_consistency_errors():
     # rho must be in (0, 1]
     with pytest.raises(ValueError, match="rho must be in"):
         CurveSurfaceConsistency(eq.surface.copy(), eq, rho=1.5).build(verbose=0)
+
+
+@pytest.mark.unit
+def test_curve_surface_consistency_coilset_fanout():
+    """Test one CurveSurfaceConsistency fans out over a CoilSet of surface coils."""
+    src = FourierRZToroidalSurface()
+
+    def _coil_at(zeta0):
+        # a modular winding coil offset to toroidal angle zeta0 (distinct, so the
+        # CoilSet's near-intersection check stays quiet); all carry a copy of src.
+        # sym_zeta=False keeps the n=0 constant mode that carries the offset.
+        return FourierRZWindingCoil(
+            surface=src, current=1e6, zeta_n=[zeta0], modes_zeta=[0], sym_zeta=False
+        )
+
+    coil = _coil_at(0.0)
+    cs = CoilSet(coil, _coil_at(2.0), _coil_at(4.0))  # 3 coils, each carries a copy
+
+    con = CurveSurfaceConsistency(cs, src)
+    con.build(verbose=0)
+
+    # dim_f is the sum over members of their (R + Z) mode residuals
+    per = coil.R_basis.num_modes + coil.Z_basis.num_modes
+    assert con.dim_f == len(cs) * per
+
+    # every member's copy starts consistent -> zero residual
+    np.testing.assert_allclose(con.compute(src.params_dict, cs.params_dict), 0)
+
+    # perturbing only member 1's copy shows up only in member 1's block
+    cs2 = cs.copy()
+    d = np.zeros(np.asarray(cs2.coils[1].R_lmn).size)
+    d[1] = 0.5
+    cs2.coils[1].R_lmn = np.asarray(cs2.coils[1].R_lmn) + d
+    f = np.asarray(con.compute(src.params_dict, cs2.params_dict)).reshape(len(cs), per)
+    np.testing.assert_allclose(f[0], 0)
+    np.testing.assert_allclose(f[2], 0)
+    np.testing.assert_allclose(np.max(np.abs(f[1])), 0.5)
+
+    # the fan-out constraint is linear and differentiable over the CoilSet DOFs
+    # (pure params algebra -- it never computes coil geometry)
+    con_of = ObjectiveFunction(CurveSurfaceConsistency(cs, src))
+    con_of.build(verbose=0)
+    J = np.asarray(con_of.jac_unscaled(con_of.x(src, cs)))
+    assert J.shape[0] == len(cs) * per
+    assert np.all(np.isfinite(J)) and np.any(J != 0)
+
+    # a MixedCoilSet borrower also fans out (dim_f sums over its members)
+    mcs = MixedCoilSet(_coil_at(1.0), _coil_at(3.0))
+    con_m = CurveSurfaceConsistency(mcs, src)
+    con_m.build(verbose=0)
+    assert con_m.dim_f == 2 * per
+    np.testing.assert_allclose(con_m.compute(src.params_dict, mcs.params_dict), 0)
 
 
 @pytest.mark.unit

@@ -730,7 +730,9 @@ class CurveSurfaceConsistency(_Objective):
         Object carrying the surface copy: a curve-on-surface or (for testing) a
         ``Surface``. Must expose ``R_lmn``/``Z_lmn`` and ``R_basis``/``Z_basis``. A
         plain curve (``R_n``/``Z_n`` or ``X_n``/``Y_n``/``Z_n``) has no surface copy and
-        is rejected at ``build``.
+        is rejected at ``build``. May also be a ``CoilSet`` of curve-on-surface coils,
+        in which case this single constraint fans out to tie every member's copy to the
+        one source.
     source : Surface or Equilibrium
         Object supplying the reference surface.
     rho : float, optional
@@ -778,6 +780,21 @@ class CurveSurfaceConsistency(_Objective):
             name=name,
         )
 
+    @staticmethod
+    def _leaf_borrowers(borrower):
+        """Flat list of leaf borrowers, in ``params_dict`` (``tree_leaves``) order.
+
+        A ``CoilSet``/``MixedCoilSet`` has a list-valued ``dimensions`` and fans out to
+        its member coils; any other borrower is returned as a single-element list.
+        """
+        if isinstance(borrower.dimensions, list):  # a coil collection
+            return [
+                leaf
+                for member in borrower.coils
+                for leaf in CurveSurfaceConsistency._leaf_borrowers(member)
+            ]
+        return [borrower]
+
     @execute_on_cpu
     def build(self, use_jit=False, verbose=1):
         """Build constant arrays.
@@ -794,19 +811,22 @@ class CurveSurfaceConsistency(_Objective):
 
         source, borrower = self.things
 
-        # borrower must carry a double-Fourier surface copy
-        errorif(
-            ("R_lmn" not in borrower.dimensions)
-            or ("Z_lmn" not in borrower.dimensions),
-            ValueError,
-            "borrower must carry a double-Fourier surface (expose R_lmn / Z_lmn); a "
-            "plain curve does not -- did you mean a curve-on-surface?",
-        )
-        errorif(
-            not (hasattr(borrower, "R_basis") and hasattr(borrower, "Z_basis")),
-            ValueError,
-            "borrower must expose R_basis / Z_basis for its surface copy.",
-        )
+        # a CoilSet borrower fans out: one constraint ties every member's surface copy
+        # to the single source. A single borrower is just the length-1 case.
+        borrowers = self._leaf_borrowers(borrower)
+        for b in borrowers:
+            # each must carry a double-Fourier surface copy
+            errorif(
+                ("R_lmn" not in b.dimensions) or ("Z_lmn" not in b.dimensions),
+                ValueError,
+                "borrower must carry a double-Fourier surface (expose R_lmn / Z_lmn); "
+                "a plain curve does not -- did you mean a curve-on-surface?",
+            )
+            errorif(
+                not (hasattr(b, "R_basis") and hasattr(b, "Z_basis")),
+                ValueError,
+                "borrower must expose R_basis / Z_basis for its surface copy.",
+            )
 
         if isinstance(source, Equilibrium):
             if self._rho is None or self._rho == 1.0:
@@ -840,11 +860,15 @@ class CurveSurfaceConsistency(_Objective):
                 f"source must be a Surface or Equilibrium, got {type(source)}."
             )
 
-        self._A = {
-            "R_lmn": _surface_projection(src_R_basis, borrower.R_basis, rho),
-            "Z_lmn": _surface_projection(src_Z_basis, borrower.Z_basis, rho),
-        }
-        self._dim_f = borrower.R_basis.num_modes + borrower.Z_basis.num_modes
+        # one projection per borrower (identical when members share a basis, but built
+        # per-member so a MixedCoilSet of differing copies still works)
+        self._A_R = [
+            _surface_projection(src_R_basis, b.R_basis, rho) for b in borrowers
+        ]
+        self._A_Z = [
+            _surface_projection(src_Z_basis, b.Z_basis, rho) for b in borrowers
+        ]
+        self._dim_f = sum(b.R_basis.num_modes + b.Z_basis.num_modes for b in borrowers)
 
         super().build(use_jit=use_jit, verbose=verbose)
 
@@ -852,14 +876,17 @@ class CurveSurfaceConsistency(_Objective):
         """Compute curve-surface consistency errors.
 
         The mismatch between the source surface (projected to the borrower's basis) and
-        the double-Fourier copy the borrower carries, for R and Z stacked together.
+        the double-Fourier copy the borrower carries, for R and Z stacked together. When
+        the borrower is a ``CoilSet``, the errors of every member are concatenated (one
+        fan-out constraint tying all members' copies to the single source).
 
         Parameters
         ----------
         params_source : dict
             Degrees of freedom of the source (a Surface or Equilibrium).
-        params_borrower : dict
-            Degrees of freedom of the borrower carrying the surface copy.
+        params_borrower : dict or list of dict
+            Degrees of freedom of the borrower carrying the surface copy; a list of
+            per-member dicts if the borrower is a ``CoilSet``.
         constants : dict
             Dictionary of constant data, eg transforms, profiles etc. Defaults to
             self.constants. (Deprecated)
@@ -870,15 +897,15 @@ class CurveSurfaceConsistency(_Objective):
             Curve-surface consistency errors.
 
         """
-        R_err = (
-            jnp.dot(self._A["R_lmn"], params_source[self._src_R_key])
-            - params_borrower["R_lmn"]
-        )
-        Z_err = (
-            jnp.dot(self._A["Z_lmn"], params_source[self._src_Z_key])
-            - params_borrower["Z_lmn"]
-        )
-        return jnp.concatenate([R_err, Z_err])
+        src_R = params_source[self._src_R_key]
+        src_Z = params_source[self._src_Z_key]
+        # a single borrower is a dict (one leaf); a CoilSet is a list of per-coil dicts
+        members = tree_leaves(params_borrower, is_leaf=lambda x: isinstance(x, dict))
+        errs = []
+        for A_R, A_Z, p in zip(self._A_R, self._A_Z, members):
+            errs.append(jnp.dot(A_R, src_R) - p["R_lmn"])
+            errs.append(jnp.dot(A_Z, src_Z) - p["Z_lmn"])
+        return jnp.concatenate(errs)
 
 
 class AxisRSelfConsistency(_Objective):
