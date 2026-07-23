@@ -9,12 +9,13 @@ from desc.geometry import (
     FourierRZCurve,
     FourierRZToroidalSurface,
     FourierRZWindingCurve,
+    FourierUmbilicCurve,
     FourierXYCurve,
     FourierXYZCurve,
     SplineXYZCurve,
 )
 from desc.grid import Grid, LinearGrid
-from desc.io import InputReader
+from desc.io import InputReader, load
 
 
 class TestFourierRZCurve:
@@ -1416,6 +1417,253 @@ class TestFourierRZWindingCurve:
                 surf, np.asarray(dd["theta"]), np.asarray(dd["zeta"]), N=2, s=s
             )
             assert fit.secular_theta == st and fit.secular_zeta == sz
+
+
+def _umbilic_surface(NFP=3):
+    """A non-axisymmetric FourierRZToroidalSurface for umbilic tests."""
+    return FourierRZToroidalSurface(
+        R_lmn=[10.0, 1.0, 0.2],
+        Z_lmn=[-1.0, -0.2],
+        modes_R=[[0, 0], [1, 0], [0, 1]],
+        modes_Z=[[-1, 0], [0, -1]],
+        NFP=NFP,
+    )
+
+
+def _umbilic_loop_grid(curve, Nz):
+    """Uniform base Grid spanning the full closure loop zeta in [0, 2*pi*p)."""
+    L = 2 * np.pi * curve.num_transits
+    z = np.linspace(0, L, Nz, endpoint=False)
+    nodes = np.column_stack([np.ones(Nz), np.zeros(Nz), z])
+    spacing = np.column_stack([np.ones(Nz), np.ones(Nz), np.full(Nz, L / Nz)])
+    return Grid(nodes, spacing=spacing, sort=False, jitable=False), z
+
+
+class TestFourierUmbilicCurve:
+    """Tests for FourierUmbilicCurve (umbilic curve constrained to a surface)."""
+
+    @pytest.mark.unit
+    def test_construction(self):
+        """Test DOFs, umbilic metadata, NFP, and closure transit count."""
+        surf = _umbilic_surface(NFP=3)
+        c = FourierUmbilicCurve(
+            surface=surf, a_n=[0.1], modes=[-1], m_umbilic=1, n_umbilic=2
+        )
+        # only the surface copy and the modulation series are DOFs
+        assert c.optimizable_params == ["R_lmn", "Z_lmn", "a_n"]
+        assert c.m_umbilic == 1 and c.n_umbilic == 2
+        assert c.NFP == 3  # inherited from the surface copy
+        # closes after n/gcd(n, NFP) = 2/gcd(2,3) = 2 transits
+        assert c.num_transits == 2
+        # default is a pure-secular single-transit curve
+        d = FourierUmbilicCurve()
+        assert d.m_umbilic == 1 and d.n_umbilic == 1 and d.num_transits == 1
+        assert np.asarray(d.a_n).size == 0
+
+    @pytest.mark.unit
+    def test_asserts(self):
+        """m_umbilic/n_umbilic must be coprime positive-n integers."""
+        with pytest.raises(ValueError, match="coprime"):
+            FourierUmbilicCurve(m_umbilic=2, n_umbilic=4)
+        with pytest.raises(ValueError, match="positive"):
+            FourierUmbilicCurve(m_umbilic=1, n_umbilic=0)
+        with pytest.raises(ValueError, match="must be integers"):
+            FourierUmbilicCurve(m_umbilic=1, n_umbilic=1.5)
+
+    @pytest.mark.unit
+    def test_theta_form_a(self):
+        """Test theta follows Form A, modulation frequency k*NFP (NOT k*NFP/n).
+
+        This is the check the #2081 tests lacked: with a_n != 0 and n > 1 the
+        modulation frequency is actually exercised, so a k*NFP/n ("Form B", the
+        N_scaling bug) regression is caught.
+        """
+        surf = _umbilic_surface(NFP=3)
+        m, n = 1, 2
+        a1, a2 = 0.15, -0.07
+        c = FourierUmbilicCurve(
+            surface=surf, a_n=[a1, a2], modes=[-1, -2], m_umbilic=m, n_umbilic=n
+        )
+        grid, z = _umbilic_loop_grid(c, 400)
+        theta = np.asarray(c.compute("theta", grid=grid, override_grid=False)["theta"])
+        NFP = c.NFP
+        # Form A (correct): modulation at frequency k*NFP
+        form_a = (m * NFP * z + a1 * np.sin(1 * NFP * z) + a2 * np.sin(2 * NFP * z)) / n
+        np.testing.assert_allclose(theta, form_a, atol=1e-12)
+        # Form B (the bug): modulation at frequency k*NFP/n -- must NOT match
+        form_b = (
+            m * NFP * z + a1 * np.sin(1 * NFP / n * z) + a2 * np.sin(2 * NFP / n * z)
+        ) / n
+        assert np.max(np.abs(theta - form_b)) > 0.05
+
+    @pytest.mark.unit
+    def test_closure(self):
+        """Each toroidal transit advances theta by exactly 2*pi*m*NFP/n."""
+        surf = _umbilic_surface(NFP=3)
+        m, n = 2, 5
+        c = FourierUmbilicCurve(
+            surface=surf, a_n=[0.2, 0.1], modes=[-1, -2], m_umbilic=m, n_umbilic=n
+        )
+        NFP = c.NFP
+        # sample same phase (zeta and zeta + 2*pi): modulation is 2*pi/NFP-periodic
+        z0 = np.linspace(0.0, 1.7, 11)
+        g0 = Grid(
+            np.column_stack([np.ones_like(z0), np.zeros_like(z0), z0]),
+            spacing=np.column_stack(
+                [np.ones_like(z0), np.ones_like(z0), np.ones_like(z0)]
+            ),
+            sort=False,
+        )
+        g1 = Grid(
+            np.column_stack([np.ones_like(z0), np.zeros_like(z0), z0 + 2 * np.pi]),
+            spacing=np.column_stack(
+                [np.ones_like(z0), np.ones_like(z0), np.ones_like(z0)]
+            ),
+            sort=False,
+        )
+        t0 = np.asarray(c.compute("theta", grid=g0, override_grid=False)["theta"])
+        t1 = np.asarray(c.compute("theta", grid=g1, override_grid=False)["theta"])
+        np.testing.assert_allclose(t1 - t0, 2 * np.pi * m * NFP / n, atol=1e-12)
+        # over the whole loop the net advance is a multiple of 2*pi (theta closes)
+        total = 2 * np.pi * c.num_transits * m * NFP / n
+        np.testing.assert_allclose(total / (2 * np.pi), round(total / (2 * np.pi)))
+
+    @pytest.mark.unit
+    def test_length_spectral(self):
+        """Test length integrates over the whole loop and is spectrally converged."""
+        surf = _umbilic_surface(NFP=3)
+        c = FourierUmbilicCurve(
+            surface=surf, a_n=[0.15], modes=[-1], m_umbilic=1, n_umbilic=2
+        )
+        # default (loop) grid vs a dense loop grid agree to machine precision
+        length_default = float(c.compute("length")["length"])
+        g, _ = _umbilic_loop_grid(c, 4000)
+        length_dense = float(c.compute("length", grid=g, override_grid=False)["length"])
+        np.testing.assert_allclose(length_default, length_dense, rtol=1e-10)
+        assert length_default > 2 * np.pi  # spans two toroidal transits
+
+    @pytest.mark.unit
+    def test_derivatives_finite_difference(self):
+        """x_s, x_ss, x_sss match finite differences on an a_n != 0, n > 1 curve."""
+        surf = _umbilic_surface(NFP=3)
+        c = FourierUmbilicCurve(
+            surface=surf, a_n=[0.15, -0.05], modes=[-1, -2], m_umbilic=1, n_umbilic=2
+        )
+
+        def xyz_at(s):
+            g = Grid(np.array([[1.0, 0.0, s]]), sort=False)
+            R, phi, Z = c.compute("x", grid=g)["x"][0]
+            return np.array([R * np.cos(phi), R * np.sin(phi), Z])
+
+        def rpz2xyzvec(v, phi):
+            return np.array(
+                [
+                    v[0] * np.cos(phi) - v[1] * np.sin(phi),
+                    v[0] * np.sin(phi) + v[1] * np.cos(phi),
+                    v[2],
+                ]
+            )
+
+        s = 0.55
+        g = Grid(np.array([[1.0, 0.0, s]]), sort=False)
+        da = c.compute(["x", "x_s", "x_ss", "x_sss"], grid=g)
+        phi = float(da["x"][0, 1])
+        h = 1e-4
+        fd_s = (xyz_at(s + h) - xyz_at(s - h)) / (2 * h)
+        fd_ss = (xyz_at(s + h) - 2 * xyz_at(s) + xyz_at(s - h)) / h**2
+        np.testing.assert_allclose(
+            rpz2xyzvec(np.asarray(da["x_s"][0]), phi), fd_s, atol=1e-6
+        )
+        np.testing.assert_allclose(
+            rpz2xyzvec(np.asarray(da["x_ss"][0]), phi), fd_ss, atol=1e-5
+        )
+        # x_sss: O(h^2) convergence of the 5-point stencil to the analytic value
+        analytic_sss = rpz2xyzvec(np.asarray(da["x_sss"][0]), phi)
+        errs = []
+        for hh in [1e-2, 5e-3]:
+            fd = (
+                xyz_at(s + 2 * hh)
+                - 2 * xyz_at(s + hh)
+                + 2 * xyz_at(s - hh)
+                - xyz_at(s - 2 * hh)
+            ) / (2 * hh**3)
+            errs.append(np.max(np.abs(fd - analytic_sss)))
+        assert errs[1] < errs[0] / 3
+
+    @pytest.mark.unit
+    def test_change_resolution(self):
+        """change_resolution grows the modulation basis and preserves coefficients."""
+        surf = _umbilic_surface(NFP=3)
+        c = FourierUmbilicCurve(surface=surf, a_n=[0.3], modes=[-1], n_umbilic=2)
+        c.change_resolution(N=4)
+        assert c.N == 4 and c.UC_basis.N == 4
+        np.testing.assert_allclose(c.get_coeffs(-1)[0], 0.3)
+
+    @pytest.mark.unit
+    def test_surface_consistency_tie(self):
+        """The umbilic curve is a valid CurveSurfaceConsistency borrower (PR1)."""
+        src = _umbilic_surface(NFP=3)
+        c = FourierUmbilicCurve(surface=src, a_n=[0.1], modes=[-1], n_umbilic=2)
+        con = c.surface_consistency(src)
+        con.build(verbose=0)
+        assert con.dim_f == c.R_basis.num_modes + c.Z_basis.num_modes
+        f = con.compute(src.params_dict, c.params_dict)
+        np.testing.assert_allclose(f, 0.0, atol=1e-12)
+
+    @pytest.mark.unit
+    def test_from_values(self):
+        """from_values round-trips theta and infers the (m, n) topology."""
+        surf = _umbilic_surface(NFP=3)
+        for m, n, a_n, modes in [
+            (1, 2, [0.15, -0.07], [-1, -2]),
+            (2, 5, [0.1], [-1]),
+            (1, 1, [0.2, 0.05], [-1, -2]),
+            (0, 1, [0.3], [-1]),
+        ]:
+            c = FourierUmbilicCurve(
+                surface=surf, a_n=a_n, modes=modes, m_umbilic=m, n_umbilic=n
+            )
+            d = c.compute(["theta", "zeta"])
+            c2 = FourierUmbilicCurve.from_values(
+                surf, np.asarray(d["theta"]), np.asarray(d["zeta"]), N=4
+            )
+            assert c2.m_umbilic == m and c2.n_umbilic == n
+            g, _ = _umbilic_loop_grid(c, 500)
+            t1 = c.compute("theta", grid=g, override_grid=False)["theta"]
+            t2 = c2.compute("theta", grid=g, override_grid=False)["theta"]
+            np.testing.assert_allclose(t1, t2, atol=1e-10)
+        # supplying (m, n) fixes the slope and recovers a_n exactly
+        c = FourierUmbilicCurve(
+            surface=surf, a_n=[0.15, -0.07], modes=[-1, -2], m_umbilic=1, n_umbilic=2
+        )
+        d = c.compute(["theta", "zeta"])
+        c3 = FourierUmbilicCurve.from_values(
+            surf,
+            np.asarray(d["theta"]),
+            np.asarray(d["zeta"]),
+            N=4,
+            m_umbilic=1,
+            n_umbilic=2,
+        )
+        np.testing.assert_allclose(c3.get_coeffs([-1, -2]), [0.15, -0.07], atol=1e-10)
+
+    @pytest.mark.unit
+    def test_save_load(self, tmpdir):
+        """Save/load round-trip preserves DOFs and metadata."""
+        surf = _umbilic_surface(NFP=3)
+        c = FourierUmbilicCurve(
+            surface=surf, a_n=[0.12, -0.03], modes=[-1, -2], m_umbilic=1, n_umbilic=2
+        )
+        fname = str(tmpdir.join("umbilic.h5"))
+        c.save(fname)
+        c2 = load(fname)
+        assert c2.m_umbilic == 1 and c2.n_umbilic == 2 and c2.NFP == 3
+        np.testing.assert_allclose(np.asarray(c2.a_n), np.asarray(c.a_n))
+        g, _ = _umbilic_loop_grid(c, 200)
+        np.testing.assert_allclose(
+            c.compute("length", grid=g, override_grid=False)["length"],
+            c2.compute("length", grid=g, override_grid=False)["length"],
+        )
 
 
 class TestFourierRZWindingCoil:

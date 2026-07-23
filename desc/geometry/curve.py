@@ -2,6 +2,7 @@
 
 import os
 import warnings
+from fractions import Fraction
 
 import numpy as np
 
@@ -2196,6 +2197,98 @@ class FourierUmbilicCurve(SurfaceCurve):
         for nn, aa in zip(n, a_n):
             if aa is not None:
                 self.a_n = put(self.a_n, self.UC_basis.get_idx(0, 0, nn), aa)
+
+    @classmethod
+    def from_values(
+        cls,
+        surface,
+        theta,
+        zeta,
+        N=10,
+        m_umbilic=None,
+        n_umbilic=None,
+        sym="sin",
+        max_n=64,
+        name="",
+    ):
+        """Fit sampled on-surface angles ``theta(zeta)`` to a FourierUmbilicCurve.
+
+        The umbilic model is linear in the secular slope ``sigma = m*NFP/n`` and the
+        scaled modulation coefficients ``b_k = a_n[k]/n``::
+
+            theta(zeta) = sigma*zeta + sum_k b_k sin(k*NFP*zeta)
+
+        so a single least-squares fit recovers ``sigma`` (hence ``m/n = sigma/NFP`` as a
+        coprime fraction) and ``b_k`` (hence ``a_n[k] = n*b_k``). If both ``m_umbilic``
+        and ``n_umbilic`` are supplied the slope is held fixed and only the modulation
+        is fit. For reliable inference the samples should span the full closure loop
+        ``zeta in [0, 2*pi*n/gcd(n, NFP))``.
+
+        Parameters
+        ----------
+        surface : FourierRZToroidalSurface
+            Host surface the curve lies on. Sets ``NFP``.
+        theta, zeta : ndarray
+            Poloidal and toroidal angles (in the surface's coordinates) sampled along
+            the curve. ``zeta`` is the curve parameter.
+        N : int
+            Fourier resolution of the modulation. Default 10.
+        m_umbilic, n_umbilic : int, optional
+            Umbilic integers. If not given, inferred from the fitted secular slope.
+        sym : {"sin", "cos", False}, optional
+            Symmetry of the modulation series. Default ``"sin"``.
+        max_n : int
+            Largest denominator considered when inferring ``n_umbilic`` from the slope.
+            Default 64.
+        name : str
+            Name for the curve.
+
+        Returns
+        -------
+        curve : FourierUmbilicCurve
+            New curve on ``surface`` matching the sampled angles.
+
+        """
+        theta = np.atleast_1d(theta).astype(float)
+        zeta = np.atleast_1d(zeta).astype(float)
+        errorif(
+            theta.size != zeta.size,
+            ValueError,
+            "theta and zeta must be the same size",
+        )
+        NFP = int(surface.NFP)
+        UC_basis = FourierSeries(N, NFP, sym=sym)
+        nodes = np.column_stack([np.ones_like(zeta), np.zeros_like(zeta), zeta])
+        B = np.asarray(UC_basis.evaluate(nodes))  # (num_samples, num_modes)
+
+        if m_umbilic is None or n_umbilic is None:
+            # joint linear fit for [sigma, b]; sigma column (zeta ramp) is independent
+            # of the periodic modulation columns, so the system is well-posed.
+            A = np.column_stack([zeta, B])
+            sol = np.linalg.lstsq(A, theta, rcond=None)[0]
+            sigma, b = float(sol[0]), sol[1:]
+            # sigma = m*NFP/n with gcd(m, n) = 1, so m/n = sigma/NFP in lowest terms
+            frac = Fraction(sigma / NFP).limit_denominator(max_n)
+            m_umbilic, n_umbilic = frac.numerator, frac.denominator  # n > 0 always
+        else:
+            errorif(
+                np.gcd(int(m_umbilic), int(n_umbilic)) != 1,
+                ValueError,
+                "m_umbilic and n_umbilic must be coprime (gcd == 1).",
+            )
+            sigma = m_umbilic * NFP / n_umbilic
+            b = np.linalg.lstsq(B, theta - sigma * zeta, rcond=None)[0]
+
+        a_n = n_umbilic * np.asarray(b)
+        return cls(
+            surface=surface,
+            a_n=a_n,
+            modes=UC_basis.modes[:, 2],
+            m_umbilic=int(m_umbilic),
+            n_umbilic=int(n_umbilic),
+            sym=sym,
+            name=name,
+        )
 
     def _loop_grid(self):
         """Base Grid over the whole closure loop zeta in [0, 2*pi*num_transits).
