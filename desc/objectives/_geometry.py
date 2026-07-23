@@ -5,7 +5,7 @@ import numpy as np
 from desc.backend import jnp, vmap
 from desc.compute import get_profiles, get_transforms
 from desc.compute.utils import _compute as compute_fun
-from desc.grid import LinearGrid, QuadratureGrid
+from desc.grid import Grid, LinearGrid, QuadratureGrid
 from desc.utils import (
     Timer,
     copy_rpz_periods,
@@ -13,6 +13,7 @@ from desc.utils import (
     parse_argname_change,
     rpz2xyz,
     safenorm,
+    setdefault,
     warnif,
 )
 
@@ -1362,6 +1363,199 @@ class GoodCoordinates(_Objective):
         f = data["g_rr"]
 
         return jnp.concatenate([g, constants["sigma"] * f])
+
+
+class UmbilicHighCurvature(_Objective):
+    """Target large negative principal curvature along an umbilic curve.
+
+    Given a source (an ``Equilibrium`` or ``FourierRZToroidalSurface``) and a
+    :class:`~desc.geometry.FourierUmbilicCurve` lying on it, this evaluates the source's
+    minimum principal curvature ``curvature_k2_rho`` at the ``(rho=1, theta, zeta)``
+    points traced out by the curve. Driving ``k2`` strongly negative there sharpens the
+    plasma boundary into a high-curvature umbilic edge.
+
+    The ``theta(zeta)`` mapping is taken directly from the curve's ``theta`` compute
+    (the corrected Form A, see :class:`~desc.geometry.FourierUmbilicCurve`); the
+    objective does not re-derive it. Values are normalized by the minor radius, so a
+    circular boundary of minor radius ``a`` (where ``k2 = -1/a``) reads ``-1``.
+
+    Parameters
+    ----------
+    eq : Equilibrium or FourierRZToroidalSurface
+        Source whose boundary curvature is optimized. Must share the curve's ``NFP``.
+    curve : FourierUmbilicCurve
+        Umbilic curve defining the sample points of the sharp boundary edge.
+    curve_grid : Grid, optional
+        Collocation grid of ``zeta`` values along the curve. Defaults to the curve's
+        closure-loop grid (``zeta in [0, 2*pi*n/gcd(n, NFP))``).
+
+    """
+
+    __doc__ = __doc__.rstrip() + collect_docs(
+        target_default="``target=-1``.",
+        bounds_default="``target=-1``.",
+    )
+
+    _static_attrs = _Objective._static_attrs + [
+        "_curve_data_keys",
+        "_equil_data_keys",
+    ]
+    _coordinates = "rtz"
+    _units = "(m^-1)"
+    _print_value_fmt = "Umbilic high curvature: "
+
+    def __init__(
+        self,
+        eq,
+        curve,
+        target=None,
+        bounds=None,
+        weight=1,
+        normalize=True,
+        normalize_target=True,
+        loss_function=None,
+        deriv_mode="auto",
+        curve_grid=None,
+        name="umbilic-high-curvature",
+        jac_chunk_size=None,
+    ):
+        if target is None and bounds is None:
+            target = -1
+        errorif(
+            eq.NFP != curve.NFP,
+            ValueError,
+            "eq and curve must have the same number of field periods, got "
+            f"{eq.NFP} and {curve.NFP}.",
+        )
+        self._curve_grid = curve_grid
+        super().__init__(
+            things=[eq, curve],
+            target=target,
+            bounds=bounds,
+            weight=weight,
+            normalize=normalize,
+            normalize_target=normalize_target,
+            loss_function=loss_function,
+            deriv_mode=deriv_mode,
+            name=name,
+            jac_chunk_size=jac_chunk_size,
+        )
+
+    def build(self, use_jit=True, verbose=1):
+        """Build constant arrays.
+
+        Parameters
+        ----------
+        use_jit : bool, optional
+            Whether to just-in-time compile the objective and derivatives.
+        verbose : int, optional
+            Level of output.
+
+        """
+        eq = self.things[0]
+        curve = self.things[1]
+        if self._curve_grid is None:
+            curve_grid = curve._loop_grid()
+        else:
+            curve_grid = self._curve_grid
+
+        self._dim_f = int(curve_grid.num_nodes)
+        self._curve_data_keys = ["theta", "zeta"]
+        self._equil_data_keys = ["curvature_k2_rho"]
+
+        timer = Timer()
+        if verbose > 0:
+            print("Precomputing transforms")
+        timer.start("Precomputing transforms")
+
+        curve_transforms = get_transforms(
+            self._curve_data_keys,
+            obj=curve,
+            grid=curve_grid,
+            has_axis=curve_grid.axis.size,
+        )
+        self._constants = {
+            "curve_transforms": curve_transforms,
+            "curve_grid": curve_grid,
+            "quad_weights": 1.0,
+        }
+
+        timer.stop("Precomputing transforms")
+        if verbose > 1:
+            timer.disp("Precomputing transforms")
+
+        if self._normalize:
+            scales = compute_scaling_factors(eq)
+            self._normalization = 1 / scales["a"]
+
+        super().build(use_jit=use_jit, verbose=verbose)
+
+    def compute(self, params_1=None, params_2=None, constants=None):
+        """Compute the boundary curvature along the umbilic curve.
+
+        Parameters
+        ----------
+        params_1 : dict
+            Dictionary of equilibrium/surface degrees of freedom, e.g.
+            ``Equilibrium.params_dict``.
+        params_2 : dict
+            Dictionary of umbilic-curve degrees of freedom, e.g. ``curve.params_dict``.
+        constants : dict
+            Dictionary of constant data, e.g. transforms. Defaults to self.constants.
+
+        Returns
+        -------
+        k : ndarray
+            Minimum principal curvature ``k2`` at each curve node (m^-1).
+
+        """
+        constants = self._get_deprecated_constants(constants)
+        eq = self.things[0]
+        curve = self.things[1]
+        equil_params = setdefault(params_1, eq.params_dict)
+        curve_params = setdefault(params_2, curve.params_dict)
+
+        # on-surface angles along the curve; inject the umbilic metadata as compute
+        # kwargs (compute_fun is called directly, bypassing curve.compute).
+        curve_data = compute_fun(
+            curve,
+            self._curve_data_keys,
+            params=curve_params,
+            transforms=constants["curve_transforms"],
+            profiles={},
+            m_umbilic=curve.m_umbilic,
+            n_umbilic=curve.n_umbilic,
+            NFP=curve.NFP,
+        )
+        theta = curve_data["theta"]
+        zeta = curve_data["zeta"]  # phi == zeta for a FourierRZToroidalSurface copy
+
+        # sample the source's boundary curvature at the curve's (rho=1, theta, zeta)
+        edge_grid = Grid(
+            jnp.array([jnp.ones_like(theta), theta, zeta]).T,
+            jitable=True,
+        )
+        equil_profiles = get_profiles(
+            self._equil_data_keys,
+            obj=eq,
+            grid=edge_grid,
+            has_axis=edge_grid.axis.size,
+        )
+        equil_transforms = get_transforms(
+            self._equil_data_keys,
+            obj=eq,
+            grid=edge_grid,
+            has_axis=edge_grid.axis.size,
+            jitable=True,
+        )
+        data = compute_fun(
+            eq,
+            self._equil_data_keys,
+            params=equil_params,
+            profiles=equil_profiles,
+            transforms=equil_transforms,
+        )
+        return data["curvature_k2_rho"]
 
 
 class MirrorRatio(_Objective):

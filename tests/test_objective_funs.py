@@ -28,7 +28,12 @@ from desc.coils import (
 from desc.compute import get_transforms
 from desc.equilibrium import Equilibrium
 from desc.examples import get
-from desc.geometry import FourierPlanarCurve, FourierRZToroidalSurface, FourierXYZCurve
+from desc.geometry import (
+    FourierPlanarCurve,
+    FourierRZToroidalSurface,
+    FourierUmbilicCurve,
+    FourierXYZCurve,
+)
 from desc.grid import ConcentricGrid, Grid, LinearGrid, QuadratureGrid
 from desc.integrals import Bounce2D
 from desc.io import load
@@ -91,6 +96,7 @@ from desc.objectives import (
     SurfaceQuadraticFlux,
     ToroidalCurrent,
     ToroidalFlux,
+    UmbilicHighCurvature,
     VacuumBoundaryError,
     Volume,
     get_NAE_constraints,
@@ -896,6 +902,55 @@ class TestObjectiveFunction:
 
         # simple test: NCSX should have higher mean absolute curvature than DSHAPE
         assert K1.mean() < K2.mean()
+
+    @pytest.mark.unit
+    def test_umbilic_high_curvature(self):
+        """Test UmbilicHighCurvature reads k2 = -1/a on a circular boundary."""
+        a, R0 = 0.8, 10.0
+        # circular cross-section torus: k2 = -1/a everywhere
+        surf = FourierRZToroidalSurface(
+            R_lmn=[R0, a],
+            modes_R=[[0, 0], [1, 0]],
+            Z_lmn=[-a],
+            modes_Z=[[-1, 0]],
+            NFP=1,
+        )
+        curve = FourierUmbilicCurve(surface=surf, m_umbilic=1, n_umbilic=1)
+
+        # raw curvature along the curve equals -1/a
+        obj = UmbilicHighCurvature(surf, curve, normalize=False)
+        obj.build(verbose=0)
+        k2 = obj.compute_unscaled(*obj.xs(surf, curve))
+        assert k2.size == obj.dim_f
+        np.testing.assert_allclose(k2, -1 / a, atol=1e-8)
+
+        # normalized by minor radius -> a circular boundary reads -1
+        obj_n = UmbilicHighCurvature(surf, curve, normalize=True)
+        obj_n.build(verbose=0)
+        np.testing.assert_allclose(obj_n.normalization, 1 / a)
+        k2n = obj_n.compute_scaled_error(*obj_n.xs(surf, curve)) / obj_n.weight
+        # scaled error = (k2 - target) / normalization, target defaults to -1
+        np.testing.assert_allclose(k2n, (-1 / a - (-1)) * a, atol=1e-8)
+
+        # gradient flows through both eq and curve with no NaNs (jac is one block
+        # per thing, each a pytree of arrays over that thing's params)
+        from jax import tree_util
+
+        blocks = obj_n.jac_unscaled(*obj_n.xs(surf, curve))
+        g = np.concatenate(
+            [np.asarray(leaf).ravel() for leaf in tree_util.tree_leaves(blocks)]
+        )
+        assert np.all(np.isfinite(g)) and np.any(g != 0)
+
+        # works with an Equilibrium source, and NFP mismatch is rejected
+        eq = Equilibrium()
+        c1 = FourierUmbilicCurve(surface=eq.surface, m_umbilic=1, n_umbilic=1)
+        obj_eq = UmbilicHighCurvature(eq, c1, normalize=False)
+        obj_eq.build(verbose=0)
+        assert np.all(np.isfinite(obj_eq.compute_unscaled(*obj_eq.xs(eq, c1))))
+        surf3 = FourierRZToroidalSurface(NFP=3)
+        with pytest.raises(ValueError, match="field periods"):
+            UmbilicHighCurvature(surf3, curve)
 
     @pytest.mark.unit
     def test_field_scale_length(self):
@@ -3322,6 +3377,7 @@ class TestComputeScalarResolution:
         SurfaceQuadraticFlux,
         ToroidalFlux,
         SurfaceCurrentRegularization,
+        UmbilicHighCurvature,
         VacuumBoundaryError,
         # no grid dependence for DeflationOperator
         DeflationOperator,
@@ -3844,6 +3900,7 @@ class TestObjectiveNaNGrad:
         SurfaceCurrentRegularization,
         SurfaceQuadraticFlux,
         ToroidalFlux,
+        UmbilicHighCurvature,
         VacuumBoundaryError,
         # we do not test these since they depend too much on what the user wants
         ExternalObjective,
