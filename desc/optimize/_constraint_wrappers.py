@@ -1038,6 +1038,10 @@ class ProximalProjection(ObjectiveFunction):
         # load-bearing for unpack_state and _proximal_jvp_blocked_pure, do not reduce
         # this to just [self._objective]
         self._objectives = [self._objective, self._constraint]
+        # the state is built by now, so this also sets the layout
+        # Note: the full state vector version of the feasible tangents used to be
+        # built here, but its eq block is just _eq_solve_objective._feasible_tangents
+        # and the other blocks are identity, so _proximal_get_tangents uses that.
         self._set_things()
 
         self._dim_f = self._objective.dim_f
@@ -1046,15 +1050,49 @@ class ProximalProjection(ObjectiveFunction):
         else:
             self._scalar = False
 
-        # Note: the full state vector version of the feasible tangents used to be
-        # built here, but its eq block is just _eq_solve_objective._feasible_tangents
-        # and the other blocks are identity, so _proximal_get_tangents uses that.
-        self._state.set_layout(self.things)
-
         self._built = True
         timer.stop("Proximal projection build")
         if verbose > 1:
             timer.disp("Proximal projection build")
+
+    def _set_things(self, things=None):
+        """Tell the wrapper, and the objective it wraps, what things it is optimizing.
+
+        Parameters
+        ----------
+        things : list, tuple, or nested list, tuple of Optimizable
+            Collection of things used by this objective. Defaults to all things from
+            all sub-objectives.
+
+        """
+        # resolves things=None into the default union and sets self._things. Every
+        # line below reads self.things, so this has to come first.
+        super()._set_things(things)
+
+        # The inner objective has to agree with the wrapper about the state vector
+        # layout: _jvp hands it tangent directions and an xg built in the *wrapper's*
+        # X space, so a narrower things list means it either rejects xg outright
+        # (batched deriv mode) or silently depends on the per-thing slicing in
+        # _proximal_jvp_blocked_pure (blocked). combine_args only calls _set_things on
+        # the wrapper, so the wrapper is what has to propagate it. Widening an already
+        # built ObjectiveFunction is safe: _set_things recomputes only _things,
+        # _things_per_objective_idx and _flatten/_unflatten, and unpack_state still
+        # filters each sub-objective down to the things it asked for.
+        self._objective._set_things(self.things)
+
+        # deliberately NOT self._constraint. F is evaluated at xf, the equilibrium
+        # only state vector (see _proximal_eq_tangents), and ProximalState.build
+        # requires F.things == [eq]. Widening it would break that contract.
+
+        # the layout and the caches are derived from self.things, so they have to be
+        # rebuilt. Guarded because build() calls _set_things() before the state has
+        # the args and dxdc that set_layout needs.
+        if self._state.built:
+            self._state.set_layout(self.things)
+            assert self._objective.dim_x == sum(self._state.dimx_per_thing), (
+                "the proximal wrapper and the objective it wraps disagree about the "
+                "state vector layout"
+            )
 
     def unpack_state(self, x, per_objective=True):
         """Unpack the state vector into its components.
