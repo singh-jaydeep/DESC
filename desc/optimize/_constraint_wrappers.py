@@ -637,6 +637,12 @@ class ProximalState:
         # eq_is_current <=> eq.params_dict equals the equilibrium params in
         # history[-1], ie. nothing has moved the equilibrium since the last commit
         self.eq_is_current = True
+        # one point's worth of tangent matrices, see get_tangents
+        self._tangent_x = None
+        self._tangent_constants = None
+        self._tangents = {}
+        # number of tangent matrices actually built, for tests and profiling
+        self.n_tangent_builds = 0
 
         self._built = False
 
@@ -824,6 +830,55 @@ class ProximalState:
         self.allxeq = [self.eq.pack_params(self.eq.params_dict)]
         self.history = [[t.params_dict.copy() for t in self.things]]
         self.eq_is_current = True
+        # the layout may have changed, so any cached tangents are the wrong shape
+        self._tangent_x = None
+        self._tangents = {}
+
+    def get_tangents(self, x, op, constants, build):
+        """Return the tangent matrix at x, calling build() on a miss.
+
+        Keyed on the point, the scaling class and the constraint constants.
+        ``scaled`` and ``scaled_error`` share a slot: compute_scaled_error differs
+        from compute_scaled by a constant target offset, so their JVPs are the same
+        function by construction. ``unscaled`` gets its own slot -- it agrees only in
+        exact arithmetic, since the SVD in _proximal_eq_tangents sees a differently
+        scaled matrix.
+
+        Every view of the subproblem shares this cache, which is the point: the
+        objective is differentiated as jac_scaled_error and the nonlinear constraints
+        as jac_scaled, both land in the ``scaled`` slot, so one build serves both.
+
+        One point's worth of cache is enough, because the optimizers only ask for
+        tangents at the current accepted iterate: trial points get compute, not jac.
+
+        Parameters
+        ----------
+        x : ndarray
+            Point to compute the tangents at.
+        op : str
+            One of ``scaled``, ``scaled_error``, ``unscaled``.
+        constants : any
+            Constant parameters for the equilibrium constraint. (Deprecated)
+        build : callable
+            Zero argument callable returning the tangent matrix, called on a miss.
+
+        """
+        key = "scaled" if op in ("scaled", "scaled_error") else op
+        x = np.asarray(x)
+        # constants is compared by identity rather than value: it is deprecated and
+        # in practice always None, and a conservative miss only costs a rebuild
+        if (
+            self._tangent_x is None
+            or not np.array_equal(self._tangent_x, x)
+            or constants is not self._tangent_constants
+        ):
+            self._tangent_x = x
+            self._tangent_constants = constants
+            self._tangents = {}
+        if key not in self._tangents:
+            self._tangents[key] = build()
+            self.n_tangent_builds += 1
+        return self._tangents[key]
 
     def commit(self, x, x_list):
         """Record x, and the equilibrium solved at it, as the accepted point.
@@ -1416,25 +1471,59 @@ class ProximalProjection(ObjectiveFunction):
         # and ∇F is the Jacobian of F with respect to full state vector. Then,
         # ∇L = Gᵀ @ ∇G @ [dc_tangents - (∇F @ dx_tangents)⁻¹ @ (∇F @ dc_tangents)]
         # We get the part in [] using the _proximal_get_tangents.
-        v = jnp.eye(x.shape[0])
         constants = setdefault(constants, [None, None])
         xg, xf = self._update_equilibrium(x, store=True)
         with prof_span("tangents"):
-            tangents = _proximal_get_tangents(
-                self._constraint,
-                xf,
-                v,
-                constants[1],
-                self._eq_solve_objective._feasible_tangents,
-                self._dxdc,
-                self._dimc_per_thing,
-                self._eq_idx,
-                "scaled_error",
-            )
+            tangents = self._full_tangents(x, xf, constants, "scaled_error")
         with prof_span("obj_vjp"):
             g = self._objective.compute_scaled_error(xg, constants[0])
             g_vjp = self._objective.vjp_scaled_error(g, xg, constants[0])
         return tangents @ g_vjp
+
+    def _full_tangents(self, x, xf, constants, op):
+        """Tangent directions for every column of the Jacobian, cached on the state.
+
+        _proximal_get_tangents is linear in its directions, so this is the matrix T
+        with ``_jvp(v) == v @ T``. Building all of it is only worth it when every
+        direction is wanted, which is the case for grad and the jac_* methods but not
+        for a single JVP, so _jvp keeps its own uncached path.
+        """
+        state = self._state
+
+        def build():
+            return _proximal_get_tangents(
+                state.constraint,
+                xf,
+                jnp.eye(x.shape[0]),
+                constants[1],
+                state.eq_solve_objective._feasible_tangents,
+                state.dxdc,
+                state.dimc_per_thing,
+                state.eq_idx,
+                op,
+            )
+
+        return state.get_tangents(x, op, constants[1], build)
+
+    def _apply_objective_jvp(self, tangents, xg, constants, op):
+        if self._objective._deriv_mode == "batched":
+            # objective's method already know about its jac_chunk_size
+            return getattr(self._objective, "jvp_" + op)(tangents, xg, constants[0])
+        else:
+            return _proximal_jvp_blocked_pure(
+                self._objective,
+                jnp.split(tangents, np.cumsum(self._dimx_per_thing), axis=-1),
+                jnp.split(xg, np.cumsum(self._dimx_per_thing)),
+                op,
+            )
+
+    def _jac(self, x, constants=None, op="scaled"):
+        constants = setdefault(constants, [None, None])
+        xg, xf = self._update_equilibrium(x, store=True)
+        with prof_span("tangents"):
+            tangents = self._full_tangents(x, xf, constants, op)
+        with prof_span("obj_jvp"):
+            return self._apply_objective_jvp(tangents, xg, constants, op).T
 
     def hess(self, x, constants=None):
         """Compute Hessian of self.compute_scalar.
@@ -1474,8 +1563,7 @@ class ProximalProjection(ObjectiveFunction):
             Jacobian matrix.
 
         """
-        v = jnp.eye(x.shape[0])
-        return self.jvp_scaled(v, x, constants).T
+        return self._jac(x, constants, "scaled")
 
     def jac_scaled_error(self, x, constants=None):
         """Compute Jacobian of self.compute_scaled_error.
@@ -1493,8 +1581,7 @@ class ProximalProjection(ObjectiveFunction):
             Jacobian matrix.
 
         """
-        v = jnp.eye(x.shape[0])
-        return self.jvp_scaled_error(v, x, constants).T
+        return self._jac(x, constants, "scaled_error")
 
     def jac_unscaled(self, x, constants=None):
         """Compute Jacobian of self.compute_unscaled.
@@ -1511,8 +1598,7 @@ class ProximalProjection(ObjectiveFunction):
         J : ndarray
             Jacobian matrix.
         """
-        v = jnp.eye(x.shape[0])
-        return self.jvp_unscaled(v, x, constants).T
+        return self._jac(x, constants, "unscaled")
 
     def jvp_scaled(self, v, x, constants=None):
         """Compute Jacobian-vector product of self.compute_scaled.
@@ -1601,16 +1687,7 @@ class ProximalProjection(ObjectiveFunction):
             )
 
         with prof_span("obj_jvp"):
-            if self._objective._deriv_mode == "batched":
-                # objective's method already know about its jac_chunk_size
-                return getattr(self._objective, "jvp_" + op)(tangents, xg, constants[0])
-            else:
-                return _proximal_jvp_blocked_pure(
-                    self._objective,
-                    jnp.split(tangents, np.cumsum(self._dimx_per_thing), axis=-1),
-                    jnp.split(xg, np.cumsum(self._dimx_per_thing)),
-                    op,
-                )
+            return self._apply_objective_jvp(tangents, xg, constants, op)
 
     @property
     def constants(self):
