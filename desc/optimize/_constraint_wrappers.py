@@ -634,6 +634,9 @@ class ProximalState:
         self.allxeq = []
         self.x_old = None
         self.history = []
+        # eq_is_current <=> eq.params_dict equals the equilibrium params in
+        # history[-1], ie. nothing has moved the equilibrium since the last commit
+        self.eq_is_current = True
 
         self._built = False
 
@@ -820,6 +823,48 @@ class ProximalState:
         ]
         self.allxeq = [self.eq.pack_params(self.eq.params_dict)]
         self.history = [[t.params_dict.copy() for t in self.things]]
+        self.eq_is_current = True
+
+    def commit(self, x, x_list):
+        """Record x, and the equilibrium solved at it, as the accepted point.
+
+        Parameters
+        ----------
+        x : ndarray
+            Accepted state vector.
+        x_list : list of dict
+            Params of each thing at x, with the equilibrium params taken from the
+            solved equilibrium rather than from x.
+
+        """
+        # Derivatives commit, and both the objective view and the constraint view are
+        # differentiated at the same accepted point, so this is called more than once
+        # per step. Overwrite rather than append in that case, or history gains a
+        # duplicate entry per view and desynchronizes from allx.
+        # np.array_equal is safe here: these are concrete arrays, never traced, the
+        # same reason f_where_x can compare them.
+        if self.x_old is not None and np.array_equal(
+            np.asarray(x), np.asarray(self.x_old)
+        ):
+            self.history[-1] = x_list
+        else:
+            self.history.append(x_list)
+        self.x_old = x
+        # the caller has just set eq.params_dict to the solved state and written that
+        # same state into history, so the two agree by construction
+        self.eq_is_current = True
+
+    def rollback(self):
+        """Restore the equilibrium to the last committed params, if it has moved."""
+        if self.eq_is_current:
+            # nothing has perturbed the equilibrium since the last commit or
+            # rollback, so eq.params_dict already equals history[-1] and
+            # update_constraint_target would redo a pinv based particular solution
+            # solve for nothing
+            return
+        self.eq.params_dict = self.history[-1][self.eq_idx]
+        self.eq_solve_objective.update_constraint_target(self.eq)
+        self.eq_is_current = True
 
     def pack_x(self):
         """Return the full proximal state vector from the current params of things.
@@ -1251,18 +1296,19 @@ class ProximalProjection(ObjectiveFunction):
             self._allx.append(x)
             self._allxopt.append(xopt)
             self._allxeq.append(xeq)
+            # the perturb + solve above is the only thing that moves the equilibrium
+            # away from the last committed state
+            self._state.eq_is_current = False
 
         if store:
-            self._x_old = x
             x_list = self.unpack_state(x, False)
             xeq_dict = self._eq.unpack_params(xeq)
             self._eq.params_dict = xeq_dict
             x_list[self._eq_idx] = xeq_dict
-            self.history.append(x_list)
+            self._state.commit(x, x_list)
         else:
             # reset to last good params
-            self._eq.params_dict = self.history[-1][self._eq_idx]
-            self._eq_solve_objective.update_constraint_target(self._eq)
+            self._state.rollback()
 
         return xopt, xeq
 
