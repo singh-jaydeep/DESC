@@ -549,6 +549,297 @@ class LinearConstraintProjection(ObjectiveFunction):
         return getattr(self._objective, name)
 
 
+class ProximalState:
+    """Shared state for the equilibrium subproblem of a proximal projection.
+
+    Owns the equilibrium, the equilibrium constraint F, everything built from them,
+    the state vector layout, and all of the mutable caches. One of these is shared by
+    every ``ProximalProjection`` view of the same subproblem: the view wrapping the
+    objective G, and, for the augmented Lagrangian methods, the view wrapping the
+    nonlinear constraints H that are not equilibrium constraints. Sharing it is what
+    makes two views cost one equilibrium solve per trial point instead of two.
+
+    Parameters
+    ----------
+    constraint : ObjectiveFunction
+        Equilibrium constraint to enforce. Should be an ObjectiveFunction with one or
+        more of the following objectives: {ForceBalance, CurrentDensity,
+        RadialForceBalance, HelicalForceBalance}
+    eq : Equilibrium
+        Equilibrium that will be optimized to satisfy the objectives.
+    perturb_options, solve_options : dict
+        dictionary of arguments passed to Equilibrium.perturb and Equilibrium.solve
+        during the projection step.
+
+    Notes
+    -----
+    This is a plain Python object on purpose. It is mutated as the optimization
+    proceeds and must never be traced -- see the comment above ``jit_if_possible``
+    for why ``ProximalProjection`` itself cannot be jitted with ``self`` either
+    static or unstatic. The same reasoning applies to anything hanging off it, so
+    this is not ``IOAble``, is not registered as a pytree, and is never passed into
+    a jitted function; the jitted helpers take the pieces they need as explicit
+    arguments.
+
+    """
+
+    def __init__(self, constraint, eq, perturb_options=None, solve_options=None):
+        assert isinstance(
+            constraint, ObjectiveFunction
+        ), "constraint should be instance of ObjectiveFunction."
+        for con in constraint.objectives:
+            errorif(
+                not con._equilibrium,
+                ValueError,
+                "ProximalProjection method cannot handle general "
+                + f"nonlinear constraint {con}.",
+            )
+            # can't have bounds on constraint bc if constraint is satisfied then
+            # Fx == 0, and that messes with Gx @ Fx^-1 Fc etc.
+            errorif(
+                con.bounds is not None,
+                ValueError,
+                "ProximalProjection can only handle equality constraints, "
+                + f"got bounds for constraint {con}",
+            )
+
+        self.eq = eq
+        self.constraint = constraint
+
+        solve_options = {} if solve_options is None else solve_options
+        perturb_options = {} if perturb_options is None else perturb_options
+        # If user does not want the solve during build, mainly for debug purposes
+        self.solve_during_proximal_build = solve_options.pop(
+            "solve_during_proximal_build", True
+        )
+        perturb_options.setdefault("verbose", 0)
+        perturb_options.setdefault("include_f", False)
+        solve_options.setdefault("verbose", 0)
+        self.perturb_options = perturb_options
+        self.solve_options = solve_options
+
+        # set by build
+        self.eq_linear_constraints = None
+        self.eq_solve_objective = None
+        self.args = None
+        self.dxdc = None
+        # set by set_layout
+        self.things = None
+        self.eq_idx = None
+        self.dimx_per_thing = None
+        self.dimc_per_thing = None
+        # mutable, shared by every view
+        self.allx = []
+        self.allxopt = []
+        self.allxeq = []
+        self.x_old = None
+        self.history = []
+
+        self._built = False
+
+    @property
+    def built(self):
+        """bool: Whether the equilibrium subproblem has been built."""
+        return self._built
+
+    def build(self, use_jit=None, verbose=1):
+        """Build the equilibrium subproblem. Runs at most once per state.
+
+        Parameters
+        ----------
+        use_jit : bool, optional
+            Whether to just-in-time compile the sub-objectives.
+        verbose : int, optional
+            Level of output.
+
+        """
+        if self._built:
+            # a second view is attaching to an already built subproblem. The
+            # expensive work -- the SVD in factorize_linear_constraints, the pinvs in
+            # _set_eq_state_vector, the initial eq.solve -- has already been done.
+            # use_jit and verbose from this caller are ignored, as they are for any
+            # already built DESC object.
+            return
+
+        self.eq_linear_constraints = get_fixed_boundary_constraints(eq=self.eq)
+        self.eq_linear_constraints = maybe_add_self_consistency(
+            self.eq, self.eq_linear_constraints
+        )
+
+        if not self.constraint.built:
+            self.constraint.build(use_jit=use_jit, verbose=verbose)
+        for constraint in self.eq_linear_constraints:
+            constraint.build(use_jit=use_jit, verbose=verbose)
+
+        # Here we create and build the LinearConstraintProjection
+        # for the equilibrium subproblem using self.constraint as objective
+        # and our fixed-bdry constraints we just made. This will
+        # be passed as the objective for the eq subproblem, which saves
+        # some time as by building it here we can avoid re-computing the
+        # constraint matrix A and its SVD for the feasible direction method
+        self.eq_solve_objective = LinearConstraintProjection(
+            self.constraint,
+            ObjectiveFunction(self.eq_linear_constraints),
+            name="Eq Update LinearConstraintProjection",
+        )
+        self.eq_solve_objective.build(use_jit=use_jit, verbose=verbose)
+
+        errorif(
+            self.constraint.things != [self.eq],
+            ValueError,
+            "ProximalProjection can only handle constraints on the equilibrium.",
+        )
+
+        self._set_eq_state_vector()
+
+        # Ensure the equilibrium is solved to the specified tolerances: the
+        # derivative identity assumes F = 0 at the point of evaluation, so eq must be
+        # solved before anything is recorded against it. This depends only on
+        # eq_solve_objective, not on the things list, which is why it belongs here
+        # rather than in set_layout. It therefore runs exactly once per subproblem: a
+        # second view returns above, and a layout rebuild re-seeds the caches without
+        # re-solving.
+        if self.solve_during_proximal_build:
+            # like the eq_solve in _update_equilibrium, this re-enters
+            # Optimizer.optimize, so collapse it to one span at profiling level 1
+            with prof_span("eq_solve", collapse=True):
+                self.eq.solve(
+                    objective=self.eq_solve_objective,
+                    constraints=None,
+                    **self.solve_options,
+                )
+
+        self._built = True
+
+    def _set_eq_state_vector(self):
+        full_args = self.eq.optimizable_params.copy()
+        self.args = self.eq.optimizable_params.copy()
+        # the eq optimizable variables for proximal are the Rb, Zb and profile
+        # coefficients. Once these are chosen, we will solve the equilibrium to
+        # find the R_lmn, Z_lmn, L_lmn, Ra_n, Za_n. That is why we remove them
+        # from the list of optimizable variables. This is accompanied by not including
+        # self-consistency constraints (see get_combined_constraint_objectives in
+        # desc.optimize.optimizer) and also removing columns corresponding to these
+        # variables from the constraint matrix A in
+        # desc.objectives.utils.factorize_linear_constraints.
+        for arg in ["R_lmn", "Z_lmn", "L_lmn", "Ra_n", "Za_n"]:
+            self.args.remove(arg)
+
+        dxdc = []
+        xz = {arg: np.zeros(self.eq.dimensions[arg]) for arg in full_args}
+
+        for arg in self.args:
+            if arg not in ["Rb_lmn", "Zb_lmn"]:
+                x_idx = self.eq.x_idx[arg]
+                dxdc.append(np.eye(self.eq.dim_x)[:, x_idx])
+            if arg == "Rb_lmn":
+                c = get_instance(self.eq_linear_constraints, BoundaryRSelfConsistency)
+                # We have A @ R_lmn = Rb_lmn
+                A = c.jac_unscaled(xz)[0]["R_lmn"]
+                Ainv = np.linalg.pinv(A)
+                # Once this is multipled by Rb_lmn, we get the full eq state vector
+                # with the R_lmn but rest is 0
+                dxdRb = np.eye(self.eq.dim_x)[:, self.eq.x_idx["R_lmn"]] @ Ainv
+                dxdc.append(dxdRb)
+            if arg == "Zb_lmn":
+                c = get_instance(self.eq_linear_constraints, BoundaryZSelfConsistency)
+                A = c.jac_unscaled(xz)[0]["Z_lmn"]
+                Ainv = np.linalg.pinv(A)
+                dxdZb = np.eye(self.eq.dim_x)[:, self.eq.x_idx["Z_lmn"]] @ Ainv
+                dxdc.append(dxdZb)
+        # dxdc is a matrix that when multiplied by the optimization variables (only
+        # Rb_lmn, Zb_lmn) gives the full state vector of the equilibrium (Rb_lmn and
+        # Zb_lmn part will be 0, but they will be represented by the equivalent
+        # R_lmn and Z_lmn). For example, let's say the eq optimization variables are
+        # ceq = [Rb_lmn, Zb_lmn, p_l, i_l].T                      # noqa : E800
+        # Then, we will use dxdc for the following:
+        # xeq = dxdc @ ceq                                        # noqa : E800
+        # And xeq will be,
+        # xeq = [                                                 # noqa : E800
+        #     R_lmn, Z_lmn, jnp.zeros_like(L_lmn)                 # noqa : E800
+        #     jnp.zeros_like(Rb_lmn), jnp.zeros_like(Zb_lmn),     # noqa : E800
+        #     p_l, i_l,                                           # noqa : E800
+        # ]                                                       # noqa : E800
+        self.dxdc = jnp.hstack(dxdc)
+
+    def set_layout(self, things):
+        """Set the state vector layout from the things the views are optimizing.
+
+        Called once per view at build, and again from
+        ``ProximalProjection._set_things`` if ``combine_args`` widens the things
+        list. Every view of one subproblem must agree on this layout, which is why it
+        lives here rather than on the views -- with a single copy there is nothing to
+        keep in sync.
+
+        Parameters
+        ----------
+        things : list of Optimizable
+            Ordered list of things the views are optimizing.
+
+        """
+        things = list(things)
+        errorif(
+            self.eq not in things,
+            ValueError,
+            "The equilibrium of the proximal subproblem is not among the things "
+            "being optimized.",
+        )
+        self.things = things
+        self.eq_idx = things.index(self.eq)
+
+        # the full state vector includes all the parameters from all the things
+        # however, sub-objectives only need the part for their thing. We will
+        # use this to split the state vector into its components
+        self.dimx_per_thing = [t.dim_x for t in things]
+        # we remove the R_lmn, Z_lmn, L_lmn, Ra_n, Za_n from the equilibrium params
+        # dimc_per_thing accounts for that, don't confuse it with reduced state vector
+        dimc_per_thing = [t.dim_x for t in things]
+        dimc_per_thing[self.eq_idx] = int(
+            np.sum([self.eq.dimensions[arg] for arg in self.args])
+        )
+        # we will need to pass this as a static argument, only possible if tuple
+        self.dimc_per_thing = tuple(dimc_per_thing)
+
+        if self.x_old is None or self.x_old.size != sum(self.dimc_per_thing):
+            # (Re)seed the caches against this layout. Discarding an existing cache is
+            # only safe because set_layout runs at build time, before any optimization
+            # step has been taken, so there is no history worth preserving.
+            assert (
+                len(self.history) <= 1
+            ), "proximal state vector layout changed after optimization started"
+            self._seed_caches()
+
+    def _seed_caches(self):
+        # build() has already solved the equilibrium; this only records it against the
+        # layout. Do not solve here -- _seed_caches runs again on a layout rebuild,
+        # and a second nested eq.solve would be pure waste.
+        self.x_old = self.pack_x()
+        self.allx = [self.x_old]
+        self.allxopt = [
+            jnp.concatenate([t.pack_params(t.params_dict) for t in self.things])
+        ]
+        self.allxeq = [self.eq.pack_params(self.eq.params_dict)]
+        self.history = [[t.params_dict.copy() for t in self.things]]
+
+    def pack_x(self):
+        """Return the full proximal state vector from the current params of things.
+
+        Note that we remove the R_lmn, Z_lmn, L_lmn, Ra_n, Za_n from the equilibrium
+        params.
+        """
+        xs = []
+        for t in self.things:
+            if t is self.eq:
+                xs += [
+                    jnp.concatenate(
+                        [jnp.atleast_1d(t.params_dict[arg]) for arg in self.args]
+                    )
+                ]
+            else:
+                xs += [t.pack_params(t.params_dict)]
+        return jnp.concatenate(xs)
+
+
 class ProximalProjection(ObjectiveFunction):
     """Remove equilibrium constraint by projecting onto constraint at each step.
 
@@ -579,102 +870,145 @@ class ProximalProjection(ObjectiveFunction):
     def __init__(
         self,
         objective,
-        constraint,
-        eq,
+        constraint=None,
+        eq=None,
         perturb_options=None,
         solve_options=None,
+        state=None,
         name="ProximalProjection",
     ):
         assert isinstance(objective, ObjectiveFunction), (
             "objective should be instance of ObjectiveFunction." ""
         )
-        assert isinstance(constraint, ObjectiveFunction), (
-            "constraint should be instance of ObjectiveFunction." ""
-        )
-        for con in constraint.objectives:
-            errorif(
-                not con._equilibrium,
-                ValueError,
-                "ProximalProjection method cannot handle general "
-                + f"nonlinear constraint {con}.",
-            )
-            # can't have bounds on constraint bc if constraint is satisfied then
-            # Fx == 0, and that messes with Gx @ Fx^-1 Fc etc.
-            errorif(
-                con.bounds is not None,
-                ValueError,
-                "ProximalProjection can only handle equality constraints, "
-                + f"got bounds for constraint {con}",
-            )
+        # assign _objective and _state first: __getattr__ forwards every missing
+        # attribute to self._objective, so touching either before they exist gives
+        # infinite recursion with a useless traceback
         self._objective = objective
-        self._constraint = constraint
-        solve_options = {} if solve_options is None else solve_options
-        self._solve_during_proximal_build = solve_options.pop(
-            "solve_during_proximal_build", True
-        )  # If user does not want the solve during build, mainly for debug purposes
-        perturb_options = {} if perturb_options is None else perturb_options
-        perturb_options.setdefault("verbose", 0)
-        perturb_options.setdefault("include_f", False)
-        solve_options.setdefault("verbose", 0)
-        self._perturb_options = perturb_options
-        self._solve_options = solve_options
+        if state is not None:
+            errorif(
+                constraint is not None and constraint is not state.constraint,
+                ValueError,
+                "Got both a ProximalState and a different constraint. The equilibrium "
+                "constraint belongs to the state, so that every view of one "
+                "subproblem is guaranteed to use the same F.",
+            )
+            errorif(
+                eq is not None and eq is not state.eq,
+                ValueError,
+                "Got both a ProximalState and a different equilibrium. The "
+                "equilibrium belongs to the state.",
+            )
+            errorif(
+                perturb_options is not None or solve_options is not None,
+                ValueError,
+                "perturb_options and solve_options belong to the ProximalState, not "
+                "to an individual view.",
+            )
+            self._state = state
+        else:
+            self._state = ProximalState(constraint, eq, perturb_options, solve_options)
         self._built = False
         # don't want to compile this, just use the compiled objective and constraint
         self._use_jit = False
         self._compiled = False
-        self._eq = eq
         self._name = name
 
-    def _set_eq_state_vector(self):
-        full_args = self._eq.optimizable_params.copy()
-        self._args = self._eq.optimizable_params.copy()
-        # the eq optimizable variables for proximal are the Rb, Zb and profile
-        # coefficients. Once these are chosen, we will solve the equilibrium to
-        # find the R_lmn, Z_lmn, L_lmn, Ra_n, Za_n. That is why we remove them
-        # from the list of optimizable variables. This is accompanied by not including
-        # self-consistency constraints (see get_combined_constraint_objectives in
-        # desc.optimize.optimizer) and also removing columns corresponding to these
-        # variables from the constraint matrix A in
-        # desc.objectives.utils.factorize_linear_constraints.
-        for arg in ["R_lmn", "Z_lmn", "L_lmn", "Ra_n", "Za_n"]:
-            self._args.remove(arg)
+    # The equilibrium subproblem lives on self._state, shared with any other view of
+    # it. These delegate so that existing call sites -- and optimizer.py, which reads
+    # _dimx_per_thing, _eq_idx and history -- keep working unchanged.
 
-        dxdc = []
-        xz = {arg: np.zeros(self._eq.dimensions[arg]) for arg in full_args}
+    @property
+    def _eq(self):
+        return self._state.eq
 
-        for arg in self._args:
-            if arg not in ["Rb_lmn", "Zb_lmn"]:
-                x_idx = self._eq.x_idx[arg]
-                dxdc.append(np.eye(self._eq.dim_x)[:, x_idx])
-            if arg == "Rb_lmn":
-                c = get_instance(self._eq_linear_constraints, BoundaryRSelfConsistency)
-                # We have A @ R_lmn = Rb_lmn
-                A = c.jac_unscaled(xz)[0]["R_lmn"]
-                Ainv = np.linalg.pinv(A)
-                # Once this is multipled by Rb_lmn, we get the full eq state vector
-                # with the R_lmn but rest is 0
-                dxdRb = np.eye(self._eq.dim_x)[:, self._eq.x_idx["R_lmn"]] @ Ainv
-                dxdc.append(dxdRb)
-            if arg == "Zb_lmn":
-                c = get_instance(self._eq_linear_constraints, BoundaryZSelfConsistency)
-                A = c.jac_unscaled(xz)[0]["Z_lmn"]
-                Ainv = np.linalg.pinv(A)
-                dxdZb = np.eye(self._eq.dim_x)[:, self._eq.x_idx["Z_lmn"]] @ Ainv
-                dxdc.append(dxdZb)
-        # dxdc is a matrix that when multiplied by the optimization variables (only
-        # Rb_lmn, Zb_lmn) gives the full state vector of the equilibrium (Rb_lmn and
-        # Zb_lmn part will be 0, but they will be represented by the equivalent
-        # R_lmn and Z_lmn). For example, let's say the eq optimization variables are
-        # ceq = [Rb_lmn, Zb_lmn, p_l, i_l].T                      # noqa : E800
-        # Then, we will use dxdc for the following:
-        # xeq = dxdc @ ceq                                        # noqa : E800
-        # And xeq will be,
-        # xeq = [                                                 # noqa : E800
-        #     R_lmn, Z_lmn, jnp.zeros_like(L_lmn)                 # noqa : E800
-        #     jnp.zeros_like(Rb_lmn), jnp.zeros_like(Zb_lmn),     # noqa : E800
-        #     p_l, i_l,                                           # noqa : E800
-        # ]                                                       # noqa : E800
-        self._dxdc = jnp.hstack(dxdc)
+    @_eq.setter
+    def _eq(self, new):
+        self._state.eq = new
+
+    @property
+    def _constraint(self):
+        return self._state.constraint
+
+    @property
+    def _eq_linear_constraints(self):
+        return self._state.eq_linear_constraints
+
+    @property
+    def _eq_solve_objective(self):
+        return self._state.eq_solve_objective
+
+    @property
+    def _args(self):
+        return self._state.args
+
+    @property
+    def _dxdc(self):
+        return self._state.dxdc
+
+    @property
+    def _eq_idx(self):
+        return self._state.eq_idx
+
+    @property
+    def _dimx_per_thing(self):
+        return self._state.dimx_per_thing
+
+    @property
+    def _dimc_per_thing(self):
+        return self._state.dimc_per_thing
+
+    @property
+    def _perturb_options(self):
+        return self._state.perturb_options
+
+    @property
+    def _solve_options(self):
+        return self._state.solve_options
+
+    @property
+    def _solve_during_proximal_build(self):
+        return self._state.solve_during_proximal_build
+
+    @property
+    def _allx(self):
+        return self._state.allx
+
+    @_allx.setter
+    def _allx(self, new):
+        self._state.allx = new
+
+    @property
+    def _allxopt(self):
+        return self._state.allxopt
+
+    @_allxopt.setter
+    def _allxopt(self, new):
+        self._state.allxopt = new
+
+    @property
+    def _allxeq(self):
+        return self._state.allxeq
+
+    @_allxeq.setter
+    def _allxeq(self, new):
+        self._state.allxeq = new
+
+    @property
+    def _x_old(self):
+        return self._state.x_old
+
+    @_x_old.setter
+    def _x_old(self, new):
+        self._state.x_old = new
+
+    @property
+    def history(self):
+        """list: Params of each thing at each accepted step."""
+        return self._state.history
+
+    @history.setter
+    def history(self, new):
+        self._state.history = new
 
     def build(self, use_jit=None, verbose=1):  # noqa: C901
         """Build the objective.
@@ -691,45 +1025,20 @@ class ProximalProjection(ObjectiveFunction):
         timer = Timer()
         timer.start("Proximal projection build")
 
-        self._eq_linear_constraints = get_fixed_boundary_constraints(eq=self._eq)
-        self._eq_linear_constraints = maybe_add_self_consistency(
-            self._eq, self._eq_linear_constraints
-        )
-
         # we don't always build here because in ~all cases the user doesn't interact
         # with this directly, so if the user wants to manually rebuild they should
         # do it before this wrapper is created for them.
         if not self._objective.built:
             self._objective.build(use_jit=use_jit, verbose=verbose)
-        if not self._constraint.built:
-            self._constraint.build(use_jit=use_jit, verbose=verbose)
 
-        for constraint in self._eq_linear_constraints:
-            constraint.build(use_jit=use_jit, verbose=verbose)
+        # builds F, the eq linear constraints, eq_solve_objective, args and dxdc, and
+        # solves the equilibrium. Runs once per subproblem however many views share it
+        self._state.build(use_jit=use_jit, verbose=verbose)
 
-        # Here we create and build the LinearConstraintProjection
-        # for the equilibrium subproblem using the self._constraint as objective
-        # and our fixed-bdry constraints we just made. This will
-        # be passed as the objective for the eq subproblem, which saves
-        # some time as by building it here we can avoid re-computing the
-        # constraint matrix A and its SVD for the feasible direction method
-        self._eq_solve_objective = LinearConstraintProjection(
-            self._constraint,
-            ObjectiveFunction(self._eq_linear_constraints),
-            name="Eq Update LinearConstraintProjection",
-        )
-        self._eq_solve_objective.build(use_jit=use_jit, verbose=verbose)
-
-        errorif(
-            self._constraint.things != [self._eq],
-            ValueError,
-            "ProximalProjection can only handle constraints on the equilibrium.",
-        )
-
+        # load-bearing for unpack_state and _proximal_jvp_blocked_pure, do not reduce
+        # this to just [self._objective]
         self._objectives = [self._objective, self._constraint]
         self._set_things()
-
-        self._eq_idx = self.things.index(self._eq)
 
         self._dim_f = self._objective.dim_f
         if self._dim_f == 1:
@@ -737,44 +1046,10 @@ class ProximalProjection(ObjectiveFunction):
         else:
             self._scalar = False
 
-        self._set_eq_state_vector()
-
-        # the full state vector includes all the parameters from all the things
-        # however, sub-objectives only need the part for their thing. We will
-        # use this to split the state vector into its components
-        self._dimx_per_thing = [t.dim_x for t in self.things]
-        # we remove the R_lmn, Z_lmn, L_lmn, Ra_n, Za_n from the equilibrium params
-        # dimc_per_thing accounts for that, don't confuse it with reduced state vector
-        self._dimc_per_thing = [t.dim_x for t in self.things]
-        self._dimc_per_thing[self._eq_idx] = int(
-            np.sum([self._eq.dimensions[arg] for arg in self._args])
-        )
-        # we will need to set this static attribute, only possible if tuple
-        self._dimc_per_thing = tuple(self._dimc_per_thing)
-
         # Note: the full state vector version of the feasible tangents used to be
         # built here, but its eq block is just _eq_solve_objective._feasible_tangents
         # and the other blocks are identity, so _proximal_get_tangents uses that.
-
-        ## history and caching
-        # first, ensure equilibrium is solved to the
-        # specified tolerances, necessary as we assume
-        # eq is solved when taking the derivatives later
-        if self._solve_during_proximal_build:
-            # like the eq_solve in _update_equilibrium, this re-enters
-            # Optimizer.optimize, so collapse it to one span at profiling level 1
-            with prof_span("eq_solve", collapse=True):
-                self._eq.solve(
-                    objective=self._eq_solve_objective,
-                    constraints=None,
-                    **self._solve_options,
-                )
-        # then store the now-solved eq state as the initial state
-        self._x_old = self.x(self.things)
-        self._allx = [self._x_old]
-        self._allxopt = [self._objective.x(*self.things)]
-        self._allxeq = [self._eq.pack_params(self._eq.params_dict)]
-        self.history = [[t.params_dict.copy() for t in self.things]]
+        self._state.set_layout(self.things)
 
         self._built = True
         timer.stop("Proximal projection build")
@@ -1268,6 +1543,14 @@ class ProximalProjection(ObjectiveFunction):
 
     def __getattr__(self, name):
         """For other attributes we defer to the base objective."""
+        # __getattr__ fires for any attribute missing on self, including while
+        # __init__ is still running. Without this guard, touching _objective or
+        # _state before they are assigned recurses infinitely instead of raising.
+        if name in ("_objective", "_state"):
+            raise AttributeError(
+                f"{type(self).__name__} has no attribute {name}, it is accessed "
+                "before __init__ assigned it"
+            )
         return getattr(self._objective, name)
 
 
