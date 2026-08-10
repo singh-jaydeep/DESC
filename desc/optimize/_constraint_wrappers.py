@@ -20,6 +20,7 @@ from desc.objectives.utils import (
 )
 from desc.utils import Timer, errorif, get_instance, setdefault, warnif
 
+from ._profiling import span as prof_span
 from .utils import f_where_x
 
 
@@ -760,11 +761,14 @@ class ProximalProjection(ObjectiveFunction):
         # specified tolerances, necessary as we assume
         # eq is solved when taking the derivatives later
         if self._solve_during_proximal_build:
-            self._eq.solve(
-                objective=self._eq_solve_objective,
-                constraints=None,
-                **self._solve_options,
-            )
+            # like the eq_solve in _update_equilibrium, this re-enters
+            # Optimizer.optimize, so collapse it to one span at profiling level 1
+            with prof_span("eq_solve", collapse=True):
+                self._eq.solve(
+                    objective=self._eq_solve_objective,
+                    constraints=None,
+                    **self._solve_options,
+                )
         # then store the now-solved eq state as the initial state
         self._x_old = self.x(self.things)
         self._allx = [self._x_old]
@@ -889,6 +893,10 @@ class ProximalProjection(ObjectiveFunction):
         # xopt is the full state vector of all the things
         # xeq is the full state vector of the equilibrium only
 
+        with prof_span("update_eq"):
+            return self._update_equilibrium_inner(x, store)
+
+    def _update_equilibrium_inner(self, x, store):
         # TODO (#1720): We don't need to check the whole state vector, just the
         # equilibrium parameters should be enough.
         # first check if its something we've seen before, if it is just return
@@ -907,17 +915,21 @@ class ProximalProjection(ObjectiveFunction):
             deltas = {str(key): xeq_dict[key] - xeq_dict_old[key] for key in xeq_dict}
             # We pass in the LinearConstraintProjection object to skip some redundant
             # computations in the perturb and solve methods
-            self._eq = self._eq.perturb(
-                objective=self._eq_solve_objective,
-                constraints=None,
-                deltas=deltas,
-                **self._perturb_options,
-            )
-            self._eq.solve(
-                objective=self._eq_solve_objective,
-                constraints=None,
-                **self._solve_options,
-            )
+            with prof_span("perturb"):
+                self._eq = self._eq.perturb(
+                    objective=self._eq_solve_objective,
+                    constraints=None,
+                    deltas=deltas,
+                    **self._perturb_options,
+                )
+            # this re-enters Optimizer.optimize, so at profiling level 1 it is
+            # collapsed to a single opaque span rather than reported in full
+            with prof_span("eq_solve", collapse=True):
+                self._eq.solve(
+                    objective=self._eq_solve_objective,
+                    constraints=None,
+                    **self._solve_options,
+                )
             xeq = self._eq.pack_params(self._eq.params_dict)
             x_list[self._eq_idx] = self._eq.params_dict.copy()
             xopt = jnp.concatenate(
@@ -1048,19 +1060,21 @@ class ProximalProjection(ObjectiveFunction):
         v = jnp.eye(x.shape[0])
         constants = setdefault(constants, [None, None])
         xg, xf = self._update_equilibrium(x, store=True)
-        tangents = _proximal_get_tangents(
-            self._constraint,
-            xf,
-            v,
-            constants[1],
-            self._eq_solve_objective._feasible_tangents,
-            self._dxdc,
-            self._dimc_per_thing,
-            self._eq_idx,
-            "scaled_error",
-        )
-        g = self._objective.compute_scaled_error(xg, constants[0])
-        g_vjp = self._objective.vjp_scaled_error(g, xg, constants[0])
+        with prof_span("tangents"):
+            tangents = _proximal_get_tangents(
+                self._constraint,
+                xf,
+                v,
+                constants[1],
+                self._eq_solve_objective._feasible_tangents,
+                self._dxdc,
+                self._dimc_per_thing,
+                self._eq_idx,
+                "scaled_error",
+            )
+        with prof_span("obj_vjp"):
+            g = self._objective.compute_scaled_error(xg, constants[0])
+            g_vjp = self._objective.vjp_scaled_error(g, xg, constants[0])
         return tangents @ g_vjp
 
     def hess(self, x, constants=None):
@@ -1214,28 +1228,30 @@ class ProximalProjection(ObjectiveFunction):
 
         # we don't need to divide this part into blocked and batched because
         # self._constraint._deriv_mode will handle it
-        tangents = _proximal_get_tangents(
-            self._constraint,
-            xf,
-            v,
-            constants[1],
-            self._eq_solve_objective._feasible_tangents,
-            self._dxdc,
-            self._dimc_per_thing,
-            self._eq_idx,
-            op,
-        )
-
-        if self._objective._deriv_mode == "batched":
-            # objective's method already know about its jac_chunk_size
-            return getattr(self._objective, "jvp_" + op)(tangents, xg, constants[0])
-        else:
-            return _proximal_jvp_blocked_pure(
-                self._objective,
-                jnp.split(tangents, np.cumsum(self._dimx_per_thing), axis=-1),
-                jnp.split(xg, np.cumsum(self._dimx_per_thing)),
+        with prof_span("tangents"):
+            tangents = _proximal_get_tangents(
+                self._constraint,
+                xf,
+                v,
+                constants[1],
+                self._eq_solve_objective._feasible_tangents,
+                self._dxdc,
+                self._dimc_per_thing,
+                self._eq_idx,
                 op,
             )
+
+        with prof_span("obj_jvp"):
+            if self._objective._deriv_mode == "batched":
+                # objective's method already know about its jac_chunk_size
+                return getattr(self._objective, "jvp_" + op)(tangents, xg, constants[0])
+            else:
+                return _proximal_jvp_blocked_pure(
+                    self._objective,
+                    jnp.split(tangents, np.cumsum(self._dimx_per_thing), axis=-1),
+                    jnp.split(xg, np.cumsum(self._dimx_per_thing)),
+                    op,
+                )
 
     @property
     def constants(self):

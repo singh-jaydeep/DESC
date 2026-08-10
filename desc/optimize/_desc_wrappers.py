@@ -2,6 +2,7 @@ from scipy.optimize import NonlinearConstraint
 
 from desc.backend import jnp
 
+from ._profiling import wrap as prof_wrap
 from .aug_lagrangian import fmin_auglag
 from .aug_lagrangian_ls import lsq_auglag
 from .fmin_scalar import fmintr
@@ -112,25 +113,29 @@ def _optimize_desc_aug_lagrangian(
         options.setdefault("max_trust_radius", 1.0)
     options["max_nfev"] = stoptol["max_nfev"]
     # local lambdas to handle constants from both objective and constraint
-    hess = (lambda x, *c: objective.hess(x)) if "bfgs" not in method else "bfgs"
+    _hess = prof_wrap(objective.hess, "hess")
+    hess = (lambda x, *c: _hess(x)) if "bfgs" not in method else "bfgs"
 
     if constraint is not None:
         lb, ub = constraint.bounds_scaled
+        _con_f = prof_wrap(constraint.compute_scaled, "constraint_f")
+        _con_jac = prof_wrap(constraint.jac_scaled, "constraint_jac")
+        _con_vjp = prof_wrap(constraint.vjp_scaled, "constraint_vjp")
         constraint_wrapped = NonlinearConstraint(
-            lambda x, *c: constraint.compute_scaled(x),
+            lambda x, *c: _con_f(x),
             lb,
             ub,
-            lambda x, *c: constraint.jac_scaled(x),
+            lambda x, *c: _con_jac(x),
         )
         # TODO (#1394): can't pass constants dict into vjp for now
-        constraint_wrapped.vjp = lambda v, x, *args: constraint.vjp_scaled(v, x)
+        constraint_wrapped.vjp = lambda v, x, *args: _con_vjp(v, x)
     else:
         constraint_wrapped = None
 
     result = fmin_auglag(
-        objective.compute_scalar,
+        prof_wrap(objective.compute_scalar, "f"),
         x0=x0,
-        grad=objective.grad,
+        grad=prof_wrap(objective.grad, "grad"),
         hess=hess,
         bounds=(-jnp.inf, jnp.inf),
         constraint=constraint_wrapped,
@@ -210,19 +215,21 @@ def _optimize_desc_aug_lagrangian_least_squares(
 
     if constraint is not None:
         lb, ub = constraint.bounds_scaled
+        _con_f = prof_wrap(constraint.compute_scaled, "constraint_f")
+        _con_jac = prof_wrap(constraint.jac_scaled, "constraint_jac")
         constraint_wrapped = NonlinearConstraint(
-            lambda x, *c: constraint.compute_scaled(x),
+            lambda x, *c: _con_f(x),
             lb,
             ub,
-            lambda x, *c: constraint.jac_scaled(x),
+            lambda x, *c: _con_jac(x),
         )
     else:
         constraint_wrapped = None
 
     result = lsq_auglag(
-        objective.compute_scaled_error,
+        prof_wrap(objective.compute_scaled_error, "f"),
         x0=x0,
-        jac=objective.jac_scaled_error,
+        jac=prof_wrap(objective.jac_scaled_error, "jac"),
         bounds=(-jnp.inf, jnp.inf),
         constraint=constraint_wrapped,
         args=(),
@@ -303,9 +310,9 @@ def _optimize_desc_least_squares(
     options["max_nfev"] = stoptol["max_nfev"]
 
     result = lsqtr(
-        objective.compute_scaled_error,
+        prof_wrap(objective.compute_scaled_error, "f"),
         x0=x0,
-        jac=objective.jac_scaled_error,
+        jac=prof_wrap(objective.jac_scaled_error, "jac"),
         args=(),
         x_scale=x_scale,
         ftol=stoptol["ftol"],
@@ -384,7 +391,7 @@ def _optimize_desc_fmin_scalar(
     """
     assert constraint is None, f"method {method} doesn't support constraints"
     options = {} if options is None else options
-    hess = objective.hess if "bfgs" not in method else "bfgs"
+    hess = prof_wrap(objective.hess, "hess") if "bfgs" not in method else "bfgs"
     if not isinstance(x_scale, str) and jnp.allclose(x_scale, 1):
         options.setdefault("initial_trust_ratio", 1e-3)
         options.setdefault("max_trust_radius", 1.0)
@@ -393,9 +400,9 @@ def _optimize_desc_fmin_scalar(
     options["max_nfev"] = stoptol["max_nfev"]
 
     result = fmintr(
-        objective.compute_scalar,
+        prof_wrap(objective.compute_scalar, "f"),
         x0=x0,
-        grad=objective.grad,
+        grad=prof_wrap(objective.grad, "grad"),
         hess=hess,
         args=(),
         x_scale=x_scale,
@@ -482,9 +489,9 @@ def _optimize_desc_stochastic(
     assert constraint is None, f"method {method} doesn't support constraints"
     options = {} if options is None else options
     result = sgd(
-        objective.compute_scalar,
+        prof_wrap(objective.compute_scalar, "f"),
         x0=x0,
-        grad=objective.grad,
+        grad=prof_wrap(objective.grad, "grad"),
         args=(),
         method=method,
         x_scale=x_scale,

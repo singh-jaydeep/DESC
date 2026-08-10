@@ -2355,6 +2355,7 @@ class Equilibrium(IOAble, Optimizable):
         options=None,
         verbose=1,
         copy=False,
+        profile=None,
     ):
         """Solve to find the equilibrium configuration.
 
@@ -2456,6 +2457,7 @@ class Equilibrium(IOAble, Optimizable):
             maxiter=maxiter,
             options=options,
             copy=copy,
+            profile=profile,
         )
 
         return things[0], result
@@ -2474,6 +2476,7 @@ class Equilibrium(IOAble, Optimizable):
         options=None,
         verbose=1,
         copy=False,
+        profile=None,
     ):
         """Optimize an equilibrium for an objective.
 
@@ -2531,6 +2534,13 @@ class Equilibrium(IOAble, Optimizable):
             Additionally, stores the before and after values of the objectives
             and constraints in the ``Objective values`` key.
 
+        Notes
+        -----
+        ``profile`` is passed through to ``Optimizer.optimize``. It records where
+        time goes during the solve and how much of it is XLA re-compiling
+        computations it has already compiled. None (the default) is off; see
+        ``Optimizer.optimize`` for the accepted forms.
+
         """
         if not isinstance(optimizer, Optimizer):
             optimizer = Optimizer(optimizer)
@@ -2558,6 +2568,7 @@ class Equilibrium(IOAble, Optimizable):
             maxiter=maxiter,
             options=options,
             copy=copy,
+            profile=profile,
         )
 
         return things[0], result

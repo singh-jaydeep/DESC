@@ -5,6 +5,7 @@ from scipy.optimize import BFGS, OptimizeResult
 from desc.backend import jnp
 from desc.utils import errorif, safediv, setdefault
 
+from ._profiling import set_step as prof_set_step
 from .bound_utils import (
     cl_scaling_vector,
     find_active_constraints,
@@ -183,6 +184,7 @@ def fmintr(  # noqa: C901
     ngev = 0
     nhev = 0
     iteration = 0
+    prof_set_step(0)
 
     N = x0.size
     x = x0.copy()
@@ -333,6 +335,7 @@ def fmintr(  # noqa: C901
         success, message = True, STATUS_MESSAGES["gtol"]
 
     while iteration < maxiter and success is None:
+        prof_set_step(iteration)
 
         H_a = H_h + jnp.diag(diag_h) if bounded else H_h
 

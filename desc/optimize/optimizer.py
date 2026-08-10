@@ -29,6 +29,8 @@ from desc.utils import (
 )
 
 from ._constraint_wrappers import LinearConstraintProjection, ProximalProjection
+from ._profiling import make_profiler
+from ._profiling import span as prof_span
 
 
 class Optimizer(IOAble):
@@ -95,6 +97,7 @@ class Optimizer(IOAble):
         maxiter=None,
         options=None,
         copy=False,
+        profile=None,
     ):
         """Optimize an objective function.
 
@@ -177,6 +180,20 @@ class Optimizer(IOAble):
         copy : bool
             Whether to return the current things or a copy (leaving the original
             unchanged).
+        profile : None, bool, str or dict, optional
+            Record where time goes during the solve, and in particular how much of
+            it is XLA re-compiling computations it has already compiled. None
+            (default) or False disables this entirely, at no cost. True prints a
+            summary table at the end. A string or path also streams one JSON
+            record per span to that file, as JSON lines. A dict is passed as
+            keyword arguments to ``desc.optimize._profiling.Profiler``, whose
+            useful options are ``max_depth`` (how deeply to break the tree down;
+            1 gives just build and solve, None the default records everything),
+            ``level`` (2 to descend into the nested equilibrium solves rather
+            than collapsing each to one span -- this is not a depth limit, use
+            ``max_depth`` for that) and ``block`` (True to make wall times
+            reflect execution rather than just dispatch, at the cost of
+            perturbing the measurement).
 
         Returns
         -------
@@ -250,81 +267,93 @@ class Optimizer(IOAble):
         timer = Timer()
         _, method = _parse_method(self.method)
 
-        timer.start("Initializing the optimization")
-        if not is_linear_proj:
-            objective, nonlinear_constraint = get_combined_constraint_objectives(
-                eq,
-                constraints,
-                objective,
-                things,
-                self.method,
+        profiler = make_profiler(profile)
+        if profiler is not None:
+            profiler.start({"method": self.method, "submethod": method})
+
+        try:
+            timer.start("Initializing the optimization")
+            with prof_span("build"):
+                if not is_linear_proj:
+                    objective, nonlinear_constraint = (
+                        get_combined_constraint_objectives(
+                            eq,
+                            constraints,
+                            objective,
+                            things,
+                            self.method,
+                            method,
+                            verbose,
+                            options,
+                        )
+                    )
+                else:
+                    nonlinear_constraint = None
+                    if not objective.built:
+                        objective.build(verbose=verbose)
+            # we have to use this cumbersome indexing in this method when passing
+            # things to objective to guard against the passed-in things having an
+            # ordering different from objective.things, to ensure the correct order
+            # is passed to the objective
+            x0 = objective.x(*[things[things.index(t)] for t in objective.things])
+            if isinstance(x_scale, (list, tuple)):
+                # sort by things to make x_scale match with objective.x
+                x_scale = [x_scale[things.index(t)] for t in objective.things]
+                x_scale = jnp.concatenate(x_scale)
+            # at this point x_scale is either "auto" or an array matching with
+            # objective.x but we may need to project it down if objective got
+            # wrapped by eg LinearConstraintProjection
+
+            x_scale_projected = _project_x_scale(x_scale, objective)
+
+            stoptol = _get_default_tols(
                 method,
-                verbose,
+                ftol,
+                xtol,
+                gtol,
+                ctol,
+                maxiter,
                 options,
             )
-        else:
-            nonlinear_constraint = None
-            if not objective.built:
-                objective.build(verbose=verbose)
-        # we have to use this cumbersome indexing in this method when passing things
-        # to objective to guard against the passed-in things having an ordering
-        # different from objective.things, to ensure the correct order is passed
-        # to the objective
-        x0 = objective.x(*[things[things.index(t)] for t in objective.things])
-        if isinstance(x_scale, (list, tuple)):
-            # sort by things to make x_scale match with objective.x
-            x_scale = [x_scale[things.index(t)] for t in objective.things]
-            x_scale = jnp.concatenate(x_scale)
-        # at this point x_scale is either "auto" or an array matching with objective.x
-        # but we may need to project it down if objective got wrapped by
-        # eg LinearConstraintProjection
 
-        x_scale_projected = _project_x_scale(x_scale, objective)
-
-        stoptol = _get_default_tols(
-            method,
-            ftol,
-            xtol,
-            gtol,
-            ctol,
-            maxiter,
-            options,
-        )
-
-        if verbose > 0:
-            print("Number of parameters: {}".format(x0.size))
-            print("Number of objectives: {}".format(objective.dim_f))
-            if nonlinear_constraint is not None:
-                num_equality = np.count_nonzero(
-                    nonlinear_constraint.bounds_scaled[0]
-                    == nonlinear_constraint.bounds_scaled[1]
-                )
-                print("Number of equality constraints: {}".format(num_equality))
-                print(
-                    "Number of inequality constraints: {}".format(
-                        nonlinear_constraint.dim_f - num_equality
+            if verbose > 0:
+                print("Number of parameters: {}".format(x0.size))
+                print("Number of objectives: {}".format(objective.dim_f))
+                if nonlinear_constraint is not None:
+                    num_equality = np.count_nonzero(
+                        nonlinear_constraint.bounds_scaled[0]
+                        == nonlinear_constraint.bounds_scaled[1]
                     )
+                    print("Number of equality constraints: {}".format(num_equality))
+                    print(
+                        "Number of inequality constraints: {}".format(
+                            nonlinear_constraint.dim_f - num_equality
+                        )
+                    )
+            timer.stop("Initializing the optimization")
+            if verbose > 1:
+                timer.disp("Initializing the optimization")
+
+            if verbose > 0:
+                print("\nStarting optimization")
+                print("Using method: " + str(self.method))
+
+            timer.start("Solution time")
+
+            with prof_span("solve"):
+                result = optimizers[method]["fun"](
+                    objective,
+                    nonlinear_constraint,
+                    x0,
+                    method,
+                    x_scale_projected,
+                    verbose,
+                    stoptol,
+                    options,
                 )
-        timer.stop("Initializing the optimization")
-        if verbose > 1:
-            timer.disp("Initializing the optimization")
-
-        if verbose > 0:
-            print("\nStarting optimization")
-            print("Using method: " + str(self.method))
-
-        timer.start("Solution time")
-
-        result = optimizers[method]["fun"](
-            objective,
-            nonlinear_constraint,
-            x0,
-            method,
-            x_scale_projected,
-            verbose,
-            stoptol,
-            options,
-        )
+        finally:
+            if profiler is not None:
+                profiler.stop()
 
         if isinstance(objective, LinearConstraintProjection):
             # remove wrapper to get at underlying objective
