@@ -930,6 +930,68 @@ def test_bounded_optimization():
 
 
 @pytest.mark.unit
+def test_auglag_multiplier_update_options():
+    """Test that the documented multiplier update options are accepted.
+
+    They are popped after the unknown option check used to run, so passing any of
+    them raised ValueError: Unknown options.
+    """
+    # min ||x - [1, 2]||^2 subject to sum(x) == 1, solution [0, 1]
+    fun = lambda x, *args: x - jnp.array([1.0, 2.0])
+    jac = lambda x, *args: jnp.eye(2)
+    constraint = NonlinearConstraint(
+        lambda x, *args: jnp.atleast_1d(jnp.sum(x)),
+        1.0,
+        1.0,
+        lambda x, *args: jnp.ones((1, 2)),
+    )
+    constraint.vjp = lambda v, x, *args: v * jnp.ones(2)
+    x0 = np.array([0.0, 0.0])
+    documented = {
+        "omega": 1.0,
+        "eta": 1.0,
+        "tau": 5,
+        "alpha_omega": 1.0,
+        "beta_omega": 1.0,
+        "alpha_eta": 0.1,
+        "beta_eta": 0.9,
+    }
+
+    out = lsq_auglag(
+        fun, x0, jac, constraint=constraint, verbose=0, maxiter=20, options=documented
+    )
+    np.testing.assert_allclose(out["x"], [0, 1], rtol=1e-6, atol=1e-6)
+
+    out = fmin_auglag(
+        lambda x, *args: 0.5 * jnp.dot(fun(x), fun(x)),
+        x0,
+        grad=fun,
+        hess="bfgs",
+        constraint=constraint,
+        verbose=0,
+        maxiter=20,
+        options=documented,
+    )
+    np.testing.assert_allclose(out["x"], [0, 1], rtol=1e-6, atol=1e-6)
+
+    # an option that really is unknown must still be rejected
+    for method in (
+        lambda o: lsq_auglag(fun, x0, jac, constraint=constraint, verbose=0, options=o),
+        lambda o: fmin_auglag(
+            lambda x, *args: 0.5 * jnp.dot(fun(x), fun(x)),
+            x0,
+            grad=fun,
+            hess="bfgs",
+            constraint=constraint,
+            verbose=0,
+            options=o,
+        ),
+    ):
+        with pytest.raises(ValueError, match="Unknown options"):
+            method({"not_a_real_option": 1})
+
+
+@pytest.mark.unit
 def test_auglag():
     """Test that our augmented lagrangian works as well as scipy for convex problems."""
     rng = default_rng(12)

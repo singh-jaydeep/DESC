@@ -321,11 +321,6 @@ def lsq_auglag(  # noqa: C901
     tr_method = options.pop("tr_method", "qr")
 
     errorif(
-        len(options) > 0,
-        ValueError,
-        "Unknown options: {}".format([key for key in options]),
-    )
-    errorif(
         tr_method not in ["cho", "svd", "qr"],
         ValueError,
         "tr_method should be one of 'cho', 'svd', 'qr', got {}".format(tr_method),
@@ -354,6 +349,15 @@ def lsq_auglag(  # noqa: C901
     alpha_eta = options.pop("alpha_eta", 0.1)
     beta_eta = options.pop("beta_eta", 0.9)
     tau = options.pop("tau", 10)
+
+    # this has to come after every pop, including the ones above: the multiplier
+    # update options are documented but were being rejected as unknown because the
+    # check used to run before they were taken out of the dict
+    errorif(
+        len(options) > 0,
+        ValueError,
+        "Unknown options: {}".format([key for key in options]),
+    )
 
     gtolk = max(omega / jnp.mean(mu) ** alpha_omega, gtol)
     ctolk = max(eta / jnp.mean(mu) ** alpha_eta, ctol)
