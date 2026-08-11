@@ -28,7 +28,11 @@ from desc.utils import (
     warnif,
 )
 
-from ._constraint_wrappers import LinearConstraintProjection, ProximalProjection
+from ._constraint_wrappers import (
+    LinearConstraintProjection,
+    ProximalProjection,
+    ProximalState,
+)
 from ._profiling import make_profiler
 from ._profiling import span as prof_span
 
@@ -549,7 +553,7 @@ def _combine_constraints(constraints):
 
     Parameters
     ----------
-    constraints : tuple of Objective
+    constraints : tuple of Objective, or a single ObjectiveFunction
         Constraints to combine.
 
     Returns
@@ -559,6 +563,10 @@ def _combine_constraints(constraints):
         Otherwise returns None.
 
     """
+    if len(constraints) == 1 and isinstance(constraints[0], ObjectiveFunction):
+        # already combined, eg the ProximalProjection that _maybe_wrap_nonlinear_
+        # constraints puts around the constraints it could not absorb
+        return constraints[0]
     if len(constraints):
         objective = ObjectiveFunction(constraints)
     else:
@@ -605,6 +613,42 @@ def _parse_constraints(constraints):
     return linear_constraints, nonlinear_constraints
 
 
+def _split_equilibrium_constraints(eq, nonlinear_constraints):
+    """Split nonlinear constraints into those the proximal projection can absorb.
+
+    The projection defines the equilibrium implicitly as the solution of F = 0 and
+    differentiates through it, so F has to be an equality constraint on the
+    equilibrium alone. Everything else has to be handled by the optimizer itself.
+    """
+    eq_constraints, other_constraints = [], []
+    for con in nonlinear_constraints:
+        # each clause of this predicate earns its place:
+        #  _equilibrium   F has to be a force balance type residual, whose zero set
+        #                 is what defines the equilibrium implicitly
+        #  bounds is None the derivative identity assumes F = 0 exactly at the point
+        #                 of evaluation. An inequality is not satisfied exactly, so
+        #                 dF/dx would be inverted off the manifold. This one is a
+        #                 mathematical requirement, not a convention
+        #  things == [eq] F is evaluated at xf, the equilibrium only state vector
+        if con._equilibrium and con.bounds is None and con.things == [eq]:
+            eq_constraints.append(con)
+        else:
+            # a user who wrote ForceBalance(bounds=...) has a misconception, and
+            # quietly rerouting it to the augmented Lagrangian would stop them ever
+            # finding out
+            errorif(
+                con._equilibrium and con.bounds is not None,
+                ValueError,
+                f"Equilibrium constraint {con} has bounds. The proximal projection "
+                "differentiates through F = 0 holding exactly at every iterate, "
+                "which an inequality does not, so it cannot be projected onto. Drop "
+                "the bounds to project onto it, or drop the proximal wrapper to "
+                "treat it as an ordinary nonlinear constraint.",
+            )
+            other_constraints.append(con)
+    return eq_constraints, other_constraints
+
+
 def _maybe_wrap_nonlinear_constraints(
     eq, objective, nonlinear_constraints, method, options
 ):
@@ -623,21 +667,62 @@ def _maybe_wrap_nonlinear_constraints(
                 Nonlinear constraints detected but method {method} does not support
                 nonlinear constraints. Defaulting to method "proximal-{method}"
                 In the future this will raise an error. To ignore this warning, specify
-                a wrapper "proximal-" to convert the nonlinearly constrained problem
-                into an unconstrained one.
+                a wrapper "proximal-" to convert the equilibrium constraints into an
+                implicit dependence. Note that only equilibrium equality constraints
+                can be absorbed this way; any others still need a method that supports
+                nonlinear constraints, such as "proximal-lsq-auglag".
                 """))
         wrapper = "proximal"
     if wrapper is not None and wrapper.lower() in ["prox", "proximal"]:
+        eq_constraints, other_constraints = _split_equilibrium_constraints(
+            eq, nonlinear_constraints
+        )
+        errorif(
+            not len(eq_constraints),
+            ValueError,
+            "The proximal wrapper projects each iterate onto the solution of an "
+            "equilibrium constraint, but none of the nonlinear constraints is an "
+            "equality constraint on the equilibrium alone, so there is nothing to "
+            f"project onto. Drop the wrapper and use the method {method} directly.",
+        )
+        errorif(
+            len(other_constraints) and not optimizers[method]["equality_constraints"],
+            ValueError,
+            f"Constraints {other_constraints} cannot be absorbed into the proximal "
+            "projection, they are not equality constraints on the equilibrium alone, "
+            f"and method {method} does not support nonlinear constraints. Use "
+            '"proximal-lsq-auglag", which projects onto the equilibrium and handles '
+            "the remaining constraints with an augmented Lagrangian.",
+        )
+        # The scalar augmented Lagrangian differentiates the constraints in reverse
+        # mode, and ProximalProjection has no vjp_* of its own: it would fall through
+        # __getattr__ to the wrapped objective's, which works in the full state
+        # vector rather than the proximal one and omits the implicit function term
+        # entirely, giving a wrong gradient with no shape error to catch it.
+        errorif(
+            len(other_constraints) and optimizers[method]["scalar"],
+            NotImplementedError,
+            f"Method {method} differentiates nonlinear constraints in reverse mode, "
+            "which the proximal projection does not implement. Use "
+            '"proximal-lsq-auglag" instead.',
+        )
         perturb_options = options.pop("perturb_options", {})
         solve_options = options.pop("solve_options", {})
-        objective = ProximalProjection(
-            objective,
-            constraint=_combine_constraints(nonlinear_constraints),
+        # One subproblem, shared by every view of it, so that differentiating the
+        # objective and the remaining constraints at the same iterate costs a single
+        # equilibrium solve rather than one per view.
+        state = ProximalState(
+            _combine_constraints(eq_constraints),
+            eq,
             perturb_options=perturb_options,
             solve_options=solve_options,
-            eq=eq,
         )
-        nonlinear_constraints = ()
+        objective = ProximalProjection(objective, state=state)
+        nonlinear_constraints = (
+            (ProximalProjection(_combine_constraints(other_constraints), state=state),)
+            if len(other_constraints)
+            else ()
+        )
     return objective, nonlinear_constraints
 
 
@@ -746,8 +831,13 @@ def get_combined_constraint_objectives(  # noqa: C901
         )
         objective.build(verbose=verbose)
         if nonlinear_constraint is not None:
+            # Every wrapper the optimizer talks to has to implement the same affine
+            # map from the reduced vector it works in to the full state vector: the
+            # constrained methods evaluate the objective and the constraints at the
+            # same reduced point. x_scale changes that map, so passing the options to
+            # only one of the two would silently evaluate them at different points.
             nonlinear_constraint = LinearConstraintProjection(
-                nonlinear_constraint, linear_constraint
+                nonlinear_constraint, linear_constraint, **linear_constraint_options
             )
             nonlinear_constraint.build(verbose=verbose)
 
