@@ -2195,3 +2195,107 @@ def test_proximal_auglag():
         f"expected at most one equilibrium solve per trial point, got "
         f"{counts['solved']}"
     )
+
+
+@pytest.mark.regression
+def test_proximal_vjp():
+    """Test that ProximalProjection's vjp matches its Jacobian.
+
+    Without a vjp of its own, __getattr__ forwards to the wrapped objective's, which
+    works in the full state vector rather than the proximal one and leaves out the
+    implicit function term, so it returns a wrong length wrong space answer with no
+    exception. Check the space as well as the values.
+    """
+    eq = Equilibrium(L=2, M=2, N=1)
+    obj = ObjectiveFunction(
+        (AspectRatio(eq=eq, target=11.0), Volume(eq=eq, target=170.0))
+    )
+    con = ObjectiveFunction(ForceBalance(eq=eq))
+    prox = ProximalProjection(obj, con, eq=eq, solve_options={"maxiter": 2})
+    prox.build(verbose=0)
+
+    c = prox.x(eq)
+    # the proximal state vector is genuinely smaller than the full one, so a vjp that
+    # fell through to the wrapped objective would be caught by the size check below
+    assert prox.dim_x < obj.dim_x
+
+    rng = default_rng(0)
+    for op in ["scaled", "scaled_error", "unscaled"]:
+        J = getattr(prox, "jac_" + op)(c)
+        for _ in range(2):
+            v = rng.normal(size=J.shape[0])
+            vjp = getattr(prox, "vjp_" + op)(v, c)
+            assert vjp.size == prox.dim_x
+            np.testing.assert_allclose(vjp, v @ J, rtol=1e-10, atol=1e-10)
+
+    # grad is the special case v = G(x), since grad(1/2 G.T @ G) = J.T @ G
+    g = prox.grad(c)
+    G = prox.compute_scaled_error(c)
+    np.testing.assert_allclose(g, prox.vjp_scaled_error(G, c), rtol=1e-12, atol=1e-12)
+    np.testing.assert_allclose(
+        g, prox.jac_scaled_error(c).T @ G, rtol=1e-10, atol=1e-10
+    )
+
+
+@pytest.mark.regression
+@pytest.mark.optimize
+def test_proximal_fmin_auglag():
+    """Test the proximal projection with the scalar augmented Lagrangian.
+
+    Same problem as test_proximal_auglag, but with a scalar method, which
+    differentiates the constraints in reverse mode. That path is only reachable
+    because ProximalProjection implements vjp_*.
+    """
+    eq = Equilibrium(L=2, M=2, N=1)
+    R_modes = np.vstack(
+        (
+            [0, 0, 0],
+            eq.surface.R_basis.modes[
+                np.max(np.abs(eq.surface.R_basis.modes), 1) > 1, :
+            ],
+        )
+    )
+    Z_modes = eq.surface.Z_basis.modes[
+        np.max(np.abs(eq.surface.Z_basis.modes), 1) > 1, :
+    ]
+
+    def force_error(e):
+        fb = ObjectiveFunction(ForceBalance(eq=e))
+        fb.build(verbose=0)
+        return np.max(np.abs(np.asarray(fb.compute_scaled_error(fb.x(e)))))
+
+    ref = Equilibrium(L=2, M=2, N=1)
+    ref.solve(verbose=0)
+    force_ref = force_error(ref)
+
+    lb, ub = 150.0, 190.0
+    V0 = float(eq.compute("V")["V"])
+    assert V0 > ub, "the volume bound should start out violated"
+
+    objective = ObjectiveFunction(AspectRatio(eq=eq, target=11.0))
+    constraints = (
+        ForceBalance(eq=eq),  # -> F, projected onto
+        Volume(eq=eq, bounds=(lb, ub)),  # -> H, augmented Lagrangian
+        FixBoundaryR(eq=eq, modes=R_modes),
+        FixBoundaryZ(eq=eq, modes=Z_modes),
+        FixPressure(eq=eq),
+        FixCurrent(eq=eq),
+        FixPsi(eq=eq),
+    )
+
+    (eq_out,), _ = Optimizer("proximal-fmin-auglag").optimize(
+        things=[eq],
+        objective=objective,
+        constraints=constraints,
+        maxiter=4,
+        gtol=-1,
+        ftol=-1,
+        verbose=0,
+        copy=True,
+    )
+
+    # force balance holds at the final iterate, to the tolerance of the inner solve
+    assert force_error(eq_out) < 10 * force_ref
+    # and the inequality was driven from violated to satisfied
+    V1 = float(eq_out.compute("V")["V"])
+    assert lb <= V1 <= ub, f"volume {V1} outside bounds after optimization"

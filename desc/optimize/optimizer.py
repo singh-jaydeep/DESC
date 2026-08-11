@@ -694,18 +694,6 @@ def _maybe_wrap_nonlinear_constraints(
             '"proximal-lsq-auglag", which projects onto the equilibrium and handles '
             "the remaining constraints with an augmented Lagrangian.",
         )
-        # The scalar augmented Lagrangian differentiates the constraints in reverse
-        # mode, and ProximalProjection has no vjp_* of its own: it would fall through
-        # __getattr__ to the wrapped objective's, which works in the full state
-        # vector rather than the proximal one and omits the implicit function term
-        # entirely, giving a wrong gradient with no shape error to catch it.
-        errorif(
-            len(other_constraints) and optimizers[method]["scalar"],
-            NotImplementedError,
-            f"Method {method} differentiates nonlinear constraints in reverse mode, "
-            "which the proximal projection does not implement. Use "
-            '"proximal-lsq-auglag" instead.',
-        )
         perturb_options = options.pop("perturb_options", {})
         solve_options = options.pop("solve_options", {})
         # One subproblem, shared by every view of it, so that differentiating the

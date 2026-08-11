@@ -1469,22 +1469,13 @@ class ProximalProjection(ObjectiveFunction):
 
         """
         # We are looking for the gradient of L = 0.5 * Gᵀ @ G
-        # Then, the gradient is ∇L = Gᵀ @ J_of_G
-        # where J_of_G is the Jacobian of G with respect to the optimization variables
-        # We explained getting J_of_G in the _jvp method. It is basically,
-        # J_of_G = ∇G @ [dc_tangents - (∇F @ dx_tangents)⁻¹ @ (∇F @ dc_tangents)]
-        # where ∇G is the Jacobian of G with respect to full state vector
-        # and ∇F is the Jacobian of F with respect to full state vector. Then,
-        # ∇L = Gᵀ @ ∇G @ [dc_tangents - (∇F @ dx_tangents)⁻¹ @ (∇F @ dc_tangents)]
-        # We get the part in [] using the _proximal_get_tangents.
+        # Then, the gradient is ∇L = Gᵀ @ J_of_G, which is the vector-Jacobian product
+        # of G with G itself as the cotangent -- so this is _vjp at v = G(x), and the
+        # derivation of the Jacobian lives there.
         constants = setdefault(constants, [None, None])
-        xg, xf = self._update_equilibrium(x, store=True)
-        with prof_span("tangents"):
-            tangents = self._full_tangents(x, xf, constants, "scaled_error")
-        with prof_span("obj_vjp"):
-            g = self._objective.compute_scaled_error(xg, constants[0])
-            g_vjp = self._objective.vjp_scaled_error(g, xg, constants[0])
-        return tangents @ g_vjp
+        xg, _ = self._update_equilibrium(x, store=True)
+        g = self._objective.compute_scaled_error(xg, constants[0])
+        return self._vjp(g, x, constants, "scaled_error")
 
     def _full_tangents(self, x, xf, constants, op):
         """Tangent directions for every column of the Jacobian, cached on the state.
@@ -1694,6 +1685,73 @@ class ProximalProjection(ObjectiveFunction):
 
         with prof_span("obj_jvp"):
             return self._apply_objective_jvp(tangents, xg, constants, op)
+
+    def vjp_scaled(self, v, x, constants=None):
+        """Compute vector-Jacobian product of self.compute_scaled.
+
+        Parameters
+        ----------
+        v : ndarray
+            Vector to left-multiply the Jacobian by.
+        x : ndarray
+            Optimization variables.
+        constants : list
+            Constant parameters passed to sub-objectives. (Deprecated)
+
+        """
+        return self._vjp(v, x, constants, "scaled")
+
+    def vjp_scaled_error(self, v, x, constants=None):
+        """Compute vector-Jacobian product of self.compute_scaled_error.
+
+        Parameters
+        ----------
+        v : ndarray
+            Vector to left-multiply the Jacobian by.
+        x : ndarray
+            Optimization variables.
+        constants : list
+            Constant parameters passed to sub-objectives. (Deprecated)
+
+        """
+        return self._vjp(v, x, constants, "scaled_error")
+
+    def vjp_unscaled(self, v, x, constants=None):
+        """Compute vector-Jacobian product of self.compute_unscaled.
+
+        Parameters
+        ----------
+        v : ndarray
+            Vector to left-multiply the Jacobian by.
+        x : ndarray
+            Optimization variables.
+        constants : list
+            Constant parameters passed to sub-objectives. (Deprecated)
+
+        """
+        return self._vjp(v, x, constants, "unscaled")
+
+    def _vjp(self, v, x, constants=None, op="scaled"):
+        # With T the tangent matrix of _full_tangents and ∇G the Jacobian of G with
+        # respect to the full state vector, the proximal Jacobian is J = ∇G @ Tᵀ (see
+        # _jvp for what T is and why). So for a cotangent v,
+        # v @ J = v @ ∇G @ Tᵀ = T @ (∇Gᵀ @ v) = T @ vjp_G(v)
+        # ie. one reverse mode pass of G and a matrix-vector product with T.
+        #
+        # Note this is not as cheap as a reverse mode pass sounds: building T costs a
+        # JVP of F per column of the Jacobian, the same as jac_* does, because the
+        # implicit function term needs (dF/dx)⁻¹ dF/dc whichever direction we
+        # differentiate in. What makes it affordable is that T is cached on the shared
+        # state, and grad -- which is this with v = G(x) -- has usually already paid
+        # for it at the same point. A true adjoint form (one solve with Fxhᵀ and one
+        # reverse pass of F, never forming Fc) would avoid that; see the handoff notes.
+        constants = setdefault(constants, [None, None])
+        xg, xf = self._update_equilibrium(x, store=True)
+        with prof_span("tangents"):
+            tangents = self._full_tangents(x, xf, constants, op)
+        with prof_span("obj_vjp"):
+            v_vjp = getattr(self._objective, "vjp_" + op)(v, xg, constants[0])
+        return tangents @ v_vjp
 
     @property
     def constants(self):
