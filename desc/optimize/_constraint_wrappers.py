@@ -1006,6 +1006,12 @@ class ProximalProjection(ObjectiveFunction):
             )
             self._state = state
         else:
+            errorif(
+                constraint is None,
+                ValueError,
+                "ProximalProjection needs either an equilibrium constraint to build a "
+                "subproblem from, or a ProximalState to share an existing one with.",
+            )
             self._state = ProximalState(constraint, eq, perturb_options, solve_options)
         self._built = False
         # don't want to compile this, just use the compiled objective and constraint
