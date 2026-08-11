@@ -548,6 +548,7 @@ def lsq_auglag(  # noqa: C901
 
             # updating augmented lagrangian params
             if g_norm < gtolk:
+                mu_old = mu
                 y = jnp.where(jnp.abs(c) < ctolk, y - mu * c, y)
                 mu = jnp.where(jnp.abs(c) >= ctolk, tau * mu, mu)
                 if constr_violation < ctolk:
@@ -559,9 +560,27 @@ def lsq_auglag(  # noqa: C901
                 # if we update lagrangian params, need to recompute L and J
                 L = lagfun(f, c, y, mu)
                 Lcost = 0.5 * jnp.dot(L, L)
-                del J
-                J = lagjac(z, y, mu, *args)
-                njev += 1
+                # The Jacobian we already have was taken at this same z. y does not
+                # enter it at all, and mu enters only through the row scaling in
+                # lagjac, so the updated Jacobian is this one with its constraint
+                # rows rescaled. Recomputing it would mean two more Jacobian
+                # evaluations, which under the proximal wrapper is a second pass
+                # over the equilibrium derivatives. Rescaling in place also avoids
+                # holding a second J sized array, which this loop is careful about.
+                if jnp.all(mu_old > 0):
+                    J = jnp.vstack(
+                        (
+                            J[: f.size],
+                            (jnp.sqrt(mu) / jnp.sqrt(mu_old))[:, None] * J[f.size :],
+                        )
+                    )
+                else:
+                    # degenerate, a zero penalty leaves no scaled rows to recover
+                    del J
+                    J = lagjac(z, y, mu, *args)
+                    # njev counts Jacobian evaluations actually performed, so it is
+                    # incremented here but not on the rescaling path above
+                    njev += 1
                 g = jnp.dot(L, J)
 
                 if jac_scale:
