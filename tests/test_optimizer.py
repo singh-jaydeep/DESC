@@ -2036,3 +2036,100 @@ def test_get_ess_scale():  # noqa: C901
     )
     np.testing.assert_allclose(eq2_scale["I"], 1)
     np.testing.assert_allclose(eq2_scale["G"], 1)
+
+
+@pytest.mark.regression
+@pytest.mark.optimize
+def test_proximal_auglag():
+    """Test proximal projection combined with an augmented Lagrangian.
+
+    ForceBalance is projected onto, so it holds at every iterate, while the
+    Volume inequality is driven by the augmented Lagrangian. The two
+    ProximalProjection views share one equilibrium subproblem, so a point is
+    solved once no matter how many views ask for it.
+    """
+    eq = Equilibrium(L=2, M=2, N=1)
+    R_modes = np.vstack(
+        (
+            [0, 0, 0],
+            eq.surface.R_basis.modes[
+                np.max(np.abs(eq.surface.R_basis.modes), 1) > 1, :
+            ],
+        )
+    )
+    Z_modes = eq.surface.Z_basis.modes[
+        np.max(np.abs(eq.surface.Z_basis.modes), 1) > 1, :
+    ]
+
+    def force_error(e):
+        fb = ObjectiveFunction(ForceBalance(eq=e))
+        fb.build(verbose=0)
+        return np.max(np.abs(np.asarray(fb.compute_scaled_error(fb.x(e)))))
+
+    # what the inner solve itself achieves, ie the tolerance the projection holds to
+    ref = Equilibrium(L=2, M=2, N=1)
+    ref.solve(verbose=0)
+    force_ref = force_error(ref)
+
+    lb, ub = 150.0, 190.0
+    V0 = float(eq.compute("V")["V"])
+    assert V0 > ub, "the volume bound should start out violated"
+
+    objective = ObjectiveFunction(AspectRatio(eq=eq, target=11.0))
+    constraints = (
+        ForceBalance(eq=eq),  # -> F, projected onto
+        Volume(eq=eq, bounds=(lb, ub)),  # -> H, augmented Lagrangian
+        FixBoundaryR(eq=eq, modes=R_modes),
+        FixBoundaryZ(eq=eq, modes=Z_modes),
+        FixPressure(eq=eq),
+        FixCurrent(eq=eq),
+        FixPsi(eq=eq),
+    )
+
+    # count equilibrium solves, and how many times a view asked for one
+    counts = {"asked": 0, "solved": 0}
+    original = ProximalProjection._update_equilibrium_inner
+
+    def counted(self, x, store):
+        counts["asked"] += 1
+        n0 = len(self._allx)
+        out = original(self, x, store)
+        counts["solved"] += len(self._allx) > n0
+        return out
+
+    ProximalProjection._update_equilibrium_inner = counted
+    try:
+        # AspectRatio is a scalar objective and lsq-auglag is a least squares
+        # method, which warns. That is expected here and not what is under test.
+        with pytest.warns(UserWarning, match="not intended for scalar objective"):
+            (eq_out,), _ = Optimizer("proximal-lsq-auglag").optimize(
+                things=[eq],
+                objective=objective,
+                constraints=constraints,
+                maxiter=2,
+                gtol=-1,
+                ftol=-1,
+                verbose=0,
+                copy=True,
+            )
+    finally:
+        ProximalProjection._update_equilibrium_inner = original
+
+    # the capability claim: force balance holds at the final iterate, to the
+    # tolerance of the inner solve, not merely asymptotically
+    assert force_error(eq_out) < 10 * force_ref
+
+    # the inequality was driven from violated to satisfied
+    V1 = float(eq_out.compute("V")["V"])
+    assert lb <= V1 <= ub, f"volume {V1} outside bounds after optimization"
+
+    # the efficiency claim: two views, but each distinct point is solved once,
+    # so the views ask far more often than the equilibrium actually moves
+    assert counts["asked"] > counts["solved"], (
+        f"expected the shared state to absorb repeated asks, got "
+        f"{counts['asked']} asks and {counts['solved']} solves"
+    )
+    assert counts["solved"] <= 4, (
+        f"expected at most one equilibrium solve per trial point, got "
+        f"{counts['solved']}"
+    )
