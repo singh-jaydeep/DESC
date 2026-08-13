@@ -1,0 +1,158 @@
+[
+  {
+    "name": "HELIOTRON",
+    "L": 6,
+    "pert": 0.01,
+    "m": 1274,
+    "n": 543,
+    "platform": "gpu",
+    "device": "NVIDIA A100 80GB PCIe",
+    "jax": "0.9.2",
+    "desc": "0+unknown",
+    "reps": 2,
+    "maxiter": 25,
+    "qr": {
+      "wall_s": 52.834586452,
+      "wall_all": [
+        52.827737510999995,
+        52.84143539300001
+      ],
+      "cost": 4885.404123087054,
+      "n_iter": 25,
+      "success": false,
+      "errors": null
+    },
+    "qr-struct": {
+      "wall_s": 52.14790876999999,
+      "wall_all": [
+        51.79379000099999,
+        52.50202753899998
+      ],
+      "cost": 4885.406180778181,
+      "n_iter": 25,
+      "success": false,
+      "errors": null
+    },
+    "speedup": 1.0131678853130741,
+    "cost_reldiff": 4.211915892103791e-07,
+    "same_iters": true,
+    "same_path": false
+  },
+  {
+    "name": "precise_QA",
+    "L": 6,
+    "pert": 0.01,
+    "m": 3234,
+    "n": 961,
+    "platform": "gpu",
+    "device": "NVIDIA A100 80GB PCIe",
+    "jax": "0.9.2",
+    "desc": "0+unknown",
+    "reps": 2,
+    "maxiter": 25,
+    "qr": {
+      "wall_s": 56.894731207000035,
+      "wall_all": [
+        57.940832880000016,
+        55.848629534000054
+      ],
+      "cost": 9635627.906099873,
+      "n_iter": 25,
+      "success": false,
+      "errors": null
+    },
+    "qr-struct": {
+      "wall_s": 59.91545449549997,
+      "wall_all": [
+        59.70302619199998,
+        60.12788279899996
+      ],
+      "cost": 9636224.685553635,
+      "n_iter": 25,
+      "success": false,
+      "errors": null
+    },
+    "speedup": 0.9495835704838589,
+    "cost_reldiff": 6.19346719879129e-05,
+    "same_iters": true,
+    "same_path": false
+  },
+  {
+    "name": "W7-X",
+    "L": 6,
+    "pert": 0.01,
+    "m": 4802,
+    "n": 1413,
+    "platform": "gpu",
+    "device": "NVIDIA A100 80GB PCIe",
+    "jax": "0.9.2",
+    "desc": "0+unknown",
+    "reps": 2,
+    "maxiter": 25,
+    "qr": {
+      "wall_s": 57.74986202650001,
+      "wall_all": [
+        57.459537103,
+        58.04018695000002
+      ],
+      "cost": 1944928.9233235838,
+      "n_iter": 25,
+      "success": false,
+      "errors": null
+    },
+    "qr-struct": {
+      "wall_s": 58.61730353299998,
+      "wall_all": [
+        59.58481945599999,
+        57.649787609999976
+      ],
+      "cost": 756327.1436886899,
+      "n_iter": 25,
+      "success": false,
+      "errors": null
+    },
+    "speedup": 0.9852016136154809,
+    "cost_reldiff": 0.6111286460811929,
+    "same_iters": true,
+    "same_path": false
+  },
+  {
+    "name": "HELIOTRON",
+    "L": 8,
+    "pert": 0.01,
+    "m": 2106,
+    "n": 833,
+    "platform": "gpu",
+    "device": "NVIDIA A100 80GB PCIe",
+    "jax": "0.9.2",
+    "desc": "0+unknown",
+    "reps": 2,
+    "maxiter": 25,
+    "qr": {
+      "wall_s": 57.94340733299998,
+      "wall_all": [
+        56.70639133599991,
+        59.18042333000005
+      ],
+      "cost": 19702.129288471922,
+      "n_iter": 25,
+      "success": false,
+      "errors": null
+    },
+    "qr-struct": {
+      "wall_s": 58.74952216400004,
+      "wall_all": [
+        59.10576017299991,
+        58.393284155000174
+      ],
+      "cost": 19518.299414469395,
+      "n_iter": 25,
+      "success": false,
+      "errors": null
+    },
+    "speedup": 0.9862787848937771,
+    "cost_reldiff": 0.00933045719632394,
+    "same_iters": true,
+    "same_path": false
+  }
+]
