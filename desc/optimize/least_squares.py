@@ -15,6 +15,7 @@ from .bound_utils import (
 from .tr_subproblems import (
     trust_region_step_exact_cho,
     trust_region_step_exact_qr,
+    trust_region_step_exact_qr_struct,
     trust_region_step_exact_svd,
     update_tr_radius,
 )
@@ -133,12 +134,19 @@ def lsqtr(  # noqa: C901
         - ``"tr_decrease_ratio"`` : (0 < float < 1) Factor to decrease the trust region
           radius by when  the ratio of actual to predicted reduction falls below
           threshold. Default 0.25.
-        - ``"tr_method"`` : (``"qr"``, ``"svd"``, ``"cho"``) Method to use for solving
-          the trust region subproblem. ``"qr"`` and ``"cho"`` uses a sequence of QR or
-          Cholesky factorizations (generally 2-3), while ``"svd"`` uses one singular
-          value decomposition. ``"cho"`` is generally the fastest for large systems,
-          especially on GPU, but may be less accurate for badly scaled systems.
-          ``"svd"`` is the most accurate but significantly slower. Default ``"qr"``.
+        - ``"tr_method"`` : (``"qr"``, ``"qr-struct"``, ``"svd"``, ``"cho"``) Method to
+          use for solving the trust region subproblem. ``"qr"`` and ``"cho"`` uses a
+          sequence of QR or Cholesky factorizations (generally 2-3), while ``"svd"``
+          uses one singular value decomposition. ``"cho"`` is generally the fastest
+          for large systems, especially on GPU, but may be less accurate for badly
+          scaled systems. ``"svd"`` is the most accurate but significantly slower.
+          ``"qr-struct"`` is ``"qr"`` with the per-alpha factorization of
+          ``[R; sqrt(alpha)*I]`` replaced by a structured (blocked, ``dtpqrt``-style)
+          retriangularization that exploits both blocks already being triangular:
+          ``(2/3)n^3`` flops instead of ``10n^3/3``, with identical iterates and the
+          same conditioning as ``"qr"``. Default ``"qr"``.
+        - ``"tr_qr_block"`` : Column-panel width used by ``tr_method="qr-struct"``.
+          Default 128.
         - ``"scaled_termination"`` : Whether to evaluate termination criteria for
           ``xtol`` and ``gtol`` in scaled / normalized units (default) or base units.
 
@@ -238,6 +246,7 @@ def lsqtr(  # noqa: C901
     tr_increase_ratio = options.pop("tr_increase_ratio", 2)
     tr_decrease_ratio = options.pop("tr_decrease_ratio", 0.25)
     tr_method = options.pop("tr_method", "qr")
+    tr_qr_block = options.pop("tr_qr_block", 128)
 
     errorif(
         len(options) > 0,
@@ -245,9 +254,11 @@ def lsqtr(  # noqa: C901
         "Unknown options: {}".format([key for key in options]),
     )
     errorif(
-        tr_method not in ["cho", "svd", "qr"],
+        tr_method not in ["cho", "svd", "qr", "qr-struct"],
         ValueError,
-        "tr_method should be one of 'cho', 'svd', 'qr', got {}".format(tr_method),
+        "tr_method should be one of 'cho', 'svd', 'qr', 'qr-struct', got {}".format(
+            tr_method
+        ),
     )
 
     callback = setdefault(callback, lambda *args: False)
@@ -298,7 +309,7 @@ def lsqtr(  # noqa: C901
             U, s, Vt = jnp.linalg.svd(J_a, full_matrices=False)
         elif tr_method == "cho":
             B_h = jnp.dot(J_a.T, J_a)
-        elif tr_method == "qr":
+        elif tr_method in ("qr", "qr-struct"):
             # try full newton step
             tall = J_a.shape[0] >= J_a.shape[1]
             if tall:
@@ -333,6 +344,10 @@ def lsqtr(  # noqa: C901
             elif tr_method == "qr":
                 step_h, hits_boundary, alpha = trust_region_step_exact_qr(
                     p_newton, Qt_fa, R, trust_radius, alpha
+                )
+            elif tr_method == "qr-struct":
+                step_h, hits_boundary, alpha = trust_region_step_exact_qr_struct(
+                    p_newton, Qt_fa, R, trust_radius, alpha, block=tr_qr_block
                 )
             step = d * step_h  # Trust-region solution in the original space.
 

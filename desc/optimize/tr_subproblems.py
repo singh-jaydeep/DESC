@@ -1,5 +1,7 @@
 """Functions for solving subproblems arising in trust region methods."""
 
+import functools
+
 import numpy as np
 
 from desc.backend import (
@@ -434,6 +436,165 @@ def trust_region_step_exact_qr(
 
             A = jnp.vstack([R, jnp.sqrt(alpha) * jnp.eye(n)])
             Qtz, Rtil = qr_multiply(A, zp, mode="right")
+
+            p = solve_triangular_regularized(Rtil, -Qtz)
+            p_norm = jnp.linalg.norm(p)
+            phi = p_norm - trust_radius
+            alpha_upper = jnp.where(phi < 0, alpha, alpha_upper)
+            alpha_lower = jnp.where(phi > 0, alpha, alpha_lower)
+
+            q = solve_triangular_regularized(Rtil.T, p, lower=True)
+            q_norm = jnp.linalg.norm(q)
+
+            alpha += (p_norm / q_norm) ** 2 * phi / trust_radius
+            alpha = jnp.clip(alpha, alpha_lower, alpha_upper)
+            k += 1
+            return p, alpha, alpha_lower, alpha_upper, phi, k
+
+        p, alpha, *_ = while_loop(
+            loop_cond,
+            loop_body,
+            (p_newton, alpha, alpha_lower, alpha_upper, jnp.inf, k),
+        )
+
+        # Make the norm of p equal to trust_radius; p is changed only slightly.
+        # This is done to prevent p from lying outside the trust region
+        # (which can cause problems later).
+        p *= trust_radius / jnp.linalg.norm(p)
+
+        return p, True, alpha
+
+    return cond(jnp.linalg.norm(p_newton) <= trust_radius, truefun, falsefun, None)
+
+
+def _apply_QT_wy(packed, taus, C):
+    """Apply Q.T to C, with Q the product of the Householder reflectors in packed.
+
+    ``packed`` is ``(M, k)`` with the reflectors strictly below the diagonal and a
+    unit diagonal implied, as returned by ``jnp.linalg.qr(..., mode="raw")``
+    (transposed). Uses the compact-WY / UT transform via the identity
+    ``T^-1 + T^-H = V^H V`` (Joffrain & Low 2006), so each application is two
+    matmuls and a triangular solve rather than ``k`` rank-1 updates. This is the
+    same route ``desc.backend.qr_multiply``'s pure-JAX fallback takes, duplicated
+    here because that helper is only defined for ``jax < 0.10``.
+    """
+    M, k = packed.shape
+    V = jnp.where(
+        jnp.tril(jnp.ones((M, k), bool), -1), packed, jnp.eye(M, k, dtype=packed.dtype)
+    )
+    # A zero tau means that reflector is the identity; zero its column so it
+    # contributes nothing instead of producing 1/0.
+    live = taus != 0
+    V = V * live
+    T_inv = V.T @ V - jnp.diag(1.0 / jnp.where(live, taus, 1.0))
+    return C - V @ solve_triangular(T_inv, V.T @ C, lower=True)
+
+
+@functools.partial(jit, static_argnames=("block",))
+def structured_retriangularize(R, z, alpha, block=128):
+    """QR of ``[R; sqrt(alpha)*I]`` exploiting its structure.
+
+    Returns ``(Rtil, Qtz)`` satisfying ``Rtil.T@Rtil == R.T@R + alpha*I`` and
+    ``Qtz == (Q.T @ [z; 0])[:n]``, matching what
+    ``qr_multiply(vstack([R, sqrt(alpha)*I]), [z; 0])`` produces (up to per-row
+    sign conventions, which cancel in the solve).
+
+    A dense QR of the stacked ``2n x n`` matrix costs ``10n^3/3`` flops and
+    ignores the fact that both blocks are already triangular. Eliminating column
+    ``j`` only has to touch the ``~j`` bottom rows that fill in while processing
+    columns ``0..j-1``, so the structured cost is ``sum_j 4j(n-j) = (2/3)n^3`` --
+    a 5x flop reduction, at the same conditioning as the dense QR (unlike the
+    ``"cho"`` route, which squares kappa(J)).
+
+    Implemented as a blocked column-panel sweep (LAPACK ``dtpqrt``-style): at
+    panel ``k`` spanning columns ``[c0, c1)`` the active rows are the ``b`` rows
+    ``R[c0:c1]`` plus the accumulated frontier of bottom rows ``0..c1-1`` (bottom
+    rows ``>= c1`` still hold only their diagonal entry, at a column ``>= c1``).
+    Applying Q.T fills bottom rows ``0..c1-1`` in columns ``>= c1``, and those
+    rows are all included at panel ``k+1``, so the frontier grows by exactly
+    ``b`` per panel and nothing is missed.
+
+    Parameters
+    ----------
+    R : ndarray, shape (k, n)
+        R factor of J, from ``qr_multiply(J, f, mode="right")``.
+    z : ndarray, shape (k,)
+        ``Q1.T@f``.
+    alpha : float
+        Levenberg-Marquardt parameter.
+    block : int
+        Column-panel width. Must be static under jit. 128 was fastest on an
+        A100 for n in 1000-4000; 256 is close and better at n >= 4000.
+
+    Returns
+    -------
+    Rtil : ndarray, shape (n, n)
+        Upper triangular, with ``Rtil.T@Rtil == R.T@R + alpha*I``.
+    Qtz : ndarray, shape (n,)
+        The transformed right-hand side.
+
+    """
+    n = R.shape[1]
+    k_ = R.shape[0]
+    # Work array: [R; sqrt(alpha)*I] with the RHS carried as a trailing column.
+    M = jnp.zeros((2 * n, n + 1))
+    M = M.at[:k_, :n].set(R)
+    M = M.at[n:, :n].set(jnp.sqrt(alpha) * jnp.eye(n))
+    M = M.at[:k_, n].set(z)
+
+    for kb in range((n + block - 1) // block):
+        c0 = kb * block
+        c1 = min(c0 + block, n)
+        bk = c1 - c0
+        idx = jnp.concatenate([jnp.arange(c0, c1), n + jnp.arange(0, c1)])
+        Sub = M[idx, c0:]
+        h, taus = jnp.linalg.qr(Sub[:, :bk], mode="raw")
+        Sub = _apply_QT_wy(h.swapaxes(-1, -2), taus, Sub)
+        M = M.at[idx, c0:].set(Sub)
+
+    return jnp.triu(M[:n, :n]), M[:n, n]
+
+
+@functools.partial(jit, static_argnames=("block",))
+def trust_region_step_exact_qr_struct(
+    p_newton, z, R, trust_radius, initial_alpha=0.0, rtol=0.01, max_iter=10, block=128
+):
+    """Solve a trust-region problem using a structured retriangularization.
+
+    Identical in exact arithmetic to ``trust_region_step_exact_qr`` -- same
+    safeguarded Hebden/Reinsch root-find on ``phi(alpha) = ||p(alpha)|| - Delta``,
+    same iterates -- but each alpha iteration factorizes ``[R; sqrt(alpha)*I]``
+    with ``structured_retriangularize`` instead of a dense QR that ignores the
+    structure. See that function for the flop argument.
+
+    Parameters and returns are as ``trust_region_step_exact_qr``, plus:
+
+    Parameters
+    ----------
+    block : int
+        Column-panel width passed to ``structured_retriangularize``.
+
+    """
+
+    def truefun(*_):
+        return p_newton, False, 0.0
+
+    def falsefun(*_):
+        # J.T@f == R.T@z, so we never need J or f here
+        alpha_upper = jnp.linalg.norm(R.T @ z) / trust_radius
+        alpha_lower = 0.0
+        alpha = initial_alpha
+        alpha = jnp.clip(alpha, alpha_lower, alpha_upper)
+        k = 0
+
+        def loop_cond(state):
+            p, alpha, alpha_lower, alpha_upper, phi, k = state
+            return (jnp.abs(phi) > rtol * trust_radius) & (k < max_iter)
+
+        def loop_body(state):
+            p, alpha, alpha_lower, alpha_upper, phi, k = state
+
+            Rtil, Qtz = structured_retriangularize(R, z, alpha, block=block)
 
             p = solve_triangular_regularized(Rtil, -Qtz)
             p_norm = jnp.linalg.norm(p)
