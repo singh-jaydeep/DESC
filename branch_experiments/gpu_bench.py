@@ -209,6 +209,9 @@ def timeit(fn, *a, reps=3, warmup=True):
 
 
 if __name__ == "__main__":
+    import os
+
+    os.makedirs("out", exist_ok=True)
     dev = jax.devices()[0]
     meta = dict(
         platform=dev.platform,
@@ -217,11 +220,16 @@ if __name__ == "__main__":
         host=platform.platform(),
     )
     print("DEVICE:", meta, flush=True)
+    # Fail loudly rather than silently benchmarking the CPU backend.
+    if os.environ.get("REQUIRE_GPU", "1") == "1":
+        assert dev.platform == "gpu", f"expected a GPU backend, got {meta}"
 
     rows = []
-    # E1 (sequential Givens) is measured only up to n=1000: it is O(n^2)
-    # sequential kernel launches, and the trend is unambiguous well before 4000.
-    GIVENS_MAX_N = 1000
+    # E1 (sequential Givens) is measured ONLY at the smallest size. The CPU run
+    # already settled it: 21.8 s at n=500 and 426 s at n=1000 against 19 ms /
+    # 72 ms for the dense QR (~1000x and ~6000x SLOWER, growing with n). One
+    # GPU point is kept to confirm the same latency-bound behaviour on device.
+    GIVENS_MAX_N = 500
     for n in [500, 1000, 2000, 4000]:
         for ratio in [1.5, 3.0]:
             m = int(ratio * n)
@@ -271,8 +279,5 @@ if __name__ == "__main__":
                 f"| svdR_call={r['call_svdR']*1e3:7.3f}",
                 flush=True,
             )
-
-    import os
-
-    os.makedirs("out", exist_ok=True)
-    json.dump(rows, open("out/gpu_results.json", "w"), indent=2)
+            # write after every size so a deadline never costs the whole run
+            json.dump(rows, open("out/gpu_results.json", "w"), indent=2)
