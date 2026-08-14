@@ -211,6 +211,55 @@ On CPU the same flag is a **7–14% regression** (per-call 0.70–0.84×), becau
 the 5× flop advantage does not cover the extra kernel/dispatch overhead there. This is
 why `qr-struct` should remain opt-in rather than becoming the default.
 
+### 1.6 An unresolved trajectory divergence — read before trusting the flag
+
+The accuracy verification above is **subproblem-level**: given identical
+`(p_newton, z, R, Δ, α)`, the two methods return steps agreeing to ≤6.9e-12 and Gram
+factors to ~1e-15. That is necessary but **not sufficient** for the full solve, and the
+end-to-end runs show it. Relative difference in final cost between `tr_method="qr"` and
+`"qr-struct"`, at `maxiter`=15:
+
+| platform | case | iterations | subproblem calls (qr / struct) | final-cost rel. diff |
+|---|---|---|---|---|
+| A100 | HELIOTRON L6 | 15 / 15 | 26 / 26 | 1.1e-05 |
+| A100 | precise_QA L6 | 15 / 15 | 29 / **30** | **6.61** |
+| A100 | HELIOTRON L8 | 15 / 15 | 27 / 27 | 4.5e-03 |
+| A100 | W7-X L6 | 15 / 15 | 30 / **27** | **0.176** |
+| CPU | HELIOTRON L6 | 15 / 15 | 26 / 26 | 4.1e-07 |
+| CPU | precise_QA L6 | 15 / 15 | 30 / 30 | 1.0e-05 |
+| CPU | HELIOTRON L8 | 15 / 15 | 27 / 27 | 8.7e-04 |
+| CPU | W7-X L6 | 15 / 15 | 30 / 30 | 5.9e-05 |
+
+Two of four A100 cases end at materially different points — a **660%** relative
+difference on precise_QA L6 and **17.6%** on W7-X L6 — despite identical iterate counts.
+Round-off cannot explain that magnitude directly.
+
+What the data does show:
+
+- The two divergent cases are **exactly** the two where the methods made *different
+  numbers of subproblem calls* (29 vs 30, 30 vs 27). The inner
+  `while actual_reduction <= 0` loop is a data-dependent branch, so a ~1e-12 step
+  difference that flips one acceptance test changes the number of trust-radius shrinks
+  and sends the two runs down different trajectories. All four CPU cases made equal call
+  counts and all four agree to ≤8.7e-04, consistent with this reading.
+- These runs are **not converged** — `maxiter`=15 was a timing budget, so "final cost" is
+  a mid-trajectory point of a nonlinear solve, where trajectory divergence is expected to
+  be visible.
+- A longer run (HELIOTRON L6, 200 iterations, isolated processes) gives
+  qr = 4529.056899877351 and qr-struct = 4529.0568869344515, a **2.9e-09** relative
+  difference. But *both* runs hit the iteration cap without converging, so this shows the
+  two trajectories staying close over many more iterations — **not** agreement at a
+  solution.
+
+**Status: plausible mechanism, not verified.** The branch-flip explanation is consistent
+with every observation but has not been confirmed by instrumenting the acceptance test
+itself, and no converged comparison exists on any case. Until both are done, `qr-struct`
+should not be treated as numerically interchangeable with `qr` at the level of a solve
+trajectory, even though it is at the level of a single subproblem. The concrete tests
+needed: log `actual_reduction` and the accept/reject decision per pass for both methods
+on precise_QA L6, and run at least one case to genuine convergence
+(`gtol`/`ftol` satisfied, not `maxiter`) under both flags.
+
 ---
 
 ## 2. (b) Batching over α
@@ -354,6 +403,12 @@ locates its mechanism: the *solve* at a given α is fine, but the *root-find* ev
 
 ## 4. Summary and recommendation
 
+**Open correctness item.** The largest unresolved question in this work is not
+performance: it is the solve-trajectory divergence of §1.6. Two of four A100 cases finish
+at substantially different points under the two flags. The mechanism is plausibly a
+branch flip in the trust-region acceptance test, but that is unverified, and no converged
+comparison has been run.
+
 **(a) Structured QR achieves 1.09–1.34× per factorization at DESC's sizes and
 1.016–1.126× end-to-end on A100.** The reason it is not 5× is a single quantitative fact:
 the routine sustains a constant ~0.28 of dense QR's achieved efficiency, because it
@@ -368,12 +423,17 @@ sequential root-find forces. The proximate cause is a batched-`geqrf` performanc
 — GEMM batches ~5× *better* per item while QR gets 5× *worse* — but even removing the
 cliff entirely leaves batching short of the bar.
 
-**Recommendation.** Keep `tr_method="qr-struct"` as an **opt-in** flag with `b`=128:
-it is a real 1.02–1.13× on GPU at no accuracy cost (steps match master to ≤6.9e-12,
-Gram residual better than the committed variant if V2's panel structure is adopted), and
-a 7–14% regression on CPU. Do not pursue tiled QR, sequential Givens, batched α, or
-Cholesky-based routes at current problem sizes; the first three are closed on measurement
-and the fourth on conditioning.
+**Recommendation.** Keep `tr_method="qr-struct"` as an **opt-in** flag with `b`=128: it is
+a real 1.02–1.13× on GPU and a 7–14% regression on CPU. Its accuracy is verified *at the
+subproblem level* — steps match master to ≤6.9e-12, and the Gram residual improves on the
+committed variant if V2's panel structure is adopted — but **not at the level of a solve
+trajectory**: two of four A100 cases end at materially different points (660% and 17.6%
+relative in final cost), almost certainly because a ~1e-12 step difference flips a
+trust-region acceptance test and changes the number of subproblem calls (§1.6). That must
+be resolved before the flag is enabled by default or used for production physics, and it
+is a correctness question independent of speed. Do not pursue tiled QR, sequential
+Givens, batched α, or Cholesky-based routes at current problem sizes; the first three are
+closed on measurement and the fourth on conditioning.
 
 **The larger point.** With the α loop at 16–36% of a warm solve, the remaining 64–84%
 — objective and Jacobian evaluation — is where a materially faster solve has to come
