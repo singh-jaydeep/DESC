@@ -28,6 +28,8 @@ from desc.geometry import (
     FourierRZCurve,
     FourierXYCurve,
     FourierXYZCurve,
+    PiecewisePlanarArcCurve,
+    PolarPlanarArcCurve,
     SplineXYZCurve,
 )
 from desc.grid import Grid, LinearGrid
@@ -1172,6 +1174,77 @@ class FourierXYCoil(_Coil, FourierXYCurve):
         )
 
 
+class PolarPlanarArcCoil(_Coil, PolarPlanarArcCurve):
+    """Coil of B planar arcs, each a polar graph r(theta) about its chord midpoint.
+
+    Structurally planar per arc with C0 corners and closure at no DOF cost, exactly like
+    PiecewisePlanarArcCoil -- but the in-plane shape basis is polar rather than a
+    transverse graph over the chord, which lets an arc leave its hinge at any angle up to
+    perpendicular with FINITE coefficients. See PolarPlanarArcCurve for the geometry and
+    for the conditioning caveat at shallow arcs.
+
+    The zero of the shape basis is the exact circular arc of radius |chord|/2, so a
+    2-arc coil with shape = 0 is a circle split at a diameter.
+
+    Parameters
+    ----------
+    current : float
+        Current through the coil, in Amperes.
+    hinges : array-like, shape (B, 3)
+        Hinge (breakpoint) coordinates in xyz, B >= 2.
+    tilts : array-like, shape (B,)
+        Plane tilt of each arc about its chord axis, radians. Default zeros.
+    shape : array-like, shape (B, M)
+        Per-arc polar radial sine coefficients. Default zeros = circular arcs.
+    name : str
+        Name for this coil.
+    """
+
+    _io_attrs_ = _Coil._io_attrs_ + PolarPlanarArcCurve._io_attrs_
+    _static_attrs = _Coil._static_attrs + PolarPlanarArcCurve._static_attrs
+
+    def __init__(
+        self, current=1, hinges=None, tilts=None, shape=None, B=None, M=None, name=""
+    ):
+        super().__init__(current, hinges, tilts, shape, B, M, name)
+
+    @classmethod
+    def from_values(cls, current, coords, B=3, M=1, knots=None, basis="xyz", name=""):
+        """Fit sampled coordinates to a PolarPlanarArcCoil.
+
+        Parameters
+        ----------
+        current : float
+            Current through the coil, in Amperes.
+        coords : ndarray, shape (num_coords, 3)
+            Sampled coordinates of the closed curve (xyz or rpz per basis).
+        B : int
+            Number of planar arcs.
+        M : int
+            Number of polar radial sine modes per arc.
+        knots : ndarray or None
+            Parameter values in [0, 2pi) at which coords are sampled.
+        basis : {"xyz", "rpz"}
+            Basis for input coordinates.
+        name : str
+            Name for this coil.
+
+        Returns
+        -------
+        coil : PolarPlanarArcCoil
+        """
+        curve = PolarPlanarArcCurve.from_values(
+            coords, B=B, M=M, knots=knots, basis=basis, name=name
+        )
+        return cls(
+            current=current,
+            hinges=curve.hinges,
+            tilts=curve.tilts,
+            shape=curve.shape,
+            name=name,
+        )
+
+
 class SplineXYZCoil(_Coil, SplineXYZCurve):
     """Coil parameterized by spline points in X,Y,Z.
 
@@ -1525,6 +1598,8 @@ def _check_type(coil0, coil):
         FourierXYCoil: ["X_basis", "Y_basis"],
         FourierXYZCoil: ["X_basis", "Y_basis", "Z_basis"],
         SplineXYZCoil: ["method", "N", "knots"],
+        PiecewisePlanarArcCoil: ["B", "M"],
+        PolarPlanarArcCoil: ["B", "M"],
     }
 
     for attr in attrs[coil0.__class__]:
@@ -1538,6 +1613,86 @@ def _check_type(coil0, coil):
                 + f"mismatch between attr {attr}, with values {a0} and {a1}."
                 + " Consider using a MixedCoilSet"
             ),
+        )
+
+
+class PiecewisePlanarArcCoil(_Coil, PiecewisePlanarArcCurve):
+    """Coil made of B planar arcs joined at shared hinges (C0 corners).
+
+    Route-B piecewise-planar coil: each member arc lies in its own plane, so the
+    coil is planar *by construction* (structural planarity, no objective/projection)
+    and C0 continuity + closure cost no DOF. See PiecewisePlanarArcCurve for the
+    "hinge + tilt + transverse-Fourier" parameterization.
+
+    Parameters
+    ----------
+    current : float
+        Current through the coil, in Amperes.
+    hinges : array-like, shape (B, 3)
+        Hinge (breakpoint) coordinates in xyz, B >= 2.
+    tilts : array-like, shape (B,)
+        Plane tilt of each arc about its chord axis, radians. Default zeros.
+    shape : array-like, shape (B, M)
+        Transverse in-plane sine coefficients per arc. Default zeros with M=1.
+    name : str
+        Name for this coil.
+    """
+
+    _io_attrs_ = _Coil._io_attrs_ + PiecewisePlanarArcCurve._io_attrs_
+    _static_attrs = _Coil._static_attrs + PiecewisePlanarArcCurve._static_attrs
+
+    def __init__(
+        self,
+        current=1,
+        hinges=None,
+        tilts=None,
+        shape=None,
+        B=None,
+        M=None,
+        name="",
+    ):
+        super().__init__(current, hinges, tilts, shape, B, M, name)
+
+    @classmethod
+    def from_values(cls, current, coords, B=3, M=1, knots=None, basis="xyz", name=""):
+        """Fit sampled coordinates to a PiecewisePlanarArcCoil.
+
+        Splits the closed curve into B equal-parameter arcs, sets each arc's hinges
+        to the sampled break points, fits the per-arc plane tilt by least squares to
+        the best-fit plane, and fits the transverse sine coefficients to the in-plane
+        deviation from the chord.
+
+        Parameters
+        ----------
+        current : float
+            Current through the coil, in Amperes.
+        coords : ndarray, shape (num_coords, 3)
+            Sampled coordinates of the closed curve (xyz or rpz per basis).
+        B : int
+            Number of planar arcs.
+        M : int
+            Number of transverse sine modes per arc.
+        knots : ndarray or None
+            Parameter values in [0, 2pi) at which coords are sampled. If None,
+            assumes uniform sampling.
+        basis : {"xyz", "rpz"}
+            Basis for input coordinates.
+        name : str
+            Name for this coil.
+
+        Returns
+        -------
+        coil : PiecewisePlanarArcCoil
+        """
+        curve = PiecewisePlanarArcCurve.from_values(
+            coords, B=B, M=M, knots=knots, basis=basis, name=name
+        )
+        return cls(
+            current=current,
+            hinges=curve.hinges,
+            tilts=curve.tilts,
+            shape=curve.shape,
+            name=name,
         )
 
 

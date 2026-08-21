@@ -249,6 +249,12 @@ _class_inheritance = {
     "desc.geometry.curve.SplineXYZCurve": [
         "desc.geometry.core.Curve",
     ],
+    "desc.geometry.curve.PiecewisePlanarArcCurve": [
+        "desc.geometry.core.Curve",
+    ],
+    "desc.geometry.curve.PolarPlanarArcCurve": [
+        "desc.geometry.core.Curve",
+    ],
     "desc.geometry.surface.FourierRZToroidalSurface": [
         "desc.geometry.core.Surface",
     ],
@@ -283,6 +289,14 @@ _class_inheritance = {
     ],
     "desc.coils.SplineXYZCoil": [
         "desc.geometry.curve.SplineXYZCurve",
+        "desc.geometry.core.Curve",
+    ],
+    "desc.coils.PiecewisePlanarArcCoil": [
+        "desc.geometry.curve.PiecewisePlanarArcCurve",
+        "desc.geometry.core.Curve",
+    ],
+    "desc.coils.PolarPlanarArcCoil": [
+        "desc.geometry.curve.PolarPlanarArcCurve",
         "desc.geometry.core.Curve",
     ],
     "desc.magnetic_fields._core.OmnigenousField": [],
