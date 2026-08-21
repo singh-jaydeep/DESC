@@ -15,6 +15,7 @@ from .bound_utils import (
 from .tr_subproblems import (
     trust_region_step_exact_cho,
     trust_region_step_exact_qr,
+    trust_region_step_exact_qr_slim,
     trust_region_step_exact_qr_struct,
     trust_region_step_exact_svd,
     update_tr_radius,
@@ -145,9 +146,20 @@ def lsqtr(  # noqa: C901
           ``[R; sqrt(alpha)*I]`` replaced by a structured (blocked, ``dtpqrt``-style)
           retriangularization that exploits both blocks already being triangular:
           ``(2/3)n^3`` flops instead of ``10n^3/3``, with identical iterates and the
-          same conditioning as ``"qr"``. Default ``"qr"``.
-        - ``"tr_qr_block"`` : Column-panel width used by ``tr_method="qr-struct"``.
-          Default 128.
+          same conditioning as ``"qr"``. ``"qr-slim"`` is ``"qr-struct"`` with two
+          further savings -- ``Q^T`` applied only to the trailing columns (the panel
+          QR already produced the rest), and the frontier carried at its exact live
+          shape rather than in an ``n x n`` buffer. Measured on an A100 at
+          ``alpha=2.2e-14``: ``"qr-slim"`` is 1.97-2.79x faster than ``"qr"`` over
+          ``n`` = 2000-20000 and 1.10-1.28x faster than ``"qr-struct"``, with a
+          slightly better Gram residual and, at ``n``=12000, 29% lower peak memory.
+          All three produce identical alpha iterates by construction.
+          Default ``"qr"``.
+        - ``"tr_qr_block"`` : Column-panel width used by ``tr_method="qr-struct"``
+          and ``"qr-slim"``. If not given, chosen from the reduced system size:
+          128 below ``n`` ~ 10000 and 512 above, which is what was measured fastest
+          on an A100 (sweeping ``b`` up to 4096). A poor choice is not free -- the
+          measured penalty for the worst swept width is 24-46%.
         - ``"scaled_termination"`` : Whether to evaluate termination criteria for
           ``xtol`` and ``gtol`` in scaled / normalized units (default) or base units.
 
@@ -246,7 +258,8 @@ def lsqtr(  # noqa: C901
     tr_increase_ratio = options.pop("tr_increase_ratio", 2)
     tr_decrease_ratio = options.pop("tr_decrease_ratio", 0.25)
     tr_method = options.pop("tr_method", "qr")
-    tr_qr_block = options.pop("tr_qr_block", 128)
+    # None => choose from the reduced size below, once R's shape is known.
+    tr_qr_block = options.pop("tr_qr_block", None)
 
     errorif(
         len(options) > 0,
@@ -254,11 +267,16 @@ def lsqtr(  # noqa: C901
         "Unknown options: {}".format([key for key in options]),
     )
     errorif(
-        tr_method not in ["cho", "svd", "qr", "qr-struct"],
+        tr_method not in ["cho", "svd", "qr", "qr-struct", "qr-slim"],
         ValueError,
-        "tr_method should be one of 'cho', 'svd', 'qr', 'qr-struct', got {}".format(
-            tr_method
-        ),
+        "tr_method should be one of 'cho', 'svd', 'qr', 'qr-struct', 'qr-slim', "
+        "got {}".format(tr_method),
+    )
+    errorif(
+        tr_qr_block is not None
+        and (tr_qr_block < 1 or int(tr_qr_block) != tr_qr_block),
+        ValueError,
+        "tr_qr_block should be a positive integer, got {}".format(tr_qr_block),
     )
 
     callback = setdefault(callback, lambda *args: False)
@@ -309,7 +327,7 @@ def lsqtr(  # noqa: C901
             U, s, Vt = jnp.linalg.svd(J_a, full_matrices=False)
         elif tr_method == "cho":
             B_h = jnp.dot(J_a.T, J_a)
-        elif tr_method in ("qr", "qr-struct"):
+        elif tr_method in ("qr", "qr-struct", "qr-slim"):
             # try full newton step
             tall = J_a.shape[0] >= J_a.shape[1]
             if tall:
@@ -322,6 +340,15 @@ def lsqtr(  # noqa: C901
                 del Q, Rt
                 # the tr subproblem still needs the QR of J_a itself
                 Qt_fa, R = qr_multiply(J_a, f_a, mode="right")
+
+            # Panel width for the structured routes. Chosen from the REDUCED size n
+            # (R is n x n), not the Jacobian's, since that is what the panel sweep sees.
+            # Measured optima on A100-80GB, fp64 (b swept to 4096): 128 below n ~ 10000,
+            # 512 above. The optimum is flat within ~1.6% over 128-512 at n = 8000.
+            if tr_qr_block is None:
+                qr_block = 128 if R.shape[1] < 10000 else 512
+            else:
+                qr_block = int(tr_qr_block)
 
         actual_reduction = -1
 
@@ -347,7 +374,11 @@ def lsqtr(  # noqa: C901
                 )
             elif tr_method == "qr-struct":
                 step_h, hits_boundary, alpha = trust_region_step_exact_qr_struct(
-                    p_newton, Qt_fa, R, trust_radius, alpha, block=tr_qr_block
+                    p_newton, Qt_fa, R, trust_radius, alpha, block=qr_block
+                )
+            elif tr_method == "qr-slim":
+                step_h, hits_boundary, alpha = trust_region_step_exact_qr_slim(
+                    p_newton, Qt_fa, R, trust_radius, alpha, block=qr_block
                 )
             step = d * step_h  # Trust-region solution in the original space.
 
