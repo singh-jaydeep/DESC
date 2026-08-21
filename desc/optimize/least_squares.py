@@ -458,7 +458,7 @@ def lsqtr(  # noqa: C901
                 del U, s, Vt
             elif tr_method == "cho":
                 del B_h
-            elif tr_method == "qr":
+            elif tr_method in ("qr", "qr_struct", "qr_slim"):
                 del R
             J = jac(x, *args)
             njev += 1
