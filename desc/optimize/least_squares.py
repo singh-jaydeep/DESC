@@ -15,6 +15,7 @@ from .bound_utils import (
 from .tr_subproblems import (
     trust_region_step_exact_cho,
     trust_region_step_exact_qr,
+    trust_region_step_exact_qr_fixed,
     trust_region_step_exact_qr_slim,
     trust_region_step_exact_qr_struct,
     trust_region_step_exact_svd,
@@ -267,10 +268,10 @@ def lsqtr(  # noqa: C901
         "Unknown options: {}".format([key for key in options]),
     )
     errorif(
-        tr_method not in ["cho", "svd", "qr", "qr-struct", "qr-slim"],
+        tr_method not in ["cho", "svd", "qr", "qr-struct", "qr-slim", "qr-fixed"],
         ValueError,
         "tr_method should be one of 'cho', 'svd', 'qr', 'qr-struct', 'qr-slim', "
-        "got {}".format(tr_method),
+        "'qr-fixed', got {}".format(tr_method),
     )
     errorif(
         tr_qr_block is not None
@@ -327,7 +328,7 @@ def lsqtr(  # noqa: C901
             U, s, Vt = jnp.linalg.svd(J_a, full_matrices=False)
         elif tr_method == "cho":
             B_h = jnp.dot(J_a.T, J_a)
-        elif tr_method in ("qr", "qr-struct", "qr-slim"):
+        elif tr_method in ("qr", "qr-struct", "qr-slim", "qr-fixed"):
             # try full newton step
             tall = J_a.shape[0] >= J_a.shape[1]
             if tall:
@@ -378,6 +379,10 @@ def lsqtr(  # noqa: C901
                 )
             elif tr_method == "qr-slim":
                 step_h, hits_boundary, alpha = trust_region_step_exact_qr_slim(
+                    p_newton, Qt_fa, R, trust_radius, alpha, block=qr_block
+                )
+            elif tr_method == "qr-fixed":
+                step_h, hits_boundary, alpha = trust_region_step_exact_qr_fixed(
                     p_newton, Qt_fa, R, trust_radius, alpha, block=qr_block
                 )
             step = d * step_h  # Trust-region solution in the original space.
@@ -458,7 +463,7 @@ def lsqtr(  # noqa: C901
                 del U, s, Vt
             elif tr_method == "cho":
                 del B_h
-            elif tr_method in ("qr", "qr_struct", "qr_slim"):
+            elif tr_method in ("qr", "qr-struct", "qr-slim", "qr-fixed"):
                 del R
             J = jac(x, *args)
             njev += 1

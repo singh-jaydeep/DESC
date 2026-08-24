@@ -556,6 +556,82 @@ def structured_retriangularize(R, z, alpha, block=128):
 
 
 @functools.partial(jit, static_argnames=("block",))
+def structured_retriangularize_fixed(R, z, alpha, block=128):
+    """QR of ``[R; sqrt(alpha)*I]``: the fixed work array, trailing columns only.
+
+    This is ``structured_retriangularize`` with the first of
+    ``structured_retriangularize_slim``'s two changes and not the second, which
+    is the combination that measurement supports:
+
+    * **Kept (slim's change 1).** ``Q.T`` is applied only to the TRAILING
+      columns. The panel QR already produced the transformed panel columns --
+      they are ``triu(packed[:bk, :bk])`` -- so pushing them back through the
+      compact-WY transform is redundant arithmetic and a second floating-point
+      path to a known quantity. This carries most of slim's speed advantage and
+      all of its accuracy advantage: not doing arithmetic cannot round it.
+    * **Dropped (slim's change 2).** The frontier is NOT carried at its exact
+      live shape. ``block`` is static, so the panel loop is fully unrolled;
+      carrying a differently-shaped frontier per panel gives XLA
+      ``ceil(n/block)`` distinct allocations whose liveness its scheduler cannot
+      collapse, and planned temp memory becomes ``O(n^3 / block)`` instead of
+      ``O(n^2)``. Measured on an A100-80GB at n=14242, b=128, that is 37.8 GB of
+      planned temporaries against this routine's ~3.4 GB, and compile-only
+      analysis matches the observed runtime peak to within 5%. Keeping the one
+      fixed ``2n x (n+1)`` buffer lets XLA update in place and free each panel's
+      temporaries immediately.
+
+    Writes back in two pieces rather than one: the panel's triangular factor
+    goes to the top ``bk`` rows by static slice, and ``Q.T``-transformed trailing
+    columns go to the gathered rows. The panel columns of the bottom rows are
+    left stale deliberately -- they are never read again (panel ``k+1`` reads
+    only columns ``>= c1``) and never returned (only ``M[:n]`` is).
+
+    Parameters
+    ----------
+    R : ndarray, shape (k, n)
+        R factor of J, from ``qr_multiply(J, f, mode="right")``.
+    z : ndarray, shape (k,)
+        ``Q1.T@f``.
+    alpha : float
+        Levenberg-Marquardt parameter.
+    block : int
+        Column-panel width. Must be static under jit.
+
+    Returns
+    -------
+    Rtil : ndarray, shape (n, n)
+        Upper triangular, with ``Rtil.T@Rtil == R.T@R + alpha*I``.
+    Qtz : ndarray, shape (n,)
+        The transformed right-hand side.
+
+    """
+    n = R.shape[1]
+    k_ = R.shape[0]
+    dt = R.dtype
+    # Work array: [R; sqrt(alpha)*I] with the RHS carried as a trailing column.
+    M = jnp.zeros((2 * n, n + 1), dt)
+    M = M.at[:k_, :n].set(R)
+    M = M.at[n:, :n].set(jnp.sqrt(jnp.asarray(alpha, dt)) * jnp.eye(n, dtype=dt))
+    M = M.at[:k_, n].set(z)
+
+    for kb in range((n + block - 1) // block):
+        c0 = kb * block
+        c1 = min(c0 + block, n)
+        bk = c1 - c0
+        idx = jnp.concatenate([jnp.arange(c0, c1), n + jnp.arange(0, c1)])
+        Sub = M[idx, c0:]
+        h, taus = jnp.linalg.qr(Sub[:, :bk], mode="raw")
+        packed = h.swapaxes(-1, -2)
+        # Change 1: take the panel's R from the reflector block, then apply Q.T
+        # to the remaining columns only.
+        trail = _apply_QT_wy(packed, taus, Sub[:, bk:])
+        M = M.at[c0:c1, c0:c1].set(jnp.triu(packed[:bk, :bk]))
+        M = M.at[idx, c1:].set(trail)
+
+    return jnp.triu(M[:n, :n]), M[:n, n]
+
+
+@functools.partial(jit, static_argnames=("block",))
 def structured_retriangularize_slim(R, z, alpha, block=128):
     """QR of ``[R; sqrt(alpha)*I]`` -- as ``structured_retriangularize``, two fixes.
 
@@ -724,6 +800,78 @@ def trust_region_step_exact_qr_slim(
             p, alpha, alpha_lower, alpha_upper, phi, k = state
 
             Rtil, Qtz = structured_retriangularize_slim(R, z, alpha, block=block)
+
+            p = solve_triangular_regularized(Rtil, -Qtz)
+            p_norm = jnp.linalg.norm(p)
+            phi = p_norm - trust_radius
+            alpha_upper = jnp.where(phi < 0, alpha, alpha_upper)
+            alpha_lower = jnp.where(phi > 0, alpha, alpha_lower)
+
+            q = solve_triangular_regularized(Rtil.T, p, lower=True)
+            q_norm = jnp.linalg.norm(q)
+
+            alpha += (p_norm / q_norm) ** 2 * phi / trust_radius
+            alpha = jnp.clip(alpha, alpha_lower, alpha_upper)
+            k += 1
+            return p, alpha, alpha_lower, alpha_upper, phi, k
+
+        p, alpha, *_ = while_loop(
+            loop_cond,
+            loop_body,
+            (p_newton, alpha, alpha_lower, alpha_upper, jnp.inf, k),
+        )
+
+        # Make the norm of p equal to trust_radius; p is changed only slightly.
+        # This is done to prevent p from lying outside the trust region
+        # (which can cause problems later).
+        p *= trust_radius / jnp.linalg.norm(p)
+
+        return p, True, alpha
+
+    return cond(jnp.linalg.norm(p_newton) <= trust_radius, truefun, falsefun, None)
+
+
+@functools.partial(jit, static_argnames=("block",))
+def trust_region_step_exact_qr_fixed(
+    p_newton, z, R, trust_radius, initial_alpha=0.0, rtol=0.01, max_iter=10, block=128
+):
+    """Solve a trust-region problem using the fixed-buffer retriangularization.
+
+    Identical to ``trust_region_step_exact_qr_struct`` except that each alpha
+    iteration calls ``structured_retriangularize_fixed``. Same safeguarded
+    Hebden/Reinsch root-find, same iterates, so it produces the same alpha
+    sequence as ``tr_method="qr"`` by construction.
+
+    Parameters and returns are as ``trust_region_step_exact_qr``, plus:
+
+    Parameters
+    ----------
+    block : int
+        Column-panel width passed to ``structured_retriangularize_fixed``.
+        Peak memory is flat in this parameter, unlike the ``"qr-slim"`` route,
+        so it trades only speed.
+
+    """
+
+    def truefun(*_):
+        return p_newton, False, 0.0
+
+    def falsefun(*_):
+        # J.T@f == R.T@z, so we never need J or f here
+        alpha_upper = jnp.linalg.norm(R.T @ z) / trust_radius
+        alpha_lower = 0.0
+        alpha = initial_alpha
+        alpha = jnp.clip(alpha, alpha_lower, alpha_upper)
+        k = 0
+
+        def loop_cond(state):
+            p, alpha, alpha_lower, alpha_upper, phi, k = state
+            return (jnp.abs(phi) > rtol * trust_radius) & (k < max_iter)
+
+        def loop_body(state):
+            p, alpha, alpha_lower, alpha_upper, phi, k = state
+
+            Rtil, Qtz = structured_retriangularize_fixed(R, z, alpha, block=block)
 
             p = solve_triangular_regularized(Rtil, -Qtz)
             p_norm = jnp.linalg.norm(p)
