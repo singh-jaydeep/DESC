@@ -16,8 +16,6 @@ from .tr_subproblems import (
     trust_region_step_exact_cho,
     trust_region_step_exact_qr,
     trust_region_step_exact_qr_fixed,
-    trust_region_step_exact_qr_slim,
-    trust_region_step_exact_qr_struct,
     trust_region_step_exact_svd,
     update_tr_radius,
 )
@@ -137,30 +135,39 @@ def lsqtr(  # noqa: C901
         - ``"tr_decrease_ratio"`` : (0 < float < 1) Factor to decrease the trust region
           radius by when  the ratio of actual to predicted reduction falls below
           threshold. Default 0.25.
-        - ``"tr_method"`` : (``"qr"``, ``"qr-struct"``, ``"svd"``, ``"cho"``) Method to
+        - ``"tr_method"`` : (``"qr"``, ``"qr-fixed"``, ``"svd"``, ``"cho"``) Method to
           use for solving the trust region subproblem. ``"qr"`` and ``"cho"`` uses a
           sequence of QR or Cholesky factorizations (generally 2-3), while ``"svd"``
           uses one singular value decomposition. ``"cho"`` is generally the fastest
           for large systems, especially on GPU, but may be less accurate for badly
           scaled systems. ``"svd"`` is the most accurate but significantly slower.
-          ``"qr-struct"`` is ``"qr"`` with the per-alpha factorization of
+          ``"qr-fixed"`` is ``"qr"`` with the per-alpha factorization of
           ``[R; sqrt(alpha)*I]`` replaced by a structured (blocked, ``dtpqrt``-style)
           retriangularization that exploits both blocks already being triangular:
-          ``(2/3)n^3`` flops instead of ``10n^3/3``, with identical iterates and the
-          same conditioning as ``"qr"``. ``"qr-slim"`` is ``"qr-struct"`` with two
-          further savings -- ``Q^T`` applied only to the trailing columns (the panel
-          QR already produced the rest), and the frontier carried at its exact live
-          shape rather than in an ``n x n`` buffer. Measured on an A100 at
-          ``alpha=2.2e-14``: ``"qr-slim"`` is 1.97-2.79x faster than ``"qr"`` over
-          ``n`` = 2000-20000 and 1.10-1.28x faster than ``"qr-struct"``, with a
-          slightly better Gram residual and, at ``n``=12000, 29% lower peak memory.
-          All three produce identical alpha iterates by construction.
-          Default ``"qr"``.
-        - ``"tr_qr_block"`` : Column-panel width used by ``tr_method="qr-struct"``
-          and ``"qr-slim"``. If not given, chosen from the reduced system size:
-          128 below ``n`` ~ 10000 and 512 above, which is what was measured fastest
-          on an A100 (sweeping ``b`` up to 4096). A poor choice is not free -- the
-          measured penalty for the worst swept width is 24-46%.
+          ``(2/3)n^3`` flops instead of ``10n^3/3``, at the same conditioning as
+          ``"qr"`` (unlike ``"cho"``, which squares kappa(J)).
+
+          Measured on an A100-80GB, fp64, at ``alpha=2.2e-14``. Per factorization,
+          ``"qr-fixed"`` is 1.54x faster than ``"qr"`` at ``n``=3434 and 2.26x at
+          ``n``=14242. Inside real equilibrium solves the alpha loop is roughly half
+          of an outer iteration, so the end-to-end gain is smaller: per outer
+          iteration 1.32x at ``n``=7602 and 1.47x at ``n``=14242. Peak device memory
+          is within 6% of ``"qr"`` at every size measured from ``n``=3434 to 38830,
+          and in full solves the peak is set by the Jacobian, not by this routine.
+          The Gram residual is slightly BETTER than ``"qr-struct"``-style schemes and
+          matches ``"qr"`` (6.30e-16 vs 6.32e-16 at ``n``=14242).
+
+          ``"qr-fixed"`` does not reproduce ``"qr"``'s iterates exactly. The two
+          agree to ~1e-14 per subproblem, but the inner ``actual_reduction > 0``
+          acceptance test amplifies that: at ``L=M=N=16`` with deterministic ops the
+          two land 1.6e-2 apart in final cost and 5.2e-5 in ``|x|``. Note that
+          without ``--xla_gpu_deterministic_ops=true`` repeated runs of a SINGLE
+          method already differ by far more than that (up to 41x in final cost), so
+          this is not specific to the method. Default ``"qr"``.
+        - ``"tr_qr_block"`` : Column-panel width used by ``tr_method="qr-fixed"``.
+          If not given, chosen from the reduced system size: 128 below ``n`` ~ 10000
+          and 512 above. A poor choice is not free -- at ``n``=14242 the worst swept
+          width costs 34% against the best. Peak memory is flat in this parameter.
         - ``"scaled_termination"`` : Whether to evaluate termination criteria for
           ``xtol`` and ``gtol`` in scaled / normalized units (default) or base units.
 
@@ -268,10 +275,10 @@ def lsqtr(  # noqa: C901
         "Unknown options: {}".format([key for key in options]),
     )
     errorif(
-        tr_method not in ["cho", "svd", "qr", "qr-struct", "qr-slim", "qr-fixed"],
+        tr_method not in ["cho", "svd", "qr", "qr-fixed"],
         ValueError,
-        "tr_method should be one of 'cho', 'svd', 'qr', 'qr-struct', 'qr-slim', "
-        "'qr-fixed', got {}".format(tr_method),
+        "tr_method should be one of 'cho', 'svd', 'qr', 'qr-fixed', "
+        "got {}".format(tr_method),
     )
     errorif(
         tr_qr_block is not None
@@ -328,7 +335,7 @@ def lsqtr(  # noqa: C901
             U, s, Vt = jnp.linalg.svd(J_a, full_matrices=False)
         elif tr_method == "cho":
             B_h = jnp.dot(J_a.T, J_a)
-        elif tr_method in ("qr", "qr-struct", "qr-slim", "qr-fixed"):
+        elif tr_method in ("qr", "qr-fixed"):
             # try full newton step
             tall = J_a.shape[0] >= J_a.shape[1]
             if tall:
@@ -372,14 +379,6 @@ def lsqtr(  # noqa: C901
             elif tr_method == "qr":
                 step_h, hits_boundary, alpha = trust_region_step_exact_qr(
                     p_newton, Qt_fa, R, trust_radius, alpha
-                )
-            elif tr_method == "qr-struct":
-                step_h, hits_boundary, alpha = trust_region_step_exact_qr_struct(
-                    p_newton, Qt_fa, R, trust_radius, alpha, block=qr_block
-                )
-            elif tr_method == "qr-slim":
-                step_h, hits_boundary, alpha = trust_region_step_exact_qr_slim(
-                    p_newton, Qt_fa, R, trust_radius, alpha, block=qr_block
                 )
             elif tr_method == "qr-fixed":
                 step_h, hits_boundary, alpha = trust_region_step_exact_qr_fixed(
@@ -463,7 +462,7 @@ def lsqtr(  # noqa: C901
                 del U, s, Vt
             elif tr_method == "cho":
                 del B_h
-            elif tr_method in ("qr", "qr-struct", "qr-slim", "qr-fixed"):
+            elif tr_method in ("qr", "qr-fixed"):
                 del R
             J = jac(x, *args)
             njev += 1
