@@ -141,6 +141,8 @@ def lsqtr(  # noqa: C901
           uses one singular value decomposition. ``"cho"`` is generally the fastest
           for large systems, especially on GPU, but may be less accurate for badly
           scaled systems. ``"svd"`` is the most accurate but significantly slower.
+          If any of the sub-objectives includes bounds, ``"svd"`` is recommended,
+          since the linear system then has a chance to be rank-deficient.
           ``"qr-fixed"`` is ``"qr"`` with the per-alpha factorization of
           ``[R; sqrt(alpha)*I]`` replaced by a structured (blocked, ``dtpqrt``-style)
           retriangularization that exploits both blocks already being triangular:
