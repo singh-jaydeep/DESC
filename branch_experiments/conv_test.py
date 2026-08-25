@@ -18,6 +18,14 @@ def solve(meth, name="HELIOTRON", L=6, pert=0.01, maxiter=200):
     eq = get(name)
     eq.change_resolution(L=L, M=L, N=eq.N, L_grid=2*L, M_grid=2*L, N_grid=2*eq.N)
     rng = np.random.default_rng(0)
+    # !!! BROKEN PERTURBATION -- DO NOT COPY. White noise scaled to the R00
+    # !!! coefficient, applied with no mode-number weighting: at precise_QA L=12 it
+    # !!! exceeds the mode's own magnitude for 98.9% of modes (median ratio 5.0e+03)
+    # !!! and a nominal "1%" is really ||delta||/||v|| = 0.32. Solves from such a
+    # !!! start reach cost ~1e24 and end with FOLDED flux surfaces (sqrt(g) changing
+    # !!! sign) while reporting "terminated successfully".
+    # !!! Correct method: eq.perturb on Rb_lmn/Zb_lmn -- see
+    # !!! modal_bench/PERTURBATION.md. Left as-is only for reproducibility.
     eq.R_lmn = eq.R_lmn + pert*rng.standard_normal(eq.R_lmn.size)*np.abs(eq.R_lmn).max()
     eq.Z_lmn = eq.Z_lmn + pert*rng.standard_normal(eq.Z_lmn.size)*np.abs(eq.Z_lmn).max()
     obj = ObjectiveFunction(ForceBalance(eq)); cons = get_fixed_boundary_constraints(eq)

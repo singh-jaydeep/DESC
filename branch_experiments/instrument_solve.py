@@ -165,6 +165,14 @@ def run_case(name, L, pert=1e-3, maxiter=30, N=None):
 
     rng = _np.random.default_rng(0)
     if pert:
+        # !!! BROKEN PERTURBATION -- DO NOT COPY. White noise scaled to the R00
+        # !!! coefficient, applied with no mode-number weighting: at precise_QA L=12 it
+        # !!! exceeds the mode's own magnitude for 98.9% of modes (median ratio 5.0e+03)
+        # !!! and a nominal "1%" is really ||delta||/||v|| = 0.32. Solves from such a
+        # !!! start reach cost ~1e24 and end with FOLDED flux surfaces (sqrt(g) changing
+        # !!! sign) while reporting "terminated successfully".
+        # !!! Correct method: eq.perturb on Rb_lmn/Zb_lmn -- see
+        # !!! modal_bench/PERTURBATION.md. Left as-is only for reproducibility.
         eq.R_lmn = eq.R_lmn + pert * rng.standard_normal(
             eq.R_lmn.size
         ) * _np.abs(eq.R_lmn).max()
