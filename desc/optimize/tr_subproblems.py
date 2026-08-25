@@ -479,27 +479,38 @@ _IDX_HINTS = dict(
 )
 
 
-def _apply_QT_wy(packed, taus, C):
-    """Apply Q.T to C, with Q the product of the Householder reflectors in packed.
+def _apply_QT_wy(at, taus, C):
+    """Apply Q.T to C, with Q the product of the Householder reflectors in ``at``.
 
-    ``packed`` is ``(M, k)`` with the reflectors strictly below the diagonal and a
-    unit diagonal implied, as returned by ``jnp.linalg.qr(..., mode="raw")``
-    (transposed). Uses the compact-WY / UT transform via the identity
+    ``at`` is ``(k, M)``: the reflectors as ROWS, i.e. ``V.T``, which is exactly
+    what ``jnp.linalg.qr(..., mode="raw")`` hands back, so the ``(M, k)``
+    transpose is never formed and all three products come from dot dimension
+    numbers alone. Uses the compact-WY / UT transform via the identity
     ``T^-1 + T^-H = V^H V`` (Joffrain & Low 2006), so each application is two
-    matmuls and a triangular solve rather than ``k`` rank-1 updates. This is the
-    same route ``desc.backend.qr_multiply``'s pure-JAX fallback takes, duplicated
-    here because that helper is only defined for ``jax < 0.10``.
+    matmuls and a triangular solve rather than ``k`` rank-1 updates.
+
+    Mirrors ``desc.backend``'s ``_householder_multiply``. Duplicated rather than
+    imported because that helper exists only on the ``jax < 0.10`` fallback
+    path: on ``jax >= 0.10`` DESC takes ``qr_multiply`` from
+    ``jax.scipy.linalg`` and the helper is not defined at all, so importing it
+    would break as soon as the minimum jax version moves.
+
+    One deliberate difference from the backend version: the ``tau == 0`` guard
+    below. A zero tau marks an identity reflector, and that case is not exotic
+    here -- at ``alpha = 0`` the ``sqrt(alpha)*I`` block is entirely zero, the
+    panel is already triangular, and every tau comes back zero. Without the
+    guard the diagonal correction is ``1/0``.
     """
-    M, k = packed.shape
-    V = jnp.where(
-        jnp.tril(jnp.ones((M, k), bool), -1), packed, jnp.eye(M, k, dtype=packed.dtype)
-    )
-    # A zero tau means that reflector is the identity; zero its column so it
-    # contributes nothing instead of producing 1/0.
+    k, m = at.shape
+    # V is unit lower-trapezoidal, so V.T (== at) is unit upper-trapezoidal.
+    below = jnp.arange(m)[None, :] - jnp.arange(k)[:, None]
+    Vt = jnp.where(below > 0, at, (below == 0).astype(at.dtype))
     live = taus != 0
-    V = V * live
-    T_inv = V.T @ V - jnp.diag(1.0 / jnp.where(live, taus, 1.0))
-    return C - V @ solve_triangular(T_inv, V.T @ C, lower=True)
+    Vt = Vt * live[:, None]
+    # solve_triangular reads only the relevant triangle, so passing the full
+    # Gram matrix V V.T minus the diagonal correction recovers T^-1.
+    T_inv = Vt @ Vt.T - jnp.diag(1.0 / jnp.where(live, taus, 1.0))
+    return C - Vt.T @ solve_triangular(T_inv, Vt @ C, lower=True)
 
 
 @functools.partial(jit, static_argnames=("block",))
@@ -575,12 +586,12 @@ def structured_retriangularize_fixed(R, z, alpha, block=128):
         bk = c1 - c0
         idx = jnp.concatenate([jnp.arange(c0, c1), n + jnp.arange(0, c1)])
         Sub = M.at[idx, c0:].get(**_IDX_HINTS)
+        # mode="raw" gives h as (k, M) -- V.T already, so no transpose is formed.
         h, taus = jnp.linalg.qr(Sub[:, :bk], mode="raw")
-        packed = h.swapaxes(-1, -2)
         # Change 1: take the panel's R from the reflector block, then apply Q.T
         # to the remaining columns only.
-        trail = _apply_QT_wy(packed, taus, Sub[:, bk:])
-        M = M.at[c0:c1, c0:c1].set(jnp.triu(packed[:bk, :bk]))
+        trail = _apply_QT_wy(h, taus, Sub[:, bk:])
+        M = M.at[c0:c1, c0:c1].set(jnp.triu(h[:bk, :bk].T))
         M = M.at[idx, c1:].set(trail, **_IDX_HINTS)
 
     return jnp.triu(M[:n, :n]), M[:n, n]
