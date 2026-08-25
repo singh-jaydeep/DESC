@@ -1,0 +1,26 @@
+{
+  "shipped": {
+    "force_vol": 78.64329936039573,
+    "force_max": 5230.3381111032895,
+    "volume": 0.6003246918022733,
+    "aspect": 5.999999678978865,
+    "sqrtg_min": 0.0004497725357335418,
+    "sqrtg_max": 0.05045076206406998,
+    "sqrtg_sign_change": false,
+    "frac_sqrtg_positive": 1.0,
+    "iota_axis": 0.41992541299380953,
+    "iota_edge": 0.4197012906187978
+  },
+  "perturbed_start": {
+    "force_vol": 430340.3924272548,
+    "force_max": 2889486.6819526115,
+    "volume": 0.678341613943092,
+    "aspect": 6.168145687622332,
+    "sqrtg_min": 0.0004983843212895211,
+    "sqrtg_max": 0.05326633494238504,
+    "sqrtg_sign_change": false,
+    "frac_sqrtg_positive": 1.0,
+    "iota_axis": 0.3586105650011639,
+    "iota_edge": 0.36031558351196663
+  }
+}
