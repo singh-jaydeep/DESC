@@ -439,10 +439,18 @@ class CoilLength(_CoilObjective):
 class CoilCurvature(_CoilObjective):
     """Coil curvature.
 
-    Targets the local curvature at each grid node for each coil.
-    Positive curvature corresponds to "convex" curves (a circle has positive curvature),
-    while negative curvature corresponds to "concave" curves.
-    Curvature values closer to 0 indicate straighter sections of coils.
+    Targets the magnitude of the local curvature at each grid node for each coil --
+    the reciprocal of the local radius of curvature. Larger values mean a more tightly
+    bent coil; values near 0 indicate straighter sections. Bounding it above is the
+    usual way to impose a minimum bend radius.
+
+    This uses the unsigned ``|curvature|``. The signed ``curvature`` quantity carries a
+    convex/concave convention set by ``sign(dot(r, frenet_normal))``, which is a step
+    function: it jumps by twice the full curvature magnitude wherever the curve's
+    normal turns perpendicular to the line back to its center. That locus is unrelated
+    to where the curvature vanishes and moves when distant parts of the curve move, so
+    signed curvature is not usable as an optimization target or bound -- a trust region
+    cannot shrink past the discontinuity.
 
     Parameters
     ----------
@@ -484,7 +492,7 @@ class CoilCurvature(_CoilObjective):
 
         super().__init__(
             coil,
-            ["curvature"],
+            ["|curvature|"],
             target=target,
             bounds=bounds,
             weight=weight,
@@ -534,7 +542,7 @@ class CoilCurvature(_CoilObjective):
         """
         data = super().compute(params, constants=constants)
         data = tree_leaves(data, is_leaf=lambda x: isinstance(x, dict))
-        out = jnp.concatenate([dat["curvature"] for dat in data])
+        out = jnp.concatenate([dat["|curvature|"] for dat in data])
         return out[self._coilset_tree["coilset_mask"]]
 
 

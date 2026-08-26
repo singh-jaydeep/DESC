@@ -1152,6 +1152,31 @@ def _frenet_binormal(params, transforms, profiles, data, **kwargs):
 
 
 @register_compute_fun(
+    name="|curvature|",
+    label="|\\kappa|",
+    units="m^{-1}",
+    units_long="Inverse meters",
+    description="Magnitude of the curvature of the curve, the reciprocal of the local "
+    + "radius of curvature. Carries no sign convention, and so -- unlike ``curvature`` "
+    + "-- is a smooth function of the curve parameters wherever the curve is regular. "
+    + "This is the quantity to bound when limiting how tightly a coil is bent.",
+    dim=1,
+    params=[],
+    transforms={},
+    profiles=[],
+    coordinates="s",
+    data=["x_s", "x_ss"],
+    parameterization="desc.geometry.core.Curve",
+)
+def _curvature_magnitude(params, transforms, profiles, data, **kwargs):
+    dxn = jnp.linalg.norm(data["x_s"], axis=-1)[:, jnp.newaxis]
+    data["|curvature|"] = jnp.linalg.norm(
+        cross(data["x_s"], data["x_ss"]) / dxn**3, axis=-1
+    )
+    return data
+
+
+@register_compute_fun(
     name="curvature",
     label="\\kappa",
     units="m^{-1}",
@@ -1163,17 +1188,21 @@ def _frenet_binormal(params, transforms, profiles, data, **kwargs):
     transforms={},
     profiles=[],
     coordinates="s",
-    data=["center", "x", "x_s", "x_ss", "frenet_normal", "phi"],
+    data=["center", "x", "|curvature|", "frenet_normal", "phi"],
     parameterization="desc.geometry.core.Curve",
 )
 def _curvature(params, transforms, profiles, data, **kwargs):
-    # magnitude of curvature
-    dxn = jnp.linalg.norm(data["x_s"], axis=-1)[:, jnp.newaxis]
-    curvature = jnp.linalg.norm(cross(data["x_s"], data["x_ss"]) / dxn**3, axis=-1)
-    # sign of curvature (positive = "convex", negative = "concave")
+    # sign of curvature (positive = "convex", negative = "concave").
+    # NOTE: `sign` is a step function, so this quantity JUMPS by 2*|curvature| where
+    # dot(r, frenet_normal) crosses zero. That locus has nothing to do with where
+    # |curvature| vanishes -- it is set by the position of the curve's center, so the
+    # jump happens at full curvature magnitude and can even move when a distant part
+    # of the curve does. Fine for reporting convexity; unusable as an optimization
+    # target or bound, where a trust region cannot shrink past the discontinuity.
+    # Use "|curvature|" for that.
     r = rpz2xyz(data["center"]) - rpz2xyz(data["x"])
     r = xyz2rpz_vec(r, phi=data["phi"])
-    data["curvature"] = curvature * sign(dot(r, data["frenet_normal"]))
+    data["curvature"] = data["|curvature|"] * sign(dot(r, data["frenet_normal"]))
     return data
 
 
@@ -1574,7 +1603,7 @@ def _ppolar_indices(s, B):
 
 
 def _ppolar_coords(params, data, B, M, deriv):
-    """xyz coords (deriv=0) or the deriv-th phi derivative (deriv=1,2,3)."""
+    """XYZ coords (deriv=0) or the deriv-th phi derivative (deriv=1,2,3)."""
     hinges = params["hinges"].reshape(B, 3)
     tilts = params["tilts"].reshape(B)
     shape = params["shape"].reshape(B, M)
