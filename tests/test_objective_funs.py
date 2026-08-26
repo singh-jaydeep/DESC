@@ -95,6 +95,7 @@ from desc.objectives import (
     Volume,
     get_NAE_constraints,
 )
+from desc.objectives._coils import _independent_coil_indices
 from desc.objectives._free_boundary import BoundaryErrorNESTOR
 from desc.objectives.nae_utils import (
     _calc_1st_order_NAE_coeffs,
@@ -1097,7 +1098,7 @@ class TestObjectiveFunction:
             obj1 = CoilSetMinDistance(coils, grid=grid)
             obj1.build()
             f1 = obj1.compute(params=coils.params_dict)
-            assert f1.size == coils.num_coils
+            assert f1.size == len(_independent_coil_indices(coils))
             np.testing.assert_allclose(f1, mindist)
             assert coils.is_self_intersecting(grid=grid, tol=tol) == expect_intersect
             # softmin
@@ -1106,13 +1107,13 @@ class TestObjectiveFunction:
             )
             obj2.build()
             f2 = obj2.compute(params=coils.params_dict)
-            assert f2.size == coils.num_coils
+            assert f2.size == len(_independent_coil_indices(coils))
             np.testing.assert_allclose(f2, mindist, rtol=5e-2, atol=1e-3)
             # num_neighbors
             obj3 = CoilSetMinDistance(coils, grid=grid, num_neighbors=num_neighbors)
             obj3.build()
             f3 = obj3.compute(params=coils.params_dict)
-            assert f3.size == coils.num_coils
+            assert f3.size == len(_independent_coil_indices(coils))
             np.testing.assert_allclose(f3, mindist)
             # softmin & num_neighbors
             obj4 = CoilSetMinDistance(
@@ -1124,7 +1125,7 @@ class TestObjectiveFunction:
             )
             obj4.build()
             f4 = obj4.compute(params=coils.params_dict)
-            assert f4.size == coils.num_coils
+            assert f4.size == len(_independent_coil_indices(coils))
             np.testing.assert_allclose(f4, mindist, rtol=5e-2, atol=1e-3)
             # test derivatives
             obj1 = ObjectiveFunction(obj1)
@@ -1231,7 +1232,7 @@ class TestObjectiveFunction:
                 f = obj.compute(params_1=eq.params_dict)
             else:
                 f = obj.compute(params_1=eq.params_dict, params_2=coils.params_dict)
-            assert f.size == coils.num_coils
+            assert f.size == obj._coil_indices.size
             np.testing.assert_allclose(f, mindist)
             obj2 = PlasmaCoilSetMinDistance(
                 eq=eq,
@@ -1250,7 +1251,7 @@ class TestObjectiveFunction:
                 f = obj2.compute(params_1=eq.params_dict)
             else:
                 f = obj2.compute(params_1=eq.params_dict, params_2=coils.params_dict)
-            assert f.size == coils.num_coils
+            assert f.size == obj2._coil_indices.size
             np.testing.assert_allclose(f, mindist, rtol=5e-2, atol=1e-3)
 
         plasma_grid = LinearGrid(M=4, zeta=16)
@@ -1375,7 +1376,7 @@ class TestObjectiveFunction:
                 f = obj.compute(params_1=eq.params_dict)
             else:
                 f = obj.compute(params_1=eq.params_dict, params_2=coils.params_dict)
-            assert f.size == coils.num_coils
+            assert f.size == obj._coil_indices.size
             np.testing.assert_allclose(f, maxdist, rtol=5e-2, atol=1e-3)
             obj2 = PlasmaCoilSetDistanceBound(
                 eq=eq,
@@ -1395,7 +1396,7 @@ class TestObjectiveFunction:
                 f = obj2.compute(params_1=eq.params_dict)
             else:
                 f = obj2.compute(params_1=eq.params_dict, params_2=coils.params_dict)
-            assert f.size == coils.num_coils
+            assert f.size == obj2._coil_indices.size
             np.testing.assert_allclose(f, maxdist, rtol=5e-2, atol=1e-3)
 
             obj3 = PlasmaCoilSetDistanceBound(
@@ -1414,7 +1415,7 @@ class TestObjectiveFunction:
                 f = obj3.compute(params_1=eq.params_dict)
             else:
                 f = obj3.compute(params_1=eq.params_dict, params_2=coils.params_dict)
-            assert f.size == coils.num_coils * 2
+            assert f.size == obj3._coil_indices.size * 2
             f = f.flatten()
             f_min = f[0::2]
             f_max = f[1::2]
@@ -1439,7 +1440,7 @@ class TestObjectiveFunction:
                 f = obj4.compute(params_1=eq.params_dict)
             else:
                 f = obj4.compute(params_1=eq.params_dict, params_2=coils.params_dict)
-            assert f.size == coils.num_coils * 2
+            assert f.size == obj4._coil_indices.size * 2
             f = f.flatten()
             f_min = f[0::2]
             f_max = f[1::2]
@@ -1733,7 +1734,9 @@ class TestObjectiveFunction:
         obj.build()
         out = obj.compute_scaled_error(coilset2.params_dict)
         # the modular coils all link 1 other coil (the axis)
-        # while the axis links all 10 modular coils
+        # while the axis links all 10 modular coils. `from_symmetry` materializes the
+        # copies (len == num_coils), so there are no virtual symmetry duplicates to
+        # deduplicate here and all 11 coils are reported.
         expected = np.array([1] * 10 + [10])
         np.testing.assert_allclose(out, expected, rtol=1e-3)
 

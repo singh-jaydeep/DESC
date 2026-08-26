@@ -1179,9 +1179,9 @@ class PolarPlanarArcCoil(_Coil, PolarPlanarArcCurve):
 
     Structurally planar per arc with C0 corners and closure at no DOF cost, exactly like
     PiecewisePlanarArcCoil -- but the in-plane shape basis is polar rather than a
-    transverse graph over the chord, which lets an arc leave its hinge at any angle up to
-    perpendicular with FINITE coefficients. See PolarPlanarArcCurve for the geometry and
-    for the conditioning caveat at shallow arcs.
+    transverse graph over the chord, which lets an arc leave its hinge at any angle
+    up to perpendicular with FINITE coefficients. See PolarPlanarArcCurve for the
+    geometry and for the conditioning caveat at shallow arcs.
 
     The zero of the shape basis is the exact circular arc of radius |chord|/2, so a
     2-arc coil with shape = 0 is a circle split at a diameter.
@@ -1937,7 +1937,7 @@ class CoilSet(OptimizableCollection, _Coil, MutableSequence):
             return x, x_s
         return x
 
-    def _compute_linking_number(self, params=None, grid=None):
+    def _compute_linking_number(self, params=None, grid=None, indices=None):
         """Calculate linking numbers for coils in the coilset.
 
         Parameters
@@ -1947,10 +1947,16 @@ class CoilSet(OptimizableCollection, _Coil, MutableSequence):
         grid : Grid or int, optional
             Grid of coordinates to evaluate at. Defaults to a Linear grid.
             If an integer, uses that many equally spaced points.
+        indices : array-like of int, optional
+            Restrict the second (column) index to these coils, returning shape
+            ``(num_coils, len(indices))`` instead of the full square matrix. Every
+            symmetry copy of a coil links the set identically, so passing one
+            representative per independent coil avoids computing duplicate columns.
+            Defaults to all coils.
 
         Returns
         -------
-        link : ndarray, shape(num_coils, num_coils)
+        link : ndarray, shape(num_coils, num_coils) or (num_coils, len(indices))
             Linking number of each coil with each other coil. link=0 means they are not
             linked, +/- 1 means the coils link each other in one direction or another.
 
@@ -1959,8 +1965,12 @@ class CoilSet(OptimizableCollection, _Coil, MutableSequence):
             grid = LinearGrid(N=50)
         dx = grid.spacing[:, 2]
         x, x_s = self._compute_position(params, grid, dx1=True, basis="xyz")
+        # only the columns are restricted; the full set is still the "other" coil, so
+        # each retained column is the same value the square matrix would have held
+        xo = x if indices is None else x[indices]
+        xo_s = x_s if indices is None else x_s[indices]
         link = _linking_number(
-            x[:, None], x[None, :], x_s[:, None], x_s[None, :], dx, dx
+            x[:, None], xo[None, :], x_s[:, None], xo_s[None, :], dx, dx
         )
         return link / (4 * jnp.pi)
 

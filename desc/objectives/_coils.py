@@ -851,6 +851,80 @@ class CoilIntegratedCurvature(_CoilObjective):
         return out[self._coilset_tree["coilset_mask"]]
 
 
+def _independent_coil_indices(coilset):
+    """Rows of ``_compute_position`` holding independent (non-symmetry-copy) coils.
+
+    ``CoilSet._compute_position`` emits the ``len(coilset)`` independent coils first,
+    then their stellarator reflections, then tiles the whole block over field periods.
+    A symmetric ``CoilSet`` is invariant under that group, so every copy of a given
+    coil has an isometric neighbourhood *within the coilset*, and any quantity that
+    depends only on coilset geometry is identical across copies.
+
+    Only valid for quantities whose "other object" is the coilset itself. Distances to
+    an external target (e.g. a discretized plasma surface) are invariant under the
+    field-period rotation but not necessarily under the reflection.
+
+    Returns
+    -------
+    idx : ndarray of int
+        Indices into the ``num_coils`` rows of ``_compute_position``.
+
+    """
+    from desc.coils import CoilSet, MixedCoilSet
+
+    if isinstance(coilset, MixedCoilSet):  # checked first: subclasses CoilSet
+        idx, offset = [], 0
+        for coil in coilset:
+            idx.append(_independent_coil_indices(coil) + offset)
+            offset += coil.num_coils
+        return np.concatenate(idx) if idx else np.array([], dtype=int)
+    if isinstance(coilset, CoilSet):
+        return np.arange(len(coilset))
+    return np.array([0])  # a single coil
+
+
+def _field_period_independent_indices(coilset, target_nfp=None):
+    """Rows of ``_compute_position`` that are not field-period copies of another row.
+
+    ``CoilSet._compute_position`` tiles a base block -- the independent coils plus,
+    if ``sym``, their stellarator reflections -- over ``NFP`` field periods. A target
+    invariant under rotation by ``2*pi/NFP`` sees identical distances from every tile,
+    so only the base block carries information.
+
+    Unlike `_independent_coil_indices` this does NOT deduplicate the reflections:
+    those are redundant only if the *target* is reflection symmetric too, which is not
+    guaranteed for an external object such as a plasma surface.
+
+    Parameters
+    ----------
+    coilset : CoilSet or MixedCoilSet or _Coil
+        Coilset whose position rows are being indexed.
+    target_nfp : int, optional
+        Field periodicity of the target the coils are measured against. The tiles are
+        equivalent only if this is a multiple of the coilset ``NFP``; when it is not,
+        every row is returned so no information is discarded.
+
+    Returns
+    -------
+    idx : ndarray of int
+        Indices into the ``num_coils`` rows of ``_compute_position``.
+
+    """
+    from desc.coils import CoilSet, MixedCoilSet
+
+    if isinstance(coilset, MixedCoilSet):  # checked first: subclasses CoilSet
+        idx, offset = [], 0
+        for coil in coilset:
+            idx.append(_field_period_independent_indices(coil, target_nfp) + offset)
+            offset += coil.num_coils
+        return np.concatenate(idx) if idx else np.array([], dtype=int)
+    if isinstance(coilset, CoilSet):
+        if target_nfp is not None and coilset.NFP > 1 and target_nfp % coilset.NFP:
+            return np.arange(coilset.num_coils)  # tiles are not equivalent
+        return np.arange(len(coilset) * (int(coilset.sym) + 1))
+    return np.array([0])  # a single coil
+
+
 class CoilSetMinDistance(_Objective):
     """Target the minimum distance between coils in a coilset.
 
@@ -898,6 +972,7 @@ class CoilSetMinDistance(_Objective):
         "_use_softmin",
         "_dist_chunk_size",
         "_num_neighbors",
+        "_coil_indices",
     ]
 
     _scalar = False
@@ -963,7 +1038,14 @@ class CoilSetMinDistance(_Objective):
         coilset = self.things[0]
         grid = self._grid or None
 
-        self._dim_f = coilset.num_coils
+        # Every symmetry copy of a coil has an isometric neighbourhood, so evaluating
+        # all `num_coils` rows returns each distinct value `num_coils // len(coilset)`
+        # times. That duplication is not free: it multiplies this objective's Gram
+        # contribution (and so its effective weight) by the multiplicity, skews the
+        # `x_scale="auto"` column norms, and costs the same factor in compute. Keep one
+        # representative per independent coil.
+        self._coil_indices = _independent_coil_indices(coilset)
+        self._dim_f = self._coil_indices.size
         self._constants = {"coilset": coilset, "grid": grid, "quad_weights": 1.0}
 
         if self._normalize:
@@ -994,7 +1076,9 @@ class CoilSetMinDistance(_Objective):
         pts = constants["coilset"]._compute_position(
             params=params, grid=constants["grid"], basis="xyz"
         )  # pts.shape = (num_coils, num_nodes, 3)
-        num_coils = self.dim_f
+        # all physical coils remain the *targets*; only the set we evaluate from
+        # is reduced, so this is the full count, not dim_f
+        num_coils = pts.shape[0]
 
         if self._num_neighbors is not None and self._num_neighbors < num_coils - 1:
             # only consider nearest neighbors
@@ -1023,7 +1107,7 @@ class CoilSetMinDistance(_Objective):
                 return softmin(dist, self._softmin_alpha)
             return jnp.min(dist)
 
-        k = jnp.arange(self.dim_f)
+        k = self._coil_indices
         min_dist_per_coil = vmap_chunked(body, chunk_size=self._dist_chunk_size)(k)
         return min_dist_per_coil
 
@@ -1104,6 +1188,7 @@ class PlasmaCoilSetDistanceBound(_Objective):
         "_coils_fixed",
         "_use_softmin",
         "_dist_chunk_size",
+        "_coil_indices",
     ]
 
     _scalar = False
@@ -1200,10 +1285,17 @@ class PlasmaCoilSetDistanceBound(_Objective):
             "Plasma/Surface grid includes interior points, should be rho=1.",
         )
 
+        # The field-period copies of a coil are all the same distance from an
+        # NFP-periodic plasma cloud, so evaluating every row returns each distinct
+        # value NFP times -- inflating this objective's effective weight and costing
+        # the same factor in compute. Keep one representative per tile. The
+        # stellarator reflections are NOT deduplicated: they are only redundant if the
+        # plasma cloud is reflection symmetric, which is not guaranteed.
+        self._coil_indices = _field_period_independent_indices(coil, plasma_grid.NFP)
         if self._mode == "bound":
-            self._dim_f = 2 * coil.num_coils
+            self._dim_f = 2 * self._coil_indices.size
         else:  # min or max mode
-            self._dim_f = coil.num_coils
+            self._dim_f = self._coil_indices.size
         self._data_keys = ["R", "phi", "Z"]
 
         eq_profiles = get_profiles(self._data_keys, obj=eq, grid=plasma_grid)
@@ -1316,10 +1408,7 @@ class PlasmaCoilSetDistanceBound(_Objective):
                 return min
             return jnp.array([min, max])
 
-        if self._mode == "bound":
-            k = jnp.arange(self.dim_f // 2)
-        else:
-            k = jnp.arange(self.dim_f)
+        k = self._coil_indices
 
         extreme_dist_per_coil = vmap_chunked(body, chunk_size=self._dist_chunk_size)(k)
 
@@ -2527,6 +2616,8 @@ class CoilSetLinkingNumber(_Objective):
         coil=True,
     )
 
+    _static_attrs = _Objective._static_attrs + ["_coil_indices"]
+
     _scalar = False
     _units = "(dimensionless)"
     _print_value_fmt = "Coil linking number: "
@@ -2582,7 +2673,11 @@ class CoilSetLinkingNumber(_Objective):
         coilset = self.things[0]
         grid = self._grid or LinearGrid(N=50)
 
-        self._dim_f = coilset.num_coils
+        # linking number depends only on coilset geometry, and the coilset maps to
+        # itself under its own symmetry group, so every copy of a coil links the set
+        # identically. Report one value per independent coil.
+        self._coil_indices = _independent_coil_indices(coilset)
+        self._dim_f = self._coil_indices.size
         self._constants = {"coilset": coilset, "grid": grid, "quad_weights": 1.0}
 
         super().build(use_jit=use_jit, verbose=verbose)
@@ -2608,7 +2703,7 @@ class CoilSetLinkingNumber(_Objective):
         """
         constants = self._get_deprecated_constants(constants)
         link = constants["coilset"]._compute_linking_number(
-            params=params, grid=constants["grid"]
+            params=params, grid=constants["grid"], indices=self._coil_indices
         )
 
         return jnp.abs(link).sum(axis=0)
