@@ -2,7 +2,7 @@
 
 from scipy.optimize import NonlinearConstraint, OptimizeResult
 
-from desc.backend import jnp, qr, qr_multiply
+from desc.backend import jnp, put, qr, qr_multiply
 from desc.utils import errorif, safediv, setdefault
 
 from .bound_utils import (
@@ -93,8 +93,10 @@ def lsq_auglag(  # noqa: C901
         If None, the termination by this condition is disabled.
     ctol : float, optional
         Tolerance for stopping based on infinity norm of the constraint violation.
-        Optimizer terminates when ``max(abs(constr_violation)) < ctol`` AND one or more
-        of the other tolerances are met (``ftol``, ``xtol``, ``gtol``)
+        This is the violation of the constraints as posed, ``max(lb - c(x), c(x) - ub,
+        0)``, not the residual of the internal slack reformulation. Optimizer
+        terminates when it is ``< ctol`` AND one or more of the other tolerances are
+        met (``ftol``, ``xtol``, ``gtol``)
     verbose : {0, 1, 2}, optional
         * 0 : work silently.
         * 1 (default) : display a termination report.
@@ -124,7 +126,10 @@ def lsq_auglag(  # noqa: C901
         - ``"omega"`` : (float) Hyperparameter for determining initial gradient
           tolerance. See algorithm 14.4.2 from [1]_ for details. Default 1.0
         - ``"eta"`` : (float) Hyperparameter for determining initial constraint
-          tolerance. See algorithm 14.4.2 from [1]_ for details. Default 1.0
+          tolerance. See algorithm 14.4.2 from [1]_ for details. Default 1.0, or
+          with ``scaled_termination`` (the default), the initial constraint
+          violation capped to 1e-2, falling back to 1e-2 if that is ``<= ctol``
+          (as it is for a feasible starting point).
         - ``"alpha_omega"`` : (float) Hyperparameter for updating gradient tolerance.
           See algorithm 14.4.2 from [1]_ for details. Default 1.0
         - ``"beta_omega"`` : (float) Hyperparameter for updating gradient tolerance.
@@ -135,6 +140,23 @@ def lsq_auglag(  # noqa: C901
           See algorithm 14.4.2 from [1]_ for details. Default 0.9
         - ``"tau"`` : (float) Factor to increase penalty parameter by when constraint
           violation doesn't decrease sufficiently. Default 10
+        - ``"max_multiplier"`` : (float > 0) Safeguarding box for the Lagrange
+          multipliers; each update is clipped to ``[-max_multiplier,
+          max_multiplier]``. The update ``y <- y - mu*c`` is only a valid multiplier
+          estimate at an approximate minimizer, so subproblems that repeatedly end
+          short can integrate a non-zero residual without bound. Clipping degrades the
+          method towards a quadratic penalty method, which is still globally
+          convergent to a feasible point. This is a guard against blow-up, not a
+          tuning knob -- it only binds when something has already gone wrong. Default
+          1e6
+        - ``"max_inner_stalls"`` : (int >= 0) How many times in a row a subproblem may
+          stall (``ftol``/``xtol`` met, or the trust region collapsing) at a point that
+          is not yet a KKT point before the solver gives up. Such a stall says the
+          *subproblem* is done, not the problem, so instead of returning it restarts
+          the inner solve from the initial trust radius. The multiplier update is left
+          to the usual ``g_norm < gtolk`` gate, since ``y <- y - mu*c`` is only a valid
+          estimate at an approximate minimizer. Set to 0 to recover the old behaviour,
+          where a stalled subproblem ended the whole solve. Default 3
         - ``"max_nfev"`` : (int > 0) Maximum number of function evaluations (each
           iteration may take more than one function evaluation). Default is
           ``5*maxiter+1``
@@ -240,21 +262,44 @@ def lsq_auglag(  # noqa: C901
     f0 = f
     cost = 1 / 2 * jnp.dot(f, f)
     c = constraint_wrapped.fun(z, *args)
-    constr_violation = jnp.linalg.norm(c, ord=jnp.inf)
     nfev += 1
+
+    # `c` is the residual of the slack-reformulated *equality* problem, c(x) - s.
+    # It is the right input to the multiplier update, but it is not the violation of
+    # the original constraints: with an interior slack it equals y/mu, so it measures
+    # dual convergence and can be driven to zero just by growing mu. Recover the true
+    # violation instead -- no extra evaluation needed, since c(x) = c(z) + s.
+    _clb, _cub = (jnp.broadcast_to(b, c.shape) for b in (constraint.lb, constraint.ub))
+    _ineq = _clb != _cub
+
+    def constr_violation_fun(c_z, z):
+        """Max violation of the ORIGINAL constraints; 0 when strictly feasible."""
+        s = z2xs(z)[1]
+        c_x = c_z + put(jnp.zeros_like(c_z), _ineq, s)
+        viol = jnp.where(
+            _ineq,
+            jnp.maximum(_clb - c_x, c_x - _cub),  # <= 0 inside the bounds
+            jnp.abs(c_z),  # equality rows already carry the target
+        )
+        return jnp.max(jnp.maximum(viol, 0.0))
+
+    constr_violation = constr_violation_fun(c, z)
+    c_norm = jnp.linalg.norm(c, ord=jnp.inf)  # reformulated residual, drives the AL
 
     lb, ub = zbounds
     bounded = jnp.any(lb != -jnp.inf) | jnp.any(ub != jnp.inf)
     assert in_bounds(z, lb, ub), "x0 is infeasible"
     z = make_strictly_feasible(z, lb, ub)
 
+    max_multiplier = options.pop("max_multiplier", 1e6)
     mu = options.pop("initial_penalty_parameter", 10 * jnp.ones_like(c))
     y = options.pop("initial_multipliers", jnp.zeros_like(c))
-    if y == "least_squares":  # use least squares multiplier estimates
+    if isinstance(y, str) and y == "least_squares":  # least squares multiplier estimate
         _J = constraint_wrapped.jac(z, *args)
         _g = f @ jac_wrapped(z, *args)
         y = jnp.linalg.lstsq(_J.T, _g)[0]
         y = jnp.nan_to_num(y, nan=0.0, posinf=0.0, neginf=0.0)
+        y = jnp.clip(y, -max_multiplier, max_multiplier)
     y, mu, c = jnp.broadcast_arrays(y, mu, c)
 
     L = lagfun(f, c, y, mu)
@@ -310,6 +355,8 @@ def lsq_auglag(  # noqa: C901
     trust_radius = init_tr.get(trust_radius, trust_radius)
     trust_radius *= tr_ratio
     trust_radius = trust_radius if (trust_radius > 0) else 1.0
+    # kept so the inner solve can be restarted on a fresh radius when (y, mu) change
+    init_trust_radius = trust_radius
 
     max_trust_radius = options.pop("max_trust_radius", jnp.inf)
     min_trust_radius = options.pop("min_trust_radius", jnp.finfo(z.dtype).eps)
@@ -318,6 +365,22 @@ def lsq_auglag(  # noqa: C901
     tr_increase_ratio = options.pop("tr_increase_ratio", 4)
     tr_decrease_ratio = options.pop("tr_decrease_ratio", 0.25)
     tr_method = options.pop("tr_method", "qr")
+
+    # notation following Conn & Gould, algorithm 14.4.2, but with our mu = their mu^-1
+    omega = options.pop("omega", min(g_norm, 1e-2) if scaled_termination else 1.0)
+    # eta is the initial ctolk, which is compared against the reformulated residual,
+    # so it keys off c_norm rather than the true violation. A feasible start gives
+    # c_norm == 0 exactly, since the slack init sets s = clip(c(x0)) = c(x0). Any
+    # eta <= ctol pins ctolk to ctol for the whole run, which disables the schedule,
+    # so fall back to the cap in that case.
+    eta_default = min(c_norm, 1e-2) if scaled_termination else 1.0
+    eta = options.pop("eta", eta_default if eta_default > ctol else 1e-2)
+    alpha_omega = options.pop("alpha_omega", 1.0)
+    beta_omega = options.pop("beta_omega", 1.0)
+    alpha_eta = options.pop("alpha_eta", 0.1)
+    beta_eta = options.pop("beta_eta", 0.9)
+    tau = options.pop("tau", 10)
+    max_inner_stalls = options.pop("max_inner_stalls", 3)
 
     errorif(
         len(options) > 0,
@@ -339,20 +402,12 @@ def lsq_auglag(  # noqa: C901
     actual_reduction = jnp.inf
     Lactual_reduction = jnp.inf
     alpha = 0.0  # "Levenberg-Marquardt" parameter
+    n_inner_stalls = 0  # consecutive subproblem stalls with no accepted step
 
     allx = [z]
     alltr = [trust_radius]
     if g_norm < gtol and constr_violation < ctol:
         success, message = True, STATUS_MESSAGES["gtol"]
-
-    # notation following Conn & Gould, algorithm 14.4.2, but with our mu = their mu^-1
-    omega = options.pop("omega", min(g_norm, 1e-2) if scaled_termination else 1.0)
-    eta = options.pop("eta", min(constr_violation, 1e-2) if scaled_termination else 1.0)
-    alpha_omega = options.pop("alpha_omega", 1.0)
-    beta_omega = options.pop("beta_omega", 1.0)
-    alpha_eta = options.pop("alpha_eta", 0.1)
-    beta_eta = options.pop("beta_eta", 0.9)
-    tau = options.pop("tau", 10)
 
     gtolk = max(omega / jnp.mean(mu) ** alpha_omega, gtol)
     ctolk = max(eta / jnp.mean(mu) ** alpha_eta, ctol)
@@ -377,7 +432,7 @@ def lsq_auglag(  # noqa: C901
         print(f"{'Beta Eta':<35}: {beta_eta:.3e}")
         print(f"{'Omega':<35}: {omega:.3e}")
         print(f"{'Eta':<35}: {eta:.3e}")
-        print(f"{'Tau':<35}: {beta_eta:.3e}")
+        print(f"{'Tau':<35}: {tau:.3e}")
         print("-" * 60, "\n")
 
     if verbose > 1:
@@ -420,6 +475,7 @@ def lsq_auglag(  # noqa: C901
 
         actual_reduction = -1
         Lactual_reduction = -1
+        inner_stall = False
 
         # theta controls step back step ratio from the bounds.
         theta = max(0.995, 1 - g_norm)
@@ -511,15 +567,33 @@ def lsq_auglag(  # noqa: C901
                 ctol=ctol,
             )
             if success is not None:
+                # Only a genuine KKT exit ends the algorithm. `ftol`/`xtol` and a
+                # collapsed trust region say this *subproblem* stopped improving,
+                # which in the nested form of alg 14.4.2 is the cue to update the
+                # multipliers and restart the inner solve -- not a global result.
+                converged = (g_norm < gtol) and (constr_violation < ctol)
+                if (
+                    max_inner_stalls  # 0 restores the old single-loop behaviour
+                    and not converged
+                    and (success or message == STATUS_MESSAGES["approx"])
+                ):
+                    if n_inner_stalls < max_inner_stalls:
+                        n_inner_stalls += 1
+                        inner_stall = True
+                        success, message = None, None
+                    else:  # repeated stalls: report honestly, don't claim success
+                        success, message = False, STATUS_MESSAGES["stall"]
                 break
 
         # if reduction was enough, accept the step
         if Lactual_reduction > 0:
+            n_inner_stalls = 0
             z = z_new
             allx.append(z)
             f = f_new
             c = c_new
-            constr_violation = jnp.linalg.norm(c, ord=jnp.inf)
+            constr_violation = constr_violation_fun(c, z)
+            c_norm = jnp.linalg.norm(c, ord=jnp.inf)
             L = L_new
             cost = cost_new
             Lcost = Lcost_new
@@ -534,33 +608,41 @@ def lsq_auglag(  # noqa: C901
             g_norm = jnp.linalg.norm(
                 (g * v * scale if scaled_termination else g * v), ord=jnp.inf
             )
+        else:
+            step_norm = step_h_norm = actual_reduction = 0
 
-            # updating augmented lagrangian params
-            if g_norm < gtolk:
-                y = jnp.where(jnp.abs(c) < ctolk, y - mu * c, y)
-                mu = jnp.where(jnp.abs(c) >= ctolk, tau * mu, mu)
-                if constr_violation < ctolk:
-                    ctolk = max(ctolk / (jnp.mean(mu) ** beta_eta), ctol)
-                    gtolk = max(gtolk / (jnp.mean(mu) ** beta_omega), gtol)
-                else:
-                    ctolk = max(eta / (jnp.mean(mu) ** alpha_eta), ctol)
-                    gtolk = max(omega / (jnp.mean(mu) ** alpha_omega), gtol)
-                # if we update lagrangian params, need to recompute L and J
-                L = lagfun(f, c, y, mu)
-                Lcost = 0.5 * jnp.dot(L, L)
-                J = lagjac(z, y, mu, *args)
-                njev += 1
-                g = jnp.dot(J.T, L)
+        # updating augmented lagrangian params
+        if Lactual_reduction > 0 and g_norm < gtolk:
+            y = jnp.where(jnp.abs(c) < ctolk, y - mu * c, y)
+            # safeguard: keep the multipliers in a box. y <- y - mu*c is only a valid
+            # estimate at an approximate minimizer, so a subproblem that keeps ending
+            # short can integrate a non-zero residual without bound. Clipping degrades
+            # the method to a (still globally convergent) penalty method instead.
+            y = jnp.clip(y, -max_multiplier, max_multiplier)
+            mu = jnp.where(jnp.abs(c) >= ctolk, tau * mu, mu)
+            if c_norm < ctolk:
+                ctolk = max(ctolk / (jnp.mean(mu) ** beta_eta), ctol)
+                gtolk = max(gtolk / (jnp.mean(mu) ** beta_omega), gtol)
+            else:
+                ctolk = max(eta / (jnp.mean(mu) ** alpha_eta), ctol)
+                gtolk = max(omega / (jnp.mean(mu) ** alpha_omega), gtol)
+            # if we update lagrangian params, need to recompute L and J
+            L = lagfun(f, c, y, mu)
+            Lcost = 0.5 * jnp.dot(L, L)
+            J = lagjac(z, y, mu, *args)
+            njev += 1
+            g = jnp.dot(J.T, L)
 
-                if jac_scale:
-                    scale, scale_inv = compute_jac_scale(J, scale_inv)
+            if jac_scale:
+                scale, scale_inv = compute_jac_scale(J, scale_inv)
 
-                v, dv = cl_scaling_vector(z, g, lb, ub)
-                v = jnp.where(dv != 0, v * scale_inv, v)
-                g_norm = jnp.linalg.norm(
-                    (g * v * scale if scaled_termination else g * v), ord=jnp.inf
-                )
+            v, dv = cl_scaling_vector(z, g, lb, ub)
+            v = jnp.where(dv != 0, v * scale_inv, v)
+            g_norm = jnp.linalg.norm(
+                (g * v * scale if scaled_termination else g * v), ord=jnp.inf
+            )
 
+        if Lactual_reduction > 0:
             z_norm = jnp.linalg.norm(
                 ((z * scale_inv) if scaled_termination else z), ord=2
             )
@@ -579,9 +661,15 @@ def lsq_auglag(  # noqa: C901
 
             if callback(jnp.copy(z2xs(z)[0]), *args):
                 success, message = False, STATUS_MESSAGES["callback"]
-
-        else:
-            step_norm = step_h_norm = actual_reduction = 0
+        if inner_stall:
+            # (b) The subproblem stalled with a collapsed radius. Nothing about the
+            # iterate changed -- in particular we do NOT force a multiplier update,
+            # since y <- y - mu*c is only a valid estimate at an approximate
+            # minimizer, and forcing it at a stalled point is the ratchet this is
+            # meant to avoid. Just restart the inner solve on a fresh radius and let
+            # the usual g_norm < gtolk gate decide when to update.
+            trust_radius = init_trust_radius
+            alpha = 0.0
 
         iteration += 1
         if verbose > 1:
