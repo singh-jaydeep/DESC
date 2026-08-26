@@ -1191,9 +1191,11 @@ def test_proximal_constrained_AL_lsq():
     dim_eq = sum(eq.dimensions[arg] for arg in state.args)
     assert dim_eq < eq.dim_x
     assert prox.dim_x == dim_eq + coil.dim_x
-    assert state.dimc_per_thing[state.eq_idx] == dim_eq
-    assert state.dimx_per_thing[state.eq_idx] == eq.dim_x
-    assert state.dimc_per_thing[0] == state.dimx_per_thing[0] == coil.dim_x
+    assert state.dim_ceq == dim_eq
+    # the layout of the full optimization vector belongs to the wrapper, not the state
+    assert prox.dimc_per_thing[prox.eq_idx] == dim_eq
+    assert prox.dimx_per_thing[prox.eq_idx] == eq.dim_x
+    assert prox.dimc_per_thing[0] == prox.dimx_per_thing[0] == coil.dim_x
 
     (eq_opt, coil_opt), _ = Optimizer("proximal-lsq-auglag").optimize(
         (eq, coil),
@@ -1532,6 +1534,51 @@ def test_proximal_jacobian():
     np.testing.assert_allclose(jac_unscaled, jac1, rtol=1e-12, atol=1e-12)
     np.testing.assert_allclose(jac_unscaled, jac2, rtol=1e-12, atol=1e-12)
     np.testing.assert_allclose(jac_unscaled, jac3, rtol=1e-12, atol=1e-12)
+
+
+@pytest.mark.slow
+@pytest.mark.regression
+def test_proximal_repeated_rejection_rollback():
+    """Test that repeated rejected probes roll back to the last committed iterate.
+
+    A trust region optimizer can evaluate several speculative points in a row before
+    accepting one. Each of those must leave the equilibrium where the last accepted
+    step left it, not where the previous probe left it.
+    """
+    eq = desc.examples.get("HELIOTRON")
+    with pytest.warns(UserWarning, match="Reducing radial"):
+        eq.change_resolution(1, 1, 1, 2, 2, 2)
+    con = ObjectiveFunction(ForceBalance(eq), use_jit=False)
+    obj = ObjectiveFunction(AspectRatio(eq, deriv_mode="fwd"), use_jit=False)
+    prox = ProximalProjection(obj, con, eq, {"order": 1}, {"maxiter": 1})
+    prox.build()
+
+    rng = np.random.default_rng(1729)
+    x0 = prox.x(eq)
+    scale = 1e-4 * np.abs(np.asarray(x0)).max()
+
+    # accept a step, and record where it left the equilibrium
+    x_commit = x0 + scale * rng.normal(size=x0.shape)
+    prox._update_equilibrium(x_commit, store=True)
+    committed = {k: np.asarray(v).copy() for k, v in prox._state.eq.params_dict.items()}
+    n_solved = len(prox._state.allxeq)
+
+    # two speculative probes in a row, neither accepted
+    for i in range(2):
+        x_probe = x_commit + scale * rng.normal(size=x0.shape)
+        prox._update_equilibrium(x_probe, store=False)
+        assert len(prox._state.allxeq) == n_solved + i + 1, "probe should have solved"
+        for key, val in committed.items():
+            np.testing.assert_allclose(
+                prox._state.eq.params_dict[key],
+                val,
+                err_msg=f"eq did not roll back to the committed iterate for {key} "
+                f"after probe {i + 1}",
+            )
+
+    # the cache is monotone, so re-evaluating a rejected probe must not re-solve
+    prox._update_equilibrium(x_probe, store=False)
+    assert len(prox._state.allxeq) == n_solved + 2, "rejected probe was not cached"
 
 
 @pytest.mark.slow

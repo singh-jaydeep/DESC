@@ -336,10 +336,12 @@ class Optimizer(IOAble):
             objective = objective._objective
 
         if isinstance(objective, ProximalProjection):
+            # the equilibrium DOF that are solve outputs are not in allx, so the
+            # wrapper fills them in from its cache of solved equilibria
+            result["history"] = objective.history(result["allx"])
             # reset eq params to initial
             if eq is not None:
                 eq.params_dict = eq_params_init
-            result["history"] = objective.history
             objective = objective._objective
         else:
             result["history"] = [
@@ -460,14 +462,14 @@ def _project_x_scale(x_scale, objective):
             else objective._objective
         )
         # Split x_scale by things to handle multiple things (eq + coils, etc.)
-        x_scale = jnp.split(x_scale, np.cumsum(prox_obj._state.dimx_per_thing)[:-1])
+        x_scale = jnp.split(x_scale, np.cumsum(prox_obj.dimx_per_thing)[:-1])
         # Project equilibrium part: remove excluded parameters
         excluded_params = ["R_lmn", "Z_lmn", "L_lmn", "Ra_n", "Za_n"]
         included_idx = []
         for arg in prox_obj._state.eq.optimizable_params:
             if arg not in excluded_params:
                 included_idx.extend(prox_obj._state.eq.x_idx[arg])
-        eq_idx = prox_obj._state.eq_idx
+        eq_idx = prox_obj.eq_idx
         x_scale[eq_idx] = x_scale[eq_idx][jnp.array(included_idx)]
         x_scale = jnp.concatenate(x_scale)
 
@@ -535,6 +537,9 @@ def _combine_constraints(constraints):
         Otherwise returns None.
 
     """
+    # defensive: callers in this module always pass Objective, not ObjectiveFunction,
+    # so this does not fire on the proximal path. It keeps an already-combined
+    # ObjectiveFunction from being nested inside another one.
     if len(constraints) == 1 and isinstance(constraints[0], ObjectiveFunction):
         return constraints[0]
     if len(constraints):
