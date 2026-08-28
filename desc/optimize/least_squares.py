@@ -133,6 +133,13 @@ def lsqtr(  # noqa: C901
         - ``"tr_decrease_ratio"`` : (0 < float < 1) Factor to decrease the trust region
           radius by when  the ratio of actual to predicted reduction falls below
           threshold. Default 0.25.
+        - ``"track_steps"`` : (bool) Record one diagnostic row per trust-region
+          ATTEMPT (rejected ones included) in ``result["step_log"]``: trust radius,
+          step norms, predicted vs actual reduction, the acceptance ratio, and -- for
+          ``tr_method="svd"`` -- the numerical rank and the fraction of the step
+          lying in the near-null space of the scaled Jacobian. Default False.
+        - ``"null_cut"`` : (float) Relative singular-value cutoff defining the
+          near-null space for ``track_steps``. Default 1e-8.
         - ``"tr_method"`` : (``"qr"``, ``"svd"``, ``"cho"``) Method to use for solving
           the trust region subproblem. ``"qr"`` and ``"cho"`` uses a sequence of QR or
           Cholesky factorizations (generally 2-3), while ``"svd"`` uses one singular
@@ -238,6 +245,8 @@ def lsqtr(  # noqa: C901
     tr_increase_ratio = options.pop("tr_increase_ratio", 2)
     tr_decrease_ratio = options.pop("tr_decrease_ratio", 0.25)
     tr_method = options.pop("tr_method", "qr")
+    track_steps = options.pop("track_steps", False)
+    null_cut = options.pop("null_cut", 1e-8)
 
     errorif(
         len(options) > 0,
@@ -283,6 +292,15 @@ def lsqtr(  # noqa: C901
 
     allx = [x]
     alltr = [trust_radius]
+    # Per trust-region ATTEMPT (accepted and rejected alike) diagnostics, only when
+    # `track_steps`. The question these answer: when a step is rejected, is it
+    # because the proposed direction lay in the near-null space of J -- where the
+    # Gauss-Newton model predicts a reduction the true function does not deliver --
+    # or because the model is fine and the problem is merely badly scaled.
+    # For tr_method="svd" the SVD of the scaled Jacobian is already in hand, so the
+    # null-space fraction of the step is free: project the step onto the trailing
+    # right singular vectors.
+    step_log = []
     if g_norm < gtol:
         success, message = True, STATUS_MESSAGES["gtol"]
 
@@ -376,6 +394,39 @@ def lsqtr(  # noqa: C901
                 tr_decrease_ratio,
             )
             alltr.append(trust_radius)
+            if track_steps:
+                rec = dict(
+                    iteration=int(iteration),
+                    trust_radius=float(tr_old),
+                    step_h_norm=float(step_h_norm),
+                    step_norm=float(step_norm),
+                    predicted_reduction=float(predicted_reduction),
+                    actual_reduction=float(actual_reduction),
+                    reduction_ratio=float(reduction_ratio),
+                    hits_boundary=bool(hits_boundary),
+                    alpha=float(alpha),
+                    accepted=bool(actual_reduction > 0),
+                )
+                if tr_method == "svd":
+                    coef = Vt @ step_h
+                    k = int(jnp.sum(s > null_cut * s[0]))
+                    cn = float(jnp.linalg.norm(coef))
+                    rec.update(
+                        rank=k,
+                        n_null=int(s.size - k),
+                        n_sv=int(s.size),
+                        n_x=int(step_h.size),
+                        s_max=float(s[0]),
+                        s_min=float(s[-1]),
+                        # fraction of the step lying in the near-null space
+                        null_frac=float(
+                            jnp.linalg.norm(coef[k:])
+                            / jnp.maximum(cn, jnp.finfo(s.dtype).tiny)
+                        ),
+                        # <1 would mean Vt does not span R^n (m < n)
+                        coef_norm_ratio=cn / max(float(step_h_norm), 1e-300),
+                    )
+                step_log.append(rec)
             alpha *= tr_old / trust_radius
 
             success, message = check_termination(
@@ -466,6 +517,7 @@ def lsqtr(  # noqa: C901
         message=message,
         active_mask=active_mask,
         allx=allx,
+        step_log=step_log,
         alltr=alltr,
     )
     result["fse"] = f

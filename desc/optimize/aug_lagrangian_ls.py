@@ -191,6 +191,31 @@ def lsq_auglag(  # noqa: C901
           this caps that wait. Off by default: with ``inner_reduction`` making ``gtolk``
           reachable by construction the grind it guards against should not arise, and an
           earlier version of this option cut healthy early subproblems short.
+        - ``"y_update_gate"`` : (``"residual"`` or ``"violation"``) Which rows are
+          eligible for the multiplier update ``y <- y - mu*c``. ``"residual"``
+          (default, historical) gates on ``|c| < ctolk``, where ``c`` is the
+          slack-reformulated residual ``c(x) - s``. That quantity is NOT the
+          violation: at an interior slack it equals ``y/mu``, so the gate reads
+          ``|y|/mu < ctolk`` and closes on precisely the rows carrying a non-zero
+          multiplier -- the method degrades to a quadratic penalty there, where
+          feasibility is floored at ``~|y*|/mu`` and only ``mu`` growth lowers it.
+          ``"violation"`` gates on the true per-row violation instead, the same
+          quantity the ``mu`` update already uses. EXPERIMENTAL.
+        - ``"min_window_progress"`` : (float > 0 or None) EXPERIMENTAL, default None
+          (off, unconditional growth). Withhold the ``mu`` increase at an outer
+          update when the subproblem just ended reduced its augmented-Lagrangian
+          cost by more than this relative amount. Growing ``mu`` is the escape from
+          a FROZEN subproblem, but the stagnation cap (``max_inner_iter``) trips on
+          elapsed iterations regardless of cause, so it also fires on subproblems
+          that are advancing normally -- and there the 10x bump only ill-conditions
+          the next solve, since ``sqrt(mu)`` scales the constraint block of ``J``.
+          Measured on a cold arc coil solve: an update that fired mid-progress took
+          ``mu`` 40 -> 313 and collapsed the step norm from 5.6e-03 to 3.1e-05,
+          after which nothing recovered. The multiplier update and the tolerance
+          ratchet still fire, so the outer cadence is unchanged.
+        - ``"track_outer"`` : (bool) Record per-outer-update diagnostics in
+          ``result["outer_diag"]``: ``mu``, ``|y|``, the multiplier change, and how
+          many rows each gate admits. Default False.
         - ``"max_nfev"`` : (int > 0) Maximum number of function evaluations (each
           iteration may take more than one function evaluation). Default is
           ``5*maxiter+1``
@@ -427,11 +452,21 @@ def lsq_auglag(  # noqa: C901
     max_inner_iter = options.pop("max_inner_iter", None)
     inner_reduction = options.pop("inner_reduction", 10.0)
     track_residual = options.pop("track_residual", False)
+    track_outer = options.pop("track_outer", False)
+    y_update_gate = options.pop("y_update_gate", "residual")
+    min_window_progress = options.pop("min_window_progress", None)
 
     errorif(
         len(options) > 0,
         ValueError,
         "Unknown options: {}".format([key for key in options]),
+    )
+    errorif(
+        y_update_gate not in ["residual", "violation"],
+        ValueError,
+        "y_update_gate should be 'residual' or 'violation', got {}".format(
+            y_update_gate
+        ),
     )
     errorif(
         tr_method not in ["cho", "svd", "qr"],
@@ -450,10 +485,21 @@ def lsq_auglag(  # noqa: C901
     alpha = 0.0  # "Levenberg-Marquardt" parameter
     n_inner_stalls = 0  # consecutive subproblem stalls with no accepted step
     iters_since_update = 0  # inner iterations spent on the current subproblem
+    # Progress made by the CURRENT subproblem, for the `mu`-growth gate. `Lcost` is
+    # what the inner solve minimizes and (y, mu) are fixed across a window, so it is
+    # comparable within one and non-increasing (steps need Lactual_reduction > 0).
+    Lcost_window_start = Lcost
+    window_max_step = 0.0
     n_outer = 0  # number of augmented Lagrangian (y, mu) updates taken
     # (iteration, reason) for every outer update, so update cadence is recoverable
     # from the result object rather than only from a verbose log
     outer_log = []
+    # Per-outer-update diagnostics (only when `track_outer`). The decisive column
+    # is `n_blocked`: rows whose ORIGINAL constraint is satisfied to within
+    # `ctolk` -- so they are due a multiplier update -- but which the residual
+    # gate `|c| < ctolk` rejects. At an interior slack `c == y/mu`, so that gate
+    # reads `|y|/mu < ctolk` and shuts off exactly the rows carrying force.
+    outer_diag = []
 
     allx = [z]
     alltr = [trust_radius]
@@ -697,6 +743,8 @@ def lsq_auglag(  # noqa: C901
         # the restart re-solve a bit-identical subproblem, which stalls identically --
         # an infinite loop that costs a full trust-region collapse (~25 evaluations)
         # per iteration and looks exactly like "the solver won't accept any steps".
+        if jnp.isfinite(step_norm):
+            window_max_step = max(window_max_step, float(step_norm))
         iters_since_update += 1
 
         al_changed = False
@@ -724,12 +772,34 @@ def lsq_auglag(  # noqa: C901
             # comparison, so it cannot silently stop firing.
             force_update = True
 
+        # Relative reduction the current subproblem has achieved so far. `mu` growth
+        # is the escape from a FROZEN subproblem (see the 811-iteration freeze that
+        # motivated `max_inner_iter`), but the stagnation cap trips on elapsed count
+        # "regardless of cause", so it also fires on subproblems that are advancing
+        # perfectly well -- and there a 10x penalty bump only ill-conditions the
+        # solve. Measure whether this window actually stagnated, and let the caller
+        # withhold the bump when it did not.
+        window_rel_progress = float(
+            (Lcost_window_start - Lcost)
+            / jnp.maximum(jnp.abs(Lcost_window_start), jnp.finfo(L.dtype).tiny)
+        )
+        mu_growth_allowed = (
+            min_window_progress is None or window_rel_progress < min_window_progress
+        )
+
         # updating augmented lagrangian params
         if force_update or (Lactual_reduction > 0 and g_norm <= gtolk):
             al_changed = True
             n_outer += 1
             outer_log.append((iteration, "stall" if force_update else "gtolk"))
-            y = jnp.where(jnp.abs(c) < ctolk, y - mu * c, y)
+            # `residual` is the historical gate; `violation` keys on the same
+            # quantity the `mu` branch below already uses.
+            _viol_rows = constr_violation_rows(c, z)
+            _pass = jnp.abs(c) < ctolk
+            _sat = _viol_rows < ctolk
+            y_gate = _sat if y_update_gate == "violation" else _pass
+            y_prev = y
+            y = jnp.where(y_gate, y - mu * c, y)
             # safeguard: keep the multipliers in a box. y <- y - mu*c is only a valid
             # estimate at an approximate minimizer, so a subproblem that keeps ending
             # short can integrate a non-zero residual without bound. Clipping degrades
@@ -742,12 +812,37 @@ def lsq_auglag(  # noqa: C901
             # |y| to 350) on a coil solve whose true violation was exactly 0 for every
             # iteration, which badly ill-conditions the subproblem and makes the
             # reported optimality meaningless.
-            mu = jnp.where(constr_violation_rows(c, z) >= ctolk, tau * mu, mu)
-            mu = jnp.minimum(mu, max_penalty)
+            if mu_growth_allowed:
+                mu = jnp.where(constr_violation_rows(c, z) >= ctolk, tau * mu, mu)
+                mu = jnp.minimum(mu, max_penalty)
             if c_norm < ctolk:
                 ctolk = max(ctolk / (jnp.mean(mu) ** beta_eta), ctol)
             else:
                 ctolk = max(eta / (jnp.mean(mu) ** alpha_eta), ctol)
+            if track_outer:
+                _blocked = _sat & ~_pass
+                outer_diag.append(
+                    dict(
+                        iteration=iteration,
+                        reason="stall" if force_update else "gtolk",
+                        window_rel_progress=window_rel_progress,
+                        window_max_step=window_max_step,
+                        mu_growth_allowed=bool(mu_growth_allowed),
+                        ctolk=float(ctolk),
+                        constr_violation=float(constr_violation),
+                        mu_mean=float(jnp.mean(mu)),
+                        mu_max=float(jnp.max(mu)),
+                        y_absmax=float(jnp.max(jnp.abs(y))),
+                        dy_absmax=float(jnp.max(jnp.abs(y - y_prev))),
+                        n_rows=int(c.size),
+                        n_sat=int(jnp.sum(_sat)),
+                        n_pass=int(jnp.sum(_pass)),
+                        n_blocked=int(jnp.sum(_blocked)),
+                        y_absmax_blocked=float(
+                            jnp.max(jnp.where(_blocked, jnp.abs(y), 0.0))
+                        ),
+                    )
+                )
         elif inner_stall:
             outer_log.append((iteration, "mu"))
             # Stalled while still infeasible. The subproblem is too hard at this
@@ -757,9 +852,37 @@ def lsq_auglag(  # noqa: C901
             # deliberately left alone: `y <- y - mu*c` is only a valid estimate at an
             # approximate minimizer, and this point is not one.
             al_changed = True
-            mu = jnp.where(constr_violation_rows(c, z) >= ctolk, tau * mu, mu)
-            mu = jnp.minimum(mu, max_penalty)
+            if mu_growth_allowed:
+                mu = jnp.where(constr_violation_rows(c, z) >= ctolk, tau * mu, mu)
+                mu = jnp.minimum(mu, max_penalty)
             ctolk = max(eta / (jnp.mean(mu) ** alpha_eta), ctol)
+            if track_outer:
+                _viol_rows = constr_violation_rows(c, z)
+                _sat = _viol_rows < ctolk
+                _pass = jnp.abs(c) < ctolk
+                _blocked = _sat & ~_pass
+                outer_diag.append(
+                    dict(
+                        iteration=iteration,
+                        reason="mu",
+                        window_rel_progress=window_rel_progress,
+                        window_max_step=window_max_step,
+                        mu_growth_allowed=bool(mu_growth_allowed),
+                        ctolk=float(ctolk),
+                        constr_violation=float(constr_violation),
+                        mu_mean=float(jnp.mean(mu)),
+                        mu_max=float(jnp.max(mu)),
+                        y_absmax=float(jnp.max(jnp.abs(y))),
+                        dy_absmax=0.0,
+                        n_rows=int(c.size),
+                        n_sat=int(jnp.sum(_sat)),
+                        n_pass=int(jnp.sum(_pass)),
+                        n_blocked=int(jnp.sum(_blocked)),
+                        y_absmax_blocked=float(
+                            jnp.max(jnp.where(_blocked, jnp.abs(y), 0.0))
+                        ),
+                    )
+                )
 
         if al_changed:
             # (y, mu) changed, so L, its Jacobian, and every scaling derived from them
@@ -786,6 +909,8 @@ def lsq_auglag(  # noqa: C901
             )
             # (y, mu) changed, so this is a new subproblem
             iters_since_update = 0
+            Lcost_window_start = Lcost
+            window_max_step = 0.0
             # Set its target RELATIVE to where it actually starts, rather than from the
             # mu-driven schedule of alg 14.4.2. That schedule cannot work here in either
             # direction: driven by mean(mu) it reaches `gtol` after ~3 updates and the
@@ -867,6 +992,7 @@ def lsq_auglag(  # noqa: C901
         nit=iteration,
         n_outer=n_outer,
         outer_log=outer_log,
+        outer_diag=outer_diag,
         message=message,
         active_mask=active_mask,
         constr_violation=constr_violation,
