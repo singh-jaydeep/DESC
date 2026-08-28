@@ -3,7 +3,7 @@
 from scipy.optimize import NonlinearConstraint, OptimizeResult
 
 from desc.backend import jnp, put, qr, qr_multiply
-from desc.utils import errorif, safediv, setdefault
+from desc.utils import errorif, safediv, scale_tail_rows, setdefault
 
 from .bound_utils import (
     cl_scaling_vector,
@@ -132,8 +132,8 @@ def lsq_auglag(  # noqa: C901
           (as it is for a feasible starting point).
         - ``"alpha_omega"`` : (float) Hyperparameter for updating gradient tolerance.
           See algorithm 14.4.2 from [1]_ for details. Default 1.0
-        - ``"beta_omega"`` : (float) Hyperparameter for updating gradient tolerance.
-          See algorithm 14.4.2 from [1]_ for details. Default 1.0
+        - ``"beta_omega"`` : (float) DEPRECATED, no effect. The successive gradient
+          tolerances are now set by ``inner_reduction`` instead. Default 1.0
         - ``"alpha_eta"`` : (float) Hyperparameter for updating constraint tolerance.
           See algorithm 14.4.2 from [1]_ for details. Default 0.1
         - ``"beta_eta"`` : (float) Hyperparameter for updating constraint tolerance.
@@ -149,14 +149,48 @@ def lsq_auglag(  # noqa: C901
           convergent to a feasible point. This is a guard against blow-up, not a
           tuning knob -- it only binds when something has already gone wrong. Default
           1e6
+        - ``"track_residual"`` : (bool) Add ``max|f|`` and ``mean|f|`` columns to the
+          iteration printout, where ``f`` is the objective residual as the optimizer
+          sees it (scaled by ``weight``/``normalization``, including quadrature
+          weights). Costs two reductions per iteration on a vector already in hand, so
+          it is free next to a Jacobian evaluation. ``Cost`` is ``1/2*||f||^2``, so
+          ``max|f|`` is the new information: whether the error is spread over the grid
+          or concentrated at a few nodes. Recorded in the result as ``allf_max`` and
+          ``allf_mean`` regardless of this setting. Default False
         - ``"max_inner_stalls"`` : (int >= 0) How many times in a row a subproblem may
-          stall (``ftol``/``xtol`` met, or the trust region collapsing) at a point that
-          is not yet a KKT point before the solver gives up. Such a stall says the
-          *subproblem* is done, not the problem, so instead of returning it restarts
-          the inner solve from the initial trust radius. The multiplier update is left
-          to the usual ``g_norm < gtolk`` gate, since ``y <- y - mu*c`` is only a valid
-          estimate at an approximate minimizer. Set to 0 to recover the old behaviour,
-          where a stalled subproblem ended the whole solve. Default 3
+          stall (``ftol``/``xtol`` met, or the trust region collapsing) *without real
+          progress* at a point that is not yet a KKT point before the solver gives up.
+          Such a stall says the *subproblem* is done, not the problem, so instead of
+          returning it runs the outer update and restarts the inner solve from the
+          initial trust radius. Which outer update depends on why it stalled: at a
+          feasible point the remaining optimality is dual error, so the multipliers are
+          updated and ``gtolk`` is floored at the accuracy the inner solve has shown it
+          can reach; while still infeasible the penalty is too weak, so ``mu`` is raised
+          and ``y`` left alone. Restarting without changing ``(y, mu)`` would re-solve a
+          bit-identical subproblem forever. Set to 0 to recover the old behaviour, where
+          a stalled subproblem ended the whole solve. Default 3
+        - ``"inner_reduction"`` : (float > 1) Factor by which each subproblem must
+          reduce the optimality before the next multiplier update is taken. After every
+          update, ``gtolk`` is set to ``max(g_norm / inner_reduction, gtol)`` --
+          relative to where that subproblem actually starts, not from the ``mu``-driven
+          schedule of alg 14.4.2. That absolute schedule fails in both directions when
+          the reachable optimality is above ``gtol``: divided by ``mean(mu)`` it hits
+          ``gtol`` after a few updates and the outer loop dies, and floored at a
+          measured ``g_norm`` it latches onto the high excursions of a signal that
+          swings an order of magnitude between iterations near convergence, so the
+          target is met at once and the outer loop churns. A relative target is
+          reachable by construction and always asks for real inner work. Larger values
+          mean longer, more thoroughly solved subproblems and fewer multiplier updates.
+          Note this supersedes ``beta_omega``, which no longer has any effect.
+          Default 10
+        - ``"max_inner_iter"`` : (int > 0 or None) EXPERIMENTAL, default None (off).
+          Maximum inner iterations spent on a single subproblem before the outer update
+          is taken regardless of whether ``gtolk`` was reached. A subproblem can grind
+          without ever stalling -- accepted steps too small to trip ``ftol``/``xtol``,
+          but nowhere near ``gtolk`` -- so nothing detects that it is finished. Setting
+          this caps that wait. Off by default: with ``inner_reduction`` making ``gtolk``
+          reachable by construction the grind it guards against should not arise, and an
+          earlier version of this option cut healthy early subproblems short.
         - ``"max_nfev"`` : (int > 0) Maximum number of function evaluations (each
           iteration may take more than one function evaluation). Default is
           ``5*maxiter+1``
@@ -248,6 +282,9 @@ def lsq_auglag(  # noqa: C901
         return jnp.concatenate((f, c))
 
     def lagjac(z, y, mu, *args):
+        # NOTE: `y` is unused -- J depends only on (z, mu), and on `mu` only through
+        # the sqrt(mu) row scaling of the constraint block. So when `mu` changes at a
+        # fixed `z`, J can be rescaled rather than rebuilt. See `mu_J` below.
         Jf = jac_wrapped(z, *args)
         Jc = constraint_wrapped.jac(z, *args)
         Jc = jnp.sqrt(mu)[:, None] * Jc
@@ -272,8 +309,8 @@ def lsq_auglag(  # noqa: C901
     _clb, _cub = (jnp.broadcast_to(b, c.shape) for b in (constraint.lb, constraint.ub))
     _ineq = _clb != _cub
 
-    def constr_violation_fun(c_z, z):
-        """Max violation of the ORIGINAL constraints; 0 when strictly feasible."""
+    def constr_violation_rows(c_z, z):
+        """Per-row violation of the ORIGINAL constraints; 0 where strictly feasible."""
         s = z2xs(z)[1]
         c_x = c_z + put(jnp.zeros_like(c_z), _ineq, s)
         viol = jnp.where(
@@ -281,7 +318,11 @@ def lsq_auglag(  # noqa: C901
             jnp.maximum(_clb - c_x, c_x - _cub),  # <= 0 inside the bounds
             jnp.abs(c_z),  # equality rows already carry the target
         )
-        return jnp.max(jnp.maximum(viol, 0.0))
+        return jnp.maximum(viol, 0.0)
+
+    def constr_violation_fun(c_z, z):
+        """Max violation of the ORIGINAL constraints; 0 when strictly feasible."""
+        return jnp.max(constr_violation_rows(c_z, z))
 
     constr_violation = constr_violation_fun(c, z)
     c_norm = jnp.linalg.norm(c, ord=jnp.inf)  # reformulated residual, drives the AL
@@ -304,6 +345,7 @@ def lsq_auglag(  # noqa: C901
 
     L = lagfun(f, c, y, mu)
     J = lagjac(z, y, mu, *args)
+    mu_J = mu  # the `mu` the current `J` was built with
     Lcost = 1 / 2 * jnp.dot(L, L)
     g = L @ J
 
@@ -330,12 +372,9 @@ def lsq_auglag(  # noqa: C901
 
     g_h = g * d
     # TODO: place this function under JIT to use in-place operation (#1669)
-    # we don't need unscaled J anymore, so we overwrite
-    # it with J_h = J * d to avoid carrying so many J-sized matrices
-    # in memory, which can be large
-    J *= d
-    J_h = J
-    del J
+    # The unscaled J is kept: an outer update at an unchanged `z` rescales it instead
+    # of re-evaluating (see `mu_J`), which is worth one extra J-sized array.
+    J_h = J * d
     g_norm = jnp.linalg.norm(
         (g * v * scale if scaled_termination else g * v), ord=jnp.inf
     )
@@ -381,6 +420,9 @@ def lsq_auglag(  # noqa: C901
     beta_eta = options.pop("beta_eta", 0.9)
     tau = options.pop("tau", 10)
     max_inner_stalls = options.pop("max_inner_stalls", 3)
+    max_inner_iter = options.pop("max_inner_iter", None)
+    inner_reduction = options.pop("inner_reduction", 10.0)
+    track_residual = options.pop("track_residual", False)
 
     errorif(
         len(options) > 0,
@@ -403,9 +445,21 @@ def lsq_auglag(  # noqa: C901
     Lactual_reduction = jnp.inf
     alpha = 0.0  # "Levenberg-Marquardt" parameter
     n_inner_stalls = 0  # consecutive subproblem stalls with no accepted step
+    iters_since_update = 0  # inner iterations spent on the current subproblem
+    n_outer = 0  # number of augmented Lagrangian (y, mu) updates taken
+    # (iteration, reason) for every outer update, so update cadence is recoverable
+    # from the result object rather than only from a verbose log
+    outer_log = []
 
     allx = [z]
     alltr = [trust_radius]
+    # Per-iteration L-inf and L-1 norms of the objective residual. `f` is already
+    # computed every iteration, so these are two reductions on a vector in hand --
+    # negligible next to a Jacobian evaluation. `cost` is 1/2*||f||^2, so `allf_max`
+    # is the genuinely new information: whether the error is spread over the grid or
+    # concentrated at a few nodes.
+    allf_max = [jnp.max(jnp.abs(f))]
+    allf_mean = [jnp.mean(jnp.abs(f))]
     if g_norm < gtol and constr_violation < ctol:
         success, message = True, STATUS_MESSAGES["gtol"]
 
@@ -436,7 +490,13 @@ def lsq_auglag(  # noqa: C901
         print("-" * 60, "\n")
 
     if verbose > 1:
-        print_header_nonlinear(True, "Penalty param", "max(|mltplr|)")
+        # gtolk is the tolerance the *subproblem* is being solved to; the outer loop
+        # only advances when Optimality drops below it. Printing it makes a dead outer
+        # loop (gtolk pinned far under any achievable Optimality) visible immediately.
+        _extra_hdr = ("max|f|", "mean|f|") if track_residual else ()
+        print_header_nonlinear(
+            True, "Penalty param", "max(|mltplr|)", "gtolk", *_extra_hdr
+        )
         print_iteration_nonlinear(
             iteration,
             nfev,
@@ -447,6 +507,8 @@ def lsq_auglag(  # noqa: C901
             constr_violation,
             jnp.mean(mu),
             jnp.max(jnp.abs(y)),
+            gtolk,
+            *((allf_max[-1], allf_mean[-1]) if track_residual else ()),
         )
 
     while iteration < maxiter and success is None:
@@ -581,13 +643,25 @@ def lsq_auglag(  # noqa: C901
                         n_inner_stalls += 1
                         inner_stall = True
                         success, message = None, None
+                    elif constr_violation < ctol:
+                        # Feasible, and repeated subproblems have stalled without
+                        # further progress, so the multiplier update has stopped
+                        # buying anything. This is a KKT point to the accuracy the
+                        # problem supports; `gtol` is simply below the noise floor of
+                        # the objective. Say so rather than claiming failure.
+                        success, message = True, STATUS_MESSAGES["precision"]
                     else:  # repeated stalls: report honestly, don't claim success
                         success, message = False, STATUS_MESSAGES["stall"]
                 break
 
         # if reduction was enough, accept the step
         if Lactual_reduction > 0:
-            n_inner_stalls = 0
+            # Only real progress clears the stall counter. Accepting a ~1e-16
+            # reduction scraped from the bottom of a collapsed trust region is not
+            # progress, and letting it reset the counter is what allowed a stalled
+            # solve to spin for hundreds of iterations instead of stopping.
+            if Lactual_reduction > ftol * Lcost:
+                n_inner_stalls = 0
             z = z_new
             allx.append(z)
             f = f_new
@@ -598,6 +672,7 @@ def lsq_auglag(  # noqa: C901
             cost = cost_new
             Lcost = Lcost_new
             J = lagjac(z, y, mu, *args)
+            mu_J = mu
             njev += 1
             g = jnp.dot(J.T, L)
 
@@ -611,26 +686,84 @@ def lsq_auglag(  # noqa: C901
         else:
             step_norm = step_h_norm = actual_reduction = 0
 
+        # A subproblem is finished when it reaches `gtolk`, but *also* when it stalls:
+        # `ftol`/`xtol` or a collapsed trust region mean the inner solve has nothing
+        # left to give at this (y, mu). Either way alg 14.4.2 says to update the
+        # multipliers/penalty and restart. Leaving (y, mu) untouched on a stall makes
+        # the restart re-solve a bit-identical subproblem, which stalls identically --
+        # an infinite loop that costs a full trust-region collapse (~25 evaluations)
+        # per iteration and looks exactly like "the solver won't accept any steps".
+        iters_since_update += 1
+
+        al_changed = False
+        force_update = False
+        # A subproblem can also be finished without ever stalling: it can simply grind,
+        # taking accepted steps too small to trip `ftol`/`xtol` while never getting
+        # near `gtolk`. That is the same situation as a stall -- the inner solve has
+        # nothing useful left to give at this (y, mu) -- but nothing detects it, so the
+        # outer loop waits for a trust-region collapse that may be hundreds of
+        # iterations away. Cap how long one subproblem may run before we accept
+        # whatever optimality it reached and move the multipliers on.
+        stagnated = (
+            max_inner_iter is not None
+            and iters_since_update >= max_inner_iter
+            and g_norm > gtolk
+        )
+        if (inner_stall and constr_violation < ctol) or stagnated:
+            # Feasible and out of road, so what is left in `g_norm` is dual error, not
+            # primal: a better multiplier estimate fixes it, a tighter inner solve does
+            # not. Firing is structural rather than a re-derived `g_norm <= gtolk`
+            # comparison, so it cannot silently stop firing.
+            force_update = True
+
         # updating augmented lagrangian params
-        if Lactual_reduction > 0 and g_norm < gtolk:
+        if force_update or (Lactual_reduction > 0 and g_norm <= gtolk):
+            al_changed = True
+            n_outer += 1
+            outer_log.append((iteration, "stall" if force_update else "gtolk"))
             y = jnp.where(jnp.abs(c) < ctolk, y - mu * c, y)
             # safeguard: keep the multipliers in a box. y <- y - mu*c is only a valid
             # estimate at an approximate minimizer, so a subproblem that keeps ending
             # short can integrate a non-zero residual without bound. Clipping degrades
             # the method to a (still globally convergent) penalty method instead.
             y = jnp.clip(y, -max_multiplier, max_multiplier)
-            mu = jnp.where(jnp.abs(c) >= ctolk, tau * mu, mu)
+            # Grow `mu` only where the ORIGINAL constraint is actually violated. The
+            # obvious test, `|c| >= ctolk`, uses the slack-reformulated residual
+            # c(x) - s, which is non-zero merely because the slack variable lags c(x)
+            # even at a strictly feasible point. Keying on it drove `mu` to 5e7 (and
+            # |y| to 350) on a coil solve whose true violation was exactly 0 for every
+            # iteration, which badly ill-conditions the subproblem and makes the
+            # reported optimality meaningless.
+            mu = jnp.where(constr_violation_rows(c, z) >= ctolk, tau * mu, mu)
             if c_norm < ctolk:
                 ctolk = max(ctolk / (jnp.mean(mu) ** beta_eta), ctol)
-                gtolk = max(gtolk / (jnp.mean(mu) ** beta_omega), gtol)
             else:
                 ctolk = max(eta / (jnp.mean(mu) ** alpha_eta), ctol)
-                gtolk = max(omega / (jnp.mean(mu) ** alpha_omega), gtol)
-            # if we update lagrangian params, need to recompute L and J
+        elif inner_stall:
+            outer_log.append((iteration, "mu"))
+            # Stalled while still infeasible. The subproblem is too hard at this
+            # penalty, which is exactly what `mu` is for -- Conn & Gould's
+            # unsuccessful branch. Raising it on the offending rows makes the restart
+            # a genuinely different subproblem instead of the same one again. `y` is
+            # deliberately left alone: `y <- y - mu*c` is only a valid estimate at an
+            # approximate minimizer, and this point is not one.
+            al_changed = True
+            mu = jnp.where(constr_violation_rows(c, z) >= ctolk, tau * mu, mu)
+            ctolk = max(eta / (jnp.mean(mu) ** alpha_eta), ctol)
+
+        if al_changed:
+            # (y, mu) changed, so L, its Jacobian, and every scaling derived from them
+            # are stale
             L = lagfun(f, c, y, mu)
             Lcost = 0.5 * jnp.dot(L, L)
-            J = lagjac(z, y, mu, *args)
-            njev += 1
+            # `lagjac` ignores `y` and depends on `mu` only through the sqrt(mu) row
+            # scaling of the constraint block, and `z` has not moved since `J` was
+            # built. Re-evaluating here would recompute the objective and constraint
+            # Jacobians purely to re-apply a diagonal. Rescaling is exact and removes
+            # one Jacobian per outer update: measured `njev = nit + n_outer`, so on a
+            # coil solve with frequent updates this was ~35% of all Jacobian work.
+            J = scale_tail_rows(J, jnp.sqrt(mu / mu_J), f.size)
+            mu_J = mu
             g = jnp.dot(J.T, L)
 
             if jac_scale:
@@ -641,20 +774,35 @@ def lsq_auglag(  # noqa: C901
             g_norm = jnp.linalg.norm(
                 (g * v * scale if scaled_termination else g * v), ord=jnp.inf
             )
+            # (y, mu) changed, so this is a new subproblem
+            iters_since_update = 0
+            # Set its target RELATIVE to where it actually starts, rather than from the
+            # mu-driven schedule of alg 14.4.2. That schedule cannot work here in either
+            # direction: driven by mean(mu) it reaches `gtol` after ~3 updates and the
+            # outer loop dies (no more multiplier updates for the rest of the run),
+            # while floored at a measured `g_norm` it latches onto the high excursions
+            # of a signal that swings an order of magnitude between iterations near
+            # convergence, so the target is met immediately and the outer loop churns --
+            # updating `y` every iteration or two at points that are not subproblem
+            # minimizers, where `y <- y - mu*c` is not a contraction and the multipliers
+            # cycle instead of converging. A fixed relative reduction is reachable by
+            # construction and always asks for real inner work.
+            gtolk = max(float(g_norm) / inner_reduction, gtol)
 
-        if Lactual_reduction > 0:
+        # `J_h`/`g_h`/`d`/`diag_h` define the next trust-region subproblem, so they
+        # must be rebuilt whenever `z` changed *or* (y, mu) changed. Rebuilding only
+        # on an accepted step left an outer update that fired on a rejected step
+        # pointing at the Jacobian of the previous augmented Lagrangian.
+        if Lactual_reduction > 0 or al_changed:
             z_norm = jnp.linalg.norm(
                 ((z * scale_inv) if scaled_termination else z), ord=2
             )
             d = v**0.5 * scale
             diag_h = g * dv * scale
             g_h = g * d
-            # we don't need unscaled J anymore, so we overwrite
-            # it with J_h = J * d to avoid carrying so many J-sized matrices
-            # in memory, which can be large
-            J *= d
-            J_h = J
-            del J
+            # The unscaled J is kept so that an outer update at an unchanged
+            # `z` can rescale it instead of re-evaluating (see `mu_J`).
+            J_h = J * d
 
             if g_norm < gtol and constr_violation < ctol:
                 success, message = True, STATUS_MESSAGES["gtol"]
@@ -662,16 +810,15 @@ def lsq_auglag(  # noqa: C901
             if callback(jnp.copy(z2xs(z)[0]), *args):
                 success, message = False, STATUS_MESSAGES["callback"]
         if inner_stall:
-            # (b) The subproblem stalled with a collapsed radius. Nothing about the
-            # iterate changed -- in particular we do NOT force a multiplier update,
-            # since y <- y - mu*c is only a valid estimate at an approximate
-            # minimizer, and forcing it at a stalled point is the ratchet this is
-            # meant to avoid. Just restart the inner solve on a fresh radius and let
-            # the usual g_norm < gtolk gate decide when to update.
+            # The subproblem stalled with a collapsed radius. `(y, mu)` were just
+            # updated above, so the augmented Lagrangian being minimized has actually
+            # changed and a fresh radius gives the new subproblem room to move.
             trust_radius = init_trust_radius
             alpha = 0.0
 
         iteration += 1
+        allf_max.append(jnp.max(jnp.abs(f)))
+        allf_mean.append(jnp.mean(jnp.abs(f)))
         if verbose > 1:
             print_iteration_nonlinear(
                 iteration,
@@ -683,6 +830,8 @@ def lsq_auglag(  # noqa: C901
                 constr_violation,
                 jnp.mean(mu),
                 jnp.max(jnp.abs(y)),
+                gtolk,
+                *((allf_max[-1], allf_mean[-1]) if track_residual else ()),
             )
 
     if g_norm < gtol and constr_violation < ctol:
@@ -706,11 +855,15 @@ def lsq_auglag(  # noqa: C901
         nfev=nfev,
         njev=njev,
         nit=iteration,
+        n_outer=n_outer,
+        outer_log=outer_log,
         message=message,
         active_mask=active_mask,
         constr_violation=constr_violation,
         allx=[z2xs(x)[0] for x in allx],
         alltr=alltr,
+        allf_max=jnp.asarray(allf_max),
+        allf_mean=jnp.asarray(allf_mean),
     )
     result["fse"] = f
     result["f0se"] = f0

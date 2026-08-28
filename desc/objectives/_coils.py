@@ -2713,6 +2713,15 @@ class CoilSetLinkingNumber(_Objective):
         link = constants["coilset"]._compute_linking_number(
             params=params, grid=constants["grid"], indices=self._coil_indices
         )
+        # `link[i, k]` is the linking number of coil i with the representative coil
+        # `_coil_indices[k]`, so the `i == _coil_indices[k]` entries are each coil's
+        # Gauss integral with ITSELF -- its writhe. That is nonzero for any non-planar
+        # coil (it converges to a finite value under grid refinement rather than to 0)
+        # and says nothing about whether coils are interlinked. Leaving it in makes
+        # `target=0` unsatisfiable and turns this objective into a penalty on coil
+        # non-planarity. Mask it out so the result is what the docstring says: the sum
+        # over every OTHER coil.
+        link = link.at[self._coil_indices, jnp.arange(self._dim_f)].set(0.0)
 
         return jnp.abs(link).sum(axis=0)
 
