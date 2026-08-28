@@ -333,6 +333,10 @@ def lsq_auglag(  # noqa: C901
     z = make_strictly_feasible(z, lb, ub)
 
     max_multiplier = options.pop("max_multiplier", 1e6)
+    # Cap on the penalty parameter. With a stagnation detector enabled, `mu` can be
+    # grown on every trip, and tau**n diverges fast; past ~1e8 the augmented Lagrangian
+    # is so ill-conditioned that the Gauss-Newton model is meaningless anyway.
+    max_penalty = options.pop("max_penalty_parameter", 1e8)
     mu = options.pop("initial_penalty_parameter", 10 * jnp.ones_like(c))
     y = options.pop("initial_multipliers", jnp.zeros_like(c))
     if isinstance(y, str) and y == "least_squares":  # least squares multiplier estimate
@@ -704,12 +708,16 @@ def lsq_auglag(  # noqa: C901
         # outer loop waits for a trust-region collapse that may be hundreds of
         # iterations away. Cap how long one subproblem may run before we accept
         # whatever optimality it reached and move the multipliers on.
-        stagnated = (
-            max_inner_iter is not None
-            and iters_since_update >= max_inner_iter
-            and g_norm > gtolk
-        )
-        if (inner_stall and constr_violation < ctol) or stagnated:
+        # `check_termination` can fail to fire indefinitely: steps are nominally
+        # accepted with a ~1e-30 reduction, so no tolerance test and no minimum-radius
+        # test ever trips, and the iterate freezes with nothing detecting it. Trip on
+        # elapsed inner iterations regardless of why.
+        stagnated = max_inner_iter is not None and iters_since_update >= max_inner_iter
+        # NB `ctolk`, the current working tolerance, not `ctol`, the final target.
+        # Alg 14.4.2 branches on the working tolerance: with `ctol` here the
+        # multipliers can never update while infeasible, so an infeasible start has
+        # no path forward -- measured 811 consecutive frozen iterations.
+        if (inner_stall and constr_violation < ctolk) or stagnated:
             # Feasible and out of road, so what is left in `g_norm` is dual error, not
             # primal: a better multiplier estimate fixes it, a tighter inner solve does
             # not. Firing is structural rather than a re-derived `g_norm <= gtolk`
@@ -735,6 +743,7 @@ def lsq_auglag(  # noqa: C901
             # iteration, which badly ill-conditions the subproblem and makes the
             # reported optimality meaningless.
             mu = jnp.where(constr_violation_rows(c, z) >= ctolk, tau * mu, mu)
+            mu = jnp.minimum(mu, max_penalty)
             if c_norm < ctolk:
                 ctolk = max(ctolk / (jnp.mean(mu) ** beta_eta), ctol)
             else:
@@ -749,6 +758,7 @@ def lsq_auglag(  # noqa: C901
             # approximate minimizer, and this point is not one.
             al_changed = True
             mu = jnp.where(constr_violation_rows(c, z) >= ctolk, tau * mu, mu)
+            mu = jnp.minimum(mu, max_penalty)
             ctolk = max(eta / (jnp.mean(mu) ** alpha_eta), ctol)
 
         if al_changed:
@@ -809,7 +819,7 @@ def lsq_auglag(  # noqa: C901
 
             if callback(jnp.copy(z2xs(z)[0]), *args):
                 success, message = False, STATUS_MESSAGES["callback"]
-        if inner_stall:
+        if inner_stall or stagnated:
             # The subproblem stalled with a collapsed radius. `(y, mu)` were just
             # updated above, so the augmented Lagrangian being minimized has actually
             # changed and a fresh radius gives the new subproblem room to move.
