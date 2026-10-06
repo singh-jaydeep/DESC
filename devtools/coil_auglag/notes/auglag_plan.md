@@ -36,6 +36,14 @@ solver ingredients that today live in `devtools/coil_auglag/ctr.py`, outside DES
 - Distances: **node-node rows with an explicit gap bound** replace the exact-curve rows as
   default (task group B). The bound delta is computed once (with a backoff factor) at
   build; no delta updates in the outer loop unless the backoff proves too generous.
+- Selected rows keep **slots with identity tracking**: a selected-row objective returns its
+  K slot rows plus a static-size array of candidate ids (pair, i, j). The optimizer uses the
+  ids to pair rows across iterates (A6) and to attach multipliers (B4). Considered and
+  rejected: one fixed row per pair via log-sum-exp (the c0-testing objectives instead sum
+  squared hinges or take a min per pair). It is conservative
+  (`m_alpha <= min d <= m_alpha + log(n_eff)/alpha`) but its curvature varies on a 1/alpha
+  scale: alpha ~2000/m (2-3 mm conservatism) bends on sub-mm scales, far below a useful
+  step, so neither secant nor exact second order would resolve it.
 - Done criterion (precise_QH from circles): feasible to `ctol` (judged by brute force,
   `check.py`), no linked pairs, scaled inner gradient <= 1e-6 at each outer update, final
   certificate (PD Hessian, small Newton decrement). Also precise_QA notebook case and
@@ -46,7 +54,7 @@ solver ingredients that today live in `devtools/coil_auglag/ctr.py`, outside DES
 | id | question | default if not asked |
 |---|---|---|
 | Q1 | Public accessor for per-row scaled bounds/targets on `ObjectiveFunction` (A3) vs reading `_scale`, `_normalize_target`, `normalization` privately as `ctr.py` does | add a public method |
-| Q2 | Row pairing for the decrease when slot rows change identity (A6) | pair by candidate id |
+| Q2 | ~~Row pairing when slot rows change identity~~ resolved: pair by candidate id among rows with nonzero residual (A6) | |
 | Q3 | How the optimizer passes "keep these candidates selected" (rows with `y > 0`) to a selected-row objective (B4) | boolean candidate mask in `constants` |
 | Q4 | Keep the exact-curve rows as `distance="curve"` for Fourier coils, or drop them | keep as an option |
 | Q5 | Backoff factor on delta and default node count | 1.5x, nodes chosen so delta <= 2% of the bound |
@@ -91,11 +99,18 @@ from `eig(BstdᵀBstd + Sd)`. Check: from G3o-like states the scaled gradient dr
 the full Hessian incl. active hinge rows (the fixed `comp2` floor). Check: from a compS
 endpoint, quadratic decrease of the scaled gradient over 3-5 steps.
 
-**A6. Row-paired decrease.** Replace `c - c_new` by `sum((r - r_new)(r + r_new))/2`
-where rows correspond; for selected-row objectives pair by candidate id (Q2), falling back to
-the total difference for rows without a partner. Why: compS stalls near 1e-6 and comp2 near
-1e-9 because decreases fall below a few ulp of a ~2e5 cost. Check: comp2 on QH reaches
-<= 1e-10 reliably (not by luck, cf. C1n vs E1).
+**A6. Row-paired decrease.** The acceptance ratio needs `cost(x) - cost(x_new)`; near
+convergence that is 1e-10..1e-17 against a ~2e5 cost (ulp 3e-11), so the difference of two
+totals is noise and lambda blows up (compS stopped near 1e-6, comp2 near 1e-9..1e-10).
+Compute `sum((r - r_new)(r + r_new))/2` instead, so large equal parts cancel row by row.
+Fixed-position rows pair by position. Selected-row objectives pair by candidate id: rows
+entering or leaving the selection are inactive (zero residual) on both sides because
+`select_distance` exceeds the bound, so only ids with a nonzero residual need pairing; any
+unmatched remainder falls back to the plain difference. This removes the summation and
+cancellation part of the floor, not rounding inside each residual (Biot-Savart sums); if
+that dominates, accept on decrease of the gradient norm once the cost cannot resolve
+progress. Check: measure the floor before and after; comp2 on QH reaches <= 1e-10
+reliably (C1n got there by two lucky 3-ulp acceptances, E1 stopped at 7.7e-9).
 
 ## B. Node-node distance rows with an explicit gap bound
 
@@ -126,7 +141,9 @@ every hinge (node count a multiple of `B`) so each stretch between nodes is smoo
 `h`, `kappa`. Splines with breaks: nodes on the breaks; derivative bounds per piece from the
 spline (Bernstein does not apply). Check: the B2 property test on both classes.
 
-**B4. Multipliers on selected rows.** Expose candidate ids per evaluation; selection keeps
+**B4. Multipliers on selected rows.** Return a static-size int array of candidate ids with
+the slot rows (padding id -1), from the same `jnp.nonzero(mask, size=K)` that fills the
+slots. Selection keeps
 any candidate with a nonzero multiplier (Q3), so a row carrying force cannot drop out and
 make the merit jump. Store multipliers sparsely (only `y > 0`). Check: an AL run where a
 contact moves along the coil keeps `sum y` continuous across selection changes.
@@ -167,6 +184,9 @@ curvature limits as constraints and QuadraticFlux as the objective.
 - **D2.** `desc.utils.safearccos(1) = inf` makes planar coils NaN for normals within ~1e-8
   of +z (present on master). Raise separately, not guarded locally.
 - **D3.** Q6 (`second_order="constraints"`).
+- **D5.** `desc.objectives.utils.softmin` (used by `CoilSetMinDistance(use_softmin=True)`)
+  is a Boltzmann-weighted average, which is >= the true minimum, so a lower bound on it is
+  not conservative. Raise separately (generic, present on master).
 - **D4.** API docs for the new methods and options. The user writes CHANGELOG entries.
 
 ## Order and constraints
