@@ -52,6 +52,8 @@ from desc.objectives import (
     CoilCurvature,
     CoilIntegratedCurvature,
     CoilLength,
+    CoilMeanSquaredCurvature,
+    CoilSetDistancePenalty,
     CoilSetLinkingNumber,
     CoilSetMinDistance,
     CoilTorsion,
@@ -77,6 +79,7 @@ from desc.objectives import (
     ObjectiveFunction,
     Omnigenity,
     PlasmaCoilSetDistanceBound,
+    PlasmaCoilSetDistancePenalty,
     PlasmaCoilSetMinDistance,
     PlasmaVesselDistance,
     Pressure,
@@ -95,6 +98,7 @@ from desc.objectives import (
     Volume,
     get_NAE_constraints,
 )
+from desc.objectives._coils import _independent_coil_indices
 from desc.objectives._free_boundary import BoundaryErrorNESTOR
 from desc.objectives.nae_utils import (
     _calc_1st_order_NAE_coeffs,
@@ -1196,11 +1200,14 @@ class TestObjectiveFunction:
             expect_intersect=False,
             tol=None,
         ):
+            # one row per independent coil: symmetry copies have identical distances
+            idx = _independent_coil_indices(coils)
+            mindist = np.broadcast_to(mindist, (coils.num_coils,))[idx]
             # vanilla
             obj1 = CoilSetMinDistance(coils, grid=grid)
             obj1.build()
             f1 = obj1.compute(params=coils.params_dict)
-            assert f1.size == coils.num_coils
+            assert f1.size == idx.size
             np.testing.assert_allclose(f1, mindist)
             assert coils.is_self_intersecting(grid=grid, tol=tol) == expect_intersect
             # softmin
@@ -1209,13 +1216,13 @@ class TestObjectiveFunction:
             )
             obj2.build()
             f2 = obj2.compute(params=coils.params_dict)
-            assert f2.size == coils.num_coils
+            assert f2.size == idx.size
             np.testing.assert_allclose(f2, mindist, rtol=5e-2, atol=1e-3)
             # num_neighbors
             obj3 = CoilSetMinDistance(coils, grid=grid, num_neighbors=num_neighbors)
             obj3.build()
             f3 = obj3.compute(params=coils.params_dict)
-            assert f3.size == coils.num_coils
+            assert f3.size == idx.size
             np.testing.assert_allclose(f3, mindist)
             # softmin & num_neighbors
             obj4 = CoilSetMinDistance(
@@ -1227,7 +1234,7 @@ class TestObjectiveFunction:
             )
             obj4.build()
             f4 = obj4.compute(params=coils.params_dict)
-            assert f4.size == coils.num_coils
+            assert f4.size == idx.size
             np.testing.assert_allclose(f4, mindist, rtol=5e-2, atol=1e-3)
             # test derivatives
             obj1 = ObjectiveFunction(obj1)
@@ -3398,6 +3405,8 @@ class TestComputeScalarResolution:
         CoilCurvature,
         CoilIntegratedCurvature,
         CoilLength,
+        CoilMeanSquaredCurvature,
+        CoilSetDistancePenalty,
         CoilSetLinkingNumber,
         CoilSetMinDistance,
         CoilTorsion,
@@ -3407,6 +3416,7 @@ class TestComputeScalarResolution:
         LinkingCurrentConsistency,
         Omnigenity,
         PlasmaCoilSetDistanceBound,
+        PlasmaCoilSetDistancePenalty,
         PlasmaCoilSetMinDistance,
         PlasmaVesselDistance,
         QuadraticFlux,
@@ -3854,6 +3864,7 @@ class TestComputeScalarResolution:
             CoilCurvature,
             CoilIntegratedCurvature,
             CoilLength,
+            CoilMeanSquaredCurvature,
             CoilTorsion,
             CoilSetLinkingNumber,
             CoilSetMinDistance,
@@ -3921,6 +3932,8 @@ class TestObjectiveNaNGrad:
         CoilCurvature,
         CoilIntegratedCurvature,
         CoilLength,
+        CoilMeanSquaredCurvature,
+        CoilSetDistancePenalty,
         CoilSetLinkingNumber,
         CoilSetMinDistance,
         CoilTorsion,
@@ -3933,6 +3946,7 @@ class TestObjectiveNaNGrad:
         LinkingCurrentConsistency,
         Omnigenity,
         PlasmaCoilSetDistanceBound,
+        PlasmaCoilSetDistancePenalty,
         PlasmaCoilSetMinDistance,
         PlasmaVesselDistance,
         QuadraticFlux,
@@ -4230,6 +4244,7 @@ class TestObjectiveNaNGrad:
             CoilCurvature,
             CoilIntegratedCurvature,
             CoilLength,
+            CoilMeanSquaredCurvature,
             CoilTorsion,
             CoilSetLinkingNumber,
             CoilSetMinDistance,
@@ -4243,6 +4258,38 @@ class TestObjectiveNaNGrad:
         obj.build(verbose=0)
         g = obj.grad(obj.x())
         assert not np.any(np.isnan(g)), str(objective)
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize("signed", [False, True])
+    def test_objective_no_nangrad_coil_distance_penalty(self, signed):
+        """Coil-coil distance penalty, active (d_min above the coil spacing)."""
+        coil = FourierXYZCoil()
+        coilset = CoilSet.linspaced_angular(coil, n=3, check_intersection=False)
+        obj = ObjectiveFunction(
+            CoilSetDistancePenalty(
+                coilset, d_min=20.0, max_active_pairs=50000, signed=signed
+            ),
+            use_jit=False,
+        )
+        obj.build(verbose=0)
+        assert obj.compute_scalar(obj.x()) > 0
+        g = obj.grad(obj.x())
+        assert not np.any(np.isnan(g))
+
+    @pytest.mark.unit
+    def test_objective_no_nangrad_plasma_coil_distance_penalty(self):
+        """Plasma-coil distance penalty, active (d_min above the clearance)."""
+        eq = Equilibrium(M=2, N=1)
+        coil = FourierPlanarCoil(center=[10, 0, 0], normal=[0, 1, 0], r_n=1)
+        coilset = CoilSet.linspaced_angular(coil, n=3, check_intersection=False)
+        obj = ObjectiveFunction(
+            PlasmaCoilSetDistancePenalty(eq, coilset, d_min=1.0, eq_fixed=True),
+            use_jit=False,
+        )
+        obj.build(verbose=0)
+        assert obj.compute_scalar(obj.x()) > 0
+        g = obj.grad(obj.x())
+        assert not np.any(np.isnan(g))
 
     @pytest.mark.unit
     @pytest.mark.parametrize("helicity", [(1, 0), (1, 1), (0, 1)])

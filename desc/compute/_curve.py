@@ -1,6 +1,6 @@
 from interpax import interp1d
 
-from desc.backend import jnp, sign
+from desc.backend import jnp, sign, vmap
 
 from ..utils import (
     cross,
@@ -9,6 +9,7 @@ from ..utils import (
     rpz2xyz,
     rpz2xyz_vec,
     safearccos,
+    safenorm,
     safenormalize,
     xyz2rpz,
     xyz2rpz_vec,
@@ -852,6 +853,99 @@ def _x_sss_FourierXYZCurve(params, transforms, profiles, data, **kwargs):
     return data
 
 
+def _splinexyz_helper(f, transforms, s_query_pts, method, derivative):
+    """Used to compute XYZ coordinates for the SplineXYZCurve compute functions.
+
+    Parameters
+    ----------
+    f : list of ndarray
+        X, Y, Z function coords with shape (3, len(transforms["knots"]))
+    transforms : dict
+        the transforms from the compute function
+    s_query_pts : ndarray
+        query points that come from s parameterization
+    kwargs : dict
+        the kwargs from the compute function
+    derivative : int
+        derivative order used for interpolation
+
+    Returns
+    -------
+    coords : ndarray
+        Interpolated XYZ coords with shape (3, len(s_query_pts))
+    """
+    f = jnp.asarray(f)
+    intervals = jnp.asarray(transforms["intervals"])
+    has_break_points = len(intervals[0])
+    s_query_pts += transforms["knots"][0]
+
+    def inner_body(f, knots, period=None):
+        """Interpolation for spline curves."""
+        fq = interp1d(
+            s_query_pts,
+            knots,
+            f.T,
+            method=method,
+            derivative=derivative,
+            period=period,
+        )
+
+        return fq.T
+
+    def body(interval, full_f, full_knots, min_interval_idx):
+        """Body used if there are break points."""
+        istart, istop = interval
+        # catch end-point
+        istop = jnp.where(istop == min_interval_idx, -1, istop)
+
+        # fill f values outside of interval with break point values so that
+        # interpolation only takes into consideration the interval
+        f_in_interval = jnp.where(
+            full_knots > full_knots[istop], full_f[:, istop][..., None], full_f
+        )
+        f_in_interval = jnp.where(
+            full_knots < full_knots[istart], full_f[:, istart][..., None], f_in_interval
+        )
+        f_interp = inner_body(f_in_interval, full_knots, period=None)
+
+        # replace values outside of interval with 0 so they don't contribute to the sum
+        f_interp = jnp.where(s_query_pts > full_knots[istop], 0, f_interp)
+        f_interp = jnp.where(s_query_pts < full_knots[istart], 0, f_interp)
+        # covers edge case where the knot is exactly equal to a query point
+        # and halves that point to sum to one later.
+        f_interp = jnp.where(
+            (s_query_pts == full_knots[istop]) & (s_query_pts != full_knots[-1]),
+            f_interp / 2,
+            f_interp,
+        )
+        f_interp = jnp.where(
+            (s_query_pts == full_knots[istart]) & (s_query_pts != full_knots[0]),
+            f_interp / 2,
+            f_interp,
+        )
+
+        return f_interp
+
+    if has_break_points:
+        min_interval_idx = intervals[0][1]
+        # manually add endpoint for broken splines so that it is closed
+        full_knots = jnp.append(
+            transforms["knots"], transforms["knots"][0] + 2 * jnp.pi
+        )
+        full_f = jnp.append(f, f[:, 0][..., None], axis=1)
+        f_interp = vmap(
+            lambda interval: body(interval, full_f, full_knots, min_interval_idx)
+        )
+        f_interp = f_interp(intervals).sum(axis=0)
+    else:
+        # regular interpolation where the period for interp is 2pi
+        f_interp = inner_body(f, transforms["knots"], period=2 * jnp.pi)
+
+    coords = jnp.stack(f_interp, axis=1)
+
+    return coords
+
+
 @register_compute_fun(
     name="center",
     label="\\langle\\mathbf{x}\\rangle",
@@ -887,7 +981,7 @@ def _center_SplineXYZCurve(params, transforms, profiles, data, **kwargs):
     "When basis is cartesian, the units are meters.",
     dim=3,
     params=["X", "Y", "Z", "rotmat", "shift"],
-    transforms={"knots": []},
+    transforms={"intervals": [], "knots": []},
     profiles=[],
     coordinates="s",
     data=["s"],
@@ -895,32 +989,13 @@ def _center_SplineXYZCurve(params, transforms, profiles, data, **kwargs):
     method="Interpolation type, Default 'cubic'. See SplineXYZCurve docs for options.",
 )
 def _x_SplineXYZCurve(params, transforms, profiles, data, **kwargs):
+
+    derivative = 0
     xq = data["s"]
-    Xq = interp1d(
-        xq,
-        transforms["knots"],
-        params["X"],
-        method=kwargs["method"],
-        derivative=0,
-        period=2 * jnp.pi,
-    )
-    Yq = interp1d(
-        xq,
-        transforms["knots"],
-        params["Y"],
-        method=kwargs["method"],
-        derivative=0,
-        period=2 * jnp.pi,
-    )
-    Zq = interp1d(
-        xq,
-        transforms["knots"],
-        params["Z"],
-        method=kwargs["method"],
-        derivative=0,
-        period=2 * jnp.pi,
-    )
-    coords = jnp.stack([Xq, Yq, Zq], axis=1)
+    f = [params["X"], params["Y"], params["Z"]]
+
+    coords = _splinexyz_helper(f, transforms, xq, kwargs["method"], derivative)
+
     coords = (
         coords @ params["rotmat"].reshape((3, 3)).T + params["shift"][jnp.newaxis, :]
     )
@@ -937,7 +1012,7 @@ def _x_SplineXYZCurve(params, transforms, profiles, data, **kwargs):
     description="Position vector along curve, first derivative",
     dim=3,
     params=["X", "Y", "Z", "rotmat"],
-    transforms={"knots": []},
+    transforms={"intervals": [], "knots": []},
     profiles=[],
     coordinates="s",
     data=["s", "phi"],
@@ -945,35 +1020,16 @@ def _x_SplineXYZCurve(params, transforms, profiles, data, **kwargs):
     method="Interpolation type, Default 'cubic'. See SplineXYZCurve docs for options.",
 )
 def _x_s_SplineXYZCurve(params, transforms, profiles, data, **kwargs):
+    derivative = 1
     xq = data["s"]
-    dXq = interp1d(
-        xq,
-        transforms["knots"],
-        params["X"],
-        method=kwargs["method"],
-        derivative=1,
-        period=2 * jnp.pi,
-    )
-    dYq = interp1d(
-        xq,
-        transforms["knots"],
-        params["Y"],
-        method=kwargs["method"],
-        derivative=1,
-        period=2 * jnp.pi,
-    )
-    dZq = interp1d(
-        xq,
-        transforms["knots"],
-        params["Z"],
-        method=kwargs["method"],
-        derivative=1,
-        period=2 * jnp.pi,
-    )
-    coords = jnp.stack([dXq, dYq, dZq], axis=1)
-    coords = coords @ params["rotmat"].reshape((3, 3)).T
-    coords = xyz2rpz_vec(coords, phi=data["phi"])
-    data["x_s"] = coords
+    f = [params["X"], params["Y"], params["Z"]]
+
+    coords_s = _splinexyz_helper(f, transforms, xq, kwargs["method"], derivative)
+    coords_s = coords_s @ params["rotmat"].reshape((3, 3)).T
+
+    coords_s = xyz2rpz_vec(coords_s, phi=data["phi"])
+
+    data["x_s"] = coords_s
     return data
 
 
@@ -985,7 +1041,7 @@ def _x_s_SplineXYZCurve(params, transforms, profiles, data, **kwargs):
     description="Position vector along curve, second derivative",
     dim=3,
     params=["X", "Y", "Z", "rotmat"],
-    transforms={"knots": []},
+    transforms={"intervals": [], "knots": []},
     profiles=[],
     coordinates="s",
     data=["s", "phi"],
@@ -993,35 +1049,15 @@ def _x_s_SplineXYZCurve(params, transforms, profiles, data, **kwargs):
     method="Interpolation type, Default 'cubic'. See SplineXYZCurve docs for options.",
 )
 def _x_ss_SplineXYZCurve(params, transforms, profiles, data, **kwargs):
+    derivative = 2
     xq = data["s"]
-    d2Xq = interp1d(
-        xq,
-        transforms["knots"],
-        params["X"],
-        method=kwargs["method"],
-        derivative=2,
-        period=2 * jnp.pi,
-    )
-    d2Yq = interp1d(
-        xq,
-        transforms["knots"],
-        params["Y"],
-        method=kwargs["method"],
-        derivative=2,
-        period=2 * jnp.pi,
-    )
-    d2Zq = interp1d(
-        xq,
-        transforms["knots"],
-        params["Z"],
-        method=kwargs["method"],
-        derivative=2,
-        period=2 * jnp.pi,
-    )
-    coords = jnp.stack([d2Xq, d2Yq, d2Zq], axis=1)
-    coords = coords @ params["rotmat"].reshape((3, 3)).T
-    coords = xyz2rpz_vec(coords, phi=data["phi"])
-    data["x_ss"] = coords
+    f = [params["X"], params["Y"], params["Z"]]
+
+    coords_ss = _splinexyz_helper(f, transforms, xq, kwargs["method"], derivative)
+    coords_ss = coords_ss @ params["rotmat"].reshape((3, 3)).T
+
+    coords_ss = xyz2rpz_vec(coords_ss, phi=data["phi"])
+    data["x_ss"] = coords_ss
     return data
 
 
@@ -1033,7 +1069,7 @@ def _x_ss_SplineXYZCurve(params, transforms, profiles, data, **kwargs):
     description="Position vector along curve, third derivative",
     dim=3,
     params=["X", "Y", "Z", "rotmat"],
-    transforms={"knots": []},
+    transforms={"intervals": [], "knots": []},
     profiles=[],
     coordinates="s",
     data=["s", "phi"],
@@ -1041,35 +1077,16 @@ def _x_ss_SplineXYZCurve(params, transforms, profiles, data, **kwargs):
     method="Interpolation type, Default 'cubic'. See SplineXYZCurve docs for options.",
 )
 def _x_sss_SplineXYZCurve(params, transforms, profiles, data, **kwargs):
+    derivative = 3
     xq = data["s"]
-    d3Xq = interp1d(
-        xq,
-        transforms["knots"],
-        params["X"],
-        method=kwargs["method"],
-        derivative=3,
-        period=2 * jnp.pi,
-    )
-    d3Yq = interp1d(
-        xq,
-        transforms["knots"],
-        params["Y"],
-        method=kwargs["method"],
-        derivative=3,
-        period=2 * jnp.pi,
-    )
-    d3Zq = interp1d(
-        xq,
-        transforms["knots"],
-        params["Z"],
-        method=kwargs["method"],
-        derivative=3,
-        period=2 * jnp.pi,
-    )
-    coords = jnp.stack([d3Xq, d3Yq, d3Zq], axis=1)
-    coords = coords @ params["rotmat"].reshape((3, 3)).T
-    coords = xyz2rpz_vec(coords, phi=data["phi"])
-    data["x_sss"] = coords
+    f = [params["X"], params["Y"], params["Z"]]
+
+    coords_sss = _splinexyz_helper(f, transforms, xq, kwargs["method"], derivative)
+    coords_sss = coords_sss @ params["rotmat"].reshape((3, 3)).T
+
+    coords_sss = xyz2rpz_vec(coords_sss, phi=data["phi"])
+    data["x_sss"] = coords_sss
+
     return data
 
 
@@ -1136,6 +1153,40 @@ def _frenet_binormal(params, transforms, profiles, data, **kwargs):
 
 
 @register_compute_fun(
+    name="|curvature|",
+    label="|\\kappa|",
+    units="m^{-1}",
+    units_long="Inverse meters",
+    description="Magnitude of the curvature of the curve, the reciprocal of the local "
+    + "radius of curvature. Carries no sign convention, and so -- unlike ``curvature`` "
+    + "-- is a smooth function of the curve parameters wherever the curve is regular. "
+    + "This is the quantity to bound when limiting how tightly a coil is bent.",
+    dim=1,
+    params=[],
+    transforms={},
+    profiles=[],
+    coordinates="s",
+    data=["x_s", "x_ss"],
+    parameterization="desc.geometry.core.Curve",
+)
+def _curvature_magnitude(params, transforms, profiles, data, **kwargs):
+    dxn = jnp.linalg.norm(data["x_s"], axis=-1)[:, jnp.newaxis]
+    # safenorm, not jnp.linalg.norm: d||v||/dv = v/||v|| is 0/0 where the cross product
+    # vanishes, i.e. wherever the curve is momentarily straight, and AD returns NaN
+    # there rather than 0. That is not a corner case for a piecewise arc -- its
+    # transverse shape is w(t) = sum_m a_m sin(m pi t), so w''(t) vanishes EXACTLY at
+    # every hinge, and any grid with a node on a hinge picks it up (measured on
+    # c0/pw_start_B5M3.h5: 4 exact zeros of 1612, one per coil, poisoning 4 x 252 =
+    # 1008 Jacobian entries). Bounded objectives hide it, because compute_scaled_error
+    # masks rows inside the bounds with jnp.where, which selects rather than
+    # multiplies; the augmented Lagrangian reads compute_scaled with no such mask, so
+    # the NaN reaches g_norm and then omega = min(g_norm, 1e-2), making gtolk NaN and
+    # the subproblem convergence test unsatisfiable forever.
+    data["|curvature|"] = safenorm(cross(data["x_s"], data["x_ss"]) / dxn**3, axis=-1)
+    return data
+
+
+@register_compute_fun(
     name="curvature",
     label="\\kappa",
     units="m^{-1}",
@@ -1147,17 +1198,21 @@ def _frenet_binormal(params, transforms, profiles, data, **kwargs):
     transforms={},
     profiles=[],
     coordinates="s",
-    data=["center", "x", "x_s", "x_ss", "frenet_normal", "phi"],
+    data=["center", "x", "|curvature|", "frenet_normal", "phi"],
     parameterization="desc.geometry.core.Curve",
 )
 def _curvature(params, transforms, profiles, data, **kwargs):
-    # magnitude of curvature
-    dxn = jnp.linalg.norm(data["x_s"], axis=-1)[:, jnp.newaxis]
-    curvature = jnp.linalg.norm(cross(data["x_s"], data["x_ss"]) / dxn**3, axis=-1)
-    # sign of curvature (positive = "convex", negative = "concave")
+    # sign of curvature (positive = "convex", negative = "concave").
+    # NOTE: `sign` is a step function, so this quantity JUMPS by 2*|curvature| where
+    # dot(r, frenet_normal) crosses zero. That locus has nothing to do with where
+    # |curvature| vanishes -- it is set by the position of the curve's center, so the
+    # jump happens at full curvature magnitude and can even move when a distant part
+    # of the curve does. Fine for reporting convexity; unusable as an optimization
+    # target or bound, where a trust region cannot shrink past the discontinuity.
+    # Use "|curvature|" for that.
     r = rpz2xyz(data["center"]) - rpz2xyz(data["x"])
     r = xyz2rpz_vec(r, phi=data["phi"])
-    data["curvature"] = curvature * sign(dot(r, data["frenet_normal"]))
+    data["curvature"] = data["|curvature|"] * sign(dot(r, data["frenet_normal"]))
     return data
 
 
@@ -1178,6 +1233,39 @@ def _curvature(params, transforms, profiles, data, **kwargs):
 def _torsion(params, transforms, profiles, data, **kwargs):
     dxd2x = cross(data["x_s"], data["x_ss"])
     data["torsion"] = dot(dxd2x, data["x_sss"]) / jnp.linalg.norm(dxd2x, axis=-1) ** 2
+    return data
+
+
+@register_compute_fun(
+    name="torsion",
+    label="\\tau",
+    units="m^{-1}",
+    units_long="Inverse meters",
+    description="Scalar torsion of the curve",
+    dim=1,
+    params=[],
+    transforms={"intervals": [], "knots": []},
+    profiles=[],
+    coordinates="s",
+    data=["s", "x_s", "x_ss", "x_sss"],
+    parameterization="desc.geometry.curve.SplineXYZCurve",
+    method="Interpolation type, Default 'cubic'. See SplineXYZCurve docs for options.",
+)
+def _torsion_SplineXYZCurve(params, transforms, profiles, data, **kwargs):
+    dxd2x = cross(data["x_s"], data["x_ss"])
+    data["torsion"] = dot(dxd2x, data["x_sss"]) / jnp.linalg.norm(dxd2x, axis=-1) ** 2
+    # set torsion to zero at break points because the curve is just
+    # 2 lines that lie in the same plane
+    if len(transforms["intervals"][0]):
+        is_break_point = (
+            data["s"] == transforms["knots"][transforms["intervals"]][:, 1:]
+        )
+        data["torsion"] = jnp.where(
+            is_break_point.any(axis=0),
+            0.0,
+            data["torsion"],
+        )
+
     return data
 
 
@@ -1236,4 +1324,520 @@ def _length_SplineXYZCurve(params, transforms, profiles, data, **kwargs):
         # this is equivalent to jnp.trapz(T, s) for a closed curve
         # but also works if grid.endpoint is False
         data["length"] = jnp.sum(T * data["ds"])
+    return data
+
+
+# ---------------------------------------------------------------------------
+# PiecewisePlanarArcCurve: B planar arcs joined at shared hinges (C0 corners).
+# Parameters: hinges (B,3), tilts (B,), shape (B,M). Curve param s in [0,2pi)
+# maps to arc i = floor(s*B/2pi) and local t = frac(s*B/2pi) in [0,1].
+# Geometry per arc (xyz):
+#   chord = H[i+1]-H[i];  e_par = chord/|chord|
+#   perp0 = normalize(ref - (ref.e_par) e_par)   [ref chosen not || chord]
+#   perp  = perp0 cos(phi) + (e_par x perp0) sin(phi)    [Rodrigues about e_par]
+#   w(t)  = sum_m a[i,m] sin((m+1) pi t)
+#   x(t)  = H[i] + t chord + w perp
+# ds->dt scale = B/(2pi):  x_s = x_t * (B/2pi);  x_ss = x_tt * (B/2pi)^2
+# ---------------------------------------------------------------------------
+
+
+_REF_DEGENERATE = 1e-12  # floor on |perp0| so an aligned reference cannot produce NaN
+
+
+def _arc_reference(e_par, ref=None):
+    """Per-arc reference vector for the in-plane frame.
+
+    `ref` is a FROZEN (B, 3) array supplied by the curve object. Freezing it is not a
+    micro-optimization -- it is required for the map from parameters to geometry to be
+    continuous.
+
+    The legacy fallback (``ref=None``) picks the reference at evaluation time as
+    ``+Y if |e_par . zhat| > 0.9 else +Z``. That condition is a function of ``hinges``,
+    which is an optimization variable, so crossing it rotates the arc discontinuously
+    about its own chord: MEASURED on `c0/pw_start_B5M3.h5`, a 1e-10 change in one hinge
+    moves the curve 12.8 cm and the QuadraticFlux cost by 0.78%, with both jumps
+    constant as the perturbation goes to zero. `jnp.where` carries no derivative through
+    its condition, so AD returns a Jacobian that is correct on each side and blind to
+    the jump -- the trust region then collapses (measured: 1e9x) trying to step across
+    a discontinuity its model cannot see, while the Jacobian looks full rank and
+    well conditioned.
+
+    Freezing at construction reproduces the legacy frame exactly at that point (the
+    same rule chooses it), so no existing geometry changes; only the parameter-dependent
+    switching is removed. The freeze also guarantees |e_par . ref| <= 0.9 at freeze
+    time, so ``perp0`` starts well away from degenerate.
+    """
+    if ref is None:
+        zc = jnp.abs(e_par[:, 2])
+        return jnp.where(
+            (zc > 0.9)[:, None],
+            jnp.array([0.0, 1.0, 0.0])[None, :],
+            jnp.array([0.0, 0.0, 1.0])[None, :],
+        )
+    return jnp.asarray(ref).reshape(e_par.shape)
+
+
+def _ppa_arc_frame(hinges, tilts, B, ref=None):
+    """Per-arc chord, e_par, perp (unit in-plane normal), for all B arcs.
+
+    Returns chord (B,3), e_par (B,3), perp (B,3).
+    """
+    Hi = hinges
+    Hnext = jnp.roll(hinges, -1, axis=0)
+    chord = Hnext - Hi
+    L = jnp.linalg.norm(chord, axis=1, keepdims=True)
+    e_par = chord / L
+    ref = _arc_reference(e_par, ref)
+    perp0 = ref - jnp.sum(ref * e_par, axis=1, keepdims=True) * e_par
+    perp0 = perp0 / jnp.maximum(
+        jnp.linalg.norm(perp0, axis=1, keepdims=True), _REF_DEGENERATE
+    )
+    # Rodrigues rotation of perp0 about e_par by tilt (perp0 _|_ e_par so no 3rd term)
+    cphi = jnp.cos(tilts)[:, None]
+    sphi = jnp.sin(tilts)[:, None]
+    perp = perp0 * cphi + jnp.cross(e_par, perp0) * sphi
+    return chord, e_par, perp
+
+
+def _ppa_indices(s, B):
+    """Map curve param s in [0,2pi) to arc index i and local t in [0,1]."""
+    u = s * B / (2 * jnp.pi)
+    i = jnp.floor(u).astype(int)
+    i = jnp.clip(i, 0, B - 1)
+    t = u - i
+    return i, t
+
+
+def _ppa_coords(params, data, B, M, deriv):
+    """Compute xyz coords (deriv=0) or d^deriv x / dt^deriv (deriv=1,2)."""
+    hinges = params["hinges"].reshape(B, 3)
+    tilts = params["tilts"].reshape(B)
+    shape = params["shape"].reshape(B, M)
+    chord, e_par, perp = _ppa_arc_frame(hinges, tilts, B, params.get("arc_ref"))
+
+    i, t = _ppa_indices(data["s"], B)
+    Hi = hinges[i]  # (nt,3)
+    ci = chord[i]  # (nt,3)
+    pi_ = perp[i]  # (nt,3)
+    ai = shape[i]  # (nt,M)
+
+    m = jnp.arange(1, M + 1)  # (M,) sine mode numbers
+    ang = jnp.pi * jnp.outer(t, m)  # (nt,M)
+    if deriv == 0:
+        w = jnp.sum(ai * jnp.sin(ang), axis=1)  # (nt,)
+        coords = Hi + t[:, None] * ci + w[:, None] * pi_
+    elif deriv == 1:
+        dw = jnp.sum(ai * (jnp.pi * m) * jnp.cos(ang), axis=1)
+        coords = ci + dw[:, None] * pi_
+    elif deriv == 2:
+        d2w = jnp.sum(ai * (-((jnp.pi * m) ** 2)) * jnp.sin(ang), axis=1)
+        coords = d2w[:, None] * pi_
+    elif deriv == 3:
+        d3w = jnp.sum(ai * (-((jnp.pi * m) ** 3)) * jnp.cos(ang), axis=1)
+        coords = d3w[:, None] * pi_
+    else:
+        raise ValueError(f"deriv must be 0,1,2,3 got {deriv}")
+    return coords
+
+
+@register_compute_fun(
+    name="x",
+    label="\\mathbf{x}",
+    units="~",
+    units_long="not applicable",
+    description="Coordinate triplet. "
+    "This is not a position vector unless basis is cartesian. "
+    "When basis is cartesian, the units are meters.",
+    dim=3,
+    params=["hinges", "tilts", "shape", "rotmat", "shift", "arc_ref"],
+    transforms={},
+    profiles=[],
+    coordinates="s",
+    data=["s"],
+    parameterization="desc.geometry.curve.PiecewisePlanarArcCurve",
+    arc_B="int: number of planar arcs",
+    arc_M="int: number of transverse sine modes per arc",
+)
+def _x_PiecewisePlanarArcCurve(params, transforms, profiles, data, **kwargs):
+    B = kwargs["arc_B"]
+    M = kwargs["arc_M"]
+    coords = _ppa_coords(params, data, B, M, deriv=0)
+    coords = coords @ params["rotmat"].reshape((3, 3)).T + params["shift"][None, :]
+    data["x"] = xyz2rpz(coords)
+    return data
+
+
+@register_compute_fun(
+    name="x_s",
+    label="\\partial_{s} \\mathbf{x}",
+    units="m",
+    units_long="meters",
+    description="Position vector along curve, first derivative",
+    dim=3,
+    params=["hinges", "tilts", "shape", "rotmat"],
+    transforms={},
+    profiles=[],
+    coordinates="s",
+    data=["s", "phi"],
+    parameterization="desc.geometry.curve.PiecewisePlanarArcCurve",
+    arc_B="int: number of planar arcs",
+    arc_M="int: number of transverse sine modes per arc",
+)
+def _x_s_PiecewisePlanarArcCurve(params, transforms, profiles, data, **kwargs):
+    B = kwargs["arc_B"]
+    M = kwargs["arc_M"]
+    scale = B / (2 * jnp.pi)
+    coords = _ppa_coords(params, data, B, M, deriv=1) * scale
+    coords = coords @ params["rotmat"].reshape((3, 3)).T
+    data["x_s"] = xyz2rpz_vec(coords, phi=data["phi"])
+    return data
+
+
+@register_compute_fun(
+    name="x_ss",
+    label="\\partial_{ss} \\mathbf{x}",
+    units="m",
+    units_long="meters",
+    description="Position vector along curve, second derivative",
+    dim=3,
+    params=["hinges", "tilts", "shape", "rotmat"],
+    transforms={},
+    profiles=[],
+    coordinates="s",
+    data=["s", "phi"],
+    parameterization="desc.geometry.curve.PiecewisePlanarArcCurve",
+    arc_B="int: number of planar arcs",
+    arc_M="int: number of transverse sine modes per arc",
+)
+def _x_ss_PiecewisePlanarArcCurve(params, transforms, profiles, data, **kwargs):
+    B = kwargs["arc_B"]
+    M = kwargs["arc_M"]
+    scale = (B / (2 * jnp.pi)) ** 2
+    coords = _ppa_coords(params, data, B, M, deriv=2) * scale
+    coords = coords @ params["rotmat"].reshape((3, 3)).T
+    data["x_ss"] = xyz2rpz_vec(coords, phi=data["phi"])
+    return data
+
+
+@register_compute_fun(
+    name="center",
+    label="\\langle\\mathbf{x}\\rangle",
+    units="m",
+    units_long="meters",
+    description="Centroid of the curve (mean of hinges)",
+    dim=3,
+    params=["hinges", "rotmat", "shift"],
+    transforms={},
+    profiles=[],
+    coordinates="s",
+    data=["x"],
+    parameterization="desc.geometry.curve.PiecewisePlanarArcCurve",
+    arc_B="int: number of planar arcs",
+)
+def _center_PiecewisePlanarArcCurve(params, transforms, profiles, data, **kwargs):
+    B = kwargs["arc_B"]
+    hinges = params["hinges"].reshape(B, 3)
+    center = jnp.mean(hinges, axis=0)
+    center = jnp.matmul(center, params["rotmat"].reshape((3, 3)).T) + params["shift"]
+    data["center"] = xyz2rpz(center) * jnp.ones_like(data["x"])
+    return data
+
+
+@register_compute_fun(
+    name="x_sss",
+    label="\\partial_{sss} \\mathbf{x}",
+    units="m",
+    units_long="meters",
+    description="Position vector along curve, third derivative",
+    dim=3,
+    params=["hinges", "tilts", "shape", "rotmat"],
+    transforms={},
+    profiles=[],
+    coordinates="s",
+    data=["s", "phi"],
+    parameterization="desc.geometry.curve.PiecewisePlanarArcCurve",
+    arc_B="int: number of planar arcs",
+    arc_M="int: number of transverse sine modes per arc",
+)
+def _x_sss_PiecewisePlanarArcCurve(params, transforms, profiles, data, **kwargs):
+    B = kwargs["arc_B"]
+    M = kwargs["arc_M"]
+    scale = (B / (2 * jnp.pi)) ** 3
+    coords = _ppa_coords(params, data, B, M, deriv=3) * scale
+    coords = coords @ params["rotmat"].reshape((3, 3)).T
+    data["x_sss"] = xyz2rpz_vec(coords, phi=data["phi"])
+    return data
+
+
+@register_compute_fun(
+    name="frenet_normal",
+    label="\\mathbf{N}_{\\mathrm{Frenet-Serret}}",
+    units="~",
+    units_long="None",
+    description="Normal unit vector to curve in Frenet-Serret frame "
+    "(safenormalized so the C0 arc-start inflections, where x_ss=0, give a finite "
+    "zero vector instead of a 0/0 nan)",
+    dim=3,
+    params=[],
+    transforms={},
+    profiles=[],
+    coordinates="s",
+    data=["x_s", "x_ss"],
+    parameterization="desc.geometry.curve.PiecewisePlanarArcCurve",
+)
+def _frenet_normal_PiecewisePlanarArcCurve(
+    params, transforms, profiles, data, **kwargs
+):
+    normal = cross(data["x_s"], cross(data["x_ss"], data["x_s"]))
+    data["frenet_normal"] = safenormalize(normal, axis=-1)
+    return data
+
+
+# ---------------------------------------------------------------------------
+# PolarPlanarArcCurve: B planar arcs, each a POLAR graph r(theta) about its
+# chord MIDPOINT. Parameters: hinges (B,3), tilts (B,), shape (B,M).
+# Curve param s in [0,2pi) -> arc i = floor(s B/2pi), local phi = frac in [0,1].
+# Geometry per arc (xyz), with C = (H[i]+H[i+1])/2, Lc = |chord|:
+#   r(phi) = Lc/2 + sum_m a[i,m] sin((m+1) pi phi)
+#   theta  = pi phi
+#   x      = C + r cos(theta) e_par + r sin(theta) perp
+# Both hinges lie ON the polar axis (theta = 0 and pi) because the pole is the
+# chord midpoint, so r(0) = r(1) = Lc/2 holds for ANY coefficients: C0 closure is
+# structural and a SINGLE series pins both endpoints.
+# Derivatives w.r.t. phi, with c = cos(pi phi), sn = sin(pi phi), p = pi, and
+# rk = d^k r / dphi^k:
+#   dx  = r1 c - p r0 sn                      dy  = r1 sn + p r0 c
+#   d2x = r2 c - 2p r1 sn - p^2 r0 c          d2y = r2 sn + 2p r1 c - p^2 r0 sn
+#   d3x = r3 c - 3p r2 sn - 3p^2 r1 c + p^3 r0 sn
+#   d3y = r3 sn + 3p r2 c - 3p^2 r1 sn - p^3 r0 c
+# All six verified symbolically against sympy. ds -> dphi scale = B/(2pi), so
+# x_s = dx (B/2pi), x_ss = d2x (B/2pi)^2, x_sss = d3x (B/2pi)^3.
+# ---------------------------------------------------------------------------
+
+
+def _ppolar_arc_frame(hinges, tilts, B, ref=None):
+    """Per-arc chord, e_par, perp, pole (chord midpoint) and chord length."""
+    Hi = hinges
+    Hnext = jnp.roll(hinges, -1, axis=0)
+    chord = Hnext - Hi
+    L = jnp.linalg.norm(chord, axis=1, keepdims=True)
+    e_par = chord / L
+    ref = _arc_reference(e_par, ref)
+    perp0 = ref - jnp.sum(ref * e_par, axis=1, keepdims=True) * e_par
+    perp0 = perp0 / jnp.maximum(
+        jnp.linalg.norm(perp0, axis=1, keepdims=True), _REF_DEGENERATE
+    )
+    cphi = jnp.cos(tilts)[:, None]
+    sphi = jnp.sin(tilts)[:, None]
+    perp = perp0 * cphi + jnp.cross(e_par, perp0) * sphi
+    pole = 0.5 * (Hi + Hnext)
+    return chord, e_par, perp, pole, L[:, 0]
+
+
+def _ppolar_indices(s, B):
+    """Map curve param s in [0,2pi) to arc index i and local phi in [0,1]."""
+    u = s * B / (2 * jnp.pi)
+    i = jnp.clip(jnp.floor(u).astype(int), 0, B - 1)
+    return i, u - i
+
+
+def _ppolar_coords(params, data, B, M, deriv):
+    """XYZ coords (deriv=0) or the deriv-th phi derivative (deriv=1,2,3)."""
+    hinges = params["hinges"].reshape(B, 3)
+    tilts = params["tilts"].reshape(B)
+    shape = params["shape"].reshape(B, M)
+    chord, e_par, perp, pole, Lc = _ppolar_arc_frame(
+        hinges, tilts, B, params.get("arc_ref")
+    )
+
+    i, phi = _ppolar_indices(data["s"], B)
+    ai = shape[i]
+    ei = e_par[i]
+    pi_ = perp[i]
+    Ci = pole[i]
+    Li = Lc[i]
+
+    m = jnp.arange(1, M + 1)
+    km = jnp.pi * m
+    ang = jnp.pi * jnp.outer(phi, m)
+    p = jnp.pi
+    c = jnp.cos(p * phi)
+    sn = jnp.sin(p * phi)
+
+    # NOTE the MINUS on the e_par component. theta is measured from the -e_par end so
+    # that phi=0 -> C - (Lc/2) e_par = H[i] and phi=1 -> C + (Lc/2) e_par = H[i+1],
+    # i.e. arc i traverses H[i] -> H[i+1] as the CoilSet/arc-index convention requires.
+    # Taking theta from +e_par instead puts phi=0 on H[i+1] and runs every arc backwards
+    # (endpoint POSITIONS still look right, so this is only caught by checking which
+    # hinge phi=0 lands on).
+    r0 = Li / 2 + jnp.sum(ai * jnp.sin(ang), axis=1)
+    if deriv == 0:
+        xl, yl = -r0 * c, r0 * sn
+        return Ci + xl[:, None] * ei + yl[:, None] * pi_
+    r1 = jnp.sum(ai * km * jnp.cos(ang), axis=1)
+    if deriv == 1:
+        xl = -(r1 * c - p * r0 * sn)
+        yl = r1 * sn + p * r0 * c
+        return xl[:, None] * ei + yl[:, None] * pi_
+    r2 = -jnp.sum(ai * km**2 * jnp.sin(ang), axis=1)
+    if deriv == 2:
+        xl = -(r2 * c - 2 * p * r1 * sn - p**2 * r0 * c)
+        yl = r2 * sn + 2 * p * r1 * c - p**2 * r0 * sn
+        return xl[:, None] * ei + yl[:, None] * pi_
+    r3 = -jnp.sum(ai * km**3 * jnp.cos(ang), axis=1)
+    if deriv == 3:
+        xl = -(r3 * c - 3 * p * r2 * sn - 3 * p**2 * r1 * c + p**3 * r0 * sn)
+        yl = r3 * sn + 3 * p * r2 * c - 3 * p**2 * r1 * sn - p**3 * r0 * c
+        return xl[:, None] * ei + yl[:, None] * pi_
+    raise ValueError(f"deriv must be 0,1,2,3 got {deriv}")
+
+
+@register_compute_fun(
+    name="x",
+    label="\\mathbf{x}",
+    units="~",
+    units_long="not applicable",
+    description="Coordinate triplet. "
+    "This is not a position vector unless basis is cartesian. "
+    "When basis is cartesian, the units are meters.",
+    dim=3,
+    params=["hinges", "tilts", "shape", "rotmat", "shift", "arc_ref"],
+    transforms={},
+    profiles=[],
+    coordinates="s",
+    data=["s"],
+    parameterization="desc.geometry.curve.PolarPlanarArcCurve",
+    arc_B="int: number of planar arcs",
+    arc_M="int: number of polar radial sine modes per arc",
+)
+def _x_PolarPlanarArcCurve(params, transforms, profiles, data, **kwargs):
+    coords = _ppolar_coords(
+        params,
+        data,
+        kwargs["arc_B"],
+        kwargs["arc_M"],
+        deriv=0,
+    )
+    coords = coords @ params["rotmat"].reshape((3, 3)).T + params["shift"][None, :]
+    data["x"] = xyz2rpz(coords)
+    return data
+
+
+@register_compute_fun(
+    name="x_s",
+    label="\\partial_{s} \\mathbf{x}",
+    units="m",
+    units_long="meters",
+    description="Position vector along curve, first derivative",
+    dim=3,
+    params=["hinges", "tilts", "shape", "rotmat"],
+    transforms={},
+    profiles=[],
+    coordinates="s",
+    data=["s", "phi"],
+    parameterization="desc.geometry.curve.PolarPlanarArcCurve",
+    arc_B="int: number of planar arcs",
+    arc_M="int: number of polar radial sine modes per arc",
+)
+def _x_s_PolarPlanarArcCurve(params, transforms, profiles, data, **kwargs):
+    B = kwargs["arc_B"]
+    coords = _ppolar_coords(params, data, B, kwargs["arc_M"], deriv=1)
+    coords = coords * (B / (2 * jnp.pi))
+    coords = coords @ params["rotmat"].reshape((3, 3)).T
+    data["x_s"] = xyz2rpz_vec(coords, phi=data["phi"])
+    return data
+
+
+@register_compute_fun(
+    name="x_ss",
+    label="\\partial_{ss} \\mathbf{x}",
+    units="m",
+    units_long="meters",
+    description="Position vector along curve, second derivative",
+    dim=3,
+    params=["hinges", "tilts", "shape", "rotmat"],
+    transforms={},
+    profiles=[],
+    coordinates="s",
+    data=["s", "phi"],
+    parameterization="desc.geometry.curve.PolarPlanarArcCurve",
+    arc_B="int: number of planar arcs",
+    arc_M="int: number of polar radial sine modes per arc",
+)
+def _x_ss_PolarPlanarArcCurve(params, transforms, profiles, data, **kwargs):
+    B = kwargs["arc_B"]
+    coords = _ppolar_coords(params, data, B, kwargs["arc_M"], deriv=2)
+    coords = coords * (B / (2 * jnp.pi)) ** 2
+    coords = coords @ params["rotmat"].reshape((3, 3)).T
+    data["x_ss"] = xyz2rpz_vec(coords, phi=data["phi"])
+    return data
+
+
+@register_compute_fun(
+    name="x_sss",
+    label="\\partial_{sss} \\mathbf{x}",
+    units="m",
+    units_long="meters",
+    description="Position vector along curve, third derivative",
+    dim=3,
+    params=["hinges", "tilts", "shape", "rotmat"],
+    transforms={},
+    profiles=[],
+    coordinates="s",
+    data=["s", "phi"],
+    parameterization="desc.geometry.curve.PolarPlanarArcCurve",
+    arc_B="int: number of planar arcs",
+    arc_M="int: number of polar radial sine modes per arc",
+)
+def _x_sss_PolarPlanarArcCurve(params, transforms, profiles, data, **kwargs):
+    B = kwargs["arc_B"]
+    coords = _ppolar_coords(params, data, B, kwargs["arc_M"], deriv=3)
+    coords = coords * (B / (2 * jnp.pi)) ** 3
+    coords = coords @ params["rotmat"].reshape((3, 3)).T
+    data["x_sss"] = xyz2rpz_vec(coords, phi=data["phi"])
+    return data
+
+
+@register_compute_fun(
+    name="center",
+    label="\\mathbf{x}_{0}",
+    units="m",
+    units_long="meters",
+    description="Centroid of the hinge points",
+    dim=3,
+    params=["hinges", "rotmat", "shift"],
+    transforms={},
+    profiles=[],
+    coordinates="",
+    data=[],
+    parameterization="desc.geometry.curve.PolarPlanarArcCurve",
+    arc_B="int: number of planar arcs",
+)
+def _center_PolarPlanarArcCurve(params, transforms, profiles, data, **kwargs):
+    B = kwargs["arc_B"]
+    center = jnp.mean(params["hinges"].reshape(B, 3), axis=0)
+    center = jnp.matmul(center, params["rotmat"].reshape((3, 3)).T) + params["shift"]
+    data["center"] = center
+    return data
+
+
+@register_compute_fun(
+    name="frenet_normal",
+    label="\\mathbf{N}_{\\mathrm{Frenet-Serret}}",
+    units="~",
+    units_long="None",
+    description="Normal unit vector to curve in Frenet-Serret frame "
+    "(safenormalized so any point where x_ss vanishes gives a finite zero vector "
+    "instead of a 0/0 nan)",
+    dim=3,
+    params=[],
+    transforms={},
+    profiles=[],
+    coordinates="s",
+    data=["x_s", "x_ss"],
+    parameterization="desc.geometry.curve.PolarPlanarArcCurve",
+)
+def _frenet_normal_PolarPlanarArcCurve(params, transforms, profiles, data, **kwargs):
+    normal = cross(data["x_s"], cross(data["x_ss"], data["x_s"]))
+    data["frenet_normal"] = safenormalize(normal, axis=-1)
     return data

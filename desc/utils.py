@@ -376,6 +376,33 @@ def islinspaced(x, axis=-1, rtol=1e-6, atol=1e-12):
     return isalmostequal(np.diff(x, axis=axis), rtol=rtol, atol=atol, axis=axis)
 
 
+@functools.partial(jit, static_argnames=["n_head"])
+def scale_tail_rows(A, row_scale, n_head):
+    """Multiply the trailing rows of a matrix by a per-row factor.
+
+    Leaves the first ``n_head`` rows untouched. Used to re-apply a changed diagonal
+    row scaling to a block matrix without rebuilding it -- e.g. the augmented
+    Lagrangian Jacobian ``[Jf; sqrt(mu)*Jc]``, whose blocks depend only on the
+    iterate, so a change in ``mu`` alone is a pure rescale of the trailing block.
+
+    Parameters
+    ----------
+    A : jnp.ndarray, shape(m, n)
+        Matrix to scale.
+    row_scale : jnp.ndarray, shape(m - n_head,)
+        Multiplicative factor for each trailing row.
+    n_head : int
+        Number of leading rows to leave unchanged. Static under JIT.
+
+    Returns
+    -------
+    jnp.ndarray, shape(m, n)
+        ``A`` with rows ``n_head:`` scaled by ``row_scale``.
+
+    """
+    return A.at[n_head:].multiply(jnp.atleast_1d(row_scale)[:, None])
+
+
 @jit
 def copy_coeffs(c_old, modes_old, modes_new, c_new=None):
     """Copy coefficients from one resolution to another."""

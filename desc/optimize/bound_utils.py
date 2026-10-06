@@ -188,6 +188,35 @@ def select_step(x, JorH, diag_h, g_h, p, p_h, d, Delta, lb, ub, theta, mode="jac
         - a reflected step (r)
         - a constrained Cauchy step (ag, minimizer along direction of scaled gradient)
     """
+    step, step_h, predicted_reduction, _ = _select_step_impl(
+        x, JorH, diag_h, g_h, p, p_h, d, Delta, lb, ub, theta, mode
+    )
+    return step, step_h, predicted_reduction
+
+
+def select_step_diag(x, JorH, diag_h, g_h, p, p_h, d, Delta, lb, ub, theta, mode="jac"):
+    """`select_step`, plus a record of WHY that step was chosen.
+
+    Returns ``(step, step_h, predicted_reduction, info)``. The step is computed by the
+    same code as `select_step`, so it is identical. ``info`` holds:
+
+    - ``in_bounds_full``: whether ``x + p`` was already feasible before any truncation
+    - ``p_stride``: the truncation fraction applied to the trust-region step (1 if none)
+    - ``hits``: per variable, -1/+1 if it set ``p_stride`` at its lower/upper bound
+    - ``selected``: -1 = the full trust-region step (no truncation needed),
+      0 = truncated trust-region step, 1 = reflected step, 2 = steepest descent
+    - ``p_value``, ``r_value``, ``ag_value``: model value of each candidate
+      (NaN for candidates never formed; inf for an unavailable reflection)
+    """
+    return _select_step_impl(
+        x, JorH, diag_h, g_h, p, p_h, d, Delta, lb, ub, theta, mode
+    )
+
+
+def _select_step_impl(
+    x, JorH, diag_h, g_h, p, p_h, d, Delta, lb, ub, theta, mode="jac"
+):
+    """Shared body of `select_step` and `select_step_diag`."""
     assert mode in ["jac", "hess"]
 
     if mode == "jac":
@@ -199,10 +228,21 @@ def select_step(x, JorH, diag_h, g_h, p, p_h, d, Delta, lb, ub, theta, mode="jac
 
     def inbounds_true(p, p_h):
         p_value = evaluate_quadratic_form(JorH, g_h, p_h, diag=diag_h)
-        return p, p_h, -p_value
+        # both `cond` branches must return the same pytree, dtypes and shapes
+        info = dict(
+            in_bounds_full=jnp.asarray(True),
+            p_stride=jnp.asarray(1.0, dtype=p.dtype),
+            hits=jnp.zeros(x.size, dtype=int),
+            selected=jnp.asarray(-1, dtype=int),
+            p_value=jnp.asarray(p_value, dtype=p.dtype),
+            r_value=jnp.asarray(jnp.nan, dtype=p.dtype),
+            ag_value=jnp.asarray(jnp.nan, dtype=p.dtype),
+        )
+        return p, p_h, -p_value, info
 
     def inbounds_false(p, p_h):
         p_stride, hits = step_size_to_bound(x, p, lb, ub)
+        p_stride_raw = p_stride
 
         # Compute the reflected direction.
         r_h = jnp.copy(p_h)
@@ -272,7 +312,16 @@ def select_step(x, JorH, diag_h, g_h, p, p_h, d, Delta, lb, ub, theta, mode="jac
         steps = jnp.array([p, r, ag])
         steps_h = jnp.array([p_h, r_h, ag_h])
         idx = jnp.nanargmin(values)
-        return steps[idx], steps_h[idx], -values[idx]
+        info = dict(
+            in_bounds_full=jnp.asarray(False),
+            p_stride=jnp.asarray(p_stride_raw, dtype=p.dtype),
+            hits=jnp.asarray(hits, dtype=int),
+            selected=jnp.asarray(idx, dtype=int),
+            p_value=jnp.asarray(p_value, dtype=p.dtype),
+            r_value=jnp.asarray(r_value, dtype=p.dtype),
+            ag_value=jnp.asarray(ag_value, dtype=p.dtype),
+        )
+        return steps[idx], steps_h[idx], -values[idx], info
 
     return cond(in_bounds(x + p, lb, ub), inbounds_true, inbounds_false, p, p_h)
 

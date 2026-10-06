@@ -32,6 +32,7 @@ __all__ = [
     "FourierRZCurve",
     "FourierXYCurve",
     "FourierXYZCurve",
+    "PiecewisePlanarArcCurve",
     "SplineXYZCurve",
 ]
 
@@ -1450,10 +1451,22 @@ class SplineXYZCurve(Curve):
 
     name : str
         name for this curve
-
+    break_indices : ndarray or None
+        If supplied, the spline will be a piecewise set of splines.
+        Indices are of knots at which the curve breaks and is only C0 continuous (e.g.
+        continuous but with "corners" where the derivative jumps). In between each set
+        of break points, there is an unbroken spline whose start and endpoints are
+        given by `break_indices[i-1, i]`, where `i` indicates the ith spline.
+        Each (the ith) spline is interpolated independently of all other unbroken
+        splines (i+1th, i-1th, etc.) and does not consider their query points
+        (knots) when interpolating. The boundary conditions are evaluated using
+        interpax's default where non-periodicity is assumed.
+        If None (the default), the spline will be the usual periodic spline with the
+        continuity dictated by the spline method.
     """
 
-    _io_attrs_ = Curve._io_attrs_ + ["_X", "_Y", "_Z", "_knots", "_method"]
+    _attributes = ["_X", "_Y", "_Z", "_knots", "_intervals", "_method"]
+    _io_attrs_ = Curve._io_attrs_ + _attributes
 
     _static_attrs = Curve._static_attrs + ["_method"]
 
@@ -1465,6 +1478,7 @@ class SplineXYZCurve(Curve):
         knots=None,
         method="cubic",
         name="",
+        break_indices=None,
     ):
         super().__init__(name)
         X, Y, Z = np.atleast_1d(X), np.atleast_1d(Y), np.atleast_1d(Z)
@@ -1499,8 +1513,36 @@ class SplineXYZCurve(Curve):
             errorif(knots[-1] > 2 * np.pi, ValueError, "knots must lie in [0, 2pi]")
             knots = knots[:-1] if closed_flag else knots
 
+        if break_indices is None:
+            intervals = [[]]
+        else:
+            unique_ordered_indices = np.unique(break_indices)
+            errorif(
+                len(unique_ordered_indices) != len(break_indices),
+                ValueError,
+                "break_indices must not contain any duplicated values",
+            )
+            errorif(
+                np.any(unique_ordered_indices != break_indices),
+                ValueError,
+                "break_indices must be monotonic",
+            )
+            errorif(
+                unique_ordered_indices[0] < 0
+                or unique_ordered_indices[-1] > len(knots) - 1,
+                ValueError,
+                "break_indices must lie in the range [0, len(knots) - 1]",
+            )
+            intervals = np.array(
+                [
+                    [break_indices[i - 1], break_indices[i]]
+                    for i in range(len(break_indices))
+                ]
+            )
+
         self._knots = knots
         self._method = method
+        self._intervals = intervals
 
     @optimizable_parameter
     @property
@@ -1574,9 +1616,16 @@ class SplineXYZCurve(Curve):
             )
 
     @property
+    def intervals(self):
+        """Intervals for spline determined from the inputted break indices."""
+        if not (hasattr(self, "_intervals")) or self._intervals is None:
+            self._intervals = [[]]
+        return self._intervals
+
+    @property
     def N(self):
         """Number of knots in the spline."""
-        return self.knots.size
+        return self._knots.size
 
     @property
     def method(self):
@@ -1632,6 +1681,7 @@ class SplineXYZCurve(Curve):
         -------
         data : dict of ndarray
             Computed quantity and intermediate variables.
+
         """
         return super().compute(
             names=names,
@@ -1644,7 +1694,15 @@ class SplineXYZCurve(Curve):
         )
 
     @classmethod
-    def from_values(cls, coords, knots=None, method="cubic", basis="xyz", name=""):
+    def from_values(
+        cls,
+        coords,
+        knots=None,
+        method="cubic",
+        basis="xyz",
+        name="",
+        break_indices=None,
+    ):
         """Create SplineXYZCurve from coordinate values.
 
         Parameters
@@ -1665,16 +1723,34 @@ class SplineXYZCurve(Curve):
         method : str
             method of interpolation
 
-            - `'nearest'`: nearest neighbor interpolation
-            - `'linear'`: linear interpolation
-            - `'cubic'`: C1 cubic splines (aka local splines)
-            - `'cubic2'`: C2 cubic splines (aka natural splines)
-            - `'catmull-rom'`: C1 cubic centripetal "tension" splines
+            - ``'nearest'``: nearest neighbor interpolation
+            - ``'linear'``: linear interpolation
+            - ``'cubic'``: C1 cubic splines (aka local splines)
+            - ``'cubic2'``: C2 cubic splines (aka natural splines)
+            - ``'catmull-rom'``: C1 cubic centripetal "tension" splines
+            - ``'cardinal'``: C1 cubic general tension splines. If used, default tension
+              of c = 0 will be used
+            - ``'monotonic'``: C1 cubic splines that attempt to preserve monotonicity in
+              the data, and will not introduce new extrema in the interpolated points
+            - ``'monotonic-0'``: same as `'monotonic'` but with 0 first derivatives at
+              both endpoints
 
-        basis : {"rpz", "xyz"}
-            Basis for input coordinates. Defaults to "xyz".
         name : str
-            Name for this curve.
+            name for this curve
+        basis : {"rpz", "xyz"}
+            basis for input coordinates. Defaults to "xyz"
+        break_indices : ndarray or None
+            If supplied, the spline will be a piecewise set of splines.
+            Indices of knots at which the curve breaks and is only C0 continuous (e.g.
+            continuous but with "corners" where the derivative jumps). In between each
+            set of break points, there is an unbroken spline whose start and endpoints
+            are given by `break_indices[i-1, i]`, where `i` indicates the ith spline.
+            Each (the ith) spline is interpolated independently of all other unbroken
+            splines (i+1th, i-1th, etc.) and does not consider their query points
+            (knots) when interpolating. The boundary conditions are evaluated using
+            Interpax's default where non-periodicity is assumed.
+            If None (the default), the spline will be the usual periodic spline with
+            the continuity dictated by the spline method.
 
         Returns
         -------
@@ -1691,4 +1767,780 @@ class SplineXYZCurve(Curve):
             knots=knots,
             method=method,
             name=name,
+            break_indices=break_indices,
         )
+
+
+class _FrozenArcReferenceMixin:
+    """Frozen per-arc frame reference, shared by the two planar-arc curve classes.
+
+    The compute kernels build each arc's in-plane direction by projecting a reference
+    vector off the chord. Choosing that reference at evaluation time from
+    ``|e_par . zhat| > 0.9`` makes the choice a function of ``hinges`` -- an
+    optimization variable -- so crossing the threshold rotates the arc discontinuously
+    about its chord (measured: 12.8 cm of curve motion and a 0.78% jump in
+    QuadraticFlux from a 1e-10 hinge perturbation, both constant as the perturbation
+    goes to zero). AD cannot see it, so the trust region collapses against a wall its
+    model says is not there.
+
+    Freezing the reference removes the switch. The freeze uses the SAME rule evaluated
+    once, so the geometry at the freeze point is unchanged; only the parameter
+    dependence goes away. Call `refreeze_arc_ref` after a large deliberate change of
+    the hinges (e.g. between continuation steps) if an arc has rotated far enough that
+    its frozen reference is no longer comfortably off its chord -- check with
+    `arc_ref_margin`.
+    """
+
+    def _compute_arc_ref(self, hinges=None):
+        """Freeze the reference as the arc's own in-plane direction. Flat (3B,).
+
+        Not the raw +Y/+Z pick: that vector sits up to 0.9 aligned with the chord, so
+        the frame degenerates (perp0 -> 0) once an arc rotates ~25 degrees toward it,
+        and a single 300-iteration flux-only solve was measured taking the worst arc
+        from 0.8933 to 0.9637. Freezing `perp0` ITSELF instead starts every arc exactly
+        perpendicular to its chord (margin 0), so degeneracy needs a full 90 degrees of
+        rotation.
+
+        This is geometry-preserving: perp0 is already unit and orthogonal to e_par, so
+        re-projecting it in the kernel returns it unchanged. The +Y/+Z rule is still
+        what picks it, evaluated once here rather than on every call.
+        """
+        H = np.asarray(self.hinges if hinges is None else hinges).reshape(self._B, 3)
+        chord = np.roll(H, -1, axis=0) - H
+        e = chord / np.linalg.norm(chord, axis=1, keepdims=True)
+        zc = np.abs(e[:, 2])[:, None]
+        r0 = np.where(zc > 0.9, np.array([0.0, 1.0, 0.0]), np.array([0.0, 0.0, 1.0]))
+        perp0 = r0 - np.sum(r0 * e, axis=1, keepdims=True) * e
+        perp0 = perp0 / np.linalg.norm(perp0, axis=1, keepdims=True)
+        return jnp.asarray(perp0.reshape(-1))
+
+    def _set_up(self):
+        """Freeze the reference on objects loaded from files written before it existed.
+
+        Called by the IO layer after attributes are restored (optimizable_io.py:75).
+        It must happen HERE and not lazily in `arc_ref`: during a solve `self.hinges`
+        is a JAX tracer, so the rule cannot be evaluated then. Freezing on load
+        reproduces the file's original geometry exactly, because the same rule chose
+        the same reference when the file was written.
+        """
+        super()._set_up()
+        if getattr(self, "_arc_ref", None) is None:
+            self._arc_ref = self._compute_arc_ref()
+
+    @optimizable_parameter
+    @property
+    def arc_ref(self):
+        """ndarray: frozen per-arc frame reference vectors, flat (3B,).
+
+        This is an optimizable parameter ONLY so that it travels with `params` through
+        `CoilSet._compute_A_or_B`, which scans a single coil object over the stacked
+        params of every coil (coils.py: `op = self[0].compute_magnetic_field`). Stored
+        on the object instead, one coil's reference would be applied to all of them and
+        the field would disagree with `Curve.compute("x")` about where the coils are.
+        `FixCurveArcReference` pins it, so it costs no degrees of freedom -- the same
+        arrangement `rotmat` and `shift` already use.
+
+        Frozen as the arc's own initial in-plane direction, so `arc_ref_margin` starts
+        at 0 and the frame survives up to 90 degrees of arc rotation.
+        """
+        ref = self.__dict__.get("_arc_ref", None)
+        errorif(
+            ref is None,
+            RuntimeError,
+            "arc_ref was never frozen on this curve. It is set in __init__ and on "
+            "load; if you built this object another way, call refreeze_arc_ref() "
+            "once, outside any jit-traced code.",
+        )
+        return ref
+
+    @arc_ref.setter
+    def arc_ref(self, new):
+        new = jnp.asarray(new).reshape(-1)
+        errorif(
+            new.size != 3 * self._B,
+            ValueError,
+            f"arc_ref must have {3 * self._B} values (3B), got {new.size}",
+        )
+        self._arc_ref = new
+
+    def refreeze_arc_ref(self):
+        """Recompute the frozen reference from the CURRENT hinges. Moves the geometry.
+
+        Only safe where a discontinuous jump is acceptable -- between continuation
+        steps, not inside a solve.
+        """
+        self._arc_ref = self._compute_arc_ref()
+        return self._arc_ref
+
+    @property
+    def arc_ref_margin(self):
+        """ndarray: |e_par . ref| per arc. 1.0 is degenerate; 0.0 at freeze time."""
+        H = np.asarray(self.hinges).reshape(self._B, 3)
+        chord = np.roll(H, -1, axis=0) - H
+        e = chord / np.linalg.norm(chord, axis=1, keepdims=True)
+        ref = np.asarray(self.arc_ref).reshape(self._B, 3)
+        return np.abs(np.sum(e * ref, axis=1))
+
+
+class PiecewisePlanarArcCurve(_FrozenArcReferenceMixin, Curve):
+    """Closed curve made of B planar arcs, each in its own plane (C0 corners).
+
+    Route-B piecewise-planar primitive. The curve is B arcs joined at shared
+    hinge points, so C0 continuity and closure are *structural* (cost no DOF) and
+    each arc is planar *by construction* (no planarity objective or projection is
+    needed). Parameterization ("hinge + tilt + transverse-Fourier"):
+
+    - ``hinges`` H, shape (B, 3): the breakpoints. Arc ``i`` runs from ``H[i]`` to
+      ``H[(i+1) % B]``. Neighbouring arcs share a hinge, so the closed C0 coil is
+      the only thing the parameters can express.
+    - ``tilts`` phi, shape (B,): each arc's plane is pinned to contain its chord
+      (the line ``H[i] -> H[i+1]``); ``phi[i]`` is the single remaining rotational
+      DOF, a rotation of the in-plane normal about the chord axis. This spans the
+      complete family of planes through the two hinge points.
+    - ``shape`` a, shape (B, M): transverse in-plane profile
+      ``w(t) = sum_m a[i, m] * sin(m * pi * t)`` for ``t in [0, 1]`` along each arc.
+      ``sin(m*pi*t)`` vanishes at ``t = 0, 1``, so the endpoints stay pinned to the
+      hinges for *any* shape coefficients -- optimizing ``a`` can never break C0.
+      The arc is a graph over its chord, which forbids fold-backs/cusps.
+
+    Geometric DOF = B*(4 + M)  (3B hinges + B tilts + B*M shape), plus 1 current.
+
+    The curve parameter s in [0, 2pi) maps to arc index i = floor(s*B/2pi) and
+    local parameter t = frac(s*B/2pi); each arc occupies an equal 2pi/B slice of s.
+
+    Parameters
+    ----------
+    hinges : array-like, shape (B, 3)
+        Hinge (breakpoint) coordinates in xyz, B >= 2.
+    tilts : array-like, shape (B,)
+        Plane tilt of each arc about its chord axis, radians. Default zeros.
+    shape : array-like, shape (B, M)
+        Transverse in-plane Fourier (sine) coefficients per arc. Default zeros
+        with M=1. Column m (0-indexed) multiplies sin((m+1)*pi*t).
+    name : str
+        Name for this curve.
+    """
+
+    _io_attrs_ = Curve._io_attrs_ + [
+        "_hinges",
+        "_tilts",
+        "_shape",
+        "_B",
+        "_M",
+        "_arc_ref",
+    ]
+    _static_attrs = Curve._static_attrs + ["_B", "_M"]
+
+    def __init__(
+        self,
+        hinges,
+        tilts=None,
+        shape=None,
+        B=None,
+        M=None,
+        name="",
+    ):
+        super().__init__(name)
+        hinges = np.asarray(hinges, dtype=float)
+        # Infer B: prefer explicit arg, else a 2D (B,3) input, else flat length/3.
+        if B is None:
+            if hinges.ndim == 2 and hinges.shape[1] == 3:
+                B = hinges.shape[0]
+            else:
+                errorif(
+                    hinges.size % 3 != 0,
+                    ValueError,
+                    f"flat hinges size must be divisible by 3, got {hinges.size}",
+                )
+                B = hinges.size // 3
+        B = int(B)
+        errorif(B < 2, ValueError, f"need at least 2 arcs (hinges), got B={B}")
+        hinges = hinges.reshape(-1)
+        errorif(
+            hinges.size != 3 * B,
+            ValueError,
+            f"hinges must have {3 * B} values (3B), got {hinges.size}",
+        )
+        if tilts is None:
+            tilts = np.zeros(B)
+        tilts = np.asarray(tilts, dtype=float).reshape(-1)
+        errorif(
+            tilts.size != B,
+            ValueError,
+            f"tilts must have size B={B}, got {tilts.size}",
+        )
+        # Infer M: prefer explicit arg, else 2D (B,M) input, else flat length/B.
+        if shape is None:
+            shape = np.zeros((B, 1)) if M is None else np.zeros((B, M))
+        shape = np.asarray(shape, dtype=float)
+        if M is None:
+            if shape.ndim == 2 and shape.shape[0] == B:
+                M = shape.shape[1]
+            else:
+                errorif(
+                    shape.size % B != 0,
+                    ValueError,
+                    f"flat shape size must be divisible by B={B}, got {shape.size}",
+                )
+                M = shape.size // B
+        M = int(M)
+        shape = shape.reshape(-1)
+        errorif(
+            shape.size != B * M,
+            ValueError,
+            f"shape must have {B * M} values (B*M), got {shape.size}",
+        )
+        self._B = B
+        self._M = M
+        # Optimizable params are stored FLAT (1D) per DESC convention; compute
+        # functions reshape via arc_B/arc_M. hinges -> (3B,), shape -> (B*M,).
+        self._hinges = jnp.asarray(hinges)
+        self._tilts = jnp.asarray(tilts)
+        self._shape = jnp.asarray(shape)
+        # Freeze the in-plane frame reference NOW, from the concrete initial hinges.
+        # It must be a constant for the parameter->geometry map to be continuous, and
+        # it cannot be computed later: during a solve `hinges` is a JAX tracer.
+        self._arc_ref = self._compute_arc_ref(hinges)
+
+    @optimizable_parameter
+    @property
+    def hinges(self):
+        """Hinge (breakpoint) coordinates, flat length 3B (row-major (B,3))."""
+        return self._hinges
+
+    @hinges.setter
+    def hinges(self, new):
+        new = jnp.asarray(new).reshape(-1)
+        errorif(
+            new.size != 3 * self._B,
+            ValueError,
+            f"hinges must have size {3 * self._B} (3B), got {new.size}",
+        )
+        self._hinges = new
+
+    @optimizable_parameter
+    @property
+    def tilts(self):
+        """Per-arc plane tilt about the chord axis, shape (B,)."""
+        return self._tilts
+
+    @tilts.setter
+    def tilts(self, new):
+        new = jnp.asarray(new).reshape(-1)
+        errorif(
+            new.size != self._B,
+            ValueError,
+            f"tilts must have size {self._B}, got {new.size}",
+        )
+        self._tilts = new
+
+    @optimizable_parameter
+    @property
+    def shape(self):
+        """Per-arc transverse sine coefficients, flat length B*M (row-major (B,M))."""
+        return self._shape
+
+    @shape.setter
+    def shape(self, new):
+        new = jnp.asarray(new).reshape(-1)
+        errorif(
+            new.size != self._B * self._M,
+            ValueError,
+            f"shape must have size {self._B * self._M} (B*M), got {new.size}",
+        )
+        self._shape = new
+
+    @property
+    def B(self):
+        """Number of planar arcs."""
+        return self._B
+
+    @property
+    def M(self):
+        """Number of transverse sine modes per arc."""
+        return self._M
+
+    @property
+    def N(self):
+        """Grid-resolution hint (used for default grid sizing)."""
+        # enough points to resolve B arcs each with M sine modes
+        return self._B * (self._M + 2)
+
+    def compute(
+        self,
+        names,
+        grid=None,
+        params=None,
+        transforms=None,
+        data=None,
+        **kwargs,
+    ):
+        """Compute the quantity given by name on grid.
+
+        See Curve.compute for full parameter docs. B and M are passed through as
+        static kwargs so the compute functions can reshape the flat parameters.
+        """
+        return super().compute(
+            names=names,
+            grid=grid,
+            params=params,
+            transforms=transforms,
+            data=data,
+            arc_B=self._B,
+            arc_M=self._M,
+            **kwargs,
+        )
+
+    @classmethod
+    def from_values(
+        cls, coords, B=3, M=1, knots=None, basis="xyz", name="", fit_method="parameter"
+    ):
+        """Fit sampled coordinates to a PiecewisePlanarArcCurve.
+
+        The closed curve is split into B equal-parameter arcs. Each arc's two hinges
+        are the sampled break points; the arc plane is the best-fit plane through that
+        arc's samples (its tilt recovered relative to the +Z reference frame), and the
+        transverse sine coefficients are least-squares fit to the in-plane deviation of
+        the samples from the straight chord.
+
+        ``fit_method`` selects the abscissa that deviation is fit against; see its
+        description below. The default reproduces every fit made before the option
+        existed, but ``"chord"`` is the one that matches the parameterization.
+
+        Parameters
+        ----------
+        coords : ndarray, shape (num_coords, 3)
+            Sampled coordinates of the closed curve.
+        B : int
+            Number of planar arcs.
+        M : int
+            Number of transverse sine modes per arc.
+        knots : ndarray or None
+            Parameter values in [0, 2pi) at which coords are sampled. If None,
+            assumes uniform sampling on [0, 2pi).
+        basis : {"xyz", "rpz"}
+            Basis for input coordinates. Defaults to "xyz".
+        name : str
+            Name for this curve.
+        fit_method : {"parameter", "chord"}
+            Abscissa the transverse deviation is fit against.
+
+            The curve places the sample at parameter ``t`` at CHORD FRACTION ``t``
+            along its arc. ``"parameter"`` (the default, and the historical
+            behaviour) instead fits the deviation against the sample's own curve
+            parameter, which is a different variable: on a circular arc of half-angle
+            ``theta`` the two differ by ``O(theta^2)`` -- up to 0.105 at ``B=2``.
+
+            The failure is silent, because the fit is exact against the wrong target.
+            A circle's perpendicular offset from its chord at PARAMETER ``t`` is
+            ``R sin(pi t)``, which is precisely the first sine mode, so
+            ``"parameter"`` returns ``a_1 = R`` and every higher coefficient exactly
+            zero -- at any ``M`` -- with a residual of 4e-16. The resulting curve is a
+            sine arch, not an arc: at ``B=2`` it lies 94.5 mm (16.7% of ``R``) from
+            the circle it was fit to, and is short (length 3.3189 vs 3.5617) and
+            over-curved (4.35 vs 1.76).
+
+            ``"chord"`` fits against the sample's actual chord fraction
+            ``(p - H_i) . e_par / |chord|``, which is what the curve then reconstructs.
+            Max deviation from a fitted circle drops to 44.9 mm at ``B=2``, 7.6 mm at
+            ``B=3``, 1.8 mm at ``B=5``. Note the ordinate is unaffected: ``chord`` and
+            ``perp`` are orthogonal, so the measured deviation ``w`` is identical
+            either way. Only the abscissa changes.
+
+            A truncated sine series cannot represent an arc through more than a
+            shallow angle exactly -- a semicircle as a graph over its own diameter has
+            vertical tangents at both hinges, so only ODD modes contribute and they
+            decay like ``m^-3/2``. Hence ``B=2`` is exact at no ``M``, and ``M=3``
+            and ``M=4`` give the identical curve (as do 5 and 6, ...).
+
+        Returns
+        -------
+        curve : PiecewisePlanarArcCurve
+        """
+        errorif(
+            fit_method not in ("parameter", "chord"),
+            ValueError,
+            f"fit_method must be 'parameter' or 'chord', got {fit_method!r}",
+        )
+        if basis == "rpz":
+            coords = rpz2xyz(coords)
+        coords = np.atleast_2d(np.asarray(coords, dtype=float))
+        # drop duplicated closing point if present
+        if np.allclose(coords[0], coords[-1]):
+            coords = coords[:-1]
+        n = coords.shape[0]
+        if knots is None:
+            knots = np.linspace(0, 2 * np.pi, n, endpoint=False)
+        else:
+            knots = np.asarray(knots, dtype=float)
+
+        # arc boundaries in parameter space
+        edges = np.linspace(0, 2 * np.pi, B, endpoint=False)
+        # hinge points = curve value at each edge (nearest sample, wrap-safe)
+        hinge_idx = [
+            int(np.argmin(np.abs(np.mod(knots - e + np.pi, 2 * np.pi) - np.pi)))
+            for e in edges
+        ]
+        hinges = coords[hinge_idx]
+
+        tilts = np.zeros(B)
+        shape = np.zeros((B, M))
+        for i in range(B):
+            e0 = edges[i]
+            e1 = edges[(i + 1) % B] if i < B - 1 else 2 * np.pi
+            # samples strictly inside this arc's parameter span (inclusive of start)
+            if i < B - 1:
+                mask = (knots >= e0) & (knots < e1)
+            else:
+                mask = knots >= e0
+            pts = coords[mask]
+            Hs = hinges[i]
+            He = hinges[(i + 1) % B]
+            chord = He - Hs
+            Lc = np.linalg.norm(chord)
+            e_par = chord / Lc
+            # reference perp (matches compute: +Z unless chord ~|| Z, else +Y)
+            ref = (
+                np.array([0.0, 1.0, 0.0])
+                if abs(e_par[2]) > 0.9
+                else np.array([0.0, 0.0, 1.0])
+            )
+            perp0 = ref - np.dot(ref, e_par) * e_par
+            perp0 /= np.linalg.norm(perp0)
+            binormal0 = np.cross(e_par, perp0)  # completes right-handed in-plane frame
+            if pts.shape[0] >= 2:
+                # best-fit plane normal via SVD of arc samples (incl. endpoints)
+                arc_pts = np.vstack([Hs, pts, He])
+                c = arc_pts.mean(0)
+                _, _, Vt = np.linalg.svd(arc_pts - c)
+                plane_normal = Vt[-1]
+                # in-plane normal is plane_normal x e_par direction; recover tilt
+                # as angle of the in-plane normal (perp) about e_par from perp0.
+                inplane = np.cross(plane_normal, e_par)
+                inplane /= np.linalg.norm(inplane) + 1e-30
+                cos_t = np.dot(inplane, perp0)
+                sin_t = np.dot(inplane, binormal0)
+                tilts[i] = np.arctan2(sin_t, cos_t)
+                perp = perp0 * np.cos(tilts[i]) + binormal0 * np.sin(tilts[i])
+                # least-squares fit sine coeffs to transverse deviation
+                if fit_method == "chord":
+                    tparam = ((pts - Hs[None, :]) @ e_par) / Lc
+                else:
+                    tparam = (knots[mask] - e0) / (e1 - e0)
+                w = (pts - (Hs[None, :] + np.outer(tparam, chord))) @ perp
+                Msin = np.sin(np.outer(tparam, np.arange(1, M + 1)) * np.pi)
+                if Msin.shape[0] >= M:
+                    coef, *_ = np.linalg.lstsq(Msin, w, rcond=None)
+                    shape[i] = coef
+        return cls(hinges=hinges, tilts=tilts, shape=shape, name=name)
+
+
+class PolarPlanarArcCurve(_FrozenArcReferenceMixin, Curve):
+    """Closed curve of B planar arcs, each a POLAR graph r(theta) about its chord.
+
+    Same skeleton as PiecewisePlanarArcCurve (B planar arcs, shared hinges, C0 corners,
+    structural planarity) but the in-plane shape of each arc is a polar graph about the
+    MIDPOINT of that arc's hinge chord instead of a transverse graph over the chord:
+
+        pole    C_i    = (H[i] + H[i+1]) / 2
+        r(phi)         = |chord_i|/2 + sum_m a[i,m] sin(m pi phi),   phi in [0, 1]
+        theta(phi)     = pi phi
+        x(phi)         = C_i + r cos(theta) e_par + r sin(theta) perp
+
+    Because the pole is the chord MIDPOINT, the two hinges sit diametrically opposite
+    about it, at theta = 0 and theta = pi exactly. Hence r(0) = r(1) = |chord|/2 is
+    automatic and a SINGLE sine series pins BOTH endpoints -- so this form spends
+    B*M shape DOF, the same as the transverse form, while being able to represent arcs
+    the transverse form cannot.
+
+    Why that matters (the reason this class exists). For the transverse graph
+    x = H + t chord + w(t) perp the tangent is chord + w'(t) perp, so the angle alpha
+    between the arc and its chord obeys tan(alpha) = |w'|/|chord|: a PERPENDICULAR
+    departure from the chord needs |w'| -> infinity and is unreachable at any M. In
+    polar form dx/dtheta = (r' cos - r sin, r' sin + r cos), which at theta = 0 is
+    (r'(0), |chord|/2), so tan(alpha) = (|chord|/2)/r'(0) and alpha = 90 deg is attained
+    exactly at r'(0) = 0 -- with FINITE coefficients. Stellarator modular coils cross a
+    midplane parting cut at 62-90 deg, i.e. precisely the regime the transverse form
+    cannot express.
+
+    Parameterization ``hinges(3B) + tilts(B) + shape(B*M)``, DOF/coil = B*(4+M), and the
+    zero of the shape basis (all a = 0) is the exact circular arc of radius |chord|/2 --
+    a semicircle at B=2. Compare PiecewisePlanarArcCurve, whose zero is the straight
+    chord.
+
+    Restriction: each arc must be a GRAPH in theta (r single-valued), and must not reach
+    the pole (r > 0). The closest approach of a circular arc of half-opening-angle beta
+    is min r / (|chord|/2) = tan(beta/2), so conditioning degrades as arcs get shallow:
+    with F facets per half-coil beta = 90deg/F, giving 1.00 / 0.41 / 0.27 / 0.20 at
+    F = 1 / 2 / 3 / 4. Ideal for the 2-arc clamshell, progressively tighter beyond it.
+
+    Parameters
+    ----------
+    hinges : array-like, shape (B, 3)
+        Hinge (breakpoint) coordinates in xyz, B >= 2.
+    tilts : array-like, shape (B,)
+        Plane tilt of each arc about its chord axis, radians. Default zeros.
+    shape : array-like, shape (B, M)
+        Per-arc polar radial sine coefficients. Default zeros with M=1, which is the
+        exact circular arc. Column m (0-indexed) multiplies sin((m+1) pi phi).
+    name : str
+        Name for this curve.
+    """
+
+    _io_attrs_ = Curve._io_attrs_ + [
+        "_hinges",
+        "_tilts",
+        "_shape",
+        "_B",
+        "_M",
+        "_arc_ref",
+    ]
+    _static_attrs = Curve._static_attrs + ["_B", "_M"]
+
+    def __init__(self, hinges, tilts=None, shape=None, B=None, M=None, name=""):
+        super().__init__(name)
+        hinges = np.asarray(hinges, dtype=float)
+        if B is None:
+            if hinges.ndim == 2 and hinges.shape[1] == 3:
+                B = hinges.shape[0]
+            else:
+                errorif(
+                    hinges.size % 3 != 0,
+                    ValueError,
+                    f"flat hinges size must be divisible by 3, got {hinges.size}",
+                )
+                B = hinges.size // 3
+        B = int(B)
+        errorif(B < 2, ValueError, f"need at least 2 arcs (hinges), got B={B}")
+        hinges = hinges.reshape(-1)
+        errorif(
+            hinges.size != 3 * B,
+            ValueError,
+            f"hinges must have {3 * B} values (3B), got {hinges.size}",
+        )
+        if tilts is None:
+            tilts = np.zeros(B)
+        tilts = np.asarray(tilts, dtype=float).reshape(-1)
+        errorif(
+            tilts.size != B, ValueError, f"tilts must have size B={B}, got {tilts.size}"
+        )
+        if shape is None:
+            shape = np.zeros((B, 1)) if M is None else np.zeros((B, M))
+        shape = np.asarray(shape, dtype=float)
+        if M is None:
+            if shape.ndim == 2 and shape.shape[0] == B:
+                M = shape.shape[1]
+            else:
+                errorif(
+                    shape.size % B != 0,
+                    ValueError,
+                    f"flat shape size must be divisible by B={B}, got {shape.size}",
+                )
+                M = shape.size // B
+        M = int(M)
+        shape = shape.reshape(-1)
+        errorif(
+            shape.size != B * M,
+            ValueError,
+            f"shape must have {B * M} values (B*M), got {shape.size}",
+        )
+        self._B = B
+        self._M = M
+        # params are stored FLAT (1D) per DESC convention; compute funcs reshape via
+        # the static arc_B/arc_M kwargs.
+        self._hinges = jnp.asarray(hinges)
+        self._tilts = jnp.asarray(tilts)
+        self._shape = jnp.asarray(shape)
+        # Freeze the in-plane frame reference NOW, from the concrete initial hinges.
+        # It must be a constant for the parameter->geometry map to be continuous, and
+        # it cannot be computed later: during a solve `hinges` is a JAX tracer.
+        self._arc_ref = self._compute_arc_ref(hinges)
+
+    @optimizable_parameter
+    @property
+    def hinges(self):
+        """Hinge (breakpoint) coordinates, flat length 3B (row-major (B,3))."""
+        return self._hinges
+
+    @hinges.setter
+    def hinges(self, new):
+        new = jnp.asarray(new).reshape(-1)
+        errorif(
+            new.size != 3 * self._B,
+            ValueError,
+            f"hinges must have size {3 * self._B} (3B), got {new.size}",
+        )
+        self._hinges = new
+
+    @optimizable_parameter
+    @property
+    def tilts(self):
+        """Per-arc plane tilt about the chord axis, shape (B,)."""
+        return self._tilts
+
+    @tilts.setter
+    def tilts(self, new):
+        new = jnp.asarray(new).reshape(-1)
+        errorif(
+            new.size != self._B,
+            ValueError,
+            f"tilts must have size {self._B}, got {new.size}",
+        )
+        self._tilts = new
+
+    @optimizable_parameter
+    @property
+    def shape(self):
+        """Per-arc polar radial sine coefficients, flat length B*M (row-major (B,M))."""
+        return self._shape
+
+    @shape.setter
+    def shape(self, new):
+        new = jnp.asarray(new).reshape(-1)
+        errorif(
+            new.size != self._B * self._M,
+            ValueError,
+            f"shape must have size {self._B * self._M} (B*M), got {new.size}",
+        )
+        self._shape = new
+
+    @property
+    def B(self):
+        """Number of planar arcs."""
+        return self._B
+
+    @property
+    def M(self):
+        """Number of polar radial sine modes per arc."""
+        return self._M
+
+    @property
+    def N(self):
+        """Grid-resolution hint (used for default grid sizing)."""
+        return self._B * (self._M + 2)
+
+    def compute(
+        self,
+        names,
+        grid=None,
+        params=None,
+        transforms=None,
+        data=None,
+        override_grid=True,
+        **kwargs,
+    ):
+        """Compute the quantity given by name on grid."""
+        return super().compute(
+            names,
+            grid=grid,
+            params=params,
+            transforms=transforms,
+            data=data,
+            override_grid=override_grid,
+            arc_B=self._B,
+            arc_M=self._M,
+            **kwargs,
+        )
+
+    @classmethod
+    def from_values(cls, coords, B=3, M=1, knots=None, basis="xyz", name=""):
+        """Fit sampled coordinates to a PolarPlanarArcCurve.
+
+        Splits the closed curve into B equal-parameter arcs, takes the hinges from the
+        sampled break points, fits each arc's plane tilt to its best-fit plane (SVD),
+        then least-squares fits the polar radial sine coefficients to r(theta) measured
+        about the chord midpoint.
+
+        Parameters
+        ----------
+        coords : ndarray, shape (num_coords, 3)
+            Sampled coordinates of the closed curve.
+        B : int
+            Number of planar arcs.
+        M : int
+            Number of polar radial sine modes per arc.
+        knots : ndarray or None
+            Parameter values in [0, 2pi) at which coords are sampled. If None, assumes
+            uniform sampling.
+        basis : {"xyz", "rpz"}
+            Basis for input coordinates.
+        name : str
+            Name for this curve.
+
+        Returns
+        -------
+        curve : PolarPlanarArcCurve
+        """
+        if basis == "rpz":
+            coords = rpz2xyz(coords)
+        coords = np.atleast_2d(np.asarray(coords, dtype=float))
+        if np.allclose(coords[0], coords[-1]):
+            coords = coords[:-1]
+        n = coords.shape[0]
+        if knots is None:
+            knots = np.linspace(0, 2 * np.pi, n, endpoint=False)
+        else:
+            knots = np.asarray(knots, dtype=float)
+
+        edges = np.linspace(0, 2 * np.pi, B, endpoint=False)
+        hinge_idx = [
+            int(np.argmin(np.abs(np.mod(knots - e + np.pi, 2 * np.pi) - np.pi)))
+            for e in edges
+        ]
+        hinges = coords[hinge_idx]
+
+        tilts = np.zeros(B)
+        shape = np.zeros((B, M))
+        for i in range(B):
+            e0 = edges[i]
+            e1 = edges[(i + 1) % B] if i < B - 1 else 2 * np.pi
+            mask = (knots >= e0) & (knots < e1) if i < B - 1 else (knots >= e0)
+            pts = coords[mask]
+            Hs = hinges[i]
+            He = hinges[(i + 1) % B]
+            chord = He - Hs
+            Lc = np.linalg.norm(chord)
+            e_par = chord / Lc
+            ref = (
+                np.array([0.0, 1.0, 0.0])
+                if abs(e_par[2]) > 0.9
+                else np.array([0.0, 0.0, 1.0])
+            )
+            perp0 = ref - np.dot(ref, e_par) * e_par
+            perp0 /= np.linalg.norm(perp0)
+            binormal0 = np.cross(e_par, perp0)
+            if pts.shape[0] >= 2:
+                arc_pts = np.vstack([Hs, pts, He])
+                c = arc_pts.mean(0)
+                _, _, Vt = np.linalg.svd(arc_pts - c)
+                plane_normal = Vt[-1]
+                inplane = np.cross(plane_normal, e_par)
+                nrm = np.linalg.norm(inplane)
+                if nrm > 1e-30:
+                    inplane = inplane / nrm
+                    tilts[i] = np.arctan2(
+                        np.dot(inplane, binormal0), np.dot(inplane, perp0)
+                    )
+                perp = perp0 * np.cos(tilts[i]) + binormal0 * np.sin(tilts[i])
+                # polar coords about the chord MIDPOINT
+                C = 0.5 * (Hs + He)
+                P = pts - C
+                xl = P @ e_par
+                yl = P @ perp
+                # orient so the arc bulges to +perp (theta in (0, pi))
+                if np.mean(yl) < 0:
+                    perp = -perp
+                    yl = -yl
+                    tilts[i] = np.arctan2(
+                        -np.dot(perp0 * 0 + perp, binormal0), np.dot(perp, perp0)
+                    )
+                # theta measured from the -e_par end, matching _ppolar_coords
+                theta = np.mod(np.arctan2(yl, -xl), 2 * np.pi)
+                rr = np.hypot(xl, yl)
+                phi = theta / np.pi
+                keep = (phi > 1e-9) & (phi < 1 - 1e-9)
+                if keep.sum() >= M:
+                    A = np.sin(np.outer(phi[keep], np.arange(1, M + 1)) * np.pi)
+                    sol, *_ = np.linalg.lstsq(A, rr[keep] - Lc / 2, rcond=None)
+                    shape[i] = sol
+        return cls(hinges=hinges, tilts=tilts, shape=shape, name=name)

@@ -1,3 +1,4 @@
+import numpy as np
 from scipy.optimize import NonlinearConstraint
 
 from desc.backend import jnp
@@ -82,6 +83,133 @@ def _warn_if_bounds(objective, constraint, x0, options):
     return options
 
 
+def _make_constraint_hess(
+    constraint, chunk_size=16, rtol=1e-6, exclude=None, verbose=0
+):
+    """Build ``constraint_hess(x, w) -> d2_x [ w . constraint.compute_scaled(x) ]``.
+
+    For ``lsq_auglag(second_order="constraints")``. ``x`` is the optimizer's (possibly
+    reduced) state; a ``LinearConstraintProjection`` is differentiated through its
+    linear ``recover``. Only sub-objectives whose weights are non-negligible
+    (``max|w_block| > rtol * max|w|``) are included, so an expensive constraint the
+    multipliers do not load (e.g. a hard-min plasma-coil distance with ~0 weight) is
+    never twice-differentiated. That filter is weight-based, and ``mu * (c - s)`` can
+    load an expensive block once the slacks move, so ``exclude`` (sub-objective class
+    names) keeps such blocks out unconditionally; they are also ignored when finding
+    ``max|w|``. Forward-over-reverse (``jacfwd_chunked`` of ``grad``), jitted and cached
+    per active set.
+    """
+    import jax
+
+    from desc.batching import jacfwd_chunked
+
+    from ._constraint_wrappers import LinearConstraintProjection
+
+    if isinstance(constraint, LinearConstraintProjection):
+        inner, recover = constraint._objective, constraint.recover
+    else:
+        inner, recover = constraint, (lambda xr: xr)
+    objs = list(inner.objectives)
+    dims = [int(o.dim_f) for o in objs]
+    offs = np.concatenate([[0], np.cumsum(dims)]).astype(int)
+    constants = inner._get_deprecated_constants(None)
+    cache = {}
+
+    def _build(active):
+        def phi(xr, w):
+            params = inner.unpack_state(recover(xr))
+            tot = 0.0
+            for k in active:
+                fk = objs[k].compute_scaled(*params[k], constants=constants[k])
+                tot = tot + jnp.dot(w[offs[k] : offs[k + 1]], fk)
+            return tot
+
+        return jax.jit(jacfwd_chunked(jax.grad(phi), argnums=0, chunk_size=chunk_size))
+
+    exclude = set(exclude or ())
+    allowed = [k for k, o in enumerate(objs) if type(o).__name__ not in exclude]
+
+    def constraint_hess(x, w):
+        w = jnp.asarray(w)
+        wabs = np.abs(np.asarray(w))
+        # the filter compares against the largest weight of the blocks that can be
+        # included, so an excluded block's weight neither enters the Hessian nor
+        # switches the others off
+        wmax = max(
+            (float(wabs[offs[k] : offs[k + 1]].max()) for k in allowed if dims[k]),
+            default=0.0,
+        )
+        if wmax == 0.0:
+            return jnp.zeros((x.size, x.size))
+        active = tuple(
+            k
+            for k in allowed
+            if dims[k] and wabs[offs[k] : offs[k + 1]].max() > rtol * wmax
+        )
+        if active not in cache:
+            if verbose:
+                print(
+                    "second_order: compiling constraint Hessian for blocks "
+                    + ", ".join(type(objs[k]).__name__ for k in active),
+                    flush=True,
+                )
+            cache[active] = _build(active)
+        return cache[active](jnp.asarray(x), w)
+
+    return constraint_hess
+
+
+def _make_constraint_quad(constraint):
+    """Build ``constraint_quad(x, w, v) -> [v . d2_x(w_k . c_k) . v for each block k]``.
+
+    For ``lsq_auglag``'s ``diag_block_split_from`` model check. One Hessian-vector
+    product (forward-over-reverse) per sub-objective, so it stays cheap for a block
+    whose dense Hessian does not (the hard-min plasma-coil distance). Jitted per block
+    on first use.
+    """
+    import jax
+
+    from ._constraint_wrappers import LinearConstraintProjection
+
+    if isinstance(constraint, LinearConstraintProjection):
+        inner, recover = constraint._objective, constraint.recover
+    else:
+        inner, recover = constraint, (lambda xr: xr)
+    objs = list(inner.objectives)
+    dims = [int(o.dim_f) for o in objs]
+    offs = np.concatenate([[0], np.cumsum(dims)]).astype(int)
+    constants = inner._get_deprecated_constants(None)
+    fns = {}
+
+    def _build(k):
+        a, e = int(offs[k]), int(offs[k + 1])
+
+        def phi(xr, w):
+            params = inner.unpack_state(recover(xr))
+            return jnp.dot(
+                w[a:e], objs[k].compute_scaled(*params[k], constants=constants[k])
+            )
+
+        def quad(xr, w, v):
+            _, hv = jax.jvp(lambda xx: jax.grad(phi)(xx, w), (xr,), (v,))
+            return jnp.dot(v, hv)
+
+        return jax.jit(quad)
+
+    def constraint_quad(x, w, v):
+        out = []
+        for k in range(len(objs)):
+            if dims[k] == 0:
+                out.append(0.0)
+                continue
+            if k not in fns:
+                fns[k] = _build(k)
+            out.append(float(fns[k](jnp.asarray(x), jnp.asarray(w), jnp.asarray(v))))
+        return np.asarray(out)
+
+    return constraint_quad
+
+
 @register_optimizer(
     name=["fmin-auglag", "fmin-auglag-bfgs"],
     description=[
@@ -164,8 +292,22 @@ def _optimize_desc_aug_lagrangian(
     else:
         constraint_wrapped = None
 
+    # Same as the lsq-auglag wrapper below: fmin_auglag takes `callback(xk, *args)` as
+    # an argument (and rejects unknown options), so pull it out of `options` and hand it
+    # the recovered full state rather than the projected coordinates the optimizer steps
+    # in.
+    _user_cb = options.pop("callback", None)
+    if _user_cb is None:
+        _cb = None
+    else:
+        _recover = getattr(objective, "recover", None)
+
+        def _cb(_x, *_a, _f=_user_cb, _r=_recover):
+            return bool(_f(_r(_x) if _r is not None else _x, *_a))
+
     result = fmin_auglag(
         objective.compute_scalar,
+        callback=_cb,
         x0=x0,
         grad=objective.grad,
         hess=hess,
@@ -257,6 +399,55 @@ def _optimize_desc_aug_lagrangian_least_squares(
     else:
         constraint_wrapped = None
 
+    # `lsq_auglag` documents a `callback(xk, *args) -> bool` that terminates the solve
+    # GRACEFULLY (STATUS_MESSAGES["callback"]), so the caller still gets a normal
+    # result and can write its record. It was unreachable: this wrapper never
+    # forwarded one, so it always defaulted to `lambda *args: False`. Pull it out of
+    # `options`, which is already threaded through from `Optimizer.optimize`.
+    # The optimizer works in the projected space, so recover the full state first --
+    # exactly what `optimizer.py` does to `result["allx"]` after the fact.
+    _user_cb = options.pop("callback", None)
+    if _user_cb is None:
+        _cb = None
+    else:
+        _recover = getattr(objective, "recover", None)
+
+        def _cb(_x, *_a, _f=_user_cb, _r=_recover):
+            return bool(_f(_r(_x) if _r is not None else _x, *_a))
+
+    # Same projected-space problem as `callback` above: `step_veto` inspects the
+    # GEOMETRY of a trial iterate, so it must see the recovered full state, not the
+    # reduced coordinates the optimizer steps in.
+    _user_veto = options.pop("step_veto", None)
+    if _user_veto is not None:
+        _recover_v = getattr(objective, "recover", None)
+
+        def _veto(_xn, _xo, _f=_user_veto, _r=_recover_v):
+            if _r is not None:
+                _xn, _xo = _r(_xn), _r(_xo)
+            return bool(_f(_xn, _xo))
+
+        options["step_veto"] = _veto
+
+    if (
+        options.get("second_order")
+        and constraint is not None
+        and "constraint_hess" not in options
+    ):
+        options["constraint_hess"] = _make_constraint_hess(
+            constraint,
+            chunk_size=options.pop("second_order_chunk", 16),
+            rtol=options.pop("second_order_rtol", 1e-3),
+            exclude=options.pop("second_order_exclude", None),
+            verbose=verbose,
+        )
+    else:
+        options.pop("second_order_chunk", None)
+        options.pop("second_order_rtol", None)
+        options.pop("second_order_exclude", None)
+    if options.get("diag_block_split_from") is not None and constraint is not None:
+        options["constraint_quad"] = _make_constraint_quad(constraint)
+
     result = lsq_auglag(
         objective.compute_scaled_error,
         x0=x0,
@@ -271,6 +462,7 @@ def _optimize_desc_aug_lagrangian_least_squares(
         ctol=stoptol["ctol"],
         verbose=verbose,
         maxiter=stoptol["maxiter"],
+        callback=_cb,
         options=options,
     )
     return result
