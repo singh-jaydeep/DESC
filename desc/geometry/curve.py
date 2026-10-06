@@ -1533,6 +1533,14 @@ class SplineXYZCurve(Curve):
                 ValueError,
                 "break_indices must lie in the range [0, len(knots) - 1]",
             )
+            # the wrap-around interval spans knots[b[-1]] to knots[0] + 2pi only, so
+            # with b[0] > 0 nothing would cover [knots[0], knots[b[0]]) and that part
+            # of the curve would evaluate to the origin
+            errorif(
+                unique_ordered_indices[0] != 0,
+                ValueError,
+                "break_indices must include 0 (rotate the knots so a break is first)",
+            )
             intervals = np.array(
                 [
                     [break_indices[i - 1], break_indices[i]]
@@ -2531,9 +2539,7 @@ class PolarPlanarArcCurve(_FrozenArcReferenceMixin, Curve):
                 if np.mean(yl) < 0:
                     perp = -perp
                     yl = -yl
-                    tilts[i] = np.arctan2(
-                        -np.dot(perp0 * 0 + perp, binormal0), np.dot(perp, perp0)
-                    )
+                    tilts[i] = np.arctan2(np.dot(perp, binormal0), np.dot(perp, perp0))
                 # theta measured from the -e_par end, matching _ppolar_coords
                 theta = np.mod(np.arctan2(yl, -xl), 2 * np.pi)
                 rr = np.hypot(xl, yl)

@@ -1091,6 +1091,42 @@ def test_auglag():
     np.testing.assert_allclose(out4["x"], out3["x"], rtol=1e-4, atol=1e-4)
 
 
+@pytest.mark.unit
+@pytest.mark.parametrize("tr_method", ["qr", "svd", "cho"])
+def test_lsq_auglag_second_order(tr_method):
+    """second_order="constraints" takes accepted steps with any tr_method."""
+    rng = default_rng(3)
+    n = 6
+    Q = rng.random((n, n))
+    Q = Q.T @ Q + np.eye(n)
+
+    vecfun = jit(lambda x: jnp.concatenate([x - 1.0, 0.1 * (x[:2] ** 2)]))
+    jac = jit(Derivative(vecfun, mode="fwd"))
+    con = jit(lambda x: jnp.atleast_1d(x @ Q @ x - 1.0))
+    conjac = jit(Derivative(con, mode="fwd"))
+
+    def constraint_hess(x, w):
+        return jnp.asarray(w)[0] * 2 * Q
+
+    out = lsq_auglag(
+        vecfun,
+        np.zeros(n) + 0.1,
+        jac,
+        bounds=(-jnp.inf, jnp.inf),
+        constraint=NonlinearConstraint(con, -np.inf, 0, conjac),
+        x_scale="auto",
+        maxiter=10,
+        verbose=0,
+        options={
+            "tr_method": tr_method,
+            "second_order": "constraints",
+            "constraint_hess": constraint_hess,
+        },
+    )
+    assert out["nit"] > 0
+    assert np.all(np.isfinite(out["x"]))
+
+
 @pytest.mark.slow
 @pytest.mark.regression
 @pytest.mark.optimize

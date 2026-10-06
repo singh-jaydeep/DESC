@@ -1125,6 +1125,9 @@ def _independent_coil_indices(coilset):
     an external target (e.g. a discretized plasma surface) are invariant under the
     field-period rotation but not necessarily under the reflection.
 
+    A MixedCoilSet keeps every row: copies within one member are interchangeable only
+    if the whole set has that member's symmetry, which another member can break.
+
     Returns
     -------
     idx : ndarray of int
@@ -1134,11 +1137,7 @@ def _independent_coil_indices(coilset):
     from desc.coils import CoilSet, MixedCoilSet
 
     if isinstance(coilset, MixedCoilSet):  # checked first: subclasses CoilSet
-        idx, offset = [], 0
-        for coil in coilset:
-            idx.append(_independent_coil_indices(coil) + offset)
-            offset += coil.num_coils
-        return np.concatenate(idx) if idx else np.array([], dtype=int)
+        return np.arange(coilset.num_coils)
     if isinstance(coilset, CoilSet):
         return np.arange(len(coilset))
     return np.array([0])  # a single coil
@@ -1534,7 +1533,7 @@ class CoilSetMinDistance(_Objective):
 
         super().build(use_jit=use_jit, verbose=verbose)
 
-    def compute(self, params, constants=None):
+    def compute(self, params, constants=None):  # noqa: C901
         """Compute minimum distances between coils.
 
         Parameters
@@ -1587,23 +1586,31 @@ class CoilSetMinDistance(_Objective):
             centroid_dists = safenorm(centroids[:, None] - centroids[None, :], axis=-1)
             centroid_dists = centroid_dists.at[jnp.diag_indices(num_coils)].set(jnp.inf)
 
-            def get_other_pts(k):
-                neighbors_idx = jax.lax.stop_gradient(
+            def get_other_idx(k):
+                return jax.lax.stop_gradient(
                     jnp.argsort(centroid_dists[k])[: self._num_neighbors]
                 )
-                return pts[neighbors_idx]
 
         else:  # consider all other coils
 
-            def get_other_pts(k):
-                return jnp.delete(pts, k, axis=0, assume_unique_indices=True)
+            def get_other_idx(k):
+                return jnp.delete(jnp.arange(num_coils), k, assume_unique_indices=True)
+
+        if self._signed:
+            # linking numbers once per evaluation, without derivatives (only the sign
+            # of each entry is used), rather than once per coil inside the vmap
+            lk = constants["coilset"]._compute_linking_number(
+                params=jax.lax.stop_gradient(params), grid=self._constants_link_grid
+            )
+            link_sign = jnp.where(jnp.abs(lk) > 0.5, -1.0, 1.0)
 
         def body(k):
             # Entry i, j, n of dist holds the distance from the jth point (or
             # segment) on the kth coil to the nth point (or segment) on the ith
             # coil, giving shape (ncoils, num_nodes, num_nodes).
             coil_pts = pts[k]
-            other_pts = get_other_pts(k)
+            other_idx = get_other_idx(k)
+            other_pts = pts[other_idx]
             if self._distance_method == "segment":
                 p1, d1 = _closed_polyline(coil_pts)
 
@@ -1651,11 +1658,7 @@ class CoilSetMinDistance(_Objective):
                 # A flip can only happen where the curves intersect, i.e. where d = 0,
                 # so the induced jump in `sign*d` is 2d ~ 0 -- the discontinuity
                 # cancels exactly where it would occur.
-                lk = constants["coilset"]._compute_linking_number(
-                    params=params, grid=self._constants_link_grid
-                )
-                sgn = jax.lax.stop_gradient(jnp.where(jnp.abs(lk[k]) > 0.5, -1.0, 1.0))
-                sgn = jnp.delete(sgn, k, assume_unique_indices=True)
+                sgn = link_sign[k, other_idx]  # same neighbours, same order as dist
                 per_other = (
                     jax.vmap(lambda d: softmin(d, self._softmin_alpha))(dist)
                     if self._use_softmin
@@ -4680,10 +4683,7 @@ class CoilSetLinkingNumber(_Objective):
         # non-planarity. Mask it out so the result is what the docstring says: the sum
         # over every OTHER coil.
         link = link.at[self._coil_indices, jnp.arange(self._dim_f)].set(0.0)
-
-        # the diagonal entries of "link" should be excluded
-        mask = ~jnp.eye(self._dim_f, dtype=bool)
-        return jnp.abs(link).sum(axis=0, where=mask)
+        return jnp.abs(link).sum(axis=0)
 
 
 class SurfaceCurrentRegularization(_Objective):

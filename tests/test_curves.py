@@ -1288,3 +1288,32 @@ def test_polar_planar_arc_signed_curvature_convention():
     center = np.asarray(curve.params_dict["hinges"]).reshape(-1, 3).mean(axis=0)
     sgn = np.sign(np.sum((center - data["x"]) * data["frenet_normal"], axis=1))
     np.testing.assert_allclose(data["curvature"], sgn * data["|curvature|"])
+
+
+@pytest.mark.unit
+def test_polar_planar_arc_from_values_round_trip():
+    """from_values recovers tilts of either sign (arcs reoriented to bulge +perp)."""
+    from desc.geometry import PolarPlanarArcCurve
+
+    hinges = np.array([[1, 1, 0], [-1, 1, 0], [-1, -1, 0], [1, -1, 0]]) + [5, 0, 0]
+    curve = PolarPlanarArcCurve(
+        hinges, tilts=[0.4, -0.7, 1.0, 0.3], shape=np.zeros(4), B=4, M=1
+    )
+    grid = LinearGrid(N=40)
+    x = curve.compute("x", grid=grid, basis="xyz")["x"]
+    fit = PolarPlanarArcCurve.from_values(x, B=4, M=1)
+    # tilts with the right sign (the shape fit itself is only approximate)
+    np.testing.assert_allclose(fit.params_dict["tilts"], curve.tilts, atol=0.03)
+    np.testing.assert_allclose(
+        fit.compute("x", grid=grid, basis="xyz")["x"], x, atol=0.1
+    )
+
+
+@pytest.mark.unit
+def test_spline_break_indices_must_start_at_zero():
+    """A first break after knot 0 would leave part of the curve uncovered."""
+    s = np.linspace(0, 2 * np.pi, 40, endpoint=False)
+    x = np.stack([8 * np.cos(s), 8 * np.sin(s), np.zeros_like(s)], axis=1)
+    SplineXYZCurve.from_values(x, knots=s, break_indices=[0, 10, 20, 30])
+    with pytest.raises(ValueError, match="break_indices must include 0"):
+        SplineXYZCurve.from_values(x, knots=s, break_indices=[5, 15, 25, 35])

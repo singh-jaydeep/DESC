@@ -1248,7 +1248,9 @@ def lsq_auglag(  # noqa: C901
             # Delete old arrays before computing new one
             # otherwise the peak is bigger by J-sized arrays
             del J_h, J_a
-            if tr_method == "svd":
+            if second_order:  # built instead of the tr_method factorization
+                del B_h, eig_h
+            elif tr_method == "svd":
                 del U, s, Vt
             elif tr_method == "cho":
                 del B_h

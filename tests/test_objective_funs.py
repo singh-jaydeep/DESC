@@ -1347,6 +1347,40 @@ class TestObjectiveFunction:
         np.testing.assert_allclose(f.min(), brute, rtol=1e-6)
 
     @pytest.mark.unit
+    def test_coil_linking_number_symmetric_and_mixed(self):
+        """One value per independent coil, matching the full linking matrix."""
+        ring = FourierPlanarCoil(center=[3, 0.6, 0], normal=[0, 1, 0], r_n=0.5)
+        coils = CoilSet(ring, ring.copy(), NFP=2, sym=True, check_intersection=False)
+        threads = CoilSet(  # ring 2 threads ring 1
+            FourierPlanarCoil(center=[0, 0, 0], normal=[0.05, 0.1, 1], r_n=1),
+            FourierPlanarCoil(center=[1, 0, 0], normal=[0, 1, 0], r_n=1),
+            check_intersection=False,
+        )
+        mixed = MixedCoilSet(coils, threads, check_intersection=False)
+        for cs in [coils, threads, mixed]:
+            obj = CoilSetLinkingNumber(cs)
+            obj.build(verbose=0)
+            f = obj.compute(cs.params_dict)
+            full = np.abs(np.asarray(cs._compute_linking_number()))
+            np.fill_diagonal(full, 0)
+            idx = _independent_coil_indices(cs)
+            np.testing.assert_allclose(f, full[:, idx].sum(axis=0), atol=1e-12)
+        np.testing.assert_allclose(f[-2:], 1, atol=1e-2)
+        assert np.all(_independent_coil_indices(mixed) == np.arange(mixed.num_coils))
+
+    @pytest.mark.unit
+    def test_coil_min_distance_signed_neighbors(self):
+        """Signed distance with num_neighbors pairs each sign with its neighbour."""
+        coil = FourierPlanarCoil(center=[3, 0, 0], normal=[0, 1, 0], r_n=1)
+        coils = CoilSet.linspaced_angular(coil, n=8, check_intersection=False)
+        fs = []
+        for nn in [None, 3]:
+            obj = CoilSetMinDistance(coils, signed=True, num_neighbors=nn)
+            obj.build(verbose=0)
+            fs.append(obj.compute(coils.params_dict))
+        np.testing.assert_allclose(fs[0], fs[1])
+
+    @pytest.mark.unit
     def test_coil_min_distance(self):
         """Tests minimum distance between coils in a coilset."""
 
