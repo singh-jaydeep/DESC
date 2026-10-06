@@ -34,6 +34,8 @@ Coils
     desc.coils.FourierXYCoil
     desc.coils.FourierXYZCoil
     desc.coils.MixedCoilSet
+    desc.coils.PiecewisePlanarArcCoil
+    desc.coils.PolarPlanarArcCoil
     desc.coils.SplineXYZCoil
     desc.coils.initialize_helical_coils
     desc.coils.initialize_modular_coils
@@ -123,6 +125,8 @@ Geometry
     desc.geometry.FourierRZToroidalSurface
     desc.geometry.FourierXYCurve
     desc.geometry.FourierXYZCurve
+    desc.geometry.PiecewisePlanarArcCurve
+    desc.geometry.PolarPlanarArcCurve
     desc.geometry.SplineXYZCurve
     desc.geometry.ZernikeRZToroidalSection
 
@@ -200,11 +204,14 @@ Objective Functions
     desc.objectives.BootstrapRedlConsistency
     desc.objectives.BoundaryError
     desc.objectives.BScaleLength
+    desc.objectives.CoilArclengthResidual
     desc.objectives.CoilArclengthVariance
     desc.objectives.CoilCurrentLength
     desc.objectives.CoilCurvature
     desc.objectives.CoilIntegratedCurvature
     desc.objectives.CoilLength
+    desc.objectives.CoilMeanSquaredCurvature
+    desc.objectives.CoilSetDistancePenalty
     desc.objectives.CoilSetLinkingNumber
     desc.objectives.CoilSetMinDistance
     desc.objectives.CoilTorsion
@@ -220,6 +227,7 @@ Objective Functions
     desc.objectives.FixBoundaryR
     desc.objectives.FixBoundaryZ
     desc.objectives.FixCoilCurrent
+    desc.objectives.FixCurveArcReference
     desc.objectives.FixCurrent
     desc.objectives.FixElectronDensity
     desc.objectives.FixElectronTemperature
@@ -263,6 +271,7 @@ Objective Functions
     desc.objectives.ObjectiveFromUser
     desc.objectives.ObjectiveFunction
     desc.objectives.Omnigenity
+    desc.objectives.PlasmaCoilSetDistancePenalty
     desc.objectives.PlasmaCoilSetDistanceBound
     desc.objectives.PlasmaCoilSetMinDistance
     desc.objectives.PlasmaVesselDistance

@@ -47,6 +47,7 @@ from desc.objectives import (
     BootstrapRedlConsistency,
     BoundaryError,
     BScaleLength,
+    CoilArclengthResidual,
     CoilArclengthVariance,
     CoilCurrentLength,
     CoilCurvature,
@@ -1187,6 +1188,43 @@ class TestObjectiveFunction:
         obj = CoilLength(curve)
         with pytest.raises(TypeError):
             obj.build()
+
+    @pytest.mark.unit
+    def test_coil_arclength_residual(self):
+        """Per-node arclength residuals: sum of squares per coil is the variance."""
+        coil = FourierXYZCoil(X_n=[0, 2, 0.4], Y_n=[0.3, 0, 2], Z_n=[0, 0.5, 0.1])
+        coils = CoilSet.linspaced_angular(coil, n=3, check_intersection=False)
+        grid = LinearGrid(N=12)
+        var = CoilArclengthVariance(coils, grid=grid, normalize=False)
+        res = CoilArclengthResidual(coils, grid=grid, normalize=False)
+        var.build(verbose=0)
+        res.build(verbose=0)
+        v = var.compute(coils.params_dict)
+        r = res.compute(coils.params_dict) * res.constants["quad_weights"]
+        assert r.size == res.dim_f
+        assert np.all(v > 0)
+        r = r.reshape(len(coils), grid.num_nodes)
+        np.testing.assert_allclose(np.sum(r**2, axis=1), v, rtol=1e-12)
+
+    @pytest.mark.unit
+    def test_coil_curvature_signed(self):
+        """Curvature objective is unsigned by default and signed on request."""
+        coil = FourierPlanarCoil(r_n=[0.5, 1, 0.5], basis="rpz")  # not convex
+        grid = LinearGrid(N=20)
+        data = coil.compute(["curvature", "|curvature|"], grid=grid)
+        for signed, key in [(False, "|curvature|"), (True, "curvature")]:
+            obj = CoilCurvature(coil, grid=grid, signed=signed, normalize=False)
+            obj.build(verbose=0)
+            np.testing.assert_allclose(obj.compute(coil.params_dict), data[key])
+        assert np.any(data["curvature"] < 0)
+
+    @pytest.mark.unit
+    def test_coil_min_distance_signed_pair_mode(self):
+        """Signed=True needs pair_mode="per_coil" and must not be silently ignored."""
+        coils = CoilSet.linspaced_angular(FourierXYZCoil(), n=3)
+        for mode in ["per_pair", "per_pair_unique"]:
+            with pytest.raises(ValueError):
+                CoilSetMinDistance(coils, pair_mode=mode, signed=True)
 
     @pytest.mark.unit
     def test_coil_min_distance(self):
@@ -3400,6 +3438,7 @@ class TestComputeScalarResolution:
         # these require special logic
         BootstrapRedlConsistency,
         BoundaryError,
+        CoilArclengthResidual,
         CoilArclengthVariance,
         CoilCurrentLength,
         CoilCurvature,
@@ -3859,6 +3898,7 @@ class TestComputeScalarResolution:
     @pytest.mark.parametrize(
         "objective",
         [
+            CoilArclengthResidual,
             CoilArclengthVariance,
             CoilCurrentLength,
             CoilCurvature,
@@ -3927,6 +3967,7 @@ class TestObjectiveNaNGrad:
         BallooningStability,
         BootstrapRedlConsistency,
         BoundaryError,
+        CoilArclengthResidual,
         CoilArclengthVariance,
         CoilCurrentLength,
         CoilCurvature,
@@ -4239,6 +4280,7 @@ class TestObjectiveNaNGrad:
     @pytest.mark.parametrize(
         "objective",
         [
+            CoilArclengthResidual,
             CoilArclengthVariance,
             CoilCurrentLength,
             CoilCurvature,

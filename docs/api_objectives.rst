@@ -130,6 +130,10 @@ Coil Optimization
     desc.objectives.CoilIntegratedCurvature
     desc.objectives.CoilCurrentLength
     desc.objectives.CoilArclengthVariance
+    desc.objectives.CoilArclengthResidual
+    desc.objectives.CoilMeanSquaredCurvature
+    desc.objectives.CoilSetDistancePenalty
+    desc.objectives.PlasmaCoilSetDistancePenalty
     desc.objectives.ToroidalFlux
     desc.objectives.SurfaceCurrentRegularization
     desc.objectives.LinkingCurrentConsistency
@@ -186,6 +190,7 @@ Fixing degrees of freedom
     desc.objectives.FixSumModesZ
     desc.objectives.FixThetaSFL
     desc.objectives.FixCoilCurrent
+    desc.objectives.FixCurveArcReference
     desc.objectives.FixSumCoilCurrent
     desc.objectives.FixParameters
     desc.objectives.ShareParameters

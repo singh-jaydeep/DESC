@@ -1808,16 +1808,17 @@ def _x_sss_PolarPlanarArcCurve(params, transforms, profiles, data, **kwargs):
     params=["hinges", "rotmat", "shift"],
     transforms={},
     profiles=[],
-    coordinates="",
-    data=[],
+    coordinates="s",
+    data=["x"],
     parameterization="desc.geometry.curve.PolarPlanarArcCurve",
     arc_B="int: number of planar arcs",
 )
 def _center_PolarPlanarArcCurve(params, transforms, profiles, data, **kwargs):
+    # rpz on the curve grid, like every other curve's "center"
     B = kwargs["arc_B"]
     center = jnp.mean(params["hinges"].reshape(B, 3), axis=0)
     center = jnp.matmul(center, params["rotmat"].reshape((3, 3)).T) + params["shift"]
-    data["center"] = center
+    data["center"] = xyz2rpz(center) * jnp.ones_like(data["x"])
     return data
 
 

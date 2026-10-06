@@ -1270,3 +1270,21 @@ class TestSplineXYZCurve:
         c = SplineXYZCurve(X=R * np.cos(phi), Y=R * np.sin(phi), Z=np.zeros_like(phi))
         with pytest.raises(TypeError):
             c.compute("length", grid=np.linspace(0, 1, 10))
+
+
+@pytest.mark.unit
+def test_polar_planar_arc_signed_curvature_convention():
+    """Signed curvature uses the rpz center, so it is right away from phi = 0."""
+    from desc.geometry import PolarPlanarArcCurve
+
+    fp = FourierPlanarCurve(center=[0, 3, 0], normal=[1, 0, 0], r_n=1.0)
+    grid = LinearGrid(N=20)
+    curve = PolarPlanarArcCurve.from_values(
+        fp.compute("x", grid=grid, basis="xyz")["x"], B=4, M=2
+    )
+    data = curve.compute(
+        ["x", "frenet_normal", "curvature", "|curvature|"], grid=grid, basis="xyz"
+    )
+    center = np.asarray(curve.params_dict["hinges"]).reshape(-1, 3).mean(axis=0)
+    sgn = np.sign(np.sum((center - data["x"]) * data["frenet_normal"], axis=1))
+    np.testing.assert_allclose(data["curvature"], sgn * data["|curvature|"])
