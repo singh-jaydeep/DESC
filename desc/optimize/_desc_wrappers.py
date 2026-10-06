@@ -2,12 +2,14 @@ import numpy as np
 from scipy.optimize import NonlinearConstraint
 
 from desc.backend import jnp
-from desc.utils import warnif
+from desc.utils import errorif, warnif
 
 from .aug_lagrangian import fmin_auglag
+from .aug_lagrangian_composite import lsq_auglag_composite
 from .aug_lagrangian_ls import lsq_auglag
 from .fmin_scalar import fmintr
 from .least_squares import lsqtr
+from .least_squares_composite import lsq_composite
 from .optimizer import register_optimizer
 from .stochastic import sgd
 
@@ -208,6 +210,14 @@ def _make_constraint_quad(constraint):
         return np.asarray(out)
 
     return constraint_quad
+
+
+def _full_state_callback(callback, objective):
+    """Call ``callback`` with the full state; solvers iterate on the reduced one."""
+    if callback is None:
+        return None
+    recover = getattr(objective, "recover", lambda x: x)
+    return lambda x, *args: bool(callback(recover(x), *args))
 
 
 @register_optimizer(
@@ -545,6 +555,186 @@ def _optimize_desc_least_squares(
         maxiter=stoptol["maxiter"],
         verbose=verbose,
         callback=None,
+        options=options,
+    )
+    return result
+
+
+@register_optimizer(
+    name="lsq-composite",
+    description="Levenberg-Marquardt least squares with bounded objectives kept exact "
+    + "as hinges in the model. See "
+    + "https://desc-docs.readthedocs.io/en/stable/_api/optimize/desc.optimize.lsq_composite.html",  # noqa: E501
+    scalar=False,
+    equality_constraints=False,
+    inequality_constraints=False,
+    stochastic=False,
+    hessian=False,
+    GPU=True,
+)
+def _optimize_desc_least_squares_composite(
+    objective, constraint, x0, method, x_scale, verbose, stoptol, options=None
+):
+    """Wrapper for desc.optimize.lsq_composite.
+
+    Parameters
+    ----------
+    objective : ObjectiveFunction
+        Function to minimize.
+    constraint : ObjectiveFunction
+        Constraint to satisfy - not supported by this method
+    x0 : ndarray
+        Starting point.
+    method : {"lsq-composite"}
+        Name of the method to use.
+    x_scale : array_like or ‘jac’, optional
+        Characteristic scale of each variable. If set to ‘jac’, the scale is the
+        inverse of the largest column norm of the Jacobian seen so far.
+    verbose : int
+        * 0  : work silently.
+        * 1 : display a termination report.
+        * 2 : display progress during iterations
+    stoptol : dict
+        Dictionary of stopping tolerances, with keys {"xtol", "ftol", "gtol", "ctol",
+        "maxiter", "max_nfev", "max_njev", "max_ngev", "max_nhev"}
+    options : dict, optional
+        Dictionary of optional keyword arguments to override default solver
+        settings. See ``desc.optimize.lsq_composite`` for details. In addition,
+        ``"callback"`` is called with the full state after each accepted step;
+        returning True stops the optimization.
+
+    Returns
+    -------
+    res : OptimizeResult
+       The optimization result represented as a ``OptimizeResult`` object.
+       Important attributes are: ``x`` the solution array, ``success`` a
+       Boolean flag indicating if the optimizer exited successfully and
+       ``message`` which describes the cause of the termination. See
+       `OptimizeResult` for a description of other attributes.
+
+    """
+    assert constraint is None, f"method {method} doesn't support constraints"
+    options = {} if options is None else dict(options)
+    callback = _full_state_callback(options.pop("callback", None), objective)
+    options["max_nfev"] = stoptol["max_nfev"]
+    lo, hi, tgt, isb = objective.scaled_bounds()
+
+    result = lsq_composite(
+        objective.compute_scaled,
+        x0=x0,
+        jac=objective.jac_scaled,
+        lo=lo,
+        hi=hi,
+        tgt=tgt,
+        isb=isb,
+        row_ids=getattr(objective, "row_ids", None),
+        args=(),
+        x_scale=x_scale,
+        ftol=stoptol["ftol"],
+        xtol=stoptol["xtol"],
+        gtol=stoptol["gtol"],
+        maxiter=stoptol["maxiter"],
+        verbose=verbose,
+        callback=callback,
+        options=options,
+    )
+    return result
+
+
+@register_optimizer(
+    name="lsq-auglag-composite",
+    description="Least squares augmented Lagrangian with slack-free hinge rows and "
+    + "composite subproblem solves. See "
+    + "https://desc-docs.readthedocs.io/en/stable/_api/optimize/desc.optimize.lsq_auglag_composite.html",  # noqa: E501
+    scalar=False,
+    equality_constraints=True,
+    inequality_constraints=True,
+    stochastic=False,
+    hessian=False,
+    GPU=True,
+)
+def _optimize_desc_aug_lagrangian_composite(
+    objective, constraint, x0, method, x_scale, verbose, stoptol, options=None
+):
+    """Wrapper for desc.optimize.lsq_auglag_composite.
+
+    Parameters
+    ----------
+    objective : ObjectiveFunction
+        Function to minimize.
+    constraint : ObjectiveFunction
+        Constraint to satisfy.
+    x0 : ndarray
+        Starting point.
+    method : {"lsq-auglag-composite"}
+        Name of the method to use.
+    x_scale : array_like or ‘jac’, optional
+        Characteristic scale of each variable. If set to ‘jac’, the scale is the
+        inverse of the largest column norm of the Jacobian seen so far.
+    verbose : int
+        * 0  : work silently.
+        * 1 : display a termination report and one line per outer iteration.
+        * 2 : display progress during the subproblem solves too.
+    stoptol : dict
+        Dictionary of stopping tolerances, with keys {"xtol", "ftol", "gtol", "ctol",
+        "maxiter", "max_nfev"}
+    options : dict, optional
+        Dictionary of optional keyword arguments to override default solver
+        settings. See ``desc.optimize.lsq_auglag_composite`` for details. In
+        addition, ``"callback"`` is called with the full state after each accepted
+        step (returning True stops the optimization), and ``"outer_callback"``
+        receives the full state as ``x``.
+
+    Returns
+    -------
+    res : OptimizeResult
+       The optimization result represented as a ``OptimizeResult`` object.
+       Important attributes are: ``x`` the solution array, ``success`` a
+       Boolean flag indicating if the optimizer exited successfully and
+       ``message`` which describes the cause of the termination. See
+       `OptimizeResult` for a description of other attributes.
+
+    """
+    errorif(
+        constraint is None,
+        ValueError,
+        f"method {method} needs nonlinear constraints; use lsq-composite without",
+    )
+    options = {} if options is None else dict(options)
+    callback = _full_state_callback(options.pop("callback", None), objective)
+    options.setdefault("max_nfev", stoptol["max_nfev"])
+    if options.get("outer_callback") is not None:
+        recover = getattr(objective, "recover", lambda x: x)
+        options["outer_callback"] = lambda h, f=options["outer_callback"]: f(
+            {**h, "x": recover(h["x"])}
+        )
+    lo, hi, tgt, isb = objective.scaled_bounds()
+    clo, chi, ctgt, cisb = constraint.scaled_bounds()
+
+    result = lsq_auglag_composite(
+        objective.compute_scaled,
+        x0=x0,
+        jac=objective.jac_scaled,
+        lo=lo,
+        hi=hi,
+        tgt=tgt,
+        isb=isb,
+        con=constraint.compute_scaled,
+        con_jac=constraint.jac_scaled,
+        lb=jnp.where(cisb, clo, ctgt),
+        ub=jnp.where(cisb, chi, ctgt),
+        row_ids=getattr(objective, "row_ids", None),
+        con_row_ids=getattr(constraint, "row_ids", None),
+        keep_rows=getattr(constraint, "keep_rows", None),
+        args=(),
+        x_scale=x_scale,
+        ftol=stoptol["ftol"],
+        xtol=stoptol["xtol"],
+        gtol=stoptol["gtol"],
+        ctol=stoptol["ctol"],
+        verbose=verbose,
+        maxiter=stoptol["maxiter"],
+        callback=callback,
         options=options,
     )
     return result

@@ -307,6 +307,8 @@ Optimize
    desc.optimize.fmin_auglag
    desc.optimize.fmintr
    desc.optimize.lsq_auglag
+   desc.optimize.lsq_auglag_composite
+   desc.optimize.lsq_composite
    desc.optimize.lsqtr
    desc.optimize.register_optimizer
    desc.optimize.sgd

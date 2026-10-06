@@ -2948,42 +2948,161 @@ def _stacked_params(params):
     return {k: jnp.stack([jnp.asarray(p[k]) for p in params]) for k in params[0]}
 
 
+def _coil_breaks(coilset):
+    """Curve parameters where some coil of the set may have a corner."""
+    from desc.coils import PiecewisePlanarArcCoil, PolarPlanarArcCoil, SplineXYZCoil
+
+    breaks = []
+    for coil in coilset:
+        if isinstance(coil, (PiecewisePlanarArcCoil, PolarPlanarArcCoil)):
+            breaks.append(2 * np.pi * np.arange(coil._B) / coil._B)
+        elif isinstance(coil, SplineXYZCoil):  # every knot, for linear splines
+            breaks.append(np.asarray(coil.knots) % (2 * np.pi))
+    return np.unique(np.concatenate(breaks)) if breaks else np.array([])
+
+
+def _coil_node_grid(coilset, n):
+    """Grid of about ``n`` nodes along each coil, with a node on every corner.
+
+    Uniform without corners; otherwise every interval between corners is split
+    evenly into pieces no longer than ``2 pi / n``.
+    """
+    breaks = _coil_breaks(coilset)
+    if breaks.size == 0:
+        return LinearGrid(N=max(1, (n - 1) // 2 + 1))
+    ends = np.append(breaks[1:], breaks[0] + 2 * np.pi)
+    s = [
+        a + (b - a) * np.arange(m) / m
+        for a, b in zip(breaks, ends)
+        for m in [int(np.ceil((b - a) * n / (2 * np.pi)))]
+    ]
+    return LinearGrid(zeta=np.sort(np.concatenate(s) % (2 * np.pi)))
+
+
+def _coil_gap_data(coilset, s_nodes, n_sub=16):
+    """Largest arclength between consecutive nodes and largest curvature per coil.
+
+    Both from ``n_sub`` samples inside each node interval, so corners on nodes are
+    excluded. For Fourier coils on uniform nodes, the largest ``|x_s|`` is certified
+    between samples by Bernstein's inequality (``|x_s|^2`` is a trigonometric
+    polynomial of degree ``2M``); otherwise ``gap_backoff`` has to cover it.
+    """
+    from desc.coils import FourierPlanarCoil, FourierXYCoil, FourierXYZCoil
+
+    s_nodes = np.sort(np.asarray(s_nodes))
+    ds = np.diff(np.append(s_nodes, s_nodes[0] + 2 * np.pi))
+    sub = (np.arange(n_sub) + 0.5) / n_sub
+    s = (s_nodes[:, None] + ds[:, None] * sub[None]).ravel() % (2 * np.pi)
+    grid = LinearGrid(zeta=s)
+    order = np.argsort(s)  # LinearGrid sorts zeta
+    uniform = np.allclose(ds, ds[0])
+    h, kmax = [], []
+    for coil in coilset:
+        data = coil.compute(["x_s", "curvature"], grid=grid, basis="xyz")
+        speed = np.empty(s.size)
+        speed[order] = np.linalg.norm(np.asarray(data["x_s"]), axis=-1)
+        speed = speed.reshape(s_nodes.size, n_sub).max(axis=1)
+        M = 0
+        if isinstance(coil, FourierPlanarCoil):  # r(s) times cos s, sin s
+            M = np.max(np.abs(coil.r_basis.modes[:, 2])) + 1
+        elif isinstance(coil, (FourierXYCoil, FourierXYZCoil)):
+            M = np.max(np.abs(coil.X_basis.modes[:, 2]))
+        if uniform and M:
+            speed = speed / np.sqrt(1 - M * ds[0] / n_sub)
+        h.append(np.max(speed * ds))
+        # curvature is 0/0 on straight pieces (linear splines)
+        kmax.append(np.max(np.nan_to_num(np.abs(np.asarray(data["curvature"])))))
+    return np.array(h), np.array(kmax)
+
+
+def _default_node_grid(coilset, gap_of, target, n=64, its=6):
+    """Node grid with ``max(gap_of(grid)) <= target``, refining by the 1/n^2 law."""
+    for _ in range(its):
+        grid = _coil_node_grid(coilset, n)
+        gap = np.max(gap_of(grid))
+        if gap <= target:
+            return grid
+        n = int(np.ceil(n * np.sqrt(gap / target) * 1.05))
+    return grid
+
+
+def _node_gap(h_a, h_b, k_a, k_b, d):
+    """Overshoot of the closest node pair over the true distance ``d`` of two curves.
+
+    ``h`` is the largest arclength between consecutive nodes and ``k`` the largest
+    curvature of each curve; at the true closest points the connector is normal to
+    both curves.
+    """
+    return (h_a + h_b) ** 2 / (8 * d) + (k_a * h_a**2 + k_b * h_b**2) / 8
+
+
+def _lower_bound_meters(obj):
+    """Smallest lower bound of a distance objective in meters, or None."""
+    if obj.bounds is None:
+        return None
+    lo = np.min(obj.bounds[0])
+    return lo if obj._normalize_target else lo * obj.normalization
+
+
 class CoilSetDistanceRows(_Objective):
-    """Coil-coil distance: one smooth row per close node, one signed row per pair.
+    """Coil-coil distance: one smooth row per close node pair, one signed row per pair.
 
-    For every coil pair (one per symmetry orbit, independent coil first) and every node
-    i of either coil, a row measures the distance from that node to the EXACT other
-    curve, ``min_t |x_a(s_i) - x_b(t)|``, by Newton on t seeded from the polyline. Rows
-    are C^inf in the coil parameters wherever the closest point is unique, unlike a
-    minimum over pairs (kinked at ties), segment distances (C^1: optima park on polyline
-    vertices) or node-node distances (blind between nodes).
+    With ``distance="node"`` (default), for every coil pair (one per symmetry orbit,
+    independent coil first) a row is ``|x_a(s_i) - x_b(s_j)| - gap`` for each node pair
+    (i, j). Node positions are smooth in the parameters of every coil type. ``gap``
+    bounds how far the closest node pair can exceed the true distance between the
+    curves (from node spacing and curvature, see ``gap``), so every row is a lower bound
+    on the true distance once that distance exceeds the objective's lower bound.
 
-    Each evaluation re-selects the rows whose polyline distance is below
-    ``select_distance`` into ``max_active_rows`` slots; unused slots read
-    ``select_distance``, inactive under bounds whose lower value is below it. Rows have
-    fixed identities (pair, side, node), so slots can be mapped back for multipliers.
+    With ``distance="curve"`` (Fourier coils only), a row is the distance from node i
+    of either coil to the EXACT other curve, ``min_t |x_a(s_i) - x_b(t)|``, by Newton
+    on t seeded from the polyline: C^inf wherever the closest point is unique.
 
-    The last ``num_pairs`` rows hold, per pair, the closest side-a row with sign -1 if
-    the pair is linked (|linking number| > 0.5, no derivative) and +1 otherwise; that
-    node is excluded from the slots. The flip happens at distance 0, so the cost is
+    Each evaluation re-selects the rows whose node (``"node"``) or polyline
+    (``"curve"``) distance is below ``select_distance`` into ``max_active_rows`` slots;
+    unused slots read ``select_distance``, inactive under bounds whose lower value is
+    below it. Rows have fixed identities (pair, node, node) or (side, pair, node),
+    returned by ``row_ids``, so slots can be mapped back for multipliers.
+
+    The last ``num_pairs`` rows hold, per pair, the closest node pair's distance
+    (``"node"``, without the gap) or the smallest selected side-a row (``"curve"``)
+    with sign -1 if the pair is linked (|linking number| > 0.5, no derivative) and +1
+    otherwise. Their lower bound is 0 whatever ``bounds`` says: they only guard
+    topology, inactive for an unlinked pair and violated for a linked one. That
+    contact also stays in the slots, so slot membership never depends on which
+    contact is closest. The flip happens at distance 0, so the cost is
     continuous through a crossing and grows as a linked pair separates, pulling it back.
 
     Parameters
     ----------
     coil : CoilSet
-        Coils to optimize: FourierPlanarCoil, FourierXYCoil or FourierXYZCoil.
+        Coils to optimize. ``distance="curve"`` needs FourierPlanarCoil, FourierXYCoil
+        or FourierXYZCoil.
     select_distance : float
-        Rows whose polyline distance is below this (in m) are evaluated. Must exceed the
-        lower bound (in m) with margin for one optimizer step.
+        Rows whose node or polyline distance is below this (in m) are evaluated. Must
+        exceed the lower bound plus the gap (in m) with margin for one optimizer step.
     max_active_rows : int, optional
         Slots for selected rows; a warning is raised when they overflow.
         ``active_row_count`` gives the count at a given state.
     grid : Grid, optional
-        Nodes along each coil, ordered and uniform. Default ``LinearGrid(N=64)``.
+        Nodes along each coil, ordered and uniform. Default ``LinearGrid(N=64)`` for
+        ``"curve"``; for ``"node"``, enough nodes that the gap is at most 2% of the
+        lower bound at the coils given at build.
     link_grid : Grid, optional
         Grid for the linking numbers of the signed rows. Default ``LinearGrid(N=100)``.
     signed : bool, optional
         Whether to sign the per-pair rows by linking. Default True.
+    distance : {"node", "curve"}, optional
+        Node-node rows with a gap, or node-to-exact-curve rows. Default "node".
+    gap : float, optional
+        Gap (in m) subtracted from every ``"node"`` slot row. Default computed at build
+        per pair as ``gap_backoff * ((h_a + h_b)^2 / (8 d) + (k_a h_a^2 + k_b h_b^2) /
+        8)``, with ``h`` the largest arclength between nodes and ``k`` the largest
+        curvature of each coil at build, and ``d`` the lower bound. Coils whose
+        curvature or node spacing grows past the build values by more than the backoff
+        can then overshoot the bound by up to the shortfall.
+    gap_backoff : float, optional
+        Safety factor on the computed gap. Default 1.5.
 
     """
 
@@ -3001,6 +3120,8 @@ class CoilSetDistanceRows(_Objective):
         "_max_active_rows",
         "_select_distance",
         "_signed",
+        "_distance",
+        "_num_candidates",
     ]
 
     _scalar = False
@@ -3024,15 +3145,26 @@ class CoilSetDistanceRows(_Objective):
         max_active_rows=3000,
         link_grid=None,
         signed=True,
+        distance="node",
+        gap=None,
+        gap_backoff=1.5,
     ):
         if target is None and bounds is None:
             bounds = (1, np.inf)
         errorif(not select_distance > 0, ValueError, "select_distance must be > 0")
+        errorif(
+            distance not in ["node", "curve"],
+            ValueError,
+            f"distance must be 'node' or 'curve', got {distance}",
+        )
         self._select_distance = float(select_distance)
         self._max_active_rows = int(max_active_rows)
         self._grid = grid
         self._link_grid = link_grid
         self._signed = bool(signed)
+        self._distance = distance
+        self._gap = gap
+        self._gap_backoff = gap_backoff
         super().__init__(
             things=coil,
             target=target,
@@ -3058,11 +3190,15 @@ class CoilSetDistanceRows(_Objective):
 
         """
         coilset = self.things[0]
-        self._curve = _fourier_curve_kind(coilset)
-        grid = self._grid or LinearGrid(N=64)
+        node = self._distance == "node"
+        self._curve = None if node else _fourier_curve_kind(coilset)
+        if self._normalize:
+            coils = tree_leaves(coilset, is_leaf=lambda x: not hasattr(x, "__len__"))
+            scales = [compute_scaling_factors(c)["a"] for c in coils]
+            self._normalization = np.mean(scales)
         T, U = _physical_coil_maps(coilset)
         self._maps = (tuple(map(tuple, T.reshape(-1, 9))), tuple(int(u) for u in U))
-        pts = np.asarray(coilset._compute_position(grid=grid, basis="xyz"))
+        pts = np.asarray(coilset._compute_position(grid=LinearGrid(N=64), basis="xyz"))
         self._pairs = tuple(
             _unique_neighbour_pairs(
                 pts.mean(axis=1),
@@ -3072,8 +3208,30 @@ class CoilSetDistanceRows(_Objective):
                 coilset.sym,
             )
         )
-        self._n_nodes = pts.shape[1]
+        a, b = (U[np.array(v)] for v in zip(*self._pairs))  # independent coils
+        lo = _lower_bound_meters(self)
+        grid, gap = self._grid, np.zeros(len(self._pairs))
+        if node and self._gap is not None:
+            gap[:] = self._gap
+        elif node:
+            errorif(
+                lo is None or not lo > 0,
+                ValueError,
+                "The gap needs a positive lower bound; pass gap explicitly.",
+            )
+
+            def gap_of(grid):
+                h, k = _coil_gap_data(coilset, grid.nodes[:, 2])
+                return self._gap_backoff * _node_gap(h[a], h[b], k[a], k[b], lo)
+
+            if grid is None:
+                grid = _default_node_grid(coilset, gap_of, 0.02 * lo)
+            gap = gap_of(grid)
+        grid = grid or LinearGrid(N=64)
+        self._n_nodes = grid.num_nodes
         self._dim_f = self._max_active_rows + len(self._pairs)
+        npair, N = len(self._pairs), self._n_nodes
+        self._num_candidates = npair * N * N if node else 2 * npair * N
         link_grid = self._link_grid or LinearGrid(N=100)
         self._constants = {
             "coilset": coilset,
@@ -3081,20 +3239,25 @@ class CoilSetDistanceRows(_Objective):
             "s_nodes": np.asarray(grid.nodes[:, 2]),
             "link_grid": link_grid,
             "link_dx": np.asarray(link_grid.spacing[:, 2]),
+            "gap": gap,
+            "keep": np.zeros(self._num_candidates, dtype=bool),
             "quad_weights": 1.0,
         }
-        if self._normalize:
-            coils = tree_leaves(coilset, is_leaf=lambda x: not hasattr(x, "__len__"))
-            scales = [compute_scaling_factors(c)["a"] for c in coils]
-            self._normalization = np.mean(scales)
+        if self.bounds is not None:  # per-pair rows only guard topology
+            lb, ub = (
+                np.broadcast_to(np.asarray(b, dtype=float), (self._dim_f,)).copy()
+                for b in self.bounds
+            )
+            lb[self._max_active_rows :] = 0.0
+            self.bounds = (lb, ub)
         super().build(use_jit=use_jit, verbose=verbose)
-        lo = np.min(self.bounds[0]) if self.bounds is not None else -np.inf
-        lo = lo if self._normalize_target else lo * self.normalization
+        lo = -np.inf if lo is None else lo
         warnif(
-            lo >= self._select_distance,
+            lo + gap.max() >= self._select_distance,
             UserWarning,
             f"select_distance {self._select_distance} does not exceed the lower bound "
-            f"{lo} (m); unselected rows would read as violated.",
+            f"{lo} plus the gap {gap.max()} (m); unselected rows would read as "
+            "violated.",
         )
 
     def _linked(self, params, constants):
@@ -3114,7 +3277,41 @@ class CoilSetDistanceRows(_Objective):
         return jnp.abs(lk / (4 * jnp.pi)) > 0.5
 
     def _rows(self, params, constants):
-        """Slot rows, per-pair rows (unsigned) and the number of selected rows."""
+        """Slot rows, per-pair rows (unsigned), selected count and slot row ids."""
+        if self._distance == "node":
+            return self._node_rows(params, constants)
+        return self._curve_rows(params, constants)
+
+    def _node_rows(self, params, constants):
+        pts = constants["coilset"]._compute_position(
+            params=params, grid=constants["grid"], basis="xyz"
+        )
+        pts0 = jax.lax.stop_gradient(pts)
+        a, b = (jnp.array(v) for v in zip(*self._pairs))
+        npair, N, K = a.size, self._n_nodes, self._max_active_rows
+
+        def node_distances(p):  # no derivative
+            return jnp.linalg.norm(pts0[a[p], :, None] - pts0[b[p], None], axis=-1)
+
+        d0 = vmap_chunked(node_distances, chunk_size=1)(jnp.arange(npair))
+        d0 = d0.reshape(npair, N * N)
+        mask = (d0 < self._select_distance) | constants["keep"].reshape(npair, -1)
+        count = jnp.sum(mask)
+        jax.debug.callback(lambda n: _warn_rows_overflow(self.name, n, K), count)
+        (idx,) = jnp.nonzero(mask.reshape(-1), size=K, fill_value=0)
+        used = jnp.arange(K) < count
+
+        def row(p, ij):  # with derivatives
+            return safenorm(pts[a[p], ij // N] - pts[b[p], ij % N])
+
+        p, ij = idx // (N * N), idx % (N * N)
+        gap = jnp.asarray(constants["gap"])
+        slots = jnp.where(used, jax.vmap(row)(p, ij) - gap[p], self._select_distance)
+        q = jnp.arange(npair)
+        closest = jax.vmap(row)(q, jnp.argmin(d0, axis=1))
+        return slots, closest, count, jnp.where(used, idx, -1)
+
+    def _curve_rows(self, params, constants):
         kind, rpz, modes = self._curve
         T = jnp.array(self._maps[0]).reshape(-1, 3, 3)
         U = jnp.array(self._maps[1])
@@ -3134,7 +3331,9 @@ class CoilSetDistanceRows(_Objective):
 
         d0, t0 = vmap_chunked(seeds, chunk_size=4)(jnp.arange(2 * npair))
         argmin = jnp.argmin(d0[:npair], axis=1)  # closest side-0 node of each pair
-        mask = (d0 < self._select_distance).at[jnp.arange(npair), argmin].set(False)
+        # the closest node stays in the slots too: excluding it by argmin would make
+        # slot membership jump where two contacts tie
+        mask = (d0 < self._select_distance) | constants["keep"].reshape(2 * npair, -1)
         count = jnp.sum(mask)
         jax.debug.callback(lambda n: _warn_rows_overflow(self.name, n, K), count)
         (idx,) = jnp.nonzero(mask.reshape(-1), size=K, fill_value=0)
@@ -3146,13 +3345,18 @@ class CoilSetDistanceRows(_Objective):
             )
 
         k, i = idx // N, idx % N
-        slots = jnp.where(
-            jnp.arange(K) < count,
-            jax.vmap(row)(k, i, t0[k, i]),
-            self._select_distance,
+        used = jnp.arange(K) < count
+        slots = jnp.where(used, jax.vmap(row)(k, i, t0[k, i]), self._select_distance)
+        # per pair, the smallest exact side-0 row: the polyline argmin's own row would
+        # jump where two contacts tie on the polyline but not exactly
+        side0 = used & (k < npair)
+        closest = jax.ops.segment_min(
+            jnp.where(side0, slots, jnp.inf), jnp.where(side0, k, 0), npair
         )
         p = jnp.arange(npair)
-        return slots, jax.vmap(row)(p, argmin, t0[p, argmin]), count
+        far = jax.vmap(row)(p, argmin, t0[p, argmin])  # no side-0 row selected
+        closest = jnp.where(jnp.isfinite(closest), closest, far)
+        return slots, closest, count, jnp.where(used, idx, -1)
 
     def compute(self, params, constants=None):
         """Compute coil-coil distance rows.
@@ -3172,7 +3376,7 @@ class CoilSetDistanceRows(_Objective):
 
         """
         constants = self._get_deprecated_constants(constants)
-        slots, closest, _ = self._rows(params, constants)
+        slots, closest, _, _ = self._rows(params, constants)
         if self._signed:
             closest = jnp.where(self._linked(params, constants), -closest, closest)
         return jnp.concatenate([slots, closest])
@@ -3180,23 +3384,57 @@ class CoilSetDistanceRows(_Objective):
     def active_row_count(self, params=None):
         """Rows within ``select_distance`` at params (to size ``max_active_rows``)."""
         params = self.things[0].params_dict if params is None else params
-        return int(self._rows(params, self.constants)[2])
+        return int(self._rows(params, self._constants)[2])
+
+    @property
+    def num_row_ids(self):
+        """int: Number of distinct row ids: candidates, then one per pair."""
+        return self._num_candidates + len(self._pairs)
+
+    def compute_row_ids(self, params, constants=None):
+        """Id of the candidate in each row; -1 for unused slots.
+
+        Slot rows hold candidates ``(pair, i, j)`` (``"node"``) or ``(side, pair, i)``
+        (``"curve"``) in row-major order; per-pair rows have ids after those.
+        """
+        constants = self._get_deprecated_constants(constants)
+        ids = self._rows(params, constants)[3]
+        return jnp.concatenate(
+            [ids, self._num_candidates + jnp.arange(len(self._pairs))]
+        )
+
+    def keep_rows(self, ids):
+        """Select the candidates ``ids`` at every evaluation, whatever their distance.
+
+        Used to keep rows that carry a multiplier from dropping out of the slots.
+        Replaces the previous set; ids beyond the candidates (per-pair rows) and
+        negative ids are ignored.
+        """
+        ids = np.asarray(ids, dtype=int)
+        ids = ids[(ids >= 0) & (ids < self._num_candidates)]
+        keep = np.zeros(self._num_candidates, dtype=bool)
+        keep[ids] = True
+        self._constants["keep"] = keep
 
     def linked_pairs(self, params=None):
         """Coil pairs (independent coil first) with |linking number| > 0.5."""
         params = self.things[0].params_dict if params is None else params
-        linked = np.asarray(self._linked(params, self.constants))
+        linked = np.asarray(self._linked(params, self._constants))
         return [pair for pair, lk in zip(self._pairs, linked) if lk]
 
 
 class PlasmaCoilSetDistanceRows(_Objective):
-    """Plasma-coil distance as one smooth row per close plasma point and coil.
+    """Plasma-coil distance as one smooth row per close plasma point and coil node.
 
-    Each row is the distance from a plasma surface point to the EXACT coil curve,
-    ``min_t |q - x(t)|`` by Newton on t from the polyline, so it is C^inf in the coil
-    parameters wherever the closest point is unique. Rows within ``select_distance``
-    are re-selected each evaluation into ``max_active_rows`` slots; unused slots read
-    ``select_distance``.
+    With ``distance="node"`` (default) a row is ``|q_j - x(s_i)| - gap`` for each
+    plasma point j and coil node i, where ``gap`` bounds how far the closest point-node
+    pair can exceed the true surface-curve distance (see ``gap``). With
+    ``distance="curve"`` (Fourier coils only) a row is the distance from a plasma point
+    to the EXACT coil curve, ``min_t |q - x(t)|`` by Newton on t from the polyline, so
+    it is C^inf in the coil parameters wherever the closest point is unique. Rows
+    within ``select_distance`` are re-selected each evaluation into
+    ``max_active_rows`` slots; unused slots read ``select_distance``. ``row_ids``
+    gives each slot's (coil, point, node) or (coil, point) identity.
 
     The coils are the independent coils and their stellarator reflections, with the
     plasma points copied over all field periods: a ``sym=True`` plasma grid covers
@@ -3207,18 +3445,29 @@ class PlasmaCoilSetDistanceRows(_Objective):
     eq : Equilibrium or FourierRZToroidalSurface
         Fixed plasma boundary.
     coil : CoilSet
-        Coils to optimize: FourierPlanarCoil, FourierXYCoil or FourierXYZCoil.
+        Coils to optimize. ``distance="curve"`` needs FourierPlanarCoil, FourierXYCoil
+        or FourierXYZCoil.
     select_distance : float
-        Rows whose polyline distance is below this (in m) are evaluated. Must exceed the
-        lower bound (in m) with margin for one optimizer step.
+        Rows whose node or polyline distance is below this (in m) are evaluated. Must
+        exceed the lower bound plus the gap (in m) with margin for one optimizer step.
     plasma_grid : Grid, optional
         Surface grid (rho=1). Default
         ``LinearGrid(M=2 * eq.M, N=2 * eq.N, NFP=eq.NFP)``.
     coil_grid : Grid, optional
-        Nodes along each coil, ordered and uniform, used for the seeds. Default
-        ``LinearGrid(N=64)``.
+        Nodes along each coil, ordered and uniform. Default ``LinearGrid(N=64)`` for
+        ``"curve"``; for ``"node"``, enough nodes that the gap is at most 2% of the
+        lower bound, or that the coil spacing is at most the plasma grid's if the
+        plasma grid alone exceeds that.
     max_active_rows : int, optional
         Slots for selected rows; a warning is raised when they overflow.
+    distance : {"node", "curve"}, optional
+        Point-node rows with a gap, or point-to-exact-curve rows. Default "node".
+    gap : float, optional
+        Gap (in m) subtracted from every ``"node"`` row. Default computed at build per
+        coil as in ``CoilSetDistanceRows``, with the plasma grid's largest cell diagonal
+        and the surface's largest principal curvature in place of the second curve's.
+    gap_backoff : float, optional
+        Safety factor on the computed gap. Default 1.5.
 
     """
 
@@ -3234,6 +3483,9 @@ class PlasmaCoilSetDistanceRows(_Objective):
         "_coil_indices",
         "_max_active_rows",
         "_select_distance",
+        "_distance",
+        "_n_nodes",
+        "_num_candidates",
     ]
 
     _scalar = False
@@ -3257,10 +3509,21 @@ class PlasmaCoilSetDistanceRows(_Objective):
         name="plasma-coil distance rows",
         jac_chunk_size=None,
         max_active_rows=6000,
+        distance="node",
+        gap=None,
+        gap_backoff=1.5,
     ):
         if target is None and bounds is None:
             bounds = (1, np.inf)
         errorif(not select_distance > 0, ValueError, "select_distance must be > 0")
+        errorif(
+            distance not in ["node", "curve"],
+            ValueError,
+            f"distance must be 'node' or 'curve', got {distance}",
+        )
+        self._distance = distance
+        self._gap = gap
+        self._gap_backoff = gap_backoff
         self._eq = eq
         self._select_distance = float(select_distance)
         self._max_active_rows = int(max_active_rows)
@@ -3291,7 +3554,8 @@ class PlasmaCoilSetDistanceRows(_Objective):
 
         """
         eq, coilset = self._eq, self.things[0]
-        self._curve = _fourier_curve_kind(coilset)
+        node = self._distance == "node"
+        self._curve = None if node else _fourier_curve_kind(coilset)
         plasma_grid = self._plasma_grid or LinearGrid(
             M=2 * eq.M, N=2 * eq.N, NFP=eq.NFP
         )
@@ -3300,8 +3564,11 @@ class PlasmaCoilSetDistanceRows(_Objective):
             UserWarning,
             "Plasma/Surface grid includes interior points, should be rho=1.",
         )
-        coil_grid = self._coil_grid or LinearGrid(N=64)
+        if self._normalize:
+            self._normalization = compute_scaling_factors(eq)["a"]
         keys = ["R", "phi", "Z"]
+        if node and self._gap is None:
+            keys += ["e_theta", "e_zeta", "curvature_k1_rho", "curvature_k2_rho"]
         data = compute_fun(
             eq,
             keys,
@@ -3315,20 +3582,98 @@ class PlasmaCoilSetDistanceRows(_Objective):
             int(k) for k in _field_period_independent_indices(coilset, plasma_grid.NFP)
         )
         self._maps = (tuple(map(tuple, T.reshape(-1, 9))), tuple(int(u) for u in U))
+        u = U[np.array(self._coil_indices)]  # independent coil of each row coil
+        lo = _lower_bound_meters(self)
+        coil_grid, gap = self._coil_grid, np.zeros(len(self._coil_indices))
+        if node and self._gap is not None:
+            gap[:] = self._gap
+        elif node:
+            errorif(
+                lo is None or not lo > 0,
+                ValueError,
+                "The gap needs a positive lower bound; pass gap explicitly.",
+            )
+            # largest cell diagonal and principal curvature of the plasma surface
+            dt, dz = (
+                2 * np.pi / plasma_grid.num_theta,
+                2 * np.pi / plasma_grid.NFP / plasma_grid.num_zeta,
+            )
+            if plasma_grid.sym:  # theta in [0, pi] with num_theta nodes
+                dt = np.pi / max(plasma_grid.num_theta - 1, 1)
+            et = np.linalg.norm(np.asarray(data["e_theta"]), axis=-1)
+            ez = np.linalg.norm(np.asarray(data["e_zeta"]), axis=-1)
+            h_p = np.max(np.hypot(et * dt, ez * dz))
+            k_p = np.max(np.abs([data["curvature_k1_rho"], data["curvature_k2_rho"]]))
+
+            def gap_of(grid):
+                h, k = _coil_gap_data(coilset, grid.nodes[:, 2])
+                return self._gap_backoff * _node_gap(h[u], h_p, k[u], k_p, lo)
+
+            if coil_grid is None:
+                # 2%, or coil spacing down to the plasma grid's if that cannot reach it
+                floor = self._gap_backoff * _node_gap(0, h_p, 0, k_p, lo)
+                target = max(0.02 * lo, 4 * floor)
+                coil_grid = _default_node_grid(coilset, gap_of, target)
+            gap = gap_of(coil_grid)
+        coil_grid = coil_grid or LinearGrid(N=64)
+        self._n_nodes = coil_grid.num_nodes
         self._dim_f = self._max_active_rows
+        Q = rpz2xyz(copy_rpz_periods(rpz, plasma_grid.NFP))
+        self._num_candidates = len(self._coil_indices) * Q.shape[0]
+        self._num_candidates *= self._n_nodes if node else 1
         self._constants = {
             "coilset": coilset,
             "coil_grid": coil_grid,
             "s_nodes": np.asarray(coil_grid.nodes[:, 2]),
-            "plasma_coords": rpz2xyz(copy_rpz_periods(rpz, plasma_grid.NFP)),
+            "plasma_coords": Q,
+            "gap": gap,
+            "keep": np.zeros(self._num_candidates, dtype=bool),
             "quad_weights": 1.0,
         }
-        if self._normalize:
-            self._normalization = compute_scaling_factors(eq)["a"]
         super().build(use_jit=use_jit, verbose=verbose)
+        lo = -np.inf if lo is None else lo
+        warnif(
+            lo + gap.max() >= self._select_distance,
+            UserWarning,
+            f"select_distance {self._select_distance} does not exceed the lower bound "
+            f"{lo} plus the gap {gap.max()} (m); unselected rows would read as "
+            "violated.",
+        )
 
     def _rows(self, params, constants):
-        """Slot rows and the number of selected rows."""
+        """Slot rows, the number of selected rows and slot row ids."""
+        if self._distance == "node":
+            return self._node_rows(params, constants)
+        return self._curve_rows(params, constants)
+
+    def _node_rows(self, params, constants):
+        cidx = np.array(self._coil_indices)
+        pts = constants["coilset"]._compute_position(
+            params=params, grid=constants["coil_grid"], basis="xyz"
+        )[cidx]
+        pts0 = jax.lax.stop_gradient(pts)
+        Q = jnp.asarray(constants["plasma_coords"])
+        nq, N, K = Q.shape[0], self._n_nodes, self._max_active_rows
+
+        def node_distances(c):  # no derivative
+            return jnp.linalg.norm(Q[:, None] - pts0[c][None], axis=-1).reshape(-1)
+
+        d0 = jax.lax.map(node_distances, jnp.arange(cidx.size))
+        mask = (d0 < self._select_distance) | constants["keep"].reshape(cidx.size, -1)
+        count = jnp.sum(mask)
+        jax.debug.callback(lambda n: _warn_rows_overflow(self.name, n, K), count)
+        (idx,) = jnp.nonzero(mask.reshape(-1), size=K, fill_value=0)
+        used = jnp.arange(K) < count
+        c, j, i = idx // (nq * N), (idx // N) % nq, idx % N
+        gap = jnp.asarray(constants["gap"])
+        dist = safenorm(Q[j] - pts[c, i], axis=-1) - gap[c]
+        return (
+            jnp.where(used, dist, self._select_distance),
+            count,
+            jnp.where(used, idx, -1),
+        )
+
+    def _curve_rows(self, params, constants):
         kind, rpz, modes = self._curve
         cidx = np.array(self._coil_indices)
         T = jnp.array(self._maps[0]).reshape(-1, 3, 3)[cidx]
@@ -3349,7 +3694,7 @@ class PlasmaCoilSetDistanceRows(_Objective):
             )(Q)
 
         d0, t0 = jax.lax.map(seeds, jnp.arange(cidx.size))
-        mask = d0 < self._select_distance
+        mask = (d0 < self._select_distance) | constants["keep"].reshape(cidx.size, -1)
         count = jnp.sum(mask)
         jax.debug.callback(lambda n: _warn_rows_overflow(self.name, n, K), count)
         (idx,) = jnp.nonzero(mask.reshape(-1), size=K, fill_value=0)
@@ -3359,7 +3704,12 @@ class PlasmaCoilSetDistanceRows(_Objective):
                 P, U[c], T[c], Q[j], t, kind, rpz, modes
             )
         )(c, j, t0[c, j])
-        return jnp.where(jnp.arange(K) < count, dist, self._select_distance), count
+        used = jnp.arange(K) < count
+        return (
+            jnp.where(used, dist, self._select_distance),
+            count,
+            jnp.where(used, idx, -1),
+        )
 
     def compute(self, params, constants=None):
         """Compute plasma-coil distance rows.
@@ -3384,7 +3734,32 @@ class PlasmaCoilSetDistanceRows(_Objective):
     def active_row_count(self, params=None):
         """Rows within ``select_distance`` at params (to size ``max_active_rows``)."""
         params = self.things[0].params_dict if params is None else params
-        return int(self._rows(params, self.constants)[1])
+        return int(self._rows(params, self._constants)[1])
+
+    @property
+    def num_row_ids(self):
+        """int: Number of distinct row ids."""
+        return self._num_candidates
+
+    def compute_row_ids(self, params, constants=None):
+        """Id of the candidate in each row; -1 for unused slots.
+
+        Candidates are ``(coil, point, node)`` (``"node"``) or ``(coil, point)``
+        (``"curve"``) in row-major order.
+        """
+        constants = self._get_deprecated_constants(constants)
+        return self._rows(params, constants)[2]
+
+    def keep_rows(self, ids):
+        """Select the candidates ``ids`` at every evaluation, whatever their distance.
+
+        Used to keep rows that carry a multiplier from dropping out of the slots.
+        Replaces the previous set; negative ids are ignored.
+        """
+        ids = np.asarray(ids, dtype=int)
+        keep = np.zeros(self._num_candidates, dtype=bool)
+        keep[ids[ids >= 0]] = True
+        self._constants["keep"] = keep
 
 
 class CoilArclengthVariance(_CoilObjective):

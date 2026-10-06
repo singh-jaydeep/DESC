@@ -58,6 +58,7 @@ def build(
             grid=LinearGrid(N=pair_N),
             weight=cc_w,
             jac_chunk_size=JCS,
+            distance="curve",
         )
     else:
         soft = dict(use_softmin=True, softmin_alpha=cc_alpha) if cc == "soft" else {}

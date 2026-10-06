@@ -16,6 +16,12 @@ from cases import build  # noqa: E402
 
 from desc.grid import LinearGrid  # noqa: E402
 from desc.io import load  # noqa: E402
+from desc.objectives import (  # noqa: E402
+    CoilSetDistanceRows,
+    CoilSetMinDistance,
+    PlasmaCoilSetDistanceRows,
+    PlasmaCoilSetMinDistance,
+)
 from desc.objectives._coils import (  # noqa: E402
     _closed_polyline,
     _point_segment_distance,
@@ -23,19 +29,25 @@ from desc.objectives._coils import (  # noqa: E402
     _unique_neighbour_pairs,
 )
 
-kw = json.loads(sys.argv[1])
-_, cs, obj, _ = build(**kw)
-obj.build(verbose=0)
-cc, pc = obj.objectives[1], obj.objectives[2]
-fine = LinearGrid(N=1000)
-for f in sys.argv[2:]:
-    if f.endswith("_x.npy"):
-        p = obj.unpack_state(jnp.asarray(np.load(f)), False)[0]
-        p = [{k: np.asarray(v) for k, v in q.items()} for q in p]
-    else:
-        p = load(f).params_dict if f != "init" else cs.params_dict
-    cs.params_dict = p
-    x = np.asarray(cs._compute_position(grid=fine, basis="xyz"))
+
+def distance_objectives(obj, cons):
+    """The built coil-coil and plasma-coil distance objectives of a problem."""
+    found = {}
+    for o in list(obj.objectives) + list(cons):
+        if isinstance(o, (CoilSetDistanceRows, CoilSetMinDistance)):
+            found["cc"] = o
+        if isinstance(o, (PlasmaCoilSetDistanceRows, PlasmaCoilSetMinDistance)):
+            found["pc"] = o
+    for o in found.values():
+        if not o.built:
+            o.build(verbose=0)
+    return found["cc"], found["pc"]
+
+
+def feasibility(cs, cc, pc, params):
+    """Brute-force distances, linked pairs, lengths and curvature at coil params."""
+    cs.params_dict = params
+    x = np.asarray(cs._compute_position(grid=LinearGrid(N=1000), basis="xyz"))
     pairs = _unique_neighbour_pairs(
         x.mean(axis=1), np.arange(len(cs)), x.shape[0] - 1, cs.NFP, cs.sym
     )
@@ -44,7 +56,7 @@ for f in sys.argv[2:]:
         float(np.asarray(_segment_segment_distance(*poly[a], *poly[b])).min())
         for a, b in pairs
     )
-    Q = jnp.asarray(pc.constants["plasma_coords"])
+    Q = jnp.asarray(pc._constants["plasma_coords"])
     dpc = min(
         float(
             np.asarray(
@@ -56,8 +68,30 @@ for f in sys.argv[2:]:
     g = LinearGrid(N=200)
     L = [float(c.compute("length", grid=g)["length"]) for c in cs]
     kmax = [float(c.compute("|curvature|", grid=g)["|curvature|"].max()) for c in cs]
-    linked = cc.linked_pairs(p) if hasattr(cc, "linked_pairs") else "n/a"
-    print(
-        f"{f}: min coil-coil {dcc:.5f} m, min plasma-coil {dpc:.5f} m, linked {linked}"
-    )
-    print(f"   lengths {np.round(L, 4)}, max |curvature| {np.round(kmax, 3)}")
+    linked = cc.linked_pairs(params) if hasattr(cc, "linked_pairs") else "n/a"
+    return dict(cc=dcc, pc=dpc, linked=linked, length=L, curvature=kmax)
+
+
+def load_params(obj, f, cs):
+    """Coil params from a full state file, a saved coilset, or the initial coils."""
+    if f.endswith("_x.npy"):
+        p = obj.unpack_state(jnp.asarray(np.load(f)), False)[0]
+        return [{k: np.asarray(v) for k, v in q.items()} for q in p]
+    return load(f).params_dict if f != "init" else cs.params_dict
+
+
+if __name__ == "__main__":
+    kw = json.loads(sys.argv[1])
+    _, cs, obj, cons = build(**kw)
+    obj.build(verbose=0)
+    cc, pc = distance_objectives(obj, cons)
+    for f in sys.argv[2:]:
+        r = feasibility(cs, cc, pc, load_params(obj, f, cs))
+        print(
+            f"{f}: min coil-coil {r['cc']:.5f} m, min plasma-coil {r['pc']:.5f} m, "
+            f"linked {r['linked']}"
+        )
+        print(
+            f"   lengths {np.round(r['length'], 4)}, "
+            f"max |curvature| {np.round(r['curvature'], 3)}"
+        )

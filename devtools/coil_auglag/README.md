@@ -29,9 +29,11 @@ The two investigation notes predate this branch; the names they use map as follo
 |---|---|
 | `setup.py`, `setup_qh.py`, `cases.py` | problem builders; `cases.build(case="qa"/"qh", **kw)` |
 | `run.py` | stock `lsq-exact` driver (verbose log, `allx`) |
+| `run_composite.py TAG KW [OPTS]` | `Optimizer("lsq-composite")` driver (the DESC port of `ctr.py`); `--start X_x.npy` |
+| `run_al.py TAG KW [OPTS]` | `Optimizer("lsq-auglag-composite")` driver on the builder's AL mode (`al=True`, node rows); outer-loop log in `TAG_outer.json` |
 | `mkstage.py TAG X KW` | make a run tag at a full state (`init` = the builder's coils) |
 | `ctr.py ARM TAG MAXITER OUT [Y]` | controlled trust region: `std`, `comp` (composite hinge model), `compS` (+ structured secant S), `comp2` (+ exact S); checkpoints every 50 its |
-| `check.py KW FILE...` | feasibility and topology at coilset files or `*_x.npy` states |
+| `check.py KW FILE...` | feasibility and topology at coilset files or `*_x.npy` states (`feasibility()` is reused by `run_al.py`) |
 | `diag.py TAG X [--hess]` | cost per objective; with `--hess` the optimality certificate |
 | `sdecomp.py`, `pintest.py` | dropped Gauss-Newton term per objective; gauge pinning test (planar coils) |
 | `trsteps.py`, `hspec.py`, `lk.py`, `common.py` | trust-region ladder, Hessian spectrum, linking numbers, loaders |
@@ -49,6 +51,16 @@ python diag.py E1 E1n_x.npy --hess
 
 Previously certified with this sequence: scaled gradient 7.7e-9, PD Hessian, coil pair
 (2, 3) linked at the penalty optimum (unlinking needs AL multipliers).
+
+The same in DESC, secant then exact finish in one solve (exact-curve rows, as above):
+
+```
+python run_composite.py LC1 '{"case":"qh"}'   # {"hessian": "secant", "finish_steps": 8}
+```
+
+Builder kwargs for the augmented Lagrangian: `al=True` (QuadraticFlux objective, limits as
+constraints), `distance="node"` (node-node rows with a gap) and `pair_N=None` (node count
+from the gap); `run_al.py` sets all three.
 
 ## Known issues
 

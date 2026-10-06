@@ -24,6 +24,7 @@ from desc.coils import (
     FourierXYCoil,
     FourierXYZCoil,
     MixedCoilSet,
+    PolarPlanarArcCoil,
     SplineXYZCoil,
     initialize_modular_coils,
 )
@@ -104,10 +105,12 @@ from desc.objectives import (
     get_NAE_constraints,
 )
 from desc.objectives._coils import (
+    _closed_polyline,
     _fourier_curve_kind,
     _fourier_curve_point,
     _independent_coil_indices,
     _physical_coil_maps,
+    _segment_segment_distance,
     _stacked_params,
 )
 from desc.objectives._free_boundary import BoundaryErrorNESTOR
@@ -1292,7 +1295,11 @@ class TestObjectiveFunction:
         for dx, linked in [(1.0, True), (2.5, False)]:
             coils = rings(dx)
             obj = CoilSetDistanceRows(
-                coils, select_distance=3, grid=grid, max_active_rows=200
+                coils,
+                select_distance=3,
+                grid=grid,
+                max_active_rows=200,
+                distance="curve",
             )
             obj.build(verbose=0)
             f = obj.compute(coils.params_dict)
@@ -1305,6 +1312,10 @@ class TestObjectiveFunction:
                 f[-1], (-1 if linked else 1) * d.min(), rtol=1e-6
             )
             assert np.all(f[:-1] > 0)
+            # the closest contact is in the slots as well; pair rows bounded by 0
+            assert np.min(np.abs(f[:-1] - np.abs(f[-1]))) < 1e-12
+            np.testing.assert_array_equal(obj.bounds[0][-1:], 0)
+            np.testing.assert_array_equal(obj.bounds[0][:-1], 1)
             # derivatives through the selection and the Newton solve
             obj2 = ObjectiveFunction(obj)
             obj2.build(verbose=0)
@@ -1317,7 +1328,9 @@ class TestObjectiveFunction:
             ) / (2 * h)
             np.testing.assert_allclose(J @ v, fd, atol=1e-8)
         with pytest.warns(UserWarning, match="max_active_rows"):
-            obj = CoilSetDistanceRows(coils, select_distance=3, max_active_rows=5)
+            obj = CoilSetDistanceRows(
+                coils, select_distance=3, max_active_rows=5, distance="curve"
+            )
             obj.build(verbose=0)
             jax.block_until_ready(obj.compute(coils.params_dict))
         with pytest.raises(NotImplementedError):
@@ -1326,7 +1339,171 @@ class TestObjectiveFunction:
                     SplineXYZCoil(1, [1, 2, 3], [0, 0, 0], [0, 1, 0])
                 ),
                 select_distance=1,
+                distance="curve",
             ).build(verbose=0)
+
+    @pytest.mark.unit
+    def test_coil_set_distance_rows_node(self):
+        """Node rows minus the gap bound the true distance; signed, ids, keep, FD."""
+
+        def true_distance(c1, c2, n=2000):  # polylines, chord error ~ k h^2 / 8
+            x = c1._compute_position(grid=LinearGrid(N=n), basis="xyz")[0]
+            y = c2._compute_position(grid=LinearGrid(N=n), basis="xyz")[0]
+            return np.min(
+                _segment_segment_distance(*_closed_polyline(x), *_closed_polyline(y))
+            )
+
+        # random Fourier coils, bound below the true distance
+        rng = np.random.default_rng(0)
+        for _ in range(3):
+            coils = []
+            for center in ([0, 0, 0], [2.3, 0, 0]):
+                coil = FourierXYZCoil(
+                    X_n=[0, 1, 0], Y_n=[0, 0, 1], Z_n=[0, 0, 0], modes=[-1, 0, 1]
+                )
+                coil.change_resolution(N=4)
+                for key in ["X_n", "Y_n", "Z_n"]:
+                    v = getattr(coil, key)
+                    setattr(coil, key, v + 0.08 * rng.standard_normal(v.size))
+                coil.translate(center)
+                coils.append(coil)
+            coils = CoilSet(*coils, check_intersection=False)
+            d = true_distance(coils[0], coils[1])
+            obj = CoilSetDistanceRows(
+                coils,
+                select_distance=d + 0.5,
+                bounds=(0.8 * d, np.inf),
+                grid=LinearGrid(N=12),
+                max_active_rows=5000,
+            )
+            obj.build(verbose=0)
+            f = obj.compute(coils.params_dict)
+            gap = obj._constants["gap"][0]
+            assert 0 <= f[-1] - d <= gap
+            assert f[:-1].min() <= d
+        # threaded and separate rings
+        grid = LinearGrid(N=32)
+        for dx, linked in [(1.0, True), (2.5, False)]:
+            coils = CoilSet(
+                FourierPlanarCoil(center=[0, 0, 0], normal=[0.05, 0.1, 1], r_n=1),
+                FourierPlanarCoil(center=[dx, 0, 0], normal=[0, 1, 0], r_n=1),
+                check_intersection=False,
+            )
+            obj = CoilSetDistanceRows(
+                coils, select_distance=1.2, grid=grid, max_active_rows=3000, gap=0.01
+            )
+            obj.build(verbose=0)
+            f = obj.compute(coils.params_dict)
+            assert obj.linked_pairs() == ([(0, 1)] if linked else [])
+            nodes = coils._compute_position(grid=grid, basis="xyz")
+            dn = np.linalg.norm(nodes[0][:, None] - nodes[1][None], axis=-1)
+            np.testing.assert_allclose(f[-1], (-1 if linked else 1) * dn.min())
+            np.testing.assert_allclose(f[:-1].min(), dn.min() - 0.01)
+            # ids: unique for used slots, kept candidates stay selected
+            ids = np.asarray(obj.compute_row_ids(coils.params_dict))
+            used = ids[:-1] >= 0
+            assert used.sum() == obj.active_row_count() == np.sum(dn < 1.2)
+            assert np.unique(ids[:-1][used]).size == used.sum()
+            far = int(np.argmax(dn))
+            obj.keep_rows([far])
+            ids = np.asarray(obj.compute_row_ids(coils.params_dict))
+            assert far in ids
+            obj.keep_rows([])
+            obj2 = ObjectiveFunction(obj)
+            obj2.build(verbose=0)
+            x = obj2.x(coils)
+            J = obj2.jac_unscaled(x)
+            v = np.random.default_rng(0).standard_normal(x.size) * 1e-3
+            h = 1e-5
+            fd = (
+                obj2.compute_unscaled(x + h * v) - obj2.compute_unscaled(x - h * v)
+            ) / (2 * h)
+            np.testing.assert_allclose(J @ v, fd, atol=1e-8)
+        with pytest.raises(ValueError, match="gap"):
+            CoilSetDistanceRows(coils, select_distance=1, bounds=(0, 1)).build(
+                verbose=0
+            )
+
+    @pytest.mark.unit
+    def test_coil_set_distance_rows_node_piecewise(self):
+        """Arcs and linear splines: nodes on every corner, gap bounds the overshoot."""
+        hinges = np.array([[1, 1, 0], [-1, 1, 0], [-1, -1, 0], [1, -1, 0]])
+        t = np.linspace(0, 2 * np.pi, 7, endpoint=False)
+        ring = np.array([np.cos(t), np.sin(t), 0.3 * np.sin(2 * t)]).T
+        for make, breaks in [
+            (
+                lambda c: PolarPlanarArcCoil(
+                    1,
+                    hinges + c,
+                    tilts=[0.4, -0.7, 1.0, 0.3],
+                    shape=np.zeros(4),
+                    B=4,
+                    M=1,
+                ),
+                2 * np.pi * np.arange(4) / 4,
+            ),
+            (
+                lambda c: SplineXYZCoil(1, *(ring + c).T, method="linear"),
+                np.linspace(0, 2 * np.pi, 7, endpoint=False),
+            ),
+        ]:
+            coils = CoilSet(
+                make(np.zeros(3)), make([2.9, 0.4, 0.2]), check_intersection=False
+            )
+            x = coils._compute_position(grid=LinearGrid(N=2000), basis="xyz")
+            d = np.min(
+                _segment_segment_distance(
+                    *_closed_polyline(x[0]), *_closed_polyline(x[1])
+                )
+            )
+            obj = CoilSetDistanceRows(
+                coils,
+                select_distance=d + 0.5,
+                bounds=(0.8 * d, np.inf),
+                max_active_rows=20000,
+            )
+            obj.build(verbose=0)
+            s = obj._constants["grid"].nodes[:, 2]
+            assert np.all(np.min(np.abs(s[:, None] - breaks[None]), axis=0) < 1e-12)
+            f = obj.compute(coils.params_dict)
+            gap = obj._constants["gap"][0]
+            assert 0 < gap <= 0.02 * 0.8 * d
+            assert 0 <= f[-1] - d <= gap
+            assert f[:-1].min() <= d
+
+    @pytest.mark.unit
+    def test_plasma_coil_set_distance_rows_node(self):
+        """Point-node rows minus the gap bound the true surface-coil distance."""
+        eq = Equilibrium(M=2, N=1, NFP=2)
+        coil = FourierPlanarCoil(center=[10, 0.3, 0], normal=[0, 1, 0.2], r_n=2.2)
+        coils = CoilSet(coil, NFP=2, sym=True, check_intersection=False)
+        plasma_grid = LinearGrid(M=6, N=6, NFP=2, sym=True)
+        fine_surface = LinearGrid(M=60, N=60, NFP=2)
+        data = eq.compute(["R", "phi", "Z"], grid=fine_surface)
+        Q = np.array([data["R"], data["phi"], data["Z"]]).T
+        Q = np.stack(
+            [Q[:, 0] * np.cos(Q[:, 1]), Q[:, 0] * np.sin(Q[:, 1]), Q[:, 2]], axis=-1
+        )
+        curves = coils._compute_position(grid=LinearGrid(N=2000), basis="xyz")
+        d = min(np.linalg.norm(Q[:, None] - c[None], axis=-1).min() for c in curves)
+        obj = PlasmaCoilSetDistanceRows(
+            eq,
+            coils,
+            select_distance=d + 1,
+            bounds=(0.8 * d, np.inf),
+            plasma_grid=plasma_grid,
+            max_active_rows=20000,
+        )
+        obj.build(verbose=0)
+        f = obj.compute(coils.params_dict)
+        gap = obj._constants["gap"].max()
+        assert gap > 0
+        assert f.min() <= d
+        assert f.min() + gap >= d - 0.01 * d  # fine-grid estimate of d
+        ids = np.asarray(obj.compute_row_ids(coils.params_dict))
+        used = ids >= 0
+        assert used.sum() == obj.active_row_count()
+        assert np.unique(ids[used]).size == used.sum()
 
     @pytest.mark.unit
     def test_plasma_coil_set_distance_rows(self):
@@ -1336,12 +1513,17 @@ class TestObjectiveFunction:
         coils = CoilSet(coil, NFP=2, sym=True, check_intersection=False)
         plasma_grid = LinearGrid(M=6, N=6, NFP=2, sym=True)
         obj = PlasmaCoilSetDistanceRows(
-            eq, coils, select_distance=3, plasma_grid=plasma_grid, max_active_rows=3000
+            eq,
+            coils,
+            select_distance=3,
+            plasma_grid=plasma_grid,
+            max_active_rows=3000,
+            distance="curve",
         )
         obj.build(verbose=0)
         f = obj.compute(coils.params_dict)
         assert obj.active_row_count() < obj.dim_f
-        Q = np.asarray(obj.constants["plasma_coords"])
+        Q = np.asarray(obj._constants["plasma_coords"])
         curves = coils._compute_position(grid=LinearGrid(N=10000), basis="xyz")
         brute = np.linalg.norm(Q[:, None, None] - curves[None], axis=-1).min()
         np.testing.assert_allclose(f.min(), brute, rtol=1e-6)

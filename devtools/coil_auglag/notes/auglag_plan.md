@@ -6,6 +6,75 @@ Branch `js/coil-auglag` (worktree `/Users/singh/PycharmProjects/DESC-coil-auglag
 it). The user prefers a task list to follow: each task says where, what, why, and how to
 check it.
 
+## Status (2026-10-06, end of first implementation session)
+
+Q1, Q3-Q6 taken at their defaults. Done, with tests (`tests/test_optimizer.py`
+`TestComposite`, `TestAugLagComposite`; `tests/test_objective_funs.py` `*_distance_rows*`):
+
+- A1 `desc/optimize/composite.py`; matches `ctr.py`'s `solve_comp` to 1e-15.
+- A2-A5 `lsq_composite` (`least_squares_composite.py`), `lsq-composite` registered, Q1 as
+  `ObjectiveFunction.scaled_bounds()`. Exact S is built from `fun` by autodiff
+  (`sum rho_i Hess s_i`; agrees with `ctr.py`'s `H - J^T J` to 3e-14).
+- A6 paired actual and predicted decrease, by row id. Floor is evaluation noise, see runs.
+- B1-B5 `distance="node"` default (exact-curve rows kept as `"curve"`), gap per pair,
+  default node grid for 2% gap, nodes on arc hinges and spline knots, candidate ids
+  (`row_ids`, `compute_row_ids`), keep mask (`keep_rows`).
+- C1-C6 `lsq_auglag_composite` (`aug_lagrangian_composite.py`), `lsq-auglag-composite`
+  registered. Multipliers and penalties per row id; shift and sqrt(mu) applied through
+  `lsq_composite(rows=...)`, so the Jacobian does not depend on mu (C2).
+- C7 `setup_qh.build(al=True, distance="node", pair_N=None)`, `run_al.py`,
+  `check.feasibility()`; `run_composite.py` for the penalty method.
+- D3 documented, D5 API entries added.
+
+Runs (untracked, `devtools/coil_auglag/`):
+
+| tag | what | result |
+|---|---|---|
+| LC1 | A2 check: `lsq-composite` from circles, secant + 8 exact, totals decrease | secant 192 its -> 1.8e-6, exact -> 3.2e-8, 21 min; same optimum as E1n (distances, lengths, curvature), PD Hessian, Newton decrement 3e-12 |
+| LC2 | exact steps from `E1o_x.npy`, paired actual decrease only | stalls 3.5e-7 |
+| LC3 | as LC2, paired predicted decrease too | 2.6e-8, then damping blow-up |
+| LC4 | LC3 with `track_steps` | from ~5e-8 every trial step measures an increase of 1e-10..4e-10 whatever its size |
+| AL1 | `run_al.py` from circles, node rows for both distances | stopped: plasma gap 6.4 cm makes unused slots (0.16 m) read as violated |
+| AL2 | as AL1 with `pc="hard"` (plasma minimum distance) | both outer iterations' inner solves stalled (1.2e-2, 2.2e-2 vs gtolk 1e-3), so no multiplier update; stopped. Suspect the kinked plasma minimum; not diagnosed |
+| AL3/AL4 | AL, exact-curve rows both distances (E1 setup) | outer 3 stalls: merit jumps 6.4e-4 under 1e-11 steps. Cause: curve mode excluded each pair's closest side-0 node (argmin) from the slots; a tie swapped slot membership and the multipliers with it. Fixed: closest node stays in the slots |
+| AL5 | after that fix | stalls at outers 2, 4-6, jumps 1.2e-4 / 7.6e-6. Cause: the per-pair row took the exact distance of the polyline-argmin node, which jumps at polyline ties, and as an unlinked duplicate of the closest contact it was violated. Fixed: per-pair rows bounded below by 0 (topology only), value = min of the pair's exact side-0 slot rows |
+| AL6 | after both fixes, maxiter 800 | no stalls in 12 of 13 outer iterations; ends on maxiter. cc 5.75 cm, pc 11.00 cm, length 2.920, nothing linked, max viol ~1e-3; QuadraticFlux cost plateaus at 8.07 (+-2e-4 rel per outer, sign alternating with the violation) vs 4.10 at the infeasible penalty optimum E1 |
+| AL7 | AL6 with the schedule fix: mean mu over active rows (nonzero y or violated), unseen ids start at that level | **converged**: 9 outer / 255 inner its, scaled gradient 9.8e-7, violation 2.4e-7; QuadraticFlux 8.0815079, relative change per outer 4e-3 -> 1e-7; pc 11.000 cm, length 2.9200, nothing linked; cc 5.755 cm by brute force (curve rows miss ~0.45 mm between nodes) |
+
+Noise floor: each QuadraticFlux (and length) residual carries 1e-13..1.6e-12 of rounding
+from its own evaluation (up to ~200 ulp), about 2e-10 in any measured decrease, so the
+ratio test fails below a scaled gradient of a few 1e-8. Decision (user): set tolerances
+above it (gtol ~1e-7 on precise_QH), no machinery to beat it. The A6 target of 1e-10 is
+dropped.
+
+B6 on precise_QH (AL builder, node rows, built on circles): coil-coil 231 nodes, gap
+1.0 mm (1.8%), ~2000 active rows at circles and at LC1; plasma-coil 65 nodes, gap 6.4 cm
+on an 11 cm bound, ~3400-4200 active rows; one constraint Jacobian 0.1 s, peak 2.4 GB.
+
+Done (AL7): fixed the outer update schedule. What AL6 showed:
+In AL6 ctolk keeps resetting to ~7e-3 (`eta / mean(mu)^alpha_eta`, Conn-Gould via master)
+because mean(mu) is over all constraint rows, almost all never active and at mu0 = 10, so
+the violation hovers near 1e-3 and the subproblems alternate tight/loose. Contacts also
+slide to new candidate ids, which start at mu0 and y = 0. Ideas: mean over active /
+violated rows, or per-group; new ids start at their group's current mu.
+
+Also seen: the curvature constraint on the 50-point grid misses peaks (fine-grid max
+14.3-14.7 vs bound 13.7, in E1 as well).
+
+Remaining for the done criterion: brute-force coil-coil feasibility (curve rows have no
+gap: more nodes, node rows, or a margin on the bound), the curvature grid, and the final
+certificate (Hessian of the Lagrangian at AL7).
+
+Open (for the user):
+- Gap from circles: built on circles the coil-coil gap uses their curvature (~1/R); at
+  the optimum curvature is ~14, where 231 nodes need ~3x the gap. Options: build the gap
+  from the curvature bound and length bound, or rebuild after a first solve.
+- Plasma-coil gap: the M=N=25 plasma grid alone gives ~1.6 cm of gap (x1.5 backoff);
+  node rows need a finer plasma grid (cost grows with points x nodes) or the gap rule
+  revisited.
+- `ProximalProjection` inherits `ObjectiveFunction.row_ids`, untested there.
+- D1, D4 untouched.
+
 ## Why
 
 The c0-testing AL (now on this branch) cannot get its inner solves to optimality, and its

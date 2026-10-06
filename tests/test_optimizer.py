@@ -19,6 +19,7 @@ from scipy.optimize import (
 import desc.examples
 from desc.backend import jit, jnp
 from desc.coils import (
+    CoilSet,
     FourierPlanarCoil,
     FourierRZCoil,
     FourierXYCoil,
@@ -35,7 +36,9 @@ from desc.objectives import (
     AspectRatio,
     BoundaryRSelfConsistency,
     BoundaryZSelfConsistency,
+    CoilCurvature,
     CoilLength,
+    CoilSetDistanceRows,
     Energy,
     FixBoundaryR,
     FixBoundaryZ,
@@ -68,10 +71,14 @@ from desc.optimize import (
     fmin_auglag,
     fmintr,
     lsq_auglag,
+    lsq_auglag_composite,
+    lsq_composite,
     lsqtr,
     optimizers,
     sgd,
 )
+from desc.optimize.composite import composite_model, composite_resid, solve_composite
+from desc.optimize.least_squares_composite import paired_decrease
 from desc.optimize.optimizer import _parse_x_scale
 from desc.optimize.utils import chol, gershgorin_bounds
 from desc.utils import get_all_instances
@@ -2123,3 +2130,374 @@ def test_get_ess_scale():  # noqa: C901
     )
     np.testing.assert_allclose(eq2_scale["I"], 1)
     np.testing.assert_allclose(eq2_scale["G"], 1)
+
+
+class TestComposite:
+    """Tests for the composite hinge model in desc.optimize.composite."""
+
+    @pytest.mark.unit
+    def test_lm_step_without_hinges(self):
+        """With only target rows the solve is the damped Gauss-Newton step."""
+        rng = default_rng(0)
+        m, n = 12, 5
+        B = rng.normal(size=(m, n))
+        r = rng.normal(size=m)
+        S = rng.normal(size=(n, n))
+        S = 0.1 * (S + S.T)
+        isb = np.zeros(m, bool)
+        lo, hi = np.full(m, -np.inf), np.full(m, np.inf)
+        lam = 0.3
+        q, _ = solve_composite(r, B, r, lam, isb, lo, hi)
+        q_lm = -np.linalg.solve(B.T @ B + lam * np.eye(n), B.T @ r)
+        np.testing.assert_allclose(q, q_lm, rtol=1e-10)
+        q, _ = solve_composite(r, B, r, lam, isb, lo, hi, S=S)
+        q_lm = -np.linalg.solve(B.T @ B + S + lam * np.eye(n), B.T @ r)
+        np.testing.assert_allclose(q, q_lm, rtol=1e-10)
+
+    @pytest.mark.unit
+    def test_hinge_1d(self):
+        """One-dimensional problems with known minimizers."""
+        isb = np.array([True])
+        # violated upper bound: 0.5 (a + b q - hi)^2 + 0.5 lam q^2
+        a, b, hi, lam = 3.0, 2.0, 1.0, 0.5
+        q, _ = solve_composite(
+            np.array([a]),
+            np.array([[b]]),
+            np.zeros(1),
+            lam,
+            isb,
+            np.array([-np.inf]),
+            np.array([hi]),
+        )
+        np.testing.assert_allclose(q, [-b * (a - hi) / (b**2 + lam)], rtol=1e-12)
+        # satisfied bound: zero step
+        q, _ = solve_composite(
+            np.array([0.0]),
+            np.array([[b]]),
+            np.zeros(1),
+            lam,
+            isb,
+            np.array([-1.0]),
+            np.array([hi]),
+        )
+        np.testing.assert_allclose(q, [0.0], atol=1e-14)
+        # target row pulls q to 2, hinge inactive at q = 0 activates past 1: q* = 1.5
+        isb = np.array([False, True])
+        a = np.array([-2.0, 0.0])
+        B = np.array([[1.0], [1.0]])
+        lo, hi = np.array([-np.inf, -np.inf]), np.array([np.inf, 1.0])
+        q, nit = solve_composite(a, B, a, 0.0, isb, lo, hi)
+        np.testing.assert_allclose(q, [1.5], rtol=1e-12)
+        assert nit >= 2
+
+    @pytest.mark.unit
+    def test_model_matches_resid_for_linear_rows(self):
+        """For linear row values the model is the exact cost."""
+        rng = default_rng(1)
+        m, n = 20, 4
+        a = rng.normal(size=m)
+        B = rng.normal(size=(m, n))
+        isb = rng.random(m) < 0.6
+        lo = np.where(isb, -0.5, -np.inf)
+        hi = np.where(isb, np.where(rng.random(m) < 0.5, 0.3, np.inf), np.inf)
+        tgt = np.where(isb, 0.0, rng.normal(size=m))
+        r = composite_resid(a, lo, hi, tgt, isb)
+        r_np = np.where(isb, np.maximum(0, a - hi) - np.maximum(0, lo - a), a - tgt)
+        np.testing.assert_allclose(r, r_np)
+        np.testing.assert_allclose(
+            composite_model(a, B, r, np.zeros(n), isb, lo, hi), 0.5 * r_np @ r_np
+        )
+        for _ in range(3):
+            q = rng.normal(size=n)
+            r_q = composite_resid(a + B @ q, lo, hi, tgt, isb)
+            np.testing.assert_allclose(
+                composite_model(a, B, r, q, isb, lo, hi), 0.5 * r_q @ r_q
+            )
+        # minimizer: no direction decreases the damped model
+        lam = 1e-2
+        q, _ = solve_composite(a, B, r, lam, isb, lo, hi)
+
+        def damped(q):
+            return composite_model(a, B, r, q, isb, lo, hi) + 0.5 * lam * q @ q
+
+        f0 = damped(q)
+        for _ in range(20):
+            assert damped(q + 1e-4 * rng.normal(size=n)) >= f0 - 1e-14
+
+    @pytest.mark.unit
+    def test_lsq_composite_options(self):
+        """Every model and Hessian option reaches the minimizer of the hinge cost."""
+        lo = jnp.array([-jnp.inf, -jnp.inf, -jnp.inf, -jnp.inf, -0.5])
+        hi = jnp.array([jnp.inf, jnp.inf, 3.0, jnp.inf, 0.5])
+        tgt = jnp.zeros(5)
+        isb = jnp.array([False, False, True, False, True])
+
+        @jit
+        def fun(x):
+            return jnp.array(
+                [
+                    10 * (x[1] - x[0] ** 2),
+                    1 - x[0],
+                    3 * (x[0] + x[1]),
+                    x[2] - 2.0,
+                    x[0] * x[2],
+                ]
+            )
+
+        def cost(x):
+            return 0.5 * jnp.sum(composite_resid(fun(x), lo, hi, tgt, isb) ** 2)
+
+        jac = jit(Derivative(fun, mode="fwd"))
+        hess = jit(Derivative(cost, mode="hess"))
+        x0 = jnp.array([-1.2, 1.0, 0.3])
+        ref = minimize(
+            cost,
+            x0,
+            jac=Derivative(cost, mode="grad"),
+            method="BFGS",
+            options=dict(gtol=1e-12),
+        )
+        for options, gtol in [
+            (dict(model="gn"), 1e-8),
+            (dict(), 1e-8),
+            (dict(hessian="secant"), 1e-8),
+            (dict(hessian="exact"), 1e-12),
+            (dict(hessian="secant", finish_steps=5, finish_gtol=1e-4), 1e-12),
+        ]:
+            res = lsq_composite(
+                fun,
+                x0,
+                jac,
+                lo,
+                hi,
+                tgt,
+                isb,
+                hess=hess,
+                ftol=0,
+                xtol=0,
+                gtol=1e-12,
+                verbose=0,
+                maxiter=500,
+                options=options,
+            )
+            np.testing.assert_allclose(res.x, ref.x, atol=1e-7, err_msg=str(options))
+            assert res.optimality < gtol, options
+        assert res.success
+        assert res.step_history[-1]["hessian"] == "exact"
+        # exact second order term from differentiating fun instead of hess
+        res = lsq_composite(
+            fun,
+            x0,
+            jac,
+            lo,
+            hi,
+            tgt,
+            isb,
+            ftol=0,
+            xtol=0,
+            gtol=1e-12,
+            verbose=0,
+            options=dict(hessian="exact"),
+        )
+        np.testing.assert_allclose(res.x, ref.x, atol=1e-7)
+        assert res.success
+
+    @pytest.mark.unit
+    def test_lsq_composite_optimizer(self):
+        """Matches lsq-exact on a coil whose length target and curvature bound clash."""
+        coil = FourierPlanarCoil(r_n=2.0)
+
+        def objective():
+            return ObjectiveFunction(
+                (
+                    CoilLength(coil, target=3 * np.pi),
+                    CoilCurvature(coil, bounds=(-np.inf, 0.4)),
+                )
+            )
+
+        obj = objective()
+        obj.build(verbose=0)
+        x = obj.x(coil)
+        lo, hi, tgt, isb = obj.scaled_bounds()
+        np.testing.assert_allclose(
+            composite_resid(obj.compute_scaled(x), lo, hi, tgt, isb),
+            obj.compute_scaled_error(x),
+        )
+        assert np.count_nonzero(
+            composite_resid(obj.compute_scaled(x), lo, hi, tgt, isb)
+        )
+        r = {}
+        for method in ["lsq-exact", "lsq-composite"]:
+            (r[method],), _ = Optimizer(method).optimize(
+                coil,
+                objective=objective(),
+                constraints=(FixParameters(coil, {"center": True, "normal": True}),),
+                ftol=0,
+                xtol=0,
+                gtol=1e-10,
+                maxiter=100,
+                verbose=0,
+                copy=True,
+            )
+        np.testing.assert_allclose(
+            r["lsq-composite"].r_n, r["lsq-exact"].r_n, rtol=1e-8
+        )
+        # between the length target 1.5 and the curvature bound 2.5
+        assert 1.5 < r["lsq-composite"].r_n[0] < 2.5
+
+    @pytest.mark.unit
+    def test_paired_decrease(self):
+        """Pairing rows by id gives the cost decrease, resolving tiny decreases."""
+        rng = default_rng(2)
+        r = 1e3 + rng.standard_normal(50)
+        ids = rng.permutation(100)[:50]
+        ids[:5] = -1  # unused slots
+        perm = rng.permutation(50)
+        r_new, ids_new = r[perm].copy(), ids[perm].copy()
+        r_new[:3] = rng.standard_normal(3)  # rows leave and enter
+        ids_new[:3] = 200 + np.arange(3)
+        np.testing.assert_allclose(
+            paired_decrease(r, ids, r_new, ids_new),
+            0.5 * (r @ r - r_new @ r_new),
+            rtol=1e-12,
+        )
+        # one row changes by a few ulp: lost in the totals, exact when paired
+        r_new = r.copy()
+        r_new[7] -= 1e-12
+        exact = 0.5 * (r[7] - r_new[7]) * (r[7] + r_new[7])
+        dec = paired_decrease(r, np.arange(50), r_new, np.arange(50))
+        np.testing.assert_allclose(dec, exact, rtol=1e-12)
+        assert abs(0.5 * (r @ r - r_new @ r_new) - exact) > 1e-2 * exact
+
+
+class TestAugLagComposite:
+    """Tests for the slack-free hinge augmented Lagrangian."""
+
+    @pytest.mark.unit
+    def test_matches_trust_constr(self):
+        """Same convex problem as test_auglag, against scipy."""
+        rng = default_rng(12)
+        n, m, p = 15, 10, 7
+        Qs, gs = [], []
+        for i in range(m + p):
+            A = 0.5 - rng.random((n, n))
+            Qs.append(A.T @ A)
+            gs.append(0.5 - rng.random(n))
+
+        @jit
+        def vecfun(x):
+            y0 = x @ Qs[0] + gs[0]
+            y1 = x @ Qs[1] + gs[1]
+            return jnp.concatenate([y0, y1**2])
+
+        @jit
+        def fun(x):
+            y = vecfun(x)
+            return 1 / 2 * jnp.dot(y, y)
+
+        @jit
+        def con(x):
+            return jnp.array([x @ Qs[p + i] @ x + gs[p + i] @ x for i in range(m)])
+
+        jac = jit(Derivative(vecfun, mode="fwd"))
+        conjac = jit(Derivative(con, mode="fwd"))
+        x0 = rng.random(n)
+        ref = minimize(
+            fun,
+            x0,
+            jac=jit(Derivative(fun, mode="grad")),
+            hess=jit(Derivative(fun, mode="hess")),
+            constraints=NonlinearConstraint(con, -np.inf, 0, conjac),
+            method="trust-constr",
+            options={"maxiter": 1000},
+        )
+        out = lsq_auglag_composite(
+            vecfun,
+            x0,
+            jac,
+            -np.inf,
+            np.inf,
+            0.0,
+            np.zeros(2 * n, bool),
+            con,
+            conjac,
+            -np.inf,
+            0.0,
+            ftol=0,
+            xtol=0,
+            gtol=1e-8,
+            ctol=1e-8,
+            verbose=0,
+        )
+        assert out.success
+        assert out.constr_violation < 1e-8
+        np.testing.assert_allclose(out.x, ref.x, rtol=1e-4, atol=1e-4)
+
+    @pytest.mark.unit
+    def test_known_solution(self):
+        """Closest point to a on the ball |x| <= 1 cut by the plane x_2 = 0.3."""
+        a = jnp.array([2.0, 1.0, 0.0])
+
+        @jit
+        def con(x):
+            return jnp.array([x @ x, x[2]])
+
+        out = lsq_auglag_composite(
+            jit(lambda x: x - a),
+            jnp.zeros(3),
+            jit(lambda x: jnp.eye(3)),
+            -np.inf,
+            np.inf,
+            0.0,
+            np.zeros(3, bool),
+            con,
+            jit(Derivative(con, mode="fwd")),
+            [-np.inf, 0.3],
+            [1.0, 0.3],
+            gtol=1e-8,
+            ctol=1e-8,
+            verbose=0,
+        )
+        assert out.success
+        x01 = np.sqrt(0.91) * np.array([2, 1]) / np.sqrt(5)
+        np.testing.assert_allclose(out.x, [*x01, 0.3], atol=1e-7)
+        # stationarity of 0.5 |x - a|^2 + y_0 (|x|^2 - 1) + y_1 (x_2 - 0.3)
+        lam = (np.sqrt(5) / np.sqrt(0.91) - 1) / 2
+        np.testing.assert_allclose(out.y, [lam, -0.3 * (1 + 2 * lam)], rtol=1e-6)
+
+    @pytest.mark.unit
+    def test_coil_distance_rows(self):
+        """Coaxial rings pulled together stop at the bound plus the node gap."""
+        coils = CoilSet(
+            FourierPlanarCoil(center=[0, 0, 0], normal=[0, 0, 1], r_n=1),
+            FourierPlanarCoil(center=[0, 0, 1.0], normal=[0, 0, 1], r_n=1),
+            check_intersection=False,
+        )
+        rows = CoilSetDistanceRows(
+            coils, select_distance=0.8, bounds=(0.5, np.inf), signed=False
+        )
+        fixed = {"normal": True, "r_n": True}
+        (out,), result = Optimizer("lsq-auglag-composite").optimize(
+            coils,
+            objective=ObjectiveFunction(
+                FixParameters(coils, [{}, {"center": True}], target=[0, 0, 0.1])
+            ),
+            constraints=(
+                FixParameters(coils, [{"center": True, **fixed}, fixed]),
+                rows,
+            ),
+            ftol=0,
+            xtol=0,
+            gtol=1e-9,
+            ctol=1e-9,
+            maxiter=200,
+            verbose=0,
+            copy=True,
+        )
+        assert result["success"]
+        gap = rows._constants["gap"][0]
+        np.testing.assert_allclose(out[1].center, [0, 0, 0.5 + gap], atol=1e-8)
+        # lower bounds push with y <= 0; the matched node pairs carry the force
+        y = result["y"][:-1][result["con_ids"][:-1] >= 0]
+        assert np.all(y <= 0)
+        assert np.sum(y < 0) == rows._n_nodes

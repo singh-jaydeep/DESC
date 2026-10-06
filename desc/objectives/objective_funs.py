@@ -1230,6 +1230,79 @@ class ObjectiveFunction(IOAble):
             ub += [ub_i]
         return (jnp.concatenate(lb), jnp.concatenate(ub))
 
+    def _row_id_offsets(self):
+        n = [getattr(obj, "num_row_ids", obj.dim_f) for obj in self.objectives]
+        return np.concatenate([[0], np.cumsum(n)[:-1]]).astype(int)
+
+    @jit
+    def row_ids(self, x, constants=None):
+        """Identity of each row, to pair rows between states.
+
+        Objectives that re-select their rows at each evaluation (they define
+        ``compute_row_ids``) give each row the id of the candidate it holds, or -1 for
+        an unused slot; every other row's id is its position. Ids are offset per
+        objective so they are unique within the ObjectiveFunction.
+
+        Parameters
+        ----------
+        x : ndarray
+            State vector.
+        constants : list
+            Constant parameters passed to sub-objectives.
+
+        Returns
+        -------
+        ids : ndarray of int
+            One id per row of ``compute_scaled``.
+
+        """
+        constants = self._get_deprecated_constants(constants)
+        params = self.unpack_state(x)
+        ids = []
+        for par, obj, const, offset in zip(
+            params, self.objectives, constants, self._row_id_offsets()
+        ):
+            if hasattr(obj, "compute_row_ids"):
+                i = obj.compute_row_ids(*par, constants=const)
+                ids.append(jnp.where(i >= 0, i + offset, -1))
+            else:
+                ids.append(offset + jnp.arange(obj.dim_f))
+        return jnp.concatenate(ids)
+
+    def keep_rows(self, ids):
+        """Keep the rows with these ids (from ``row_ids``) selected at every evaluation.
+
+        Replaces the previous set, for every objective that re-selects its rows.
+        """
+        ids = np.asarray(ids, dtype=int)
+        for obj, offset in zip(self.objectives, self._row_id_offsets()):
+            if hasattr(obj, "keep_rows"):
+                local = ids - offset
+                obj.keep_rows(local[(local >= 0) & (local < obj.num_row_ids)])
+
+    def scaled_bounds(self):
+        """Per-row bounds and targets in the units of ``compute_scaled``.
+
+        Returns
+        -------
+        lo, hi : ndarray
+            Lower and upper bounds on rows of objectives with bounds, infinite on rows
+            of objectives with a target.
+        tgt : ndarray
+            Target on rows of objectives with a target, zero on the others.
+        isb : ndarray of bool
+            True on rows of objectives with bounds.
+
+        """
+        isb = jnp.concatenate(
+            [jnp.full(obj.dim_f, obj.bounds is not None) for obj in self.objectives]
+        )
+        lo, hi = self.bounds_scaled
+        lo = jnp.where(isb, lo, -jnp.inf)
+        hi = jnp.where(isb, hi, jnp.inf)
+        tgt = jnp.where(isb, 0.0, self.target_scaled)
+        return lo, hi, tgt, isb
+
     @property
     def weights(self):
         """ndarray: weight vector."""

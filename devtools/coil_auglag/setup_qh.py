@@ -47,12 +47,17 @@ def build(
     fixnorm=True,
     link_w=0.0,
     link_N=40,
+    distance="curve",
+    al=False,
 ):
     """Build (eq, coilset, objective, constraints).
 
     cc, pc: "rows" (smooth per-row distances) or "hard" (DESC's minimum).
     fixnorm pins the largest normal component of each coil: scaling a planar coil's
-    normal is an exact gauge. link_w > 0 adds the built-in CoilSetLinkingNumber.
+    normal is an exact gauge. distance: "curve" (exact-curve rows, as in the existing
+    tags) or "node" (node-node rows with a gap); pair_N=None picks the node count
+    from the gap. al=True returns QuadraticFlux alone as the objective and the
+    engineering limits as constraints (weights 1), for lsq-auglag-composite. link_w > 0 adds the built-in CoilSetLinkingNumber.
     """
     eq = desc.examples.get("precise_QH")
     if coilset is None:
@@ -61,14 +66,18 @@ def build(
             c.change_resolution(N=N)
     coil_grid = LinearGrid(N=N_coil)
     plasma_grid = LinearGrid(M=25, N=25, NFP=eq.NFP, sym=eq.sym)
+    if al:
+        qf_w = cc_w = pc_w = curv_w = len_w = 1
+    pair_grid = None if pair_N is None else LinearGrid(N=pair_N)
     if cc == "rows":
         cc_obj = CoilSetDistanceRows(
             coilset,
             select_distance=cc_sel,
             bounds=(cc_bound, np.inf),
-            grid=LinearGrid(N=pair_N),
+            grid=pair_grid,
             max_active_rows=cc_K,
             signed=signed,
+            distance=distance,
             weight=cc_w,
             jac_chunk_size=JCS,
         )
@@ -88,9 +97,10 @@ def build(
             select_distance=pc_sel,
             bounds=(pc_bound, np.inf),
             plasma_grid=plasma_grid,
-            coil_grid=LinearGrid(N=pair_N),
+            coil_grid=pair_grid,
             max_active_rows=pc_K,
             weight=pc_w,
+            distance=distance,
             jac_chunk_size=JCS,
         )
     else:
@@ -139,9 +149,12 @@ def build(
                 coilset, grid=LinearGrid(N=link_N), weight=link_w, jac_chunk_size=1
             )
         )
-    obj = ObjectiveFunction(tuple(objs), deriv_mode="blocked")
     cons = (FixSumCoilCurrent(coilset),)
     if fixnorm:
         fix = [{"normal": np.array([np.argmax(np.abs(c.normal))])} for c in coilset]
         cons = cons + (FixParameters(coilset, fix),)
+    if al:  # QuadraticFlux (and linking, if any) stay in the objective
+        cons = cons + tuple(objs[1:5])
+        objs = objs[:1] + objs[5:]
+    obj = ObjectiveFunction(tuple(objs), deriv_mode="blocked")
     return eq, coilset, obj, cons

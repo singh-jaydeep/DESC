@@ -356,6 +356,11 @@ def lsq_auglag(  # noqa: C901
           the default, otherwise the default is ``"qr"``.
         - ``"scaled_termination"`` : Whether to evaluate termination criteria for
           ``xtol`` and ``gtol`` in scaled / normalized units (default) or base units.
+        - ``"second_order"`` : (None or ``"constraints"``) Add the constraint rows'
+          dropped second order term ``(mu c - y) Hess(c)`` to the model, from
+          ``"constraint_hess"``, a callable ``(x, w) -> Hess(w . c)``. Superseded by
+          ``desc.optimize.lsq_auglag_composite``, whose secant and exact second order
+          terms also cover the objective rows. Default None.
 
     Returns
     -------

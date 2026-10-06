@@ -543,6 +543,24 @@ class LinearConstraintProjection(ObjectiveFunction):
         """
         return self._vjp(v, x_reduced, constants, "vjp_unscaled")
 
+    def row_ids(self, x_reduced, constants=None):
+        """Identity of each row, see ``ObjectiveFunction.row_ids``.
+
+        Parameters
+        ----------
+        x_reduced : ndarray
+            Reduced state vector that satisfies linear constraints.
+        constants : list
+            Constant parameters passed to sub-objectives. (Deprecated)
+
+        Returns
+        -------
+        ids : ndarray of int
+            One id per row.
+
+        """
+        return self._objective.row_ids(self.recover(x_reduced), constants)
+
     def __getattr__(self, name):
         """For other attributes we defer to the base objective."""
         return getattr(self._objective, name)
