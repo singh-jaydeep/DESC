@@ -136,6 +136,8 @@ Coil Optimization
     desc.objectives.CoilSetDistanceRows
     desc.objectives.PlasmaCoilSetDistancePenalty
     desc.objectives.PlasmaCoilSetDistanceRows
+    desc.objectives.PlasmaCoilDistanceField
+    desc.objectives.node_gap_estimate
     desc.objectives.ToroidalFlux
     desc.objectives.SurfaceCurrentRegularization
     desc.objectives.LinkingCurrentConsistency

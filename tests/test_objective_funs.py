@@ -83,6 +83,7 @@ from desc.objectives import (
     ObjectiveFromUser,
     ObjectiveFunction,
     Omnigenity,
+    PlasmaCoilDistanceField,
     PlasmaCoilSetDistanceBound,
     PlasmaCoilSetDistancePenalty,
     PlasmaCoilSetDistanceRows,
@@ -103,6 +104,7 @@ from desc.objectives import (
     VacuumBoundaryError,
     Volume,
     get_NAE_constraints,
+    node_gap_estimate,
 )
 from desc.objectives._coils import (
     _closed_polyline,
@@ -112,6 +114,7 @@ from desc.objectives._coils import (
     _physical_coil_maps,
     _segment_segment_distance,
     _stacked_params,
+    _surface_distance,
 )
 from desc.objectives._free_boundary import BoundaryErrorNESTOR
 from desc.objectives.nae_utils import (
@@ -1371,10 +1374,9 @@ class TestObjectiveFunction:
             d = true_distance(coils[0], coils[1])
             obj = CoilSetDistanceRows(
                 coils,
-                select_distance=d + 0.5,
+                select_distance=d + 0.2,
                 bounds=(0.8 * d, np.inf),
-                grid=LinearGrid(N=12),
-                max_active_rows=5000,
+                max_active_rows=60000,
             )
             obj.build(verbose=0)
             f = obj.compute(coils.params_dict)
@@ -1472,6 +1474,28 @@ class TestObjectiveFunction:
             assert f[:-1].min() <= d
 
     @pytest.mark.unit
+    def test_node_gap_estimate(self):
+        """On circles at uniform speed the estimate equals the gap built from coils."""
+        R, d = 1.0, 0.5
+        coils = CoilSet(
+            FourierPlanarCoil(center=[0, 0, 0], normal=[0, 0, 1], r_n=R),
+            FourierPlanarCoil(center=[0, 0, 1.5], normal=[0, 0, 1], r_n=R),
+            check_intersection=False,
+        )
+        grid = LinearGrid(N=100)
+        obj = CoilSetDistanceRows(
+            coils, select_distance=2, bounds=(d, np.inf), grid=grid
+        )
+        obj.build(verbose=0)
+        gap = node_gap_estimate(grid.num_nodes, 2 * np.pi * R, 1 / R, d, 1.0)
+        # built gap carries the certified-speed factor 1/(1 - M ds/16), here 1.002
+        np.testing.assert_allclose(obj._constants["gap"], gap, rtol=3e-3)
+        assert node_gap_estimate(grid.num_nodes, 2 * np.pi * R, 1 / R, d) > 3.9 * gap
+        built = obj._constants["gap"].copy()
+        obj.build(verbose=0)  # per-pair rows hold a 0 lower bound after build
+        np.testing.assert_allclose(obj._constants["gap"], built)
+
+    @pytest.mark.unit
     def test_plasma_coil_set_distance_rows_node(self):
         """Point-node rows minus the gap bound the true surface-coil distance."""
         eq = Equilibrium(M=2, N=1, NFP=2)
@@ -1489,7 +1513,7 @@ class TestObjectiveFunction:
         obj = PlasmaCoilSetDistanceRows(
             eq,
             coils,
-            select_distance=d + 1,
+            select_distance=d + 4,  # above the bound plus the coarse grid's gap
             bounds=(0.8 * d, np.inf),
             plasma_grid=plasma_grid,
             max_active_rows=20000,
@@ -1504,6 +1528,62 @@ class TestObjectiveFunction:
         used = ids >= 0
         assert used.sum() == obj.active_row_count()
         assert np.unique(ids[used]).size == used.sum()
+
+    @pytest.mark.unit
+    def test_plasma_coil_distance_field(self):
+        """Field rows bound the true distance; saturated far out, negative inside."""
+        from scipy.spatial import cKDTree
+
+        surf = FourierRZToroidalSurface(
+            R_lmn=[3, 1, 0.1],
+            modes_R=[[0, 0], [1, 0], [1, 1]],
+            Z_lmn=[-1, -0.1],
+            modes_Z=[[-1, 0], [-1, 1]],
+            NFP=4,
+        )
+
+        def ring(R, r):
+            c, s = np.cos(0.1), np.sin(0.1)
+            coil = FourierPlanarCoil(center=[R * c, R * s, 0], normal=[-s, c, 0], r_n=r)
+            return CoilSet(coil, NFP=4, check_intersection=False)
+
+        coils = ring(3, 1.6)
+        obj = PlasmaCoilDistanceField(surf, coils, bounds=(0.4, np.inf), spacing=0.1)
+        obj.build(verbose=0)
+        margin = float(obj._constants["margin"][0])
+        assert margin > 2 * obj.field_info["max_error"]
+        cloud = Grid(LinearGrid(M=64, N=64, NFP=1).nodes, sort=False)
+        pts = surf.compute(["x"], grid=cloud, basis="xyz")["x"]
+        tree = cKDTree(np.asarray(pts))
+
+        def exact(c, grid):
+            x = np.asarray(c._compute_position(grid=grid, basis="xyz")[0])
+            return _surface_distance(surf, x, cloud.nodes[:, 1:], tree)
+
+        f = obj.compute(coils.params_dict)
+        d = exact(coils, obj._constants["coil_grid"])
+        exact_band = d < 0.6  # below saturation[0] = 1.5 * 0.4
+        assert exact_band.sum() > d.size // 4
+        tol = 2 * obj.field_info["max_error"]
+        np.testing.assert_allclose((f + margin)[exact_band], d[exact_band], atol=tol)
+        assert f.min() <= exact(coils, LinearGrid(N=2000)).min()
+
+        obj2 = ObjectiveFunction(obj)
+        obj2.build(verbose=0)
+        x = obj2.x(coils)
+        J = obj2.jac_unscaled(x)
+        v = np.random.default_rng(0).standard_normal(x.size) * 1e-3
+        h = 1e-5
+        fd = (obj2.compute_unscaled(x + h * v) - obj2.compute_unscaled(x - h * v)) / (
+            2 * h
+        )
+        np.testing.assert_allclose(J @ v, fd, atol=1e-8)
+
+        far = ring(8, 1.6)  # off the grid: saturated, zero gradient
+        np.testing.assert_allclose(obj.compute(far.params_dict) + margin, 0.8)
+        # edge coefficients carry ~0.268^8 of the saturation step from the prefilter
+        assert np.abs(obj2.jac_unscaled(obj2.x(far))).max() < 1e-5
+        assert obj.compute(ring(3, 0.3).params_dict).max() < 0
 
     @pytest.mark.unit
     def test_plasma_coil_set_distance_rows(self):
@@ -4672,7 +4752,21 @@ class TestObjectiveNaNGrad:
             check_intersection=False,
         )
         obj = ObjectiveFunction(
-            CoilSetDistanceRows(coils, select_distance=3, max_active_rows=500),
+            CoilSetDistanceRows(coils, select_distance=3, max_active_rows=5000),
+            use_jit=False,
+        )
+        obj.build(verbose=0)
+        g = obj.grad(obj.x())
+        assert not np.any(np.isnan(g))
+
+    @pytest.mark.unit
+    def test_objective_no_nangrad_plasma_coil_distance_field(self):
+        """Plasma-coil distance field."""
+        eq = Equilibrium(M=2, N=1)
+        coil = FourierPlanarCoil(center=[10, 0, 0], normal=[0, 1, 0], r_n=2)
+        coilset = CoilSet.linspaced_angular(coil, n=3, check_intersection=False)
+        obj = ObjectiveFunction(
+            PlasmaCoilDistanceField(eq, coilset, bounds=(0.5, np.inf), spacing=0.2),
             use_jit=False,
         )
         obj.build(verbose=0)
@@ -4686,7 +4780,7 @@ class TestObjectiveNaNGrad:
         coil = FourierPlanarCoil(center=[10, 0, 0], normal=[0, 1, 0], r_n=2)
         coilset = CoilSet.linspaced_angular(coil, n=3, check_intersection=False)
         obj = ObjectiveFunction(
-            PlasmaCoilSetDistanceRows(eq, coilset, select_distance=3),
+            PlasmaCoilSetDistanceRows(eq, coilset, select_distance=3, gap=0.1),
             use_jit=False,
         )
         obj.build(verbose=0)

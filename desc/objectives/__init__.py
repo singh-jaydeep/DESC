@@ -15,6 +15,7 @@ from ._coils import (
     CoilSetMinDistance,
     CoilTorsion,
     LinkingCurrentConsistency,
+    PlasmaCoilDistanceField,
     PlasmaCoilSetDistanceBound,
     PlasmaCoilSetDistancePenalty,
     PlasmaCoilSetDistanceRows,
@@ -23,6 +24,7 @@ from ._coils import (
     SurfaceCurrentRegularization,
     SurfaceQuadraticFlux,
     ToroidalFlux,
+    node_gap_estimate,
 )
 from ._equilibrium import (
     CurrentDensity,

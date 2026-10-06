@@ -10,7 +10,7 @@ from desc.backend import tree_flatten, tree_leaves, tree_map, tree_unflatten
 from desc.batching import vmap_chunked
 from desc.compute import get_profiles, get_transforms
 from desc.compute.utils import _compute as compute_fun
-from desc.grid import LinearGrid, _Grid
+from desc.grid import Grid, LinearGrid, _Grid
 from desc.integrals import compute_B_plasma
 from desc.utils import (
     Timer,
@@ -3036,11 +3036,54 @@ def _node_gap(h_a, h_b, k_a, k_b, d):
     return (h_a + h_b) ** 2 / (8 * d) + (k_a * h_a**2 + k_b * h_b**2) / 8
 
 
+def node_gap_estimate(
+    num_nodes,
+    max_length,
+    max_curvature,
+    min_distance,
+    speed_ratio=2.0,
+    backoff=1.5,
+):
+    """Coil-coil gap for node rows, from the engineering bounds instead of the coils.
+
+    The default gap of ``CoilSetDistanceRows(distance="node")`` is computed from the
+    coils at build, which can be far from where the optimizer ends up: node spacing
+    grows as coils lengthen and their parameterization speeds up unevenly. This
+    estimates it from the bounds instead, with the largest node spacing taken as
+    ``speed_ratio * max_length / num_nodes``. Pass the result as ``gap=``.
+
+    Parameters
+    ----------
+    num_nodes : int
+        Nodes per coil of the distance-row grid.
+    max_length : float
+        Upper bound on coil length (m).
+    max_curvature : float
+        Upper bound on coil curvature (1/m).
+    min_distance : float
+        Lower bound on coil-coil distance (m).
+    speed_ratio : float, optional
+        Largest node spacing over the mean spacing. 1 for uniform arclength; about
+        1.9 for FourierPlanarCoil optima on precise_QH.
+    backoff : float, optional
+        Safety factor on the gap.
+
+    Returns
+    -------
+    gap : float
+        Gap (m) to subtract from every node row.
+
+    """
+    h = speed_ratio * max_length / num_nodes
+    return backoff * _node_gap(h, h, max_curvature, max_curvature, min_distance)
+
+
 def _lower_bound_meters(obj):
     """Smallest lower bound of a distance objective in meters, or None."""
     if obj.bounds is None:
         return None
-    lo = np.min(obj.bounds[0])
+    # slot rows only: after build the per-pair rows hold 0
+    lo = np.min(np.atleast_1d(obj.bounds[0])[: getattr(obj, "_max_active_rows", None)])
     return lo if obj._normalize_target else lo * obj.normalization
 
 
@@ -3760,6 +3803,355 @@ class PlasmaCoilSetDistanceRows(_Objective):
         keep = np.zeros(self._num_candidates, dtype=bool)
         keep[ids[ids >= 0]] = True
         self._constants["keep"] = keep
+
+
+def _bspline3_weights(t):
+    """Cubic B-spline weights of the four nodes around fractional position t."""
+    t2, t3 = t * t, t * t * t
+    return (
+        jnp.stack(
+            [(1 - t) ** 3, 3 * t3 - 6 * t2 + 4, -3 * t3 + 3 * t2 + 3 * t + 1, t3],
+            axis=-1,
+        )
+        / 6
+    )
+
+
+def _distance_field_eval(coef, x, lo, step, nfp):
+    """Tricubic B-spline of a field on an (R, phi, Z) grid at xyz points ``x``.
+
+    ``coef`` holds B-spline coefficients (``scipy.ndimage.spline_filter``) at nodes
+    ``lo + step * index``, periodic in phi over one field period; R and Z indices are
+    clamped, so the field must be constant near those edges.
+    """
+    R = safenorm(x[..., :2], axis=-1)
+    phi = jnp.mod(jnp.arctan2(x[..., 1], x[..., 0]), 2 * jnp.pi / nfp)
+    u = (jnp.stack([R, phi, x[..., 2]], axis=-1) - lo) / step
+    i = jnp.floor(u)
+    w = _bspline3_weights(u - i)  # (..., 3, 4)
+    i = i.astype(int)[..., None] + jnp.arange(-1, 3)
+    n = coef.shape
+    iR = jnp.clip(i[..., 0, :], 0, n[0] - 1)
+    iP = jnp.mod(i[..., 1, :], n[1])
+    iZ = jnp.clip(i[..., 2, :], 0, n[2] - 1)
+    c = coef[iR[..., :, None, None], iP[..., None, :, None], iZ[..., None, None, :]]
+    return jnp.einsum(
+        "...i,...j,...k,...ijk->...", w[..., 0, :], w[..., 1, :], w[..., 2, :], c
+    )
+
+
+def _saturate(d, d1, d2):
+    """``d`` below ``d1``, constant ``(d1 + d2) / 2`` above ``d2``, C^3 between."""
+    t = np.clip((d - d1) / (d2 - d1), 0, 1)
+    # slope 1 - smoothstep5(t), integrated
+    return np.where(d < d1, d, d1 + (d2 - d1) * (t - t**6 + 3 * t**5 - 2.5 * t**4))
+
+
+def _surface_distance(surf, X, cloud_tz, tree, its=8, chunk=50000):
+    """Distance from points X to a toroidal surface, by Newton from the nearest cloud.
+
+    Returns the smaller of the cloud and Newton distances: both are distances to points
+    on the surface, and Newton's is the true one wherever it converged to the foot.
+    """
+    keys = ["x", "e_theta", "e_zeta", "e_theta_t", "e_theta_z", "e_zeta_z"]
+    out = np.empty(len(X))
+    for s in range(0, len(X), chunk):
+        x = X[s : s + chunk]
+        dc, k = tree.query(x)
+        tz = np.array(cloud_tz)[k]
+        for _ in range(its):
+            nodes = np.column_stack([np.ones(len(x)), tz % (2 * np.pi)])
+            q = surf.compute(keys, grid=Grid(nodes, sort=False), basis="xyz")
+            q = {key: np.asarray(q[key]) for key in keys}
+            f = q["x"] - x
+            St, Sz = q["e_theta"], q["e_zeta"]
+            g1, g2 = np.sum(f * St, -1), np.sum(f * Sz, -1)
+            a = np.sum(St * St + f * q["e_theta_t"], -1)
+            b = np.sum(St * Sz + f * q["e_theta_z"], -1)
+            c = np.sum(Sz * Sz + f * q["e_zeta_z"], -1)
+            det = a * c - b * b
+            ok = det > 0  # off a minimum: stay put, the cloud distance stands
+            tz[:, 0] -= np.where(ok, (c * g1 - b * g2) / np.where(ok, det, 1), 0)
+            tz[:, 1] -= np.where(ok, (a * g2 - b * g1) / np.where(ok, det, 1), 0)
+        nodes = np.column_stack([np.ones(len(x)), tz % (2 * np.pi)])
+        xs = surf.compute(["x"], grid=Grid(nodes, sort=False), basis="xyz")["x"]
+        xs = np.asarray(xs)
+        out[s : s + chunk] = np.minimum(np.linalg.norm(xs - x, axis=-1), dc)
+    return out
+
+
+def _plasma_distance_field(surf, nfp, d_lo, d1, d2, spacing, n_check=4000, seed=0):
+    """B-spline coefficients of the signed, saturated distance to a fixed surface.
+
+    Distances are exact (Newton) at nodes outside the surface and below ``d1``, from a
+    dense surface cloud elsewhere; negative inside. Returns ``coef, lo, step, info``,
+    with ``info`` the largest spline error in ``[d_lo / 2, d1]`` on random points and
+    the smallest concave radius of the surface.
+    """
+    from matplotlib.path import Path
+    from scipy.ndimage import spline_filter1d
+    from scipy.spatial import cKDTree
+
+    Mc, Nc = max(64, 8 * surf.M), max(64, 8 * surf.N * nfp)
+    # plain Grid: a full-torus LinearGrid(NFP=1) warns against the surface's NFP
+    cloud = Grid(LinearGrid(M=Mc, N=Nc, NFP=1).nodes, sort=False)
+    data = surf.compute(
+        ["x", "R", "Z", "curvature_k1_rho", "curvature_k2_rho"], grid=cloud, basis="xyz"
+    )
+    tree = cKDTree(np.asarray(data["x"]))
+    cloud_tz = cloud.nodes[:, 1:]
+    k = np.concatenate(
+        [np.asarray(data["curvature_k1_rho"]), np.asarray(data["curvature_k2_rho"])]
+    )
+    # convex curvature is negative; concave regions put kinks at their radius
+    concave_radius = 1 / k.max() if k.max() > 0 else np.inf
+
+    R, Z = np.asarray(data["R"]), np.asarray(data["Z"])
+    pad = d2 + 8 * spacing  # coefficients constant over the clamped R, Z edges
+    lo = np.array([R.min() - pad, 0.0, Z.min() - pad])
+    errorif(
+        lo[0] <= 0,
+        ValueError,
+        f"Distance-field grid reaches R={lo[0]:.3g} <= 0; reduce the saturation "
+        "distance.",
+    )
+    nR = int(np.ceil((R.max() + pad - lo[0]) / spacing)) + 1
+    nZ = int(np.ceil((Z.max() + pad - lo[2]) / spacing)) + 1
+    period = 2 * np.pi / nfp
+    nP = int(np.ceil(period * (R.max() + pad) / spacing))
+    step = np.array(
+        [
+            (R.max() + pad - lo[0]) / (nR - 1),
+            period / nP,
+            (Z.max() + pad - lo[2]) / (nZ - 1),
+        ]
+    )
+    rr, pp, zz = (lo[j] + step[j] * np.arange(n) for j, n in enumerate((nR, nP, nZ)))
+
+    D = np.empty((nR, nP, nZ))
+    RR, ZZ = np.meshgrid(rr, zz, indexing="ij")
+    RZ = np.column_stack([RR.ravel(), ZZ.ravel()])
+    theta = np.linspace(0, 2 * np.pi, max(256, 16 * surf.M), endpoint=False)
+    g = Grid(LinearGrid(theta=theta, zeta=pp, NFP=1).nodes, sort=False)
+    q = surf.compute(["R", "Z"], grid=g)
+    section = np.column_stack([q["R"], q["Z"]])
+    for j, phi in enumerate(pp):
+        X = np.column_stack([RZ[:, 0] * np.cos(phi), RZ[:, 0] * np.sin(phi), RZ[:, 1]])
+        d = tree.query(X)[0]
+        inside = Path(section[np.isclose(g.nodes[:, 2], phi)]).contains_points(RZ)
+        D[:, j] = np.where(inside, -d, d).reshape(nR, nZ)
+    G = np.stack(np.meshgrid(rr, pp, zz, indexing="ij"), -1)
+    G = np.stack(
+        [G[..., 0] * np.cos(G[..., 1]), G[..., 0] * np.sin(G[..., 1]), G[..., 2]], -1
+    )
+    band = (D > 0) & (D < d1 + 3 * spacing)  # above d1 rows are inactive
+    D[band] = _surface_distance(surf, G[band], cloud_tz, tree)
+    D = _saturate(D, d1, d2)
+    coef = D
+    for axis, mode in enumerate(["mirror", "grid-wrap", "mirror"]):
+        coef = spline_filter1d(coef, order=3, axis=axis, mode=mode)
+
+    rng = np.random.default_rng(seed)
+    X = G.reshape(-1, 3)[rng.choice(G[..., 0].size, 50 * n_check)]
+    X = X + step.min() * rng.uniform(-0.5, 0.5, X.shape)
+    dc = tree.query(X)[0]
+    ds = np.asarray(
+        _distance_field_eval(jnp.asarray(coef), jnp.asarray(X), lo, step, nfp)
+    )
+    keep = (dc > d_lo / 2) & (dc < d1) & (ds > 0)  # outside only
+    X, ds = X[keep][:n_check], ds[keep][:n_check]
+    err = ds - _surface_distance(surf, X, cloud_tz, tree)
+    info = dict(max_error=float(np.max(np.abs(err))), concave_radius=concave_radius)
+    return coef, lo, step, info
+
+
+class PlasmaCoilDistanceField(_Objective):
+    """Plasma-coil distance from a precomputed distance field of a fixed boundary.
+
+    At build, the signed distance to the plasma boundary (negative inside) is computed
+    on a cylindrical (R, phi, Z) grid over one field period and fit by a cubic
+    B-spline, so it is C^2 in space. Each row is the field at one coil node minus a
+    margin, for the independent coils and their stellarator reflections; rows keep
+    their identity, with no selection. The field is exact (to the spline error) below
+    ``saturation[0]`` and flattens smoothly to a constant above ``saturation[1]``,
+    where the constraint is inactive. The boundary must not change after build.
+
+    The margin makes every row a lower bound on the true distance: twice the largest
+    spline error measured at build, plus ``node_margin`` for the coil passing closer
+    between nodes than at them.
+
+    Parameters
+    ----------
+    eq : Equilibrium or FourierRZToroidalSurface
+        Fixed plasma boundary.
+    coil : CoilSet
+        Coils to optimize.
+    coil_grid : Grid, optional
+        Nodes along each coil. Default about 512 per coil, with a node on every corner
+        of piecewise coils.
+    spacing : float, optional
+        Field grid spacing in m. Default 0.01.
+    saturation : tuple of float, optional
+        ``(d1, d2)`` in m: exact below d1, constant above d2. Default 1.5 and 2.5 times
+        the lower bound.
+    node_margin : float, optional
+        Allowance in m for the coil dipping closer between nodes. Default from the coils
+        at build: ``node_backoff * h^2 / 8 * (k + kappa)``, with h the largest node
+        spacing, k the largest coil curvature and kappa the largest curvature of the
+        distance level sets near the bound. Coils that lengthen or bend during the
+        optimization need more; pass a value from the length and curvature bounds.
+    node_backoff : float, optional
+        Safety factor on the computed ``node_margin``. Default 1.5.
+
+    """
+
+    __doc__ = __doc__.rstrip() + collect_docs(
+        target_default="``bounds=(1,np.inf)``.",
+        bounds_default="``bounds=(1,np.inf)``.",
+        coil=True,
+    )
+
+    _static_attrs = _Objective._static_attrs + ["_coil_indices", "_nfp"]
+
+    _scalar = False
+    _units = "(m)"
+    _print_value_fmt = "Plasma-coil distance field: "
+
+    def __init__(
+        self,
+        eq,
+        coil,
+        target=None,
+        bounds=None,
+        weight=1,
+        normalize=True,
+        normalize_target=True,
+        loss_function=None,
+        deriv_mode="auto",
+        coil_grid=None,
+        spacing=0.01,
+        saturation=None,
+        node_margin=None,
+        node_backoff=1.5,
+        name="plasma-coil distance field",
+        jac_chunk_size=None,
+    ):
+        if target is None and bounds is None:
+            bounds = (1, np.inf)
+        self._eq = eq
+        self._coil_grid = coil_grid
+        self._spacing = spacing
+        self._saturation = saturation
+        self._node_margin = node_margin
+        self._node_backoff = node_backoff
+        super().__init__(
+            things=coil,
+            target=target,
+            bounds=bounds,
+            weight=weight,
+            normalize=normalize,
+            normalize_target=normalize_target,
+            loss_function=loss_function,
+            deriv_mode=deriv_mode,
+            name=name,
+            jac_chunk_size=jac_chunk_size,
+        )
+
+    def build(self, use_jit=True, verbose=1):
+        """Build constant arrays.
+
+        Parameters
+        ----------
+        use_jit : bool, optional
+            Whether to just-in-time compile the objective and derivatives.
+        verbose : int, optional
+            Level of output.
+
+        """
+        eq, coilset = self._eq, self.things[0]
+        surf = getattr(eq, "surface", eq)
+        self._nfp = int(surf.NFP)
+        if self._normalize:
+            self._normalization = compute_scaling_factors(eq)["a"]
+        lo = _lower_bound_meters(self)
+        if self._saturation is None:
+            errorif(
+                lo is None or not lo > 0,
+                ValueError,
+                "The saturation distances need a positive lower bound; pass them.",
+            )
+            d1, d2 = 1.5 * lo, 2.5 * lo
+        else:
+            d1, d2 = self._saturation
+        d_lo = lo if lo is not None and lo > 0 else d1 / 1.5
+        timer = Timer()
+        timer.start("Distance field")
+        coef, grid_lo, step, info = _plasma_distance_field(
+            surf, self._nfp, d_lo, d1, d2, self._spacing
+        )
+        timer.stop("Distance field")
+        if verbose > 1:
+            timer.disp("Distance field")
+        warnif(
+            info["concave_radius"] < 1.5 * d_lo,
+            UserWarning,
+            f"The boundary has concave radius {info['concave_radius']:.3g} m, near the "
+            f"bound {d_lo:.3g} m: the distance there may have a ridge the spline "
+            "smooths over.",
+        )
+        self._coil_indices = tuple(
+            int(i) for i in _field_period_independent_indices(coilset, self._nfp)
+        )
+        coil_grid = self._coil_grid or _coil_node_grid(coilset, 512)
+        nu = len(coilset)
+        u = np.array(self._coil_indices) % (nu * (int(coilset.sym) + 1))
+        src = np.where(u < nu, u, 2 * nu - 1 - u)  # reflections come in reverse order
+        if self._node_margin is None:
+            h, k = _coil_gap_data(coilset, coil_grid.nodes[:, 2])
+            kappa = 1 / d_lo
+            if info["concave_radius"] > d_lo:
+                kappa = max(kappa, 1 / (info["concave_radius"] - d_lo))
+            node_margin = self._node_backoff * h[src] ** 2 / 8 * (k[src] + kappa)
+        else:
+            node_margin = np.full(len(u), float(self._node_margin))
+        self.field_info = dict(info, node_margin=float(np.max(node_margin)))
+        self._dim_f = len(self._coil_indices) * coil_grid.num_nodes
+        self._constants = {
+            "coilset": coilset,
+            "coil_grid": coil_grid,
+            "coef": jnp.asarray(coef),
+            "lo": jnp.asarray(grid_lo),
+            "step": jnp.asarray(step),
+            "margin": jnp.asarray(2 * info["max_error"] + node_margin),
+            "quad_weights": 1.0,
+        }
+        super().build(use_jit=use_jit, verbose=verbose)
+
+    def compute(self, params, constants=None):
+        """Compute plasma-coil distance rows.
+
+        Parameters
+        ----------
+        params : dict
+            Dictionary of coilset degrees of freedom, eg CoilSet.params_dict
+        constants : dict
+            Dictionary of constant data, eg transforms, profiles etc.
+            Defaults to self._constants. (Deprecated)
+
+        Returns
+        -------
+        f : array of floats
+            Field minus margin at every node of every row coil.
+
+        """
+        constants = self._get_deprecated_constants(constants)
+        x = constants["coilset"]._compute_position(
+            params=params, grid=constants["coil_grid"], basis="xyz"
+        )[np.array(self._coil_indices)]
+        d = _distance_field_eval(
+            constants["coef"], x, constants["lo"], constants["step"], self._nfp
+        )
+        return (d - constants["margin"][:, None]).ravel()
 
 
 class CoilArclengthVariance(_CoilObjective):

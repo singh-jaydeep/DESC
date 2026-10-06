@@ -269,9 +269,11 @@ Objective Functions
     desc.objectives.MeanCurvature
     desc.objectives.MercierStability
     desc.objectives.MirrorRatio
+    desc.objectives.node_gap_estimate
     desc.objectives.ObjectiveFromUser
     desc.objectives.ObjectiveFunction
     desc.objectives.Omnigenity
+    desc.objectives.PlasmaCoilDistanceField
     desc.objectives.PlasmaCoilSetDistancePenalty
     desc.objectives.PlasmaCoilSetDistanceRows
     desc.objectives.PlasmaCoilSetDistanceBound

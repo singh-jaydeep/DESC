@@ -40,6 +40,15 @@ Runs (untracked, `devtools/coil_auglag/`):
 | AL5 | after that fix | stalls at outers 2, 4-6, jumps 1.2e-4 / 7.6e-6. Cause: the per-pair row took the exact distance of the polyline-argmin node, which jumps at polyline ties, and as an unlinked duplicate of the closest contact it was violated. Fixed: per-pair rows bounded below by 0 (topology only), value = min of the pair's exact side-0 slot rows |
 | AL6 | after both fixes, maxiter 800 | no stalls in 12 of 13 outer iterations; ends on maxiter. cc 5.75 cm, pc 11.00 cm, length 2.920, nothing linked, max viol ~1e-3; QuadraticFlux cost plateaus at 8.07 (+-2e-4 rel per outer, sign alternating with the violation) vs 4.10 at the infeasible penalty optimum E1 |
 | AL7 | AL6 with the schedule fix: mean mu over active rows (nonzero y or violated), unseen ids start at that level | **converged**: 9 outer / 255 inner its, scaled gradient 9.8e-7, violation 2.4e-7; QuadraticFlux 8.0815079, relative change per outer 4e-3 -> 1e-7; pc 11.000 cm, length 2.9200, nothing linked; cc 5.755 cm by brute force (curve rows miss ~0.45 mm between nodes) |
+| AL8 | AL7 with finer grids: `pair_N=256` (513 nodes/coil), `curv_N=200` (401 nodes/coil) | **converged**: 10 outer / 352 inner its, gradient 7.5e-7, violation 3.4e-7; QuadraticFlux 8.0733402. Brute force: curvature 13.700 (bound 13.7), length 2.9200, pc 11.000 cm, cc 5.789 cm (0.11 mm short, between-node miss), nothing linked |
+| AL9 | AL8 with node-node coil-coil rows (E1): explicit gap 2.102 mm (kmax, AL8 spacing), `cc_sel=0.1`, ~5.7k active rows | **converged**: 10 outer / 402 inner its, gradient 8.8e-7, violation 1.1e-7, every inner solve met its tolerance; QuadraticFlux 8.127 (+0.7% vs AL8). Brute force: cc 5.988 cm (1.9 mm above the bound: the gap is conservative, no miss), pc 11.000 cm, length 2.9200, curvature 13.700, nothing linked |
+| AL10 | AL9 with the E2 gap from the bounds: `node_gap_estimate(513, 2.92, 13.7, 0.058)` = 2.342 mm, from circles | **converged**: 9 outer / 404 inner its, gradient 5.3e-7, violation 7.5e-7, every inner solve met its tolerance; QuadraticFlux 8.133. Brute force: cc 6.012 cm, pc 11.000 cm, length 2.9200, curvature 13.700, nothing linked; gap used 2.342 mm vs 2.097 mm needed at the final state (no flag) |
+| AL11 | AL10 with `PlasmaCoilDistanceField` for plasma-coil (E3): 10 mm field, `node_margin` 0.554 mm from the bounds (h = 2.0 Lmax/513, kmax, 1/d_min) | **converged**: 13 outer / 491 inner its, gradient 7.9e-7, violation 2.2e-7, every inner solve met its tolerance; QuadraticFlux 8.247 (+1.4% vs AL10). Against the EXACT boundary: pc 11.055 cm, cc 6.013 cm, length 2.9200, curvature 13.700, nothing linked. Field build ~1.5-3 min, spline error 1e-6 m |
+
+Correction (2026-10-06): `check.py` used to measure plasma-coil distance to the
+objective's own plasma grid points (M=N=25), so AL8-AL10's "pc 11.000 cm" held only at
+those points. Against the exact boundary (Newton projection, now what `check.py` does)
+AL8 and AL10 are at 10.875 cm, 1.25 mm inside the bound. AL11's field rows fix this.
 
 Noise floor: each QuadraticFlux (and length) residual carries 1e-13..1.6e-12 of rounding
 from its own evaluation (up to ~200 ulp), about 2e-10 in any measured decrease, so the
@@ -61,9 +70,9 @@ violated rows, or per-group; new ids start at their group's current mu.
 Also seen: the curvature constraint on the 50-point grid misses peaks (fine-grid max
 14.3-14.7 vs bound 13.7, in E1 as well).
 
-Remaining for the done criterion: brute-force coil-coil feasibility (curve rows have no
-gap: more nodes, node rows, or a margin on the bound), the curvature grid, and the final
-certificate (Hessian of the Lagrangian at AL7).
+Remaining for the done criterion: the last 0.11 mm of brute-force coil-coil clearance at
+AL8 (curve rows have no gap: more nodes, node rows, or a margin on the bound), and the
+final certificate (Hessian of the Lagrangian at AL8). Curvature is fixed by `curv_N=200`.
 
 Open (for the user):
 - Gap from circles: built on circles the coil-coil gap uses their curvature (~1/R); at
@@ -315,6 +324,80 @@ criterion. Run one heavy job at a time.
   is a Boltzmann-weighted average, which is >= the true minimum, so a lower bound on it is
   not conservative. Raise separately (generic, present on master).
 - **D5.** API docs for the new methods and options. The user writes CHANGELOG entries.
+
+## E. Distance constraints shared by every coil representation
+
+Decided with the user (2026-10-06): the representations being compared (FourierPlanar,
+FourierXYZ, PolarPlanarArcCoil) get identical distance constraints. Coil-coil: node-node
+`CoilSetDistanceRows`; curve mode cannot take arc coils, and a whole-curve Newton
+projection would kink across the bisector of every concave corner. Plasma-coil: a fixed,
+splined distance field, since the plasma does not move in stage 2. Dense-grid node-node
+rows were rejected: the gap needs M=N=200 (1.6 mm, ~430k active rows), and the selection
+pass and candidate ids scale with plasma points x coil nodes (~2.6e9 ids).
+
+**E1. Node-mode coil-coil in the AL (run AL9).** AL8 with `cc_distance="node"`, explicit
+`cc_gap=2.102e-3` (1.5 x `_node_gap` with h from the AL8 coils at 513 nodes, k = kmax
+13.7), `cc_sel=0.1`, `cc_K=10000` (~3-6k active). Check: converges like AL8 (no stalled
+inner solve, violation falling each outer), QuadraticFlux a little above 8.0733, and
+`check.py` finds brute-force coil-coil >= 5.8 cm with no between-node miss.
+
+**Done (AL10).** **E2. Gap set in advance from the bounds (decided with the user, 2026-10-06).** Spacing
+is not fixed during a run: at 513 nodes h is 3.8 mm on the circles and 10.8 mm at
+AL8/AL9, so a gap built on the circles is ~8x too small. Rule: `h = s * Lmax / n` and
+`k = kmax`, gap `= backoff * _node_gap(h, h, kmax, kmax, d_min)`, where `s` is the ratio
+of the largest node spacing to the mean. Measured `s` (h n / L, per coil): circles 1.00;
+AL8 and AL9 1.68-1.89 (FourierPlanar, polar parameter). Default `s = 2.0`; the gap goes as
+s^2, so that is ~11% over the 1.9 seen. With s = 2.0 at 513 nodes: h = 11.4 mm, gap
+2.3 mm (4% of 5.8 cm); AL9's hand-set 2.102 mm against 2.094 mm needed at its final state.
+- `desc/objectives/_coils.py`: a public helper, e.g.
+  `node_gap_estimate(n_nodes, max_length, max_curvature, min_distance, speed_ratio=2.0,
+  backoff=1.5)`, returning the gap to pass as `gap=`. The objectives keep their current
+  default (gap from the coils at build); no new options on them.
+- `check.py`: report the gap needed at the checked state (`_coil_gap_data` on the row
+  grid, `_node_gap` with the measured h and k) next to the gap used, and flag when the
+  used gap is more than 2% short.
+- Arc coils: nodes are split evenly per arc, so `s` there includes the spread of arc
+  lengths; measure it on the first PolarPlanarArcCoil run before trusting 2.0.
+Escalation (user): only if runs regularly come out more than 2% short do we build
+anything adaptive (e.g. gap updates between outer iterations).
+Check: `check.py` on AL9 reports 2.094 mm needed against 2.102 mm used, no flag; a run
+from circles with the helper's gap ends with no flag.
+
+**Done (AL11).** **E3. `PlasmaCoilDistanceField` in `desc/objectives/_coils.py`.** Rows: `phi(x_i) - margin`
+for each node of the field-period-independent coils (corners on nodes via
+`_coil_node_grid`), bounds `(d_min, inf)`. Fixed row count and identity: no selection,
+slots, ids or keep mask. Build:
+- cylindrical (R, phi, Z) grid over one field period, periodic in phi, padded ~0.3 m
+  past the boundary; spacing default 10 mm (3M nodes, 24 MB on precise_QH);
+- exact distance by Newton projection on the boundary (`x`, `e_theta`, `e_zeta`, second
+  derivatives; seed from a KD-tree of a dense boundary cloud) at nodes in the band around
+  the bound, cloud distance elsewhere; signed (negative inside the plasma) so steps across
+  the boundary are pushed back;
+- smooth saturation beyond the band (constraint inactive there), monotone;
+- cubic B-spline coefficients (`scipy.ndimage.spline_filter`, `mode="grid-wrap"`);
+- `margin` = measured spline error (max over a test set in the band) plus the
+  between-node dip `h_c^2/8 (kmax + 1/d_min)` of the coil.
+Why: ~2k rows (4 coils x 513 nodes) against 150-430k for dense node-node rows, cost
+independent of plasma resolution, works for any coil class. Prototype
+(`sdf_probe.py`, precise_QH): max error 0.026 mm at h = 20 mm, 0.008 mm at
+10 mm against Newton-exact distances in d in [0.08, 0.16] m.
+
+**Done (AL11).** **E4. Tricubic B-spline evaluation in JAX.** `jax.scipy.ndimage.map_coordinates` stops at
+order 1 and interpax's cubic is only C1; write the 4x4x4 gather with cubic B-spline
+weights (C2, which the exact-Hessian finish needs). Check: matches
+`scipy.ndimage.map_coordinates(order=3, prefilter=False)` to 1e-13; `jax.jacfwd` against
+finite differences.
+
+**Done (AL11).** **E5. Reach check at build.** The field is smooth near d_min only if the boundary's
+concave radius (positive principal curvature in DESC's convention, where convex is
+negative) exceeds d_min and no two distant parts of the boundary are equally close.
+precise_QH: concave radius >= 23 cm (k1 max 4.3), convex edges to 1.1 cm (k2 min -92,
+harmless). Warn when 1/max(k_concave) < 1.5 d_min, and report the largest spline error in
+the band from a random test set. Check: warns on a deliberately dented boundary.
+
+**E6. Benchmarks.** Rerun the AL9 setup with E3 for plasma-coil; then precise_QA
+(FourierXYZ) and PolarPlanarArcCoil on the same constraints; then the user's test cases.
+Check: `check.py` feasibility (fine-grid distances) with no shortfall beyond `margin`.
 
 ## Order and dependencies
 

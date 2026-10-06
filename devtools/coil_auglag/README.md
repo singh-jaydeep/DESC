@@ -6,6 +6,12 @@ branch. Run them from this directory (they import each other) with the `.venvDEV
 interpreter, one heavy job at a time on a small machine. Run outputs (`*.npy`, `*.h5`,
 `*.json`, `*.log`) are ignored by git.
 
+`.venvDEV` imports the main checkout's `desc`; point it at this worktree, e.g.
+`PYTHONPATH=/Users/singh/PycharmProjects/DESC-coil-auglag python run_al.py ...`.
+
+**Start with `GUIDE.md`**: how to use the new objectives and solvers, choose resolutions
+and set up the augmented Lagrangian, with precise_QH as a worked example.
+
 The history, numbers and reasoning are in `notes/`: `stage2_crawl_handoff.md`
 (precise_QA: F1-F4, the composite hinge model) and `stage2_qh_planar_handoff.md`
 (precise_QH: smooth distance rows, linking, structured secant, exact-Hessian finish).

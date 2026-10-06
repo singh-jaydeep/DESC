@@ -14,6 +14,7 @@ from desc.objectives import (
     FixParameters,
     FixSumCoilCurrent,
     ObjectiveFunction,
+    PlasmaCoilDistanceField,
     PlasmaCoilSetDistanceRows,
     PlasmaCoilSetMinDistance,
     QuadraticFlux,
@@ -49,15 +50,23 @@ def build(
     link_N=40,
     distance="curve",
     al=False,
+    curv_N=None,
+    cc_distance=None,
+    pc_distance=None,
+    cc_gap=None,
+    pc_node_margin=None,
 ):
     """Build (eq, coilset, objective, constraints).
 
-    cc, pc: "rows" (smooth per-row distances) or "hard" (DESC's minimum).
+    cc, pc: "rows" (smooth per-row distances) or "hard" (DESC's minimum); pc may also be
+    "field" (PlasmaCoilDistanceField on the pair grid, pc_node_margin in m).
     fixnorm pins the largest normal component of each coil: scaling a planar coil's
     normal is an exact gauge. distance: "curve" (exact-curve rows, as in the existing
     tags) or "node" (node-node rows with a gap); pair_N=None picks the node count
     from the gap. al=True returns QuadraticFlux alone as the objective and the
-    engineering limits as constraints (weights 1), for lsq-auglag-composite. link_w > 0 adds the built-in CoilSetLinkingNumber.
+    engineering limits as constraints (weights 1), for lsq-auglag-composite. curv_N
+    sets the curvature grid (default N_coil, which is also QuadraticFlux's field grid).
+    cc_distance, pc_distance override distance per objective; cc_gap sets the coil-coil gap (m). link_w > 0 adds the built-in CoilSetLinkingNumber.
     """
     eq = desc.examples.get("precise_QH")
     if coilset is None:
@@ -77,7 +86,8 @@ def build(
             grid=pair_grid,
             max_active_rows=cc_K,
             signed=signed,
-            distance=distance,
+            distance=cc_distance or distance,
+            gap=cc_gap,
             weight=cc_w,
             jac_chunk_size=JCS,
         )
@@ -100,7 +110,17 @@ def build(
             coil_grid=pair_grid,
             max_active_rows=pc_K,
             weight=pc_w,
-            distance=distance,
+            distance=pc_distance or distance,
+            jac_chunk_size=JCS,
+        )
+    elif pc == "field":
+        pc_obj = PlasmaCoilDistanceField(
+            eq,
+            coilset,
+            bounds=(pc_bound, np.inf),
+            coil_grid=pair_grid,
+            node_margin=pc_node_margin,
+            weight=pc_w,
             jac_chunk_size=JCS,
         )
     else:
@@ -131,7 +151,7 @@ def build(
         CoilCurvature(
             coilset,
             bounds=(-np.inf, kmax),
-            grid=coil_grid,
+            grid=coil_grid if curv_N is None else LinearGrid(N=curv_N),
             weight=curv_w,
             jac_chunk_size=JCS,
         ),
