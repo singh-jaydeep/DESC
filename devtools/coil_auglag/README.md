@@ -9,7 +9,9 @@ interpreter, one heavy job at a time on a small machine. Run outputs (`*.npy`, `
 The history, numbers and reasoning are in `notes/`: `stage2_crawl_handoff.md`
 (precise_QA: F1-F4, the composite hinge model) and `stage2_qh_planar_handoff.md`
 (precise_QH: smooth distance rows, linking, structured secant, exact-Hessian finish).
-Those notes predate this branch; the names they use map as follows.
+`auglag_plan.md` is the task list for the next phase (composite solver in DESC, node-node
+distance rows with a gap bound, slack-free hinge augmented Lagrangian).
+The two investigation notes predate this branch; the names they use map as follows.
 
 | in the notes | now |
 |---|---|
