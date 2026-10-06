@@ -133,7 +133,9 @@ Coil Optimization
     desc.objectives.CoilArclengthResidual
     desc.objectives.CoilMeanSquaredCurvature
     desc.objectives.CoilSetDistancePenalty
+    desc.objectives.CoilSetDistanceRows
     desc.objectives.PlasmaCoilSetDistancePenalty
+    desc.objectives.PlasmaCoilSetDistanceRows
     desc.objectives.ToroidalFlux
     desc.objectives.SurfaceCurrentRegularization
     desc.objectives.LinkingCurrentConsistency

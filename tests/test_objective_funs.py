@@ -21,8 +21,10 @@ from desc.coils import (
     CoilSet,
     FourierPlanarCoil,
     FourierRZCoil,
+    FourierXYCoil,
     FourierXYZCoil,
     MixedCoilSet,
+    SplineXYZCoil,
     initialize_modular_coils,
 )
 from desc.compute import get_transforms
@@ -55,6 +57,7 @@ from desc.objectives import (
     CoilLength,
     CoilMeanSquaredCurvature,
     CoilSetDistancePenalty,
+    CoilSetDistanceRows,
     CoilSetLinkingNumber,
     CoilSetMinDistance,
     CoilTorsion,
@@ -81,6 +84,7 @@ from desc.objectives import (
     Omnigenity,
     PlasmaCoilSetDistanceBound,
     PlasmaCoilSetDistancePenalty,
+    PlasmaCoilSetDistanceRows,
     PlasmaCoilSetMinDistance,
     PlasmaVesselDistance,
     Pressure,
@@ -99,7 +103,13 @@ from desc.objectives import (
     Volume,
     get_NAE_constraints,
 )
-from desc.objectives._coils import _independent_coil_indices
+from desc.objectives._coils import (
+    _fourier_curve_kind,
+    _fourier_curve_point,
+    _independent_coil_indices,
+    _physical_coil_maps,
+    _stacked_params,
+)
 from desc.objectives._free_boundary import BoundaryErrorNESTOR
 from desc.objectives.nae_utils import (
     _calc_1st_order_NAE_coeffs,
@@ -114,7 +124,7 @@ from desc.profiles import (
     PowerSeriesProfile,
     ScaledProfile,
 )
-from desc.utils import PRINT_WIDTH, ResolutionWarning, safenorm
+from desc.utils import PRINT_WIDTH, ResolutionWarning, rotation_matrix, safenorm
 from desc.vmec_utils import ptolemy_linear_transform
 
 
@@ -1225,6 +1235,116 @@ class TestObjectiveFunction:
         for mode in ["per_pair", "per_pair_unique"]:
             with pytest.raises(ValueError):
                 CoilSetMinDistance(coils, pair_mode=mode, signed=True)
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize("kind", ["planar rpz", "planar xyz", "xy", "xyz"])
+    def test_fourier_curve_point(self, kind):
+        """Exact curve evaluator matches _compute_position, symmetry copies included."""
+        coil = {
+            "planar rpz": FourierPlanarCoil(
+                center=[3, 0.2, 0.1],
+                normal=[0.3, 1, 0.2],
+                r_n=[0.1, 1, 0.2],
+                basis="rpz",
+            ),
+            "planar xyz": FourierPlanarCoil(
+                center=[3, 0.5, 0.1],
+                normal=[0.3, 1, 0.2],
+                r_n=[0.1, 1, 0.2],
+                basis="xyz",
+            ),
+            "xy": FourierXYCoil(
+                center=[3, 0.4, 0.1],
+                normal=[0.2, 1, -0.3],
+                X_n=[0.2, 1, 0.1],
+                Y_n=[1, 0.1, 0.3],
+            ),
+            "xyz": FourierXYZCoil(X_n=[0, 3, 1], Y_n=[0.3, 0.2, 0.1], Z_n=[1, 0, 0.2]),
+        }[kind]
+        coil.rotmat = rotation_matrix([0.1, 0.2, 0.3]).ravel()
+        coil.shift = [0.1, -0.2, 0.05]
+        coils = CoilSet(coil, coil.copy(), NFP=2, sym=True, check_intersection=False)
+        grid = LinearGrid(N=10)
+        x_ref, x_s_ref = coils._compute_position(grid=grid, dx1=True, basis="xyz")
+        curve = _fourier_curve_kind(coils)
+        T, U = _physical_coil_maps(coils)
+        P = _stacked_params(coils.params_dict)
+        for k in range(coils.num_coils):
+            x, x_s, _ = jax.vmap(
+                lambda t, k=k: _fourier_curve_point(P, U[k], t, *curve)
+            )(jnp.asarray(grid.nodes[:, 2]))
+            np.testing.assert_allclose(x @ T[k].T, x_ref[k], atol=1e-13)
+            np.testing.assert_allclose(x_s @ T[k].T, x_s_ref[k], atol=1e-13)
+
+    @pytest.mark.unit
+    def test_coil_set_distance_rows(self):
+        """Rows are exact node-to-curve distances; signed by linking; smooth."""
+
+        def rings(dx):  # ring 2 threads ring 1 when dx = 1, separate when dx = 2.5
+            return CoilSet(
+                FourierPlanarCoil(center=[0, 0, 0], normal=[0.05, 0.1, 1], r_n=1),
+                FourierPlanarCoil(center=[dx, 0, 0], normal=[0, 1, 0], r_n=1),
+                check_intersection=False,
+            )
+
+        grid = LinearGrid(N=32)
+        fine = LinearGrid(N=10000)
+        for dx, linked in [(1.0, True), (2.5, False)]:
+            coils = rings(dx)
+            obj = CoilSetDistanceRows(
+                coils, select_distance=3, grid=grid, max_active_rows=200
+            )
+            obj.build(verbose=0)
+            f = obj.compute(coils.params_dict)
+            assert obj.linked_pairs() == ([(0, 1)] if linked else [])
+            # pair row: closest node of coil 0 to the exact coil 1, sign by linking
+            nodes = coils[0].compute("x", grid=grid, basis="xyz")["x"]
+            curve = coils[1].compute("x", grid=fine, basis="xyz")["x"]
+            d = np.linalg.norm(nodes[:, None] - curve[None], axis=-1).min(axis=1)
+            np.testing.assert_allclose(
+                f[-1], (-1 if linked else 1) * d.min(), rtol=1e-6
+            )
+            assert np.all(f[:-1] > 0)
+            # derivatives through the selection and the Newton solve
+            obj2 = ObjectiveFunction(obj)
+            obj2.build(verbose=0)
+            x = obj2.x(coils)
+            J = obj2.jac_unscaled(x)
+            v = np.random.default_rng(0).standard_normal(x.size) * 1e-3
+            h = 1e-5
+            fd = (
+                obj2.compute_unscaled(x + h * v) - obj2.compute_unscaled(x - h * v)
+            ) / (2 * h)
+            np.testing.assert_allclose(J @ v, fd, atol=1e-8)
+        with pytest.warns(UserWarning, match="max_active_rows"):
+            obj = CoilSetDistanceRows(coils, select_distance=3, max_active_rows=5)
+            obj.build(verbose=0)
+            jax.block_until_ready(obj.compute(coils.params_dict))
+        with pytest.raises(NotImplementedError):
+            CoilSetDistanceRows(
+                CoilSet.linspaced_angular(
+                    SplineXYZCoil(1, [1, 2, 3], [0, 0, 0], [0, 1, 0])
+                ),
+                select_distance=1,
+            ).build(verbose=0)
+
+    @pytest.mark.unit
+    def test_plasma_coil_set_distance_rows(self):
+        """Rows are exact plasma-point-to-curve distances, reflections included."""
+        eq = Equilibrium(M=2, N=1, NFP=2)
+        coil = FourierPlanarCoil(center=[10, 0.3, 0], normal=[0, 1, 0.2], r_n=2.2)
+        coils = CoilSet(coil, NFP=2, sym=True, check_intersection=False)
+        plasma_grid = LinearGrid(M=6, N=6, NFP=2, sym=True)
+        obj = PlasmaCoilSetDistanceRows(
+            eq, coils, select_distance=3, plasma_grid=plasma_grid, max_active_rows=3000
+        )
+        obj.build(verbose=0)
+        f = obj.compute(coils.params_dict)
+        assert obj.active_row_count() < obj.dim_f
+        Q = np.asarray(obj.constants["plasma_coords"])
+        curves = coils._compute_position(grid=LinearGrid(N=10000), basis="xyz")
+        brute = np.linalg.norm(Q[:, None, None] - curves[None], axis=-1).min()
+        np.testing.assert_allclose(f.min(), brute, rtol=1e-6)
 
     @pytest.mark.unit
     def test_coil_min_distance(self):
@@ -3446,6 +3566,7 @@ class TestComputeScalarResolution:
         CoilLength,
         CoilMeanSquaredCurvature,
         CoilSetDistancePenalty,
+        CoilSetDistanceRows,
         CoilSetLinkingNumber,
         CoilSetMinDistance,
         CoilTorsion,
@@ -3456,6 +3577,7 @@ class TestComputeScalarResolution:
         Omnigenity,
         PlasmaCoilSetDistanceBound,
         PlasmaCoilSetDistancePenalty,
+        PlasmaCoilSetDistanceRows,
         PlasmaCoilSetMinDistance,
         PlasmaVesselDistance,
         QuadraticFlux,
@@ -3975,6 +4097,7 @@ class TestObjectiveNaNGrad:
         CoilLength,
         CoilMeanSquaredCurvature,
         CoilSetDistancePenalty,
+        CoilSetDistanceRows,
         CoilSetLinkingNumber,
         CoilSetMinDistance,
         CoilTorsion,
@@ -3988,6 +4111,7 @@ class TestObjectiveNaNGrad:
         Omnigenity,
         PlasmaCoilSetDistanceBound,
         PlasmaCoilSetDistancePenalty,
+        PlasmaCoilSetDistanceRows,
         PlasmaCoilSetMinDistance,
         PlasmaVesselDistance,
         QuadraticFlux,
@@ -4315,6 +4439,36 @@ class TestObjectiveNaNGrad:
         )
         obj.build(verbose=0)
         assert obj.compute_scalar(obj.x()) > 0
+        g = obj.grad(obj.x())
+        assert not np.any(np.isnan(g))
+
+    @pytest.mark.unit
+    def test_objective_no_nangrad_coil_set_distance_rows(self):
+        """Coil-coil distance rows, with linked and selected rows present."""
+        coils = CoilSet(
+            FourierPlanarCoil(center=[0, 0, 0], normal=[0.05, 0.1, 1], r_n=1),
+            FourierPlanarCoil(center=[1, 0, 0], normal=[0, 1, 0], r_n=1),
+            check_intersection=False,
+        )
+        obj = ObjectiveFunction(
+            CoilSetDistanceRows(coils, select_distance=3, max_active_rows=500),
+            use_jit=False,
+        )
+        obj.build(verbose=0)
+        g = obj.grad(obj.x())
+        assert not np.any(np.isnan(g))
+
+    @pytest.mark.unit
+    def test_objective_no_nangrad_plasma_coil_set_distance_rows(self):
+        """Plasma-coil distance rows, active."""
+        eq = Equilibrium(M=2, N=1)
+        coil = FourierPlanarCoil(center=[10, 0, 0], normal=[0, 1, 0], r_n=2)
+        coilset = CoilSet.linspaced_angular(coil, n=3, check_intersection=False)
+        obj = ObjectiveFunction(
+            PlasmaCoilSetDistanceRows(eq, coilset, select_distance=3),
+            use_jit=False,
+        )
+        obj.build(verbose=0)
         g = obj.grad(obj.x())
         assert not np.any(np.isnan(g))
 

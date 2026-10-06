@@ -212,6 +212,7 @@ Objective Functions
     desc.objectives.CoilLength
     desc.objectives.CoilMeanSquaredCurvature
     desc.objectives.CoilSetDistancePenalty
+    desc.objectives.CoilSetDistanceRows
     desc.objectives.CoilSetLinkingNumber
     desc.objectives.CoilSetMinDistance
     desc.objectives.CoilTorsion
@@ -272,6 +273,7 @@ Objective Functions
     desc.objectives.ObjectiveFunction
     desc.objectives.Omnigenity
     desc.objectives.PlasmaCoilSetDistancePenalty
+    desc.objectives.PlasmaCoilSetDistanceRows
     desc.objectives.PlasmaCoilSetDistanceBound
     desc.objectives.PlasmaCoilSetMinDistance
     desc.objectives.PlasmaVesselDistance
