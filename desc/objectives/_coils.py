@@ -18,13 +18,11 @@ from desc.utils import (
     copy_rpz_periods,
     errorif,
     reflection_matrix,
-    rotation_matrix,
+    rotate_vector_to_vector,
     rpz2xyz,
     rpz2xyz_vec,
-    safearccos,
     safediv,
     safenorm,
-    safenormalize,
     setdefault,
     warnif,
 )
@@ -2903,13 +2901,7 @@ def _fourier_curve_point(P, u, t, kind, rpz, modes):
         if rpz:
             normal = rpz2xyz_vec(normal, phi=center[1])
             center = rpz2xyz(center)
-        zaxis = jnp.array([0.0, 0.0, 1.0])
-        cosang = jnp.dot(zaxis, safenormalize(normal))
-        A = jnp.where(
-            jnp.allclose(cosang, -1.0),
-            jnp.diag(jnp.array([1.0, -1.0, -1.0])),
-            rotation_matrix(jnp.cross(zaxis, normal), safearccos(cosang)),
-        )
+        A = rotate_vector_to_vector(jnp.array([0.0, 0.0, 1.0]), normal)
         loc = loc @ A.T
         loc = loc.at[0].add(center)
     R = P["rotmat"][u].reshape(3, 3)

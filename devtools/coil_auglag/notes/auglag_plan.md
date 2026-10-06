@@ -163,6 +163,11 @@ machinery (pre-hinge value `c`, bounds shifted); equalities as in `lsq_auglag`'s
 grows only on rows still violated (the hinge residual IS the violation, so the c0-testing
 true-violation bookkeeping `:429-450` and `y_update_gate` are unnecessary); keep
 `max_multiplier`/`max_penalty_parameter` as caps.
+Keep the Jacobian handling of PR #2298 (already the effect of the vendored
+`scale_tail_rows` rescale at `aug_lagrangian_ls.py:1449`): rescale the constraint rows by
+`sqrt(mu_new/mu_old)` at an outer update instead of re-evaluating, and do the update right
+after the accepted step that built J so no extra unscaled copy has to live across
+iterations (the vendored code keeps one).
 **C3. Stalls.** Master termination; an inner stall raises `mu` on violated rows and
 restarts the inner solve; never return success at an infeasible point.
 **C4. Second order.** Inner solves with `hessian="secant"`; `finish_steps` exact steps at
@@ -181,8 +186,8 @@ curvature limits as constraints and QuadraticFlux as the objective.
   `step_veto` loop to `maxiter`, `_trust_region_step_eigh` (`aug_lagrangian_ls.py:35`) on
   singular PSD models. Fix where `lsq-auglag`/`fmin-auglag` stay in use, or document as
   superseded; decide `test_auglag` for the old `lsq-auglag` once C passes it.
-- **D2.** `desc.utils.safearccos(1) = inf` makes planar coils NaN for normals within ~1e-8
-  of +z (present on master). Raise separately, not guarded locally.
+- **D2.** ~~Planar coils NaN for normals within ~1e-8 of +z~~ fixed by folding in PR #2277
+  (`rotate_vector_to_vector`); `CoilSetDistanceRows`' evaluator uses it too.
 - **D3.** Q6 (`second_order="constraints"`).
 - **D5.** `desc.objectives.utils.softmin` (used by `CoilSetMinDistance(use_softmin=True)`)
   is a Boltzmann-weighted average, which is >= the true minimum, so a lower bound on it is

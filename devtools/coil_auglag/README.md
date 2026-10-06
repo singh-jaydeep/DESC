@@ -61,6 +61,3 @@ Previously certified with this sequence: scaled gradient 7.7e-9, PD Hessian, coi
   the termination checks and spins the outer loop to `maxiter`;
   `_trust_region_step_eigh` puts the step on the trust-region boundary for a singular
   PSD model even when the minimizer is inside.
-- Planar coils (FourierPlanar, FourierXY) evaluate to NaN when the normal is within
-  ~1e-8 of +z but not exactly +z: `desc.utils.safearccos(1) = inf`. Present on master;
-  `CoilSetDistanceRows` uses the same formula.
