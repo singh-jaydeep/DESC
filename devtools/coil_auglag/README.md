@@ -53,6 +53,12 @@ Previously certified with this sequence: scaled gradient 7.7e-9, PD Hessian, coi
 - `tests/test_optimizer.py::test_auglag` fails: the c0-testing `lsq_auglag` stops
   infeasible ("subproblems repeatedly stalled", max violation 2.2e-3) where master and
   `fmin_auglag` converge. To be addressed in the augmented Lagrangian work.
+- Open in the c0-testing augmented Lagrangian (from the branch code review):
+  `fmin_auglag` resets its stall counter on any accepted step, so ftol/xtol stalls
+  never terminate and runs go to `maxiter`; a `step_veto` that keeps rejecting skips
+  the termination checks and spins the outer loop to `maxiter`;
+  `_trust_region_step_eigh` puts the step on the trust-region boundary for a singular
+  PSD model even when the minimizer is inside.
 - Planar coils (FourierPlanar, FourierXY) evaluate to NaN when the normal is within
   ~1e-8 of +z but not exactly +z: `desc.utils.safearccos(1) = inf`. Present on master;
   `CoilSetDistanceRows` uses the same formula.
