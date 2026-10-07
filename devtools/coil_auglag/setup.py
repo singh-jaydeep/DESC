@@ -133,6 +133,8 @@ def build_al(
     curv_N=200,
     arclen_w=0.025,
     len_factor=1.5,
+    lmax=None,
+    speed_tol=None,
     speed_ratio=1.2,
     cc_sel=None,
     cc_K=10000,
@@ -142,10 +144,13 @@ def build_al(
 
     Objective: QuadraticFlux plus arclength residuals (weight arclen_w relative to it,
     the F1 ratio). Constraints: the notebook's coil-coil (0.1 a_coil), plasma-coil
-    (0.25 a_plasma) and |curvature| (2 / a_coil) bounds, length <= len_factor * L0;
+    (0.25 a_plasma) and |curvature| (2 / a_coil) bounds, length <= lmax (m) or
+    len_factor * L0;
     node rows (gap from the bounds with speed_ratio) and the plasma distance field,
     both on pair_N nodes; curvature on its own grid. Gauges: FixCoilCurrent on coil
     0, and per coil the n=+-1 coefficient most aligned with the phase s -> s + c.
+    speed_tol=delta moves arclength to the constraints instead: relative speed rows
+    within (-delta, delta), and the gap built with speed_ratio 1 + delta.
     """
     from common import phase_tangent
 
@@ -155,11 +160,13 @@ def build_al(
     a_c = np.mean([compute_scaling_factors(c)["a"] for c in c0])
     a_p = compute_scaling_factors(eq)["a"]
     cc_bound, pc_bound, kmax = 0.1 * a_c, 0.25 * a_p, 2 / a_c
-    lmax = len_factor * float(c0[0].compute("length")["length"])
+    lmax = lmax or len_factor * float(c0[0].compute("length")["length"])
     coil_grid = LinearGrid(N=50)
     plasma_grid = LinearGrid(M=25, N=25, NFP=eq.NFP, sym=eq.sym)
     pair_grid = LinearGrid(N=pair_N)
     n = pair_grid.num_nodes
+    if speed_tol is not None:
+        speed_ratio = 1 + speed_tol
     h = speed_ratio * lmax / n
     obj = ObjectiveFunction(
         (
@@ -172,7 +179,11 @@ def build_al(
                 bs_chunk_size=10,
                 jac_chunk_size=JCS,
             ),
-            CoilArclengthResidual(coilset, weight=arclen_w, grid=coil_grid),
+        )
+        + (
+            ()
+            if speed_tol is not None
+            else (CoilArclengthResidual(coilset, weight=arclen_w, grid=coil_grid),)
         ),
         deriv_mode="blocked",
     )
@@ -216,4 +227,13 @@ def build_al(
         ),
         CoilLength(coilset, bounds=(0, lmax), grid=coil_grid, jac_chunk_size=JCS),
     )
+    if speed_tol is not None:
+        cons += (
+            CoilArclengthResidual(
+                coilset,
+                relative=True,
+                bounds=(-speed_tol, speed_tol),
+                grid=LinearGrid(N=100),
+            ),
+        )
     return eq, coilset, obj, cons

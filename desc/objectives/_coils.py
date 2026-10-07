@@ -4302,6 +4302,10 @@ class CoilArclengthResidual(CoilArclengthVariance):
     grid : Grid, optional
         Collocation grid containing the nodes to evaluate at.
         Defaults to ``LinearGrid(N=2 * coil.N + 5)``
+    relative : bool, optional
+        Return ``|x_s|_i / mean(|x_s|) - 1`` instead, dimensionless, so bounds
+        ``(-delta, delta)`` cap the largest node spacing at ``1 + delta`` times the
+        mean. Default False.
 
     """
 
@@ -4311,6 +4315,7 @@ class CoilArclengthResidual(CoilArclengthVariance):
         coil=True,
     )
 
+    _static_attrs = CoilArclengthVariance._static_attrs + ["_relative"]
     _units = "(m)"
     _print_value_fmt = "Coil arclength residual: "
     _broadcast_input = "node"
@@ -4327,7 +4332,11 @@ class CoilArclengthResidual(CoilArclengthVariance):
         deriv_mode="auto",
         grid=None,
         name="coil arclength residual",
+        relative=False,
     ):
+        self._relative = relative
+        if relative:
+            self._units = "(dimensionless)"
         super().__init__(
             coils,
             target=target,
@@ -4359,6 +4368,8 @@ class CoilArclengthResidual(CoilArclengthVariance):
         self._constants["quad_weights"] = quad_weights
         if self._normalize:  # residuals have units of length, not length^2
             self._normalization = np.mean([scale["a"] for scale in self._scales])
+            if self._relative:
+                self._normalization = 1
         _Objective.build(self, use_jit=use_jit, verbose=verbose)
 
     def compute(self, params, constants=None):
@@ -4383,7 +4394,8 @@ class CoilArclengthResidual(CoilArclengthVariance):
         out = []
         for k, dat in enumerate(data):
             sp = jnp.linalg.norm(dat["x_s"], axis=1)
-            out.append(constants["mask"][k] * (sp - jnp.mean(sp)))
+            dev = sp / jnp.mean(sp) - 1 if self._relative else sp - jnp.mean(sp)
+            out.append(constants["mask"][k] * dev)
         return jnp.concatenate(out)[self._coilset_tree["objective_mask"]]
 
 

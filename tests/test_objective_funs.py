@@ -1216,11 +1216,19 @@ class TestObjectiveFunction:
         var.build(verbose=0)
         res.build(verbose=0)
         v = var.compute(coils.params_dict)
-        r = res.compute(coils.params_dict) * res.constants["quad_weights"]
+        r = res.compute(coils.params_dict) * res._constants["quad_weights"]
         assert r.size == res.dim_f
         assert np.all(v > 0)
         r = r.reshape(len(coils), grid.num_nodes)
         np.testing.assert_allclose(np.sum(r**2, axis=1), v, rtol=1e-12)
+        rel = CoilArclengthResidual(coils, grid=grid, relative=True, bounds=(-0.1, 0.1))
+        obj = ObjectiveFunction(rel)
+        obj.build(verbose=0)
+        sp = np.linalg.norm(coils[0].compute("x_s", grid=grid)["x_s"], axis=1)
+        f = rel.compute(coils.params_dict).reshape(len(coils), grid.num_nodes)
+        np.testing.assert_allclose(f[0], sp / sp.mean() - 1, rtol=1e-12)
+        assert rel.normalization == 1
+        assert np.all(np.isfinite(obj.jac_scaled(obj.x(coils))))
 
     @pytest.mark.unit
     def test_coil_curvature_signed(self):

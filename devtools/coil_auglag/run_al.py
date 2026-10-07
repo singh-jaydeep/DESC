@@ -33,14 +33,13 @@ a = p.parse_args()
 kw = {"distance": "node", "pair_N": None, **json.loads(a.kw), "al": True}
 eq, c0, obj, cons = build(**kw)
 obj.build(verbose=0)
-if a.start:  # objective built on the initial coils so normalizations match
-    c0.params_dict = obj.unpack_state(np.load(a.start), False)[0]
-json.dump(kw, open(f"{a.tag}.json", "w"))
-
 nonlinear = [c for c in cons if not c.linear]
 for c in nonlinear:
     if not c.built:
         c.build(verbose=0)
+if a.start:  # everything built on the initial coils so normalizations match
+    c0.params_dict = obj.unpack_state(np.load(a.start), False)[0]
+json.dump(kw, open(f"{a.tag}.json", "w"))
 sizes = [getattr(c, "num_row_ids", c.dim_f) for c in nonlinear]
 offsets = np.concatenate([[0], np.cumsum(sizes)])
 cc, pc = distance_objectives(obj, cons)
