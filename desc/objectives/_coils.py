@@ -3084,7 +3084,8 @@ def _lower_bound_meters(obj):
         return None
     # slot rows only: after build the per-pair rows hold 0
     lo = np.min(np.atleast_1d(obj.bounds[0])[: getattr(obj, "_max_active_rows", None)])
-    return lo if obj._normalize_target else lo * obj.normalization
+    # _normalization: called mid-build, before .normalization is readable
+    return lo if obj._normalize_target else lo * obj._normalization
 
 
 class CoilSetDistanceRows(_Objective):

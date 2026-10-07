@@ -13,9 +13,12 @@ from desc.objectives import (
     CoilSetDistanceRows,
     CoilSetMinDistance,
     FixCoilCurrent,
+    FixParameters,
     ObjectiveFunction,
+    PlasmaCoilDistanceField,
     PlasmaCoilSetMinDistance,
     QuadraticFlux,
+    node_gap_estimate,
 )
 from desc.objectives.normalization import compute_scaling_factors
 
@@ -121,4 +124,96 @@ def build(
     mask = [False] * len(coilset)
     mask[0] = True
     cons = (FixCoilCurrent(coilset, indices=mask),)
+    return eq, coilset, obj, cons
+
+
+def build_al(
+    coilset=None,
+    pair_N=256,
+    curv_N=200,
+    arclen_w=0.025,
+    len_factor=1.5,
+    speed_ratio=1.2,
+    cc_sel=None,
+    cc_K=10000,
+    spacing=0.01,
+):
+    """The notebook problem for lsq-auglag-composite, bounds converted to meters.
+
+    Objective: QuadraticFlux plus arclength residuals (weight arclen_w relative to it,
+    the F1 ratio). Constraints: the notebook's coil-coil (0.1 a_coil), plasma-coil
+    (0.25 a_plasma) and |curvature| (2 / a_coil) bounds, length <= len_factor * L0;
+    node rows (gap from the bounds with speed_ratio) and the plasma distance field,
+    both on pair_N nodes; curvature on its own grid. Gauges: FixCoilCurrent on coil
+    0, and per coil the n=+-1 coefficient most aligned with the phase s -> s + c.
+    """
+    from common import phase_tangent
+
+    eq = desc.examples.get("precise_QA")
+    c0 = initialize_modular_coils(eq, num_coils=3, r_over_a=3.0).to_FourierXYZ()
+    coilset = c0 if coilset is None else coilset
+    a_c = np.mean([compute_scaling_factors(c)["a"] for c in c0])
+    a_p = compute_scaling_factors(eq)["a"]
+    cc_bound, pc_bound, kmax = 0.1 * a_c, 0.25 * a_p, 2 / a_c
+    lmax = len_factor * float(c0[0].compute("length")["length"])
+    coil_grid = LinearGrid(N=50)
+    plasma_grid = LinearGrid(M=25, N=25, NFP=eq.NFP, sym=eq.sym)
+    pair_grid = LinearGrid(N=pair_N)
+    n = pair_grid.num_nodes
+    h = speed_ratio * lmax / n
+    obj = ObjectiveFunction(
+        (
+            QuadraticFlux(
+                eq,
+                field=coilset,
+                eval_grid=plasma_grid,
+                field_grid=coil_grid,
+                vacuum=True,
+                bs_chunk_size=10,
+                jac_chunk_size=JCS,
+            ),
+            CoilArclengthResidual(coilset, weight=arclen_w, grid=coil_grid),
+        ),
+        deriv_mode="blocked",
+    )
+    modes = c0[0].X_basis.modes[:, 2]
+    pins = []
+    for p in coilset.params_dict:
+        t = phase_tangent(p, modes)
+        k, i = max(
+            ((k, i) for k in t for i in np.where(np.abs(modes) == 1)[0]),
+            key=lambda ki: abs(t[ki[0]][ki[1]]),
+        )
+        pins.append({k: np.array([i])})
+    mask = [False] * len(coilset)
+    mask[0] = True
+    cons = (
+        FixCoilCurrent(coilset, indices=mask),
+        FixParameters(coilset, pins),
+        CoilSetDistanceRows(
+            coilset,
+            select_distance=cc_sel or 2 * cc_bound,
+            bounds=(cc_bound, np.inf),
+            grid=pair_grid,
+            gap=node_gap_estimate(n, lmax, kmax, cc_bound, speed_ratio),
+            max_active_rows=cc_K,
+            jac_chunk_size=JCS,
+        ),
+        PlasmaCoilDistanceField(
+            eq,
+            coilset,
+            bounds=(pc_bound, np.inf),
+            coil_grid=pair_grid,
+            spacing=spacing,
+            node_margin=1.5 * h**2 / 8 * (kmax + 1 / pc_bound),
+            jac_chunk_size=JCS,
+        ),
+        CoilCurvature(
+            coilset,
+            bounds=(-np.inf, kmax),
+            grid=LinearGrid(N=curv_N),
+            jac_chunk_size=JCS,
+        ),
+        CoilLength(coilset, bounds=(0, lmax), grid=coil_grid, jac_chunk_size=JCS),
+    )
     return eq, coilset, obj, cons

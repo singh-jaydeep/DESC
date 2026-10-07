@@ -1494,6 +1494,15 @@ class TestObjectiveFunction:
         built = obj._constants["gap"].copy()
         obj.build(verbose=0)  # per-pair rows hold a 0 lower bound after build
         np.testing.assert_allclose(obj._constants["gap"], built)
+        normalized = CoilSetDistanceRows(
+            coils,
+            select_distance=2,
+            bounds=(d / obj.normalization, np.inf),
+            normalize_target=False,
+            grid=grid,
+        )
+        normalized.build(verbose=0)
+        np.testing.assert_allclose(normalized._constants["gap"], built)
 
     @pytest.mark.unit
     def test_plasma_coil_set_distance_rows_node(self):
