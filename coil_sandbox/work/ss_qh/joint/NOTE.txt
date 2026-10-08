@@ -80,3 +80,10 @@ Build check (build/): 5.0 GB peak, cc active 1313/80000, field max err 1.7e-6.
 2026-10-08 17:41 -- single_stage.py --horizontal-hinges added; ss_level.sh (same as ss_z0.sh but the flag and start
   base_level). Dry: B.n 2.07x tol (67.5%), d_pc 28.8% (single stage's 2% d_pc backoff vs run_al's; ss_z0 had 12.5%).
   Launched chain -> k4b -> refine (ss_level.out).
+2026-10-08 18:36-19:06 -- ss_level chain: k1 8.46e-3, k2 5.30e-3, k3 4.15e-3, k4 3.28e-3, k4b 3.22e-3 (all maxiter).
+  Refine on B_level: first attempt SEGFAULT (exit 139) in outer 7 -> on_level/arcB2_level_segv1 (outer-6 checkpoint
+  2.8590e-3 via from_checkpoint.py --eq, new option). Identical rerun: CONVERGED gtol 9 outer / 91 inner, 222 s,
+  B.n 2.8590e-3 = 1.93x free arcB2 on B_arcB2 (z0: 4.3x). REMOVABLE, hinge clearance +0.047, coil z -175,-43,-46,+82 mm.
+  QS rho .5 9.7e-4 (B_arcB2 8.8e-4), iota min 1.187. view.html rebuilt (11 coilsets). RESULTS.md has an Update section.
+  User question answered: stage 2 (lsq-auglag-composite) uses hessian=secant by default; single stage
+  (proximal-lsq-exact) is plain GN -> noted in results/K5_STALL.md.

@@ -66,8 +66,11 @@ form `total` (∫|κ|ds ≤ 2π + ε) stalls the solver on nearly straight legs.
 `work/ss_qh/joint/results/` (RESULTS.md), timeline in `work/ss_qh/joint/NOTE.txt`. `run_al.py --fix-hinge-z 0` and
 `single_stage.py --fix-hinge-z 0` hold every hinge's z exactly (FixParameters; z = 0 is the only single plane under
 stellarator symmetry). On precise_QH the joint plane costs 2.8× (fixed eq); single stage from near-converged states
-leaves 4.3× vs free arcB2 on its own boundary, because precise_QH's helical-axis excursion is untouched. Next (awaiting
-the user): WISTELL-A cold start (`work/ss_qh/joint/cold/`). Traps: arc starts with z = 0 hinges must be built
+leaves 4.3× vs free arcB2 on its own boundary, because precise_QH's helical-axis excursion is untouched. The user's
+relaxation, each coil's hinges level at its own height (`--horizontal-hinges` in both drivers, sandbox/demount.HingeLevel),
+gets 1.93× after the same single stage (`ss_level.sh`; RESULTS.md "Update"). Single-stage convergence issue (k = 5
+stall; single stage is plain GN, stage 2 uses the secant Hessian): `work/ss_qh/joint/results/K5_STALL.md`. Next if still
+unsatisfying: WISTELL-A cold start (`work/ss_qh/joint/cold/`). Traps: arc starts with z = 0 hinges must be built
 (`work/ss_qh/joint/make_z0_start.py`), not fitted, then repacked (`work/ss_qh/fixed_ss_eq/repack_arcs.py`);
 free-hinge cold starts can link coils in one step, so pass `run_al.py --link-mu 1e8` (initial AL penalty on the
 signed per-pair coil-coil rows only; main repo 31ed99491).

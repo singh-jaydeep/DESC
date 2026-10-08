@@ -1,6 +1,6 @@
 """Rebuild a run_al.py result from an outer-iteration checkpoint (a run stopped before its own end).
 
-    python work/ss_qh/joint/from_checkpoint.py RUN_DIR START.h5 K [--vacuum]     (sandbox root, CPU)
+    python work/ss_qh/joint/from_checkpoint.py RUN_DIR START.h5 K [--vacuum] [--eq EQ]     (sandbox root, CPU)
 
 Unpacks RUN_DIR/x_outerKK.npy into the start coilset, writes RUN_DIR/result_outerKK.h5 and .json with the same
 dense check (common.evaluate against the bounds) and linking/margins that run_al.py reports at the end.
@@ -14,7 +14,7 @@ from desc.io import load
 
 run, start, k = sys.argv[1], sys.argv[2], int(sys.argv[3])
 vac = "--vacuum" in sys.argv
-eq, _ = S.load_equilibrium("precise_QH")
+eq, _ = S.load_equilibrium(sys.argv[sys.argv.index("--eq") + 1] if "--eq" in sys.argv else "precise_QH")
 cs = load(start)
 cs.params_dict = cs.unpack_params(np.load(f"{run}/x_outer{k:02d}.npy"))
 P = S.paper_bounds(eq, S.n_unique(cs), None, "bounds/precise_qh_gil.json")

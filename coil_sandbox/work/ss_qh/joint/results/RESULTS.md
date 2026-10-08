@@ -1,4 +1,43 @@
-# arcB2 with every hinge on z = 0 (one demountable joint plane): precise_QH, 2026-10-08
+# arcB2 with demountable hinges on precise_QH: one joint plane (z = 0) vs level hinges per coil, 2026-10-08
+
+## Update (evening): per-coil horizontal hinges halve the gap
+
+**Relaxing "every hinge on z = 0" to "each coil's hinges level, at its own height" (user's idea) takes the joint-plane
+arcB2 from 4.3× to 1.93× free arcB2 after single stage.** With the equilibrium fixed (precise_QH) it already recovers
+~80% of what the single plane cost (1.37× vs the same cold start); single stage then does far better than it did for
+z = 0. Every result is converged, removable vertically and unlinked.
+
+| arcB2 M5 | boundary | B·n | ÷ free on own boundary |
+|---|---|---|---|
+| free hinges (matrix) | B_arcB2 | 1.484e-3 | 1 |
+| **level per coil** | **B_level** (this single stage, k4b) | **2.859e-3** | **1.93** |
+| z = 0 joint plane | B_z0 | 6.372e-3 | 4.3 |
+
+Single stage with the level constraint (`../ss_level.sh`, same weights/anchors as `../ss_z0.sh`, start `base_level`):
+
+| step | B·n of the ss coils | QS ρ = 0.5 | QS edge | ι min | A |
+|---|---|---|---|---|---|
+| start (precise_QH, base_level) | 8.77e-3 | 2.2e-4 | 1.4e-3 | 1.252 | 8.00 |
+| k = 1 | 8.46e-3 | 1.35e-3 | 3.8e-3 | 1.247 | 7.93 |
+| k = 2 | 5.30e-3 | 1.60e-3 | 5.3e-3 | 1.217 | 8.15 |
+| k = 3 | 4.15e-3 | 1.49e-3 | 3.4e-3 | 1.200 | 8.12 |
+| k = 4 | 3.28e-3 | 9.9e-4 | 3.7e-3 | 1.187 | 8.12 |
+| k4b | 3.22e-3 | 9.7e-4 | 3.7e-3 | 1.187 | 8.12 |
+| ref: B_arcB2 (free) | 2.0e-3 | 8.8e-4 | 4.8e-3 | ~1.24 | 8.17 |
+| ref: B_z0 (z = 0, k4b) | 6.82e-3 | 3.7e-3 | 8.0e-3 | 1.181 | 8.09 |
+
+* Refinement on B_level (`../on_level/arcB2_level`, run_al.py --horizontal-hinges --link-mu 1e8): converged gtol,
+  9 outer / 91 inner, 3.7 min; B·n 2.859e-3; L and κ active; removable, min hinge clearance +0.047 m; coil heights
+  −175, −43, −46, +82 mm (−162, −46, −64, +62 during the single stage, where they did not move). The first attempt
+  segfaulted in outer 7 (kept as `arcB2_level_segv1`; its outer-6 checkpoint read the same 2.859e-3); the identical
+  rerun passed.
+* QS at the B_arcB2 level (ρ = 0.5 9.7e-4 vs 8.8e-4; edge better), ι min 1.187 just under the 1.19 weighted bound
+  (B_arcB2 kept ~1.24). B·n started at 2.1× its tolerance (z = 0: 4.5×), so far less QS was traded.
+* Every k step ran to maxiter; k4b gained 2% (as for z = 0).
+* Remaining gap 1.93×: horizontality of the chords (free arcB2 chords tilt 37–80° from horizontal).
+
+The sections below are the z = 0 study (afternoon), unchanged.
+
 
 ## The answer so far
 

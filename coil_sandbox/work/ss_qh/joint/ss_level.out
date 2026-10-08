@@ -1,1 +1,11 @@
 === start work/ss_qh/joint/ss_level 17:41:18
+=== end work/ss_qh/joint/ss_level exit 0 18:36:46
+=== start work/ss_qh/joint/ss_level_k4b 18:36:56
+=== end work/ss_qh/joint/ss_level_k4b exit 0 18:49:55
+=== start work/ss_qh/joint/on_level/arcB2_level 18:50:05
+work/ss_qh/joint/ss_level.sh: line 16: 2545331 Segmentation fault         $CAP $PY "$@" --out $out > $out/run.log 2>&1
+=== end work/ss_qh/joint/on_level/arcB2_level exit 139 18:57:24
+CHAIN DONE exit 0
+=== start work/ss_qh/joint/on_level/arcB2_level 18:58:24
+=== end work/ss_qh/joint/on_level/arcB2_level exit 0 19:06:10
+REFINE2 DONE

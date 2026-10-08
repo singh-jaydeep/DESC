@@ -16,5 +16,8 @@ add "JOINT z0 single-stage coils on B_z0 (k4b)"    $J/ss_z0_k4b/coils_k4.h5     
 add "JOINT z0 refined on B_z0 (k4b)"               $J/on_z0/arcB2_z0/result.h5        $J/ss_z0_k4b/eq_k4.h5
 add "JOINT z0 single-stage coils on B_z0 (k5)"     $J/ss_z0_k5/coils_k5.h5            $J/ss_z0_k5/eq_k5.h5
 add "JOINT z0 refined on B_z0 (k5)"                $J/on_z0_k5/arcB2_z0/result.h5     $J/ss_z0_k5/eq_k5.h5
+add "LEVEL per coil on precise_QH"                  $J/base_level/result.h5            precise_QH
+add "LEVEL single-stage coils on B_level (k4b)"     $J/ss_level_k4b/coils_k4.h5        $J/ss_level_k4b/eq_k4.h5
+add "LEVEL refined on B_level (k4b)"                $J/on_level/arcB2_level/result.h5  $J/ss_level_k4b/eq_k4.h5
 $CAP $PY view.py $J/results/view.html --eq precise_QH --vacuum --bounds bounds/precise_qh_gil.json --length-mult 1.0 \
-    --device cpu --title "precise_QH, arcB2 M5 with every hinge on z = 0 (joint plane): baselines and single stage" "${H[@]}"
+    --device cpu --title "precise_QH, arcB2 M5 with hinges on z = 0 (joint plane) or level per coil: baselines and single stage" "${H[@]}"
