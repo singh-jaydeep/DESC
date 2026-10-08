@@ -1,0 +1,39 @@
+### stage1 aspect-pinned (A = 6.00 +- 0.01) at 17:41:18
+### stage1 done 18:16:02: C    : mean 1.0077 -> 0.9762  (-3.13%) eps1 : mean 0.0676 -> 0.0607  (-10.31%) 
+###   stop: Warning: Maximum number of iterations has been exceeded.
+###   iters: 301  aspect: Aspect ratio:                                                6.000e+00  -->   6.010e+00 (dimensionless)
+### resolution check 18:16:02
+Running as unit: run-p1354396-i1356488.scope; invocation ID: 879ede7c17ca4c5d83e200597de0d6e3
+DEVICE requested=gpu obtained=gpu (1x NVIDIA GeForce RTX 5070 Laptop GPU)
+run                        L=8 eps1        |f|          L=12 eps1        |f|      GAP       A
+E0923 18:16:13.034214 1354875 xtile_compiler.cc:399] Fusion: input_reduce_fusion = f64[8,360]{1,0} fusion(a.1, b.1), kind=kCustom, calls=fused_reduce.clone, backend_config={"operation_queue_id":"0","wait_on_operation_queues":[],"fusion_backend_config":{"kind":"__triton","block_level_fusion_config":{"num_warps":"8","output_tiles":[{"sizes":["8","8"]}],"num_ctas":1,"num_stages":1,"is_tma_allowed":true,"is_warp_specialization_allowed":false}},"force_earliest_schedule":false,"reification_cost":[],"device_type":"DEVICE_TYPE_INVALID"}
+E0923 18:16:13.034246 1354875 xtile_compiler.cc:401] Computation: fused_reduce.clone {
+  param_0.4 = f64[8,360,144]{2,1,0} parameter(0)
+  param_1.5 = f64[144]{0} parameter(1)
+  broadcast.1.3 = f64[8,360,144]{2,1,0} broadcast(param_1.5), dimensions={2}
+  multiply.1.3 = f64[8,360,144]{2,1,0} multiply(param_0.4, broadcast.1.3)
+  constant_3 = f64[] constant(0)
+  ROOT reduce.1.1 = f64[8,360]{1,0} reduce(multiply.1.3, constant_3), dimensions={2}, to_apply=scalar_add_computation
+}
+live_eps1_L1_aspin 0.060661 ( -10.31%)  1.613e-05 0.060661 ( -10.31%)  4.959e-07    0.00p  6.0100
+### coil complexity 18:19:07
+Running as unit: run-p1356639-i1358734.scope; invocation ID: b8bf74a57e8c47acb81c2ac4186dee5d
+DEVICE requested=cpu obtained=cpu (1x cpu)
+
+=== baseline precise_QA ===  a = 0.17178 m   A = 6.0000
+  L_gradB/a   min   3.1620   5th   3.3790   median   4.9137   area-mean   4.8334
+  pdrot [1/m] max  29.4682   95th   9.5763   median   2.1641   area-mean   2.3321
+  pdrot * a   max   5.0620   95th   1.6450   median   0.3717   area-mean   0.4006
+  smallest |shape-operator director| (umbilic proximity) 4.798e-01
+
+=== live_eps1_L1_aspin ===  a = 0.17161 m   A = 6.0100
+  L_gradB/a   min   3.4076   5th   3.5211   median   4.7490   area-mean   4.8004
+  pdrot [1/m] max  41.9493   95th  10.7596   median   1.9656   area-mean   2.5259
+  pdrot * a   max   7.1989   95th   1.8464   median   0.3373   area-mean   0.4335
+  smallest |shape-operator director| (umbilic proximity) 3.581e-01
+
+============================================================================================
+RELATIVE TO BASELINE  (L_gradB/a SMALLER = harder; pdrot*a LARGER = less planar)
+run                       Lg min    Lg 5th    Lg med   Lg mean    pd max   pd 95th    pd med   pd mean
+live_eps1_L1_aspin        +7.77%    +4.20%    -3.35%    -0.68%   +42.21%   +12.25%    -9.26%    +8.20%
+### ASPIN ALL DONE 18:19:16

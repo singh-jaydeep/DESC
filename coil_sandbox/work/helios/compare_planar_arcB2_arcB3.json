@@ -1,0 +1,165 @@
+{
+ "planar N=7": {
+  "file": "work/helios/planarN7_final_it300.h5",
+  "verdict": "FEASIBLE",
+  "margins": {
+   "L": 1.0,
+   "kappa": 0.39807,
+   "convex": 0.27233,
+   "d_cc": 1.68288,
+   "d_pc": 1.37592
+  },
+  "bn": 0.04023347575629668,
+  "mean_absBn_T": 0.24441016545413752,
+  "mean_absBn_over_Baxis": 0.04035571832868935,
+  "max_absBn_T": 0.9843927754533708,
+  "rms_ratio": 0.048046476762676794,
+  "current_length_GAm": 9.354233771792888,
+  "d_cc": 2.0194610844271126,
+  "d_pc": 1.6510998723016723,
+  "per_coil": [
+   {
+    "L": 35.9999,
+    "kappa": 0.527,
+    "corner_deg": 0.0,
+    "concave_rad": 0.0002723315361251731,
+    "I_MA": 21.7
+   },
+   {
+    "L": 35.9988,
+    "kappa": 0.553,
+    "corner_deg": 0.0,
+    "concave_rad": 3.1641702145473244e-05,
+    "I_MA": 20.96
+   },
+   {
+    "L": 36.0,
+    "kappa": 0.597,
+    "corner_deg": 0.0,
+    "concave_rad": 0.00012565337173321318,
+    "I_MA": 22.29
+   }
+  ]
+ },
+ "arcB2 M=5": {
+  "file": "work/helios/arcB2_M5_final_it200.h5",
+  "verdict": "FAILS L",
+  "margins": {
+   "L": 1.0,
+   "kappa": 0.48321,
+   "convex": 0.17,
+   "d_cc": 1.1812,
+   "d_pc": 1.68871
+  },
+  "bn": 0.013200970506758648,
+  "mean_absBn_T": 0.08571989553941875,
+  "mean_absBn_over_Baxis": 0.01415361735517739,
+  "max_absBn_T": 0.3615306079505307,
+  "rms_ratio": 0.016382360846877858,
+  "current_length_GAm": 9.354350730368814,
+  "d_cc": 1.417441518916115,
+  "d_pc": 2.0264460668509945,
+  "per_coil": [
+   {
+    "L": 36.0,
+    "kappa": 0.725,
+    "corner_deg": 94.8,
+    "concave_rad": 0.0001377820810953264,
+    "I_MA": 20.26,
+    "fold_deg": [
+     57.9
+    ]
+   },
+   {
+    "L": 36.0,
+    "kappa": 0.51,
+    "corner_deg": 96.4,
+    "concave_rad": 0.00017000070305111126,
+    "I_MA": 21.34,
+    "fold_deg": [
+     74.0
+    ]
+   },
+   {
+    "L": 36.0,
+    "kappa": 0.644,
+    "corner_deg": 89.6,
+    "concave_rad": 7.460740678028942e-05,
+    "I_MA": 23.36,
+    "fold_deg": [
+     76.2
+    ]
+   }
+  ]
+ },
+ "arcB3 M=5": {
+  "file": "work/helios/arcB3_M5_final_it200.h5",
+  "verdict": "FAILS L",
+  "margins": {
+   "L": 1.00004,
+   "kappa": 0.69466,
+   "convex": 0.39052,
+   "d_cc": 1.03424,
+   "d_pc": 1.38872
+  },
+  "bn": 0.01008281378655446,
+  "mean_absBn_T": 0.06318691530904988,
+  "mean_absBn_over_Baxis": 0.010433090422129981,
+  "max_absBn_T": 0.24123701908220663,
+  "rms_ratio": 0.01204142659817069,
+  "current_length_GAm": 9.354476917249965,
+  "d_cc": 1.241088555585685,
+  "d_pc": 1.6664691641077032,
+  "per_coil": [
+   {
+    "L": 36.0013,
+    "kappa": 1.042,
+    "corner_deg": 86.7,
+    "concave_rad": 7.03592715649403e-05,
+    "I_MA": 20.06,
+    "fold_deg": [
+     25.9,
+     12.5,
+     33.1
+    ]
+   },
+   {
+    "L": 35.9999,
+    "kappa": 0.722,
+    "corner_deg": 48.4,
+    "concave_rad": 0.00029415067406282744,
+    "I_MA": 22.3,
+    "fold_deg": [
+     22.1,
+     33.2,
+     47.1
+    ]
+   },
+   {
+    "L": 36.0004,
+    "kappa": 0.897,
+    "corner_deg": 70.4,
+    "concave_rad": 0.0003905161670172806,
+    "I_MA": 22.59,
+    "fold_deg": [
+     70.4,
+     81.6,
+     62.8
+    ]
+   }
+  ]
+ },
+ "gap": {
+  "paper_planar_plus_shaping": 0.0023,
+  "B_axis_T": 6.05639486982898,
+  "arcB2 M=5": {
+   "linear_fraction_closed": 0.6885194163779267,
+   "log_fraction_closed": 0.36573376769652516
+  },
+  "arcB3 M=5": {
+   "linear_fraction_closed": 0.7862846694448379,
+   "log_fraction_closed": 0.4721932607222233
+  },
+  "plasma_only_mean_absBn_T": 0.16646978484486746
+ }
+}

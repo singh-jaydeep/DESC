@@ -1,0 +1,348 @@
+{
+ "settings": {
+  "eq": "sample_equilibria/helios_repro.h5",
+  "start": "work/helios/xyz16/feas/result.h5",
+  "out": "work/helios/xyz16/stage2",
+  "mode": "stage2",
+  "length_mult": 1.0,
+  "margin": 0.0,
+  "fix_hinges": false,
+  "anchor_weight": 0.001,
+  "margin_skip": "",
+  "a": null,
+  "bounds": "bounds/helios_kruger2026_noconvex.json",
+  "device": "gpu",
+  "vacuum": false,
+  "maxiter": 300,
+  "check_every": 25,
+  "ckpt_every": 50,
+  "diag_log": null,
+  "dcc_backoff": 0.025,
+  "dpc_backoff": 0.02,
+  "no_arc_backoffs": false,
+  "convex_form": "signed",
+  "convex_kmin": 0.0,
+  "convex_backoff": 0.5,
+  "planarity": "auto",
+  "planarity_tol": 0.0,
+  "speed_floor": 0.0,
+  "arclength_weight": 0.0,
+  "torsion_weight": 0.0,
+  "coil_grid_n": 150,
+  "kappa_grid_n": null,
+  "eval_m": 25,
+  "eval_n": 25,
+  "plasma_m": 64,
+  "plasma_n": 64,
+  "src_gl": 24,
+  "src_n": 400,
+  "vc_m": null,
+  "vc_n": null,
+  "vc_chunk": 64,
+  "dcc_k": 20000,
+  "dpc_k": 20000,
+  "no_signed": false,
+  "dcc_neighbors": null,
+  "dcc_chunk": 4,
+  "dpc_chunk": 1,
+  "qf_chunk": 25,
+  "coil_jac_chunk": null,
+  "no_second_order": false,
+  "so_chunk": 16,
+  "so_rtol": 0.05,
+  "max_tr": 0.5,
+  "max_inner_iter": 100,
+  "ctol": 0.0001
+ },
+ "eq_kind": "h5",
+ "device": "gpu",
+ "vacuum": false,
+ "length_multiplier": 1.0,
+ "bounds": {
+  "L": 36.0,
+  "Ltot": null,
+  "kappa": 1.5,
+  "kms": null,
+  "convex": null,
+  "planar": null,
+  "dcc": 1.2,
+  "dpc": 1.2
+ },
+ "target": {
+  "L": 36.0,
+  "Ltot": null,
+  "kappa": 1.5,
+  "kms": null,
+  "convex": null,
+  "planar": null,
+  "dcc": 1.2,
+  "dpc": 1.2
+ },
+ "enforced": {
+  "L": 36.0,
+  "Ltot": null,
+  "kappa": 1.5,
+  "kms": null,
+  "convex": null,
+  "planar": null,
+  "dcc": 1.2299999999999998,
+  "dpc": 1.224
+ },
+ "solver": {
+  "wall_s": 1686.026837348938,
+  "message": "Maximum number of iterations has been exceeded.",
+  "nit": 300,
+  "n_outer": 23,
+  "constr_violation": 3.058892765280261e-05,
+  "y_absmax_final": 0.03688954550360361
+ },
+ "start": {
+  "per_coil": [
+   {
+    "L": 29.163617448693856,
+    "kappa": 1.1215890767742023,
+    "kms": 0.28007786002947477,
+    "corner": 0.0,
+    "convex": NaN,
+    "kappa_s_min": NaN,
+    "planar": 0.0
+   },
+   {
+    "L": 28.52102680847902,
+    "kappa": 0.9897499387013012,
+    "kms": 0.14825712252518622,
+    "corner": 0.0,
+    "convex": NaN,
+    "kappa_s_min": NaN,
+    "planar": 0.0
+   },
+   {
+    "L": 29.0119436997848,
+    "kappa": 0.7292883278912157,
+    "kms": 0.08375888130424093,
+    "corner": 0.0,
+    "convex": NaN,
+    "kappa_s_min": NaN,
+    "planar": 0.0
+   },
+   {
+    "L": 27.909800364468275,
+    "kappa": 0.3393308961016873,
+    "kms": 0.05846810890973355,
+    "corner": 0.0,
+    "convex": NaN,
+    "kappa_s_min": NaN,
+    "planar": 0.0
+   }
+  ],
+  "L": 29.163617448693856,
+  "L_total": 114.60638832142595,
+  "kappa": 1.1215890767742023,
+  "kms": 0.28007786002947477,
+  "corner": 0.0,
+  "convex": NaN,
+  "planar": 0.0,
+  "d_cc": 1.5373218753060267,
+  "d_pc": 1.529388941638339,
+  "linked": 0,
+  "linked_pairs": [],
+  "bn": 0.07994370609813736,
+  "bn_max": 0.24847862343475569,
+  "bn_local": 0.07590781094784928,
+  "bn_max_T": 1.6166219816026364,
+  "vacuum": false,
+  "n_coils": 16
+ },
+ "result": {
+  "per_coil": [
+   {
+    "L": 35.99995572473643,
+    "kappa": 1.2960305577478555,
+    "kms": 0.2254954123580757,
+    "corner": 0.0,
+    "convex": NaN,
+    "kappa_s_min": NaN,
+    "planar": 0.0
+   },
+   {
+    "L": 35.9997235929378,
+    "kappa": 1.4787770585458542,
+    "kms": 0.1500369779410792,
+    "corner": 0.0,
+    "convex": NaN,
+    "kappa_s_min": NaN,
+    "planar": 0.0
+   },
+   {
+    "L": 36.000065730657255,
+    "kappa": 1.4996050669294447,
+    "kms": 0.3740706802943209,
+    "corner": 0.0,
+    "convex": NaN,
+    "kappa_s_min": NaN,
+    "planar": 0.0
+   },
+   {
+    "L": 36.00001147015405,
+    "kappa": 1.4978064525690913,
+    "kms": 0.2993141514435661,
+    "corner": 0.0,
+    "convex": NaN,
+    "kappa_s_min": NaN,
+    "planar": 0.0
+   }
+  ],
+  "L": 36.000065730657255,
+  "L_total": 143.99975651848553,
+  "kappa": 1.4996050669294447,
+  "kms": 0.3740706802943209,
+  "corner": 0.0,
+  "convex": NaN,
+  "planar": 0.0,
+  "d_cc": 1.2261197388462035,
+  "d_pc": 1.3232474827949956,
+  "linked": 0,
+  "linked_pairs": [],
+  "bn": 0.0037990525983509315,
+  "bn_max": 0.02195813185415077,
+  "bn_local": 0.0038154967599337616,
+  "bn_max_T": 0.14159153229169155,
+  "vacuum": false,
+  "n_coils": 16
+ },
+ "margins": {
+  "L": 1.0000018258515904,
+  "kappa": 0.9997367112862965,
+  "d_cc": 1.021766449038503,
+  "d_pc": 1.1027062356624964
+ },
+ "failed": [
+  "L"
+ ],
+ "active": [
+  "L",
+  "kappa"
+ ],
+ "history": [
+  {
+   "iter": 25,
+   "bn": 0.009099178492118283,
+   "L": 0.8749619816043483,
+   "kappa": 0.734938536377225,
+   "d_cc": 1.0176957246592182,
+   "d_pc": 1.3524012705788895,
+   "linked": 0,
+   "verdict": "FEASIBLE"
+  },
+  {
+   "iter": 50,
+   "bn": 0.0057217949870712196,
+   "L": 0.9338433795786956,
+   "kappa": 0.7250425134803015,
+   "d_cc": 1.020532269676353,
+   "d_pc": 1.1991869356008007,
+   "linked": 0,
+   "verdict": "FEASIBLE"
+  },
+  {
+   "iter": 75,
+   "bn": 0.004564618593432396,
+   "L": 0.9698533829664598,
+   "kappa": 0.7999805412294166,
+   "d_cc": 1.0186478220836683,
+   "d_pc": 1.1147906826933578,
+   "linked": 0,
+   "verdict": "FEASIBLE"
+  },
+  {
+   "iter": 100,
+   "bn": 0.004121475167227188,
+   "L": 0.9908691269295136,
+   "kappa": 0.886532844178447,
+   "d_cc": 1.01959382216776,
+   "d_pc": 1.086402535175211,
+   "linked": 0,
+   "verdict": "FEASIBLE"
+  },
+  {
+   "iter": 125,
+   "bn": 0.003972091318217509,
+   "L": 0.9987533731479894,
+   "kappa": 0.9216436396808274,
+   "d_cc": 1.0203299939067263,
+   "d_pc": 1.0896013306644374,
+   "linked": 0,
+   "verdict": "FEASIBLE"
+  },
+  {
+   "iter": 150,
+   "bn": 0.0039187603467612814,
+   "L": 0.9999915209245671,
+   "kappa": 0.9263088271739198,
+   "d_cc": 1.0205031820728943,
+   "d_pc": 1.090966173336416,
+   "linked": 0,
+   "verdict": "FEASIBLE"
+  },
+  {
+   "iter": 175,
+   "bn": 0.0038682360305840164,
+   "L": 0.9999976288702926,
+   "kappa": 0.9377098963641203,
+   "d_cc": 1.02107676464692,
+   "d_pc": 1.0974310916452952,
+   "linked": 0,
+   "verdict": "FEASIBLE"
+  },
+  {
+   "iter": 200,
+   "bn": 0.003849224259311499,
+   "L": 0.9999924751574691,
+   "kappa": 0.9475857702536062,
+   "d_cc": 1.0213798102704543,
+   "d_pc": 1.1001413975507877,
+   "linked": 0,
+   "verdict": "FEASIBLE"
+  },
+  {
+   "iter": 225,
+   "bn": 0.0038346848097916167,
+   "L": 0.9999941345845106,
+   "kappa": 0.9547095479203831,
+   "d_cc": 1.0214762403874893,
+   "d_pc": 1.1010601141261311,
+   "linked": 0,
+   "verdict": "FEASIBLE"
+  },
+  {
+   "iter": 250,
+   "bn": 0.003817772328954315,
+   "L": 0.999997428683291,
+   "kappa": 0.9992671517767572,
+   "d_cc": 1.0216882367204767,
+   "d_pc": 1.102486559665301,
+   "linked": 0,
+   "verdict": "FEASIBLE"
+  },
+  {
+   "iter": 275,
+   "bn": 0.0038123065116813107,
+   "L": 0.9999994793041146,
+   "kappa": 0.9995746858745523,
+   "d_cc": 1.0217438539370092,
+   "d_pc": 1.1025929535375998,
+   "linked": 0,
+   "verdict": "FEASIBLE"
+  },
+  {
+   "iter": 300,
+   "bn": 0.0037990525983509315,
+   "L": 1.0000018258515904,
+   "kappa": 0.9997367112862965,
+   "d_cc": 1.021766449038503,
+   "d_pc": 1.1027062356624964,
+   "linked": 0,
+   "verdict": "FAILS L"
+  }
+ ]
+}

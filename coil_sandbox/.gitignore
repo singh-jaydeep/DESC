@@ -1,0 +1,30 @@
+# coil_sandbox (tracked inside the DESC fork since 2026-10-08): code, docs, bounds, handoffs, text results, and the
+# run outputs other machines need -- final coil/eq states (*.h5), run logs, viewers. Checkpoints, per-iteration
+# diagnostics (diag.jsonl), figures and vendor/ stay on disk. The negations override the parent DESC .gitignore.
+vendor/
+__pycache__/
+*.pyc
+*.npy
+*.npz
+*.png
+*.pdf
+*.jsonl
+*.nc
+*.pkl
+*.mp4
+*.gif
+# downloaded caches and generated viewer data
+cache/
+*.gz
+*.bak
+917_results/data.js
+*viewer_data.json
+# Windows download markers; run logs under other names
+*Zone.Identifier
+log*.txt
+*.log.*
+# tracked although the parent ignores them
+!*.h5
+!*.out
+!*.log
+ckpt_*.h5

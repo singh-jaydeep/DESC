@@ -1,0 +1,9 @@
+LADDER rung x30 (tau_qs 0.006138) from work/ss_qa/ss_v2_qs10_k4_M5/eq_k4.h5  19:41:10
+LADDER rung x30 exit 0  19:59:03
+LADDER rung x100 (tau_qs 0.020460000000000002) from work/ss_qa/qsladder/qs30/eq_k4.h5  19:59:03
+LADDER rung x100 exit 0  20:15:21
+LADDER rung x1000 (tau_qs 0.2046) from work/ss_qa/qsladder/qs100/eq_k4.h5  20:15:21
+LADDER rung x1000 exit 0  20:34:25
+LADDER analysis  20:34:25
+LADDER analysis exit 0  20:35:43
+LADDER done

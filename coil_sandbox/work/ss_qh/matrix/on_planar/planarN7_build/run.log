@@ -1,0 +1,63 @@
+Running as unit: run-p2150371-i2153831.scope; invocation ID: 81cca6b7c2e64a95bdbc67ea1078a1cd
+E1008 02:39:04.569049 2150533 cuda_executor.cc:1743] Could not get kernel mode driver version: ( INVALID_ARGUMENT: Version does not match the format X.Y.Z )
+E1008 02:39:04.580845 2150371 cuda_executor.cc:1743] Could not get kernel mode driver version: ( INVALID_ARGUMENT: Version does not match the format X.Y.Z )
+DESC /home/singh/Documents/DESC2/desc
+DEVICE requested=gpu obtained=gpu (1x NVIDIA GeForce RTX 5070 Laptop GPU)
+  [mem] RSS 0.83 GB  peak 0.83 GB
+eq work/ss_qh/matrix/ss/planar_k4b/eq_k4.h5 NFP 4 sym True; start work/ss_qh/matrix/ss/planar_k4b/coils_k4.h5: 4 unique coils (FourierPlanarCoil), 4 top-level; VACUUM
+BOUNDS L 2.926  Ltot -  kappa 13.67  kms 18.69  convex -  planar -  dcc 0.05851  dpc 0.1097
+  built coil length in 2.6 s
+  built coil curvature in 0.2 s
+  built coil mean squared curvature in 0.2 s
+  built coil-coil distance rows in 4.0 s
+E1008 02:39:20.654857 2150552 xtile_compiler.cc:399] Fusion: input_reduce_fusion = f64[66177]{0} fusion(a.1, b.1), kind=kCustom, calls=fused_reduce.clone, backend_config={"operation_queue_id":"0","wait_on_operation_queues":[],"fusion_backend_config":{"kind":"__triton","block_level_fusion_config":{"num_warps":"8","output_tiles":[{"sizes":["64"]}],"num_ctas":1,"num_stages":1,"is_tma_allowed":true,"is_warp_specialization_allowed":false}},"force_earliest_schedule":false,"reification_cost":[],"device_type":"DEVICE_TYPE_INVALID"}
+E1008 02:39:20.654933 2150552 xtile_compiler.cc:401] Computation: fused_reduce.clone {
+  param_0.2 = f64[66177,144]{1,0} parameter(0)
+  param_1.2 = f64[144]{0} parameter(1)
+  broadcast.2 = f64[66177,144]{1,0} broadcast(param_1.2), dimensions={1}
+  multiply.2 = f64[66177,144]{1,0} multiply(param_0.2, broadcast.2)
+  constant_2 = f64[] constant(0)
+  ROOT reduce.2 = f64[66177]{0} reduce(multiply.2, constant_2), dimensions={1}, to_apply=scalar_add_computation
+}
+E1008 02:39:24.634243 2150540 xtile_compiler.cc:399] Fusion: input_reduce_fusion = f64[67584]{0} fusion(a.1, b.1), kind=kCustom, calls=fused_reduce.clone, backend_config={"operation_queue_id":"0","wait_on_operation_queues":[],"fusion_backend_config":{"kind":"__triton","block_level_fusion_config":{"num_warps":"8","output_tiles":[{"sizes":["64"]}],"num_ctas":1,"num_stages":1,"is_tma_allowed":true,"is_warp_specialization_allowed":false}},"force_earliest_schedule":false,"reification_cost":[],"device_type":"DEVICE_TYPE_INVALID"}
+E1008 02:39:24.634288 2150540 xtile_compiler.cc:401] Computation: fused_reduce.clone {
+  param_0.4 = f64[67584,144]{1,0} parameter(0)
+  param_1.5 = f64[144]{0} parameter(1)
+  broadcast.4 = f64[67584,144]{1,0} broadcast(param_1.5), dimensions={1}
+  multiply.4 = f64[67584,144]{1,0} multiply(param_0.4, broadcast.4)
+  constant_3 = f64[] constant(0)
+  ROOT reduce.2 = f64[67584]{0} reduce(multiply.4, constant_3), dimensions={1}, to_apply=scalar_add_computation
+}
+  [mem] RSS 2.62 GB  peak 3.42 GB
+E1008 02:40:03.726478 2150540 xtile_compiler.cc:399] Fusion: input_reduce_fusion = f64[50000]{0} fusion(a.1, b.1), kind=kCustom, calls=fused_reduce.clone, backend_config={"operation_queue_id":"0","wait_on_operation_queues":[],"fusion_backend_config":{"kind":"__triton","block_level_fusion_config":{"num_warps":"8","output_tiles":[{"sizes":["64"]}],"num_ctas":1,"num_stages":1,"is_tma_allowed":true,"is_warp_specialization_allowed":false}},"force_earliest_schedule":false,"reification_cost":[],"device_type":"DEVICE_TYPE_INVALID"}
+E1008 02:40:03.726524 2150540 xtile_compiler.cc:401] Computation: fused_reduce.clone {
+  param_0.2 = f64[50000,144]{1,0} parameter(0)
+  param_1.2 = f64[144]{0} parameter(1)
+  broadcast.2 = f64[50000,144]{1,0} broadcast(param_1.2), dimensions={1}
+  multiply.2 = f64[50000,144]{1,0} multiply(param_0.2, broadcast.2)
+  constant_2 = f64[] constant(0)
+  ROOT reduce.2 = f64[50000]{0} reduce(multiply.2, constant_2), dimensions={1}, to_apply=scalar_add_computation
+}
+  [mem] RSS 3.12 GB  peak 3.66 GB
+  [mem] RSS 3.72 GB  peak 3.99 GB
+  [mem] RSS 3.86 GB  peak 4.16 GB
+  [mem] RSS 3.73 GB  peak 4.28 GB
+  [mem] RSS 3.53 GB  peak 4.37 GB
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: The boundary has concave radius 0.00621 m, near the bound 0.11 m: the distance there may have a ridge the spline smooths over.
+  warnings.warn(msg, err)
+  built plasma-coil distance field in 180.1 s
+BUILD 189.7 s; cc gap 2.334 mm on 513 nodes/coil, pc node margin 0.556 mm on 513 nodes/coil; cc active rows at start 5795 of 10000; field {'max_error': 2.624006452039973e-05, 'concave_radius': np.float64(0.006214560669952965), 'node_margin': 0.0005558236641974026}
+INFO {'kind': 'FourierPlanarCoil', 'gauge': 'largest normal component pinned', 'field_grid': 'uniform N=50 (101 nodes)', 'n_nodes': 513, 'speed_ratio': 2.0, 'cc_gap_mode': 'bounds', 'cc_gap': 0.002334459389629091, 'pc_node_margin': 0.0005558236641974026}
+  coil length                      rows 4
+  coil curvature                   rows 2404
+  coil mean squared curvature      rows 4
+  coil-coil distance rows          rows 18948240
+  plasma-coil distance field       rows 4104
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 4.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 4.
+  warnings.warn(msg, err)
+  [mem] RSS 4.62 GB  peak 4.62 GB
+START  bn 6.9531e-03  L 1.000  kappa 1.007  kMS 1.000  d_cc 0.999  d_pc 1.129  linked 0  -> FAILS L,kappa,kMS,d_cc
+START  true: cc 0.05839 pc 0.12385 max L 2.9267 max |k| 13.771 linked [] gap {'used': 0.002334459389629091, 'needed': 0.0016464231148330677}
+maxiter 0: build check only

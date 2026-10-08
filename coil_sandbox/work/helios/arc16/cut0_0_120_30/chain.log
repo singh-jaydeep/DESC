@@ -1,0 +1,8 @@
+[0_0_120_30] repair
+[0_0_120_30] stage 2, hinges held
+DEVICE requested=cpu obtained=cpu (1x cpu)
+hinge change over leg A: 0.00e+00 m
+[0_0_120_30] stage 2, free
+DEVICE requested=cpu obtained=cpu (1x cpu)
+arc_ref margins [0.095 0.077 0.217 0.216]
+[0_0_120_30] done

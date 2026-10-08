@@ -1,0 +1,560 @@
+Running as unit: run-p2107356-i2110777.scope; invocation ID: fd58588091564b82acaf5f758f2606c2
+E1008 01:03:32.349887 2107492 cuda_executor.cc:1743] Could not get kernel mode driver version: ( INVALID_ARGUMENT: Version does not match the format X.Y.Z )
+E1008 01:03:32.362691 2107356 cuda_executor.cc:1743] Could not get kernel mode driver version: ( INVALID_ARGUMENT: Version does not match the format X.Y.Z )
+DESC /home/singh/Documents/DESC2/desc
+DEVICE requested=gpu obtained=gpu (1x NVIDIA GeForce RTX 5070 Laptop GPU)
+--field-term bn is blind to the current scale: holding the coil current SUM fixed
+  [mem] RSS 0.83 GB  peak 0.83 GB
+eq precise_QH (desc.examples) NFP 4 sym True L,M,N 8,8,8 dim_x 1462; start work/ss_qh/matrix/base/xyzN6/result.h5: 4 unique coils (FourierXYZCoil), 32 total
+SETTINGS {'eq': 'precise_QH', 'start': 'work/ss_qh/matrix/base/xyzN6/result.h5', 'out': 'work/ss_qh/matrix/ss/xyz', 'bounds': 'bounds/precise_qh_gil.json', 'a': None, 'device': None, 'length_mult': 1.0, 'fix_coils': False, 'dry': False, 'field_term': 'bn', 'fix_current_sum': True, 'helicity': '1,4', 'qs_rho': '0.2,0.4,0.6,0.8,1.0', 'A_min': 7.5, 'A_max': 8.5, 'vol_band': 0.02, 'V0': None, 'bn_norm': None, 'qs_form': 'scale-invariant', 'iota_min': 1.19, 'kmin': 1, 'kmax': 4, 'maxiter': 100, 'ftol': 1e-06, 'xtol': 1e-12, 'gtol': 1e-08, 'max_tr': None, 'perturb_order': 2, 'solve_tol': 1e-10, 'tau_bn': 0.005, 'tau_qs': None, 'tau_qs_rel': 10.0, 'tau_A': 0.01, 'tau_V': 0.005, 'tau_iota': 0.01, 'tau_L': 0.01, 'tau_kappa': 0.01, 'tau_kms': 0.01, 'tau_dpc': 0.01, 'tau_dcc': 1e-06, 'dcc_backoff': 0.025, 'dpc_backoff': 0.02, 'no_arc_backoffs': False, 'eval_m': 25, 'eval_n': 25, 'plasma_m': 32, 'plasma_n': 32, 'coil_grid_n': 150, 'src_gl': 24, 'src_n': 100, 'bs_chunk': 10, 'jac_chunk': 2, 'dcc_k': 20000}
+BOUNDS (judged, absolute) L 2.926  Ltot -  kappa 13.67  kms 18.69  convex -  planar -  dcc 0.05851  dpc 0.1097
+ENFORCED L 2.926  Ltot -  kappa 13.67  kms 18.69  convex -  planar -  dcc 0.05997  dpc 0.1119
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 4.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 4.
+  warnings.warn(msg, err)
+START physics  A 8.000  R0 0.9947  a 0.1243  iota [1.2523, 1.2562]  QS(Boozer, |B_nonsym|/<B>) rho 0.25 4.81e-04  rho 0.5 2.25e-04  rho 0.75 3.86e-04  rho 1 1.44e-03
+START coils    bn 9.3323e-04 (max 4.744e-03)  L 1.000  kappa 1.000  kMS 1.000  d_cc 1.022  d_pc 1.185  linked 0  -> FAILS L,kappa
+QS two-term rms at the start 0.001695 -> tau_qs 0.01695
+B.n normalization frozen at the start: 0.42526; volume band around V0 = 0.30352
+quadrature scales s (expected; compare the s(qw) column): bn 6.283  qs 41.41  iota 1  kappa 0.3622  dcc 9.06e+04
+/home/singh/Documents/DESC2/desc/utils.py:590: FutureWarning: constants is deprecated and will be removed in a future release. Users should not include constants in the arguments of their objective compute methods. Instead declare all the constants in the build method and use as self._constants.
+  warnings.warn(msg, err)
+E1008 01:04:09.665554 2107356 cuda_fft.cc:256] Failed to make cuFFT batched plan: 5
+E1008 01:04:09.665586 2107356 cuda_fft.cc:323] Initialize Params: rank: 1 elem_count: 201 input_embed: 201 input_stride: 1 input_distance: 201 output_embed: 201 output_stride: 1 output_distance: 201 batch_count: 4
+E1008 01:04:09.665591 2107356 cuda_fft.cc:332] Failed to initialize batched cufft plan with customized allocator: Failed to make cuFFT batched plan.
+E1008 01:04:09.665946 2107356 status_macros.cc:58] INTERNAL: RET_CHECK failure (external/xla/xla/backends/gpu/runtime/fft_thunk.cc:199) fft_plan != nullptr Failed to create cuFFT batched plan with scratch allocator
+*** Begin stack trace ***
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	PyObject_Vectorcall
+	_PyEval_EvalFrameDefault
+	_PyObject_FastCallDictTstate
+	_PyObject_Call_Prepend
+	
+	_PyObject_Call
+	_PyEval_EvalFrameDefault
+	PyObject_Vectorcall
+	
+	
+	
+	_PyEval_EvalFrameDefault
+	PyEval_EvalCode
+	
+	
+	
+	_PyRun_SimpleFileObject
+	_PyRun_AnyFileObject
+	Py_RunMain
+	Py_BytesMain
+	
+	__libc_start_main
+	
+*** End stack trace ***
+
+Traceback (most recent call last):
+  File "/home/singh/Documents/DESC2/coil_sandbox/single_stage.py", line 460, in <module>
+    main()
+  File "/home/singh/Documents/DESC2/coil_sandbox/single_stage.py", line 418, in main
+    table0 = term_table(terms, "TERMS AT THE START")
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/singh/Documents/DESC2/coil_sandbox/single_stage.py", line 296, in term_table
+    raw = np.atleast_1d(np.asarray(t.compute_unscaled(*p)))
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/singh/miniforge3/envs/desc-env2/lib/python3.12/site-packages/jax/_src/array.py", line 441, in __array__
+    return np.asarray(self._value, dtype=dtype, **kwds)  # pyrefly: ignore[no-matching-overload]
+                      ^^^^^^^^^^^
+  File "/home/singh/miniforge3/envs/desc-env2/lib/python3.12/site-packages/jax/_src/profiler.py", line 384, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/singh/miniforge3/envs/desc-env2/lib/python3.12/site-packages/jax/_src/array.py", line 641, in _value
+    npy_value, did_copy = self._single_device_array_to_np_array_did_copy()
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+jax.errors.JaxRuntimeError: INTERNAL: RET_CHECK failure (external/xla/xla/backends/gpu/runtime/fft_thunk.cc:199) fft_plan != nullptr Failed to create cuFFT batched plan with scratch allocator
+E1008 01:04:09.721193 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b4b172070; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:09.721883 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b466c24d0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:09.722571 2107356 cuda_executor.cc:279] [0] failed to unload module 0x7f8c4400cd00; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:09.724755 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b52e3c500; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:09.726487 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b474d7800; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:09.730238 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b4b4114c0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:09.733996 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b4b5ab700; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:09.734862 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b517c5150; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:09.735551 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b4a080b50; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:09.736475 2107356 cuda_executor.cc:279] [0] failed to unload module 0x7f8c4000fc20; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:09.738842 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b4662d8b0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:09.741638 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b52bb7870; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:09.742590 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b52d319f0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:09.743331 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b4aa26010; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:09.745772 2107356 cuda_executor.cc:279] [0] failed to unload module 0x7f8bfc001980; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:09.746740 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b52351350; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:09.757260 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b46f013d0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:09.770106 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b4afe6490; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:09.777650 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b524f1270; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:09.779917 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b4ad4e190; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:09.781153 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b47213610; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:09.782187 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b471dc9c0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:09.782864 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b4ad50a90; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:09.783538 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b51ad1930; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:09.784196 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b52541020; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:09.784855 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b498739e0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:09.785526 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b4a0fffe0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:09.813934 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b51d5d390; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:09.895637 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b52818950; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:09.904947 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b4a601c50; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.052234 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b46c37760; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.109794 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b49998320; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.115695 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b516a3350; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.162230 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b52022890; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.182073 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b513949c0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.189283 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b494978a0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.201960 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b4a73b0d0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.215817 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b4a231410; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.234806 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b46ef4440; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.285374 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b51a29300; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.296565 2107356 cuda_executor.cc:603] [0] error deallocating host memory at 0x204c00800: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.301520 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b2abdc6e0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.302843 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b30502a10; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.310393 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b312f46e0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.311226 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b314e7260; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.313254 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b2a1b9000; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.313411 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b2abd2df0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.314273 2107356 cuda_executor.cc:603] [0] error deallocating host memory at 0x204c00a00: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.314398 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b32989a50; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.315497 2107356 cuda_executor.cc:603] [0] error deallocating host memory at 0x204c00c00: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.315788 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b37dc6330; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.316294 2107356 cuda_executor.cc:603] [0] error deallocating host memory at 0x204c00e00: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.316308 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b382f0120; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.316949 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b329802b0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.317145 2107356 cuda_executor.cc:603] [0] error deallocating host memory at 0x204c01000: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.317332 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b392798b0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.317538 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b37a8b7b0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.318054 2107356 cuda_executor.cc:603] [0] error deallocating host memory at 0x204c01400: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.318214 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b39b8e850; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.318626 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b35821610; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.320204 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b4176b6e0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.321451 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b4603b2d0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.322078 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b361853d0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.322758 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b4793b270; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.323154 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b47b8a5b0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.324244 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b4f15f430; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.325516 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b4bb6df10; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.325874 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b5349ca80; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.326278 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b4e537480; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.327357 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b54a04e40; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.328607 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b4fa740e0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.328977 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b54f15760; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.330320 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b55995960; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.331312 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b593dcd30; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.331938 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b57890f20; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.332493 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b5b649cb0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.333791 2107356 cuda_executor.cc:603] [0] error deallocating host memory at 0x204c01a00: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.334153 2107356 cuda_executor.cc:603] [0] error deallocating host memory at 0x204c01800: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.334380 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b5bf14540; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.336075 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b5bd14c20; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.336697 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b325bafa0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.337172 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b122b0fb0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.337604 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b55984020; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.338233 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b4e3bd3a0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.338623 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b4b4d03b0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.339087 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b2635fc00; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.339564 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b4db099b0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.340017 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b4ee89fe0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.340621 2107356 cuda_executor.cc:279] [0] failed to unload module 0x7f8c50004f70; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.341067 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b52c7b410; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.341459 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b540c7d10; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.341748 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b54f06980; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.342119 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b53abba50; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.343810 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b624123e0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.344542 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b314bcf40; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.344942 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b610becb0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.346106 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b39331600; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.347718 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b19d2d730; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.348215 2107356 cuda_executor.cc:603] [0] error deallocating host memory at 0x204c02000: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.348558 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b6636e790; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.348964 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b65f6ca30; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.349621 2107356 cuda_executor.cc:603] [0] error deallocating host memory at 0x204c02200: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.349892 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b667ce3b0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.350145 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b667c3eb0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.350501 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b2b6b1720; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.351056 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b382c3f00; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.351601 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b666d6ab0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.351980 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b370bda40; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.352263 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b26c86a50; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.352635 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b382f6840; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.353122 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b67441f50; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.353556 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b67604e50; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.354142 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b15b74bf0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.354506 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b30a75bb0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.354815 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b268de840; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.355188 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b15dca1a0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.355643 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b241d8640; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.355890 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b36c1d100; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.356217 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b381c9350; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.356526 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b61cb6f90; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.356873 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b667c74a0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.357252 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b667bd460; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.357528 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b36d963b0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.357862 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b245cb9e0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.358079 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b157d9f60; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.358280 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b26a440e0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.358557 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b382f5b60; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.358904 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b61bc2490; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.359232 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b30ad5d50; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.359705 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b2abdcbd0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.360047 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b26a45070; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.360404 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b15dec230; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.360682 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b24877d00; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.361060 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b30f92920; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.361320 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b36d8d850; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.361609 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b382f4d20; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.361875 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b667c85b0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.362179 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b61fc0070; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.362592 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b24c5a680; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.362944 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b19097e70; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.363341 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b37858c70; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.363689 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b193b6880; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.364375 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b19809920; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.364910 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b13f9ce90; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.365189 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b19e578a0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.366068 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b6785e300; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.366677 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b1ad95040; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.366895 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b1a6a50d0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.367187 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b57c20300; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.367302 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b679af760; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.367691 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b67c88530; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.368796 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b44f191b0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.369114 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b1aefd040; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.369362 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b4230d5a0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.369614 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b57e4e990; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.370035 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b271c9040; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.370466 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b4e10b770; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.370875 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b277e9e30; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.371242 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b356b27f0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.371565 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b5b38cd90; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.371838 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b4db815a0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.372376 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b6508c6e0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.372937 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b5e18fad0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.373280 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b55793590; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.373531 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b58cc1f20; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.373817 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b68a30fa0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.374091 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b42b7b880; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.374349 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b2525b430; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.374569 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b45d27590; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.374879 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b539cb180; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.375141 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b50442320; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.375417 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b54423080; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.375717 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b5abba3e0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.376047 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b279fe720; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.376850 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b45721300; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.377127 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b357d1ee0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.377436 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b2515ecc0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.377765 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b286c8730; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.378339 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b4307bc90; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.379095 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b59bec1e0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.379340 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b5293e510; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.379669 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b45ea4220; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.379950 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b4b062cb0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.380366 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b451d41e0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.380680 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b5ad19170; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.380969 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b68a4e980; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.381314 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b424377c0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.381686 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b58d7f9b0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.381947 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b64fd68b0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.382230 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b41a5e120; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.382642 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b5b365650; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.383024 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b6a291a70; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.383366 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b6ac35190; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.412355 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b4c271020; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.413930 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b4c333700; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.414719 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b393814e0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.415486 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b4c756280; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.415857 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b5e1e7a40; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.418446 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b2ab5b2a0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.418943 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b3a6f48a0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.420670 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b117004f0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.421979 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b116ff1d0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.422615 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b4289ad90; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.423108 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b4c06cc10; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.423536 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b12a29db0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.424892 2107356 cuda_executor.cc:279] [0] failed to unload module 0x7f8c4400c9c0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.425076 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b5a722f40; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.425298 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b55173e80; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.425935 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b4c69f080; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.426549 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b2abd3a30; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.427813 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b2c3bf410; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.428373 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b30055970; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.429601 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b2face1d0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.430127 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b37e160a0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.431157 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b3035d380; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.431551 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b61380080; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.432621 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b662d6520; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.433210 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b2eed4170; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.434349 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b2facee80; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.434779 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b5a0cc680; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.435646 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b69a307c0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.436293 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b5982a8f0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.436995 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b2a3c9090; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.437566 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b2f04c140; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.438140 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b25de7030; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.438694 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b65a115d0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.439261 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b36aa8ff0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.439824 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b48505480; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.440443 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b2fcf35a0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.440791 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b59bb2b90; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.441254 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b481baa20; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.441849 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b6ac657c0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.443324 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b2a7f32b0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.472555 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b35894600; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.474227 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b1a270fb0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.474854 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b4c8612d0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.475787 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b69d34460; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.478884 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b1938a790; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.479389 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b38f4c890; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.480327 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b195e0b30; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.480730 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b26378af0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.481179 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b2882c1f0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.481516 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b282db560; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.482182 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b4d273310; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.482903 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b30122fa0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.483265 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b5b77acf0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.484103 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b28bac970; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.484503 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b5bcff4b0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.485094 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b2ff2ccd0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.485942 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b64dfe610; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.486454 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b68de0680; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.487206 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b2f0416e0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.487844 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b36533050; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.488629 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b55661ec0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.488997 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b24fa3d40; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.489509 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b25593080; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.489941 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b42b01a10; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.490454 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b199719b0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.490904 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b4e85ed00; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.491299 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b19d16930; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.491654 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b35150c10; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.492289 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b4e4f3af0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.492843 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b32958c20; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.493661 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b27265140; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.494065 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b589f87b0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.494624 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b65511710; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.494956 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b68570050; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.495368 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b39480890; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.495690 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b6a225640; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.496073 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b690731f0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.496359 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b39740a60; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.496636 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b4fe3c350; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.497540 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b426ed970; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.498378 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b4fd66360; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.498815 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b5a5fc8c0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.499366 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b5ae6dba0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.500711 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b458d0790; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.501715 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b53c38c90; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.502265 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b55376010; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.502882 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b4dc8c2a0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.506268 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b656491a0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.506854 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b30503600; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.507290 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b2563e2f0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.507729 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b32924ed0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.510009 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b6136c9b0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.510376 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b366a9f30; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.510889 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b68eaea70; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.511412 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b31435070; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.511851 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b306b6f30; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.512250 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b616fc6d0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.512843 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b6186bf90; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.513429 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b3067c140; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.514053 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b61a82a40; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.514228 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b30679920; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.516513 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b31816ab0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.517053 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b62611490; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.517396 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b62859c40; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.517695 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b4f414b50; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.518205 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b3197fba0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.520604 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b54ce3630; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.521432 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b5bcfe340; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.521875 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b2bced760; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.522305 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b31c98830; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.522954 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b6a62c550; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.523427 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b698ffea0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.524093 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b28dc2a30; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.524502 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b25dac960; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.524789 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b27407a50; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.525174 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b6915f380; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.525492 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b36aa9f80; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.525910 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b2b6bbd50; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.526157 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b4cdd3c00; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.526493 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b479c4210; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.526896 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b4d42a750; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.527274 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b4e9c5180; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.527663 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b5a2d3560; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.528067 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b65a69a10; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.529158 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b2a5360e0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.529903 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b3297f1b0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.530693 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b382efc30; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.531376 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b6585f750; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.531813 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b47a698c0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.532220 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b36490cb0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.532642 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b25905320; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.533087 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b29d52c10; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.533478 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b5924e4c0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.533826 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b59ef3d20; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.534210 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b6a84f9e0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.534721 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b696c5a30; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.535022 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b698b8c50; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.535286 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b47d3cfc0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.535591 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b36893160; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.535775 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b25a665c0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.536174 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b29f6f220; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.536468 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b593e9af0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.536697 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b65a767d0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.537124 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b59f684a0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.537618 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b6a9974c0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.538060 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b59558b50; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.538398 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b2a18b610; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.538759 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b47eeb090; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.539268 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b6a8efdf0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.539755 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b597e0800; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.540070 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b482e3ac0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.540484 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b2a5c66e0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.540913 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b472d5a90; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.541306 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b6afacc50; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.541775 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b2ab4eac0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.542555 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b3bd5c1c0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.543002 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b37a055d0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.543477 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b2abd70f0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.543978 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b65ec0cb0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.544314 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b38079910; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.544558 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b2b799fd0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.545041 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b65ea2b30; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.545414 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b2ba91df0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.546005 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b26379020; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.546807 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b68ae9140; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.547396 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b475a7c80; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.548008 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b25457170; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.548617 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b363deef0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.549100 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b652c1e50; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.549833 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b58fd1250; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.551180 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b30c01da0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.552932 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b41edf850; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.553371 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b27992a40; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.553735 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b24364c00; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.554263 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b35125e80; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.555406 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b585d4000; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.557178 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b685125f0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.557851 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b64b3f090; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.558310 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b69f1f260; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.558605 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b3601e0c0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.558952 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b285927c0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.559443 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b4be6fc60; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.560096 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b4c2a80a0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.560445 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b649e5a30; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.560770 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b288d6fd0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.561276 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b69e9f6b0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.561603 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b41f1ff60; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.561958 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b68654ce0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.562367 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b544e8eb0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.562798 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b3a640420; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.563192 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b58fbfe20; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.563575 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b5bd03630; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.563981 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b6a59dd40; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.564450 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b454667c0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.565323 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b247aada0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.565832 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b283ff400; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.566255 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b35d97570; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.566696 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b35121c90; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.567181 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b4ef4eec0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.567786 2107356 cuda_executor.cc:603] [0] error deallocating host memory at 0x204c02400: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.568117 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b69383be0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.568684 2107356 cuda_executor.cc:603] [0] error deallocating host memory at 0x204c01e00: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.568902 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b629b6fe0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.569375 2107356 cuda_executor.cc:603] [0] error deallocating host memory at 0x204c00600: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.569751 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b27d9daf0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.570017 2107356 cuda_executor.cc:603] [0] error deallocating host memory at 0x204c01200: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.570527 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b39825d70; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.571209 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b4cd51a60; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.571759 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b35b58050; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.571881 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b19971ec0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.572326 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b258d5030; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.572459 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b6566ef00; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.573147 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b6a15c230; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.574182 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b5e27da20; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.574759 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b39d2e4b0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.575291 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b6315d140; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.575713 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b667c7960; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.576477 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b83a7f910; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.578238 2107356 cuda_executor.cc:603] [0] error deallocating host memory at 0x204c02a00: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.578476 2107356 cuda_executor.cc:603] [0] error deallocating host memory at 0x204c02800: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.578975 2107356 cuda_executor.cc:603] [0] error deallocating host memory at 0x204c02600: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.579263 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b80d40400; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.581563 2107356 cuda_executor.cc:603] [0] error deallocating host memory at 0x204c01600: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.582176 2107356 cuda_executor.cc:279] [0] failed to unload module 0x7f8c40003c40; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.584412 2107356 cuda_executor.cc:603] [0] error deallocating host memory at 0x204c03200: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.584541 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b81c348e0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.586381 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b841266e0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.588398 2107356 cuda_executor.cc:603] [0] error deallocating host memory at 0x204c03600: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.588725 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b83487470; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.590912 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b8283f4f0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.592249 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b3c019320; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.592870 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b556efa20; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.593272 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b4bc1eff0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.593825 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b42be8030; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.594299 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b4ff50160; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.594868 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b5a717de0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.595612 2107356 cuda_executor.cc:279] [0] failed to unload module 0x7f8c20002fa0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.596237 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b37e39760; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.596747 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b45981de0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.597244 2107356 cuda_executor.cc:279] [0] failed to unload module 0x7f8c88005310; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.597969 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b5b077c20; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.598535 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b4e1b6b40; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.599024 2107356 cuda_executor.cc:279] [0] failed to unload module 0x7f8c880069c0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.599467 2107356 cuda_executor.cc:279] [0] failed to unload module 0x7f8c04007ff0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.600172 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b5297e240; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.600792 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b4b0bcc10; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.602135 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b5355e790; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.602748 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b1a6eaf80; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.603272 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b4d7e4480; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.604292 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b488519c0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.607595 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b3a641ae0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.610491 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b5849ce40; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.610864 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b1b93d510; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.611591 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b68134360; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.613827 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b4d2997b0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.616508 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b4c7b4ca0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.617292 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b4d602450; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.617760 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b4cba1490; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.619370 2107356 cuda_executor.cc:603] [0] error deallocating host memory at 0x204c03000: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.619849 2107356 cuda_executor.cc:603] [0] error deallocating host memory at 0x204c02e00: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.620273 2107356 cuda_executor.cc:603] [0] error deallocating host memory at 0x204c02c00: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.620666 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b80e789e0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.623953 2107356 cuda_executor.cc:603] [0] error deallocating host memory at 0x204c01c00: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.624074 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b5e74e100; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.626765 2107356 cuda_executor.cc:603] [0] error deallocating host memory at 0x204c03400: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.626814 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b828e6680; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.630633 2107356 cuda_executor.cc:603] [0] error deallocating host memory at 0x204c03800: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.630775 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b8367cfb0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.633992 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b83a0a1a0; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.634762 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b818a5280; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.636629 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b26228a80; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.636789 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b1a486040; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.638089 2107356 cuda_executor.cc:603] [0] error deallocating host memory at 0x204c00400: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered
+E1008 01:04:10.638787 2107356 cuda_executor.cc:279] [0] failed to unload module 0x5e2b27d48000; leaking: INTERNAL: CUDA error: : CUDA_ERROR_ILLEGAL_ADDRESS: an illegal memory access was encountered

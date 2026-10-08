@@ -1,0 +1,43 @@
+### writing the ORIGINAL-equilibrium iota reference into 922_stage1opt_results/runs/live_eps1_L1_aspin
+DEVICE requested=cpu obtained=cpu (1x cpu)
+wrote 922_stage1opt_results/runs/live_eps1_L1_aspin/iota0_lo.npy  dim_f=5  iota 0.419701..0.420180
+  values: [0.41992  0.420041 0.42018  0.419984 0.419701]
+### continuation with iota TIED TO BASELINE, 600 iters, 18:31:05
+### done 18:35:46: leg baseline 0.06066; ORIGINAL baseline 0.06763 (cumulative -10.31%) iota reference: ORIGINAL equilibrium (922_stage1opt_results/runs/live_eps1_L1_aspin/iota0_lo.npy); this leg starts at 0.41223..0.42768, bounds stay 0.41970..0.42018 +- 0.05 C    : mean 0.9762 -> 1.0698  (+9.59%) eps1 : mean 0.0607 -> 0.0454  (-25.12%) 
+###   stop: Warning: A bad approximation caused failure to predict improvement.
+###   iters: 13  Aspect ratio:                                                6.010e+00  -->   6.010e+00 (dimensionless)
+###   iota:  Maximum Generic objective value:                             4.277e-01  -->   4.733e-01 (~) Minimum Generic objective value:                             4.122e-01  -->   4.558e-01 (~) 
+###   force: Maximum absolute Force error:                                9.984e-05  -->   2.385e-04 (normalized)
+### resolution check 18:35:46
+Running as unit: run-p1368501-i1370604.scope; invocation ID: b818596f77ac46e9a4dfd0822a658d80
+DEVICE requested=gpu obtained=gpu (1x NVIDIA GeForce RTX 5070 Laptop GPU)
+run                        L=8 eps1        |f|          L=12 eps1        |f|      GAP       A
+live_eps1_L1_aspin3 0.045421 ( -32.84%)  1.083e-04 0.045377 ( -32.91%)  9.776e-06    0.07p  6.0100
+### coil complexity 18:38:13
+Running as unit: run-p1370653-i1372758.scope; invocation ID: 7f634abd48ff4bc6a6187e37dbbd50f8
+DEVICE requested=cpu obtained=cpu (1x cpu)
+
+=== baseline precise_QA ===  a = 0.17178 m   A = 6.0000
+  L_gradB/a   min   3.1620   5th   3.3790   median   4.9137   area-mean   4.8334
+  pdrot [1/m] max  29.4682   95th   9.5763   median   2.1641   area-mean   2.3321
+  pdrot * a   max   5.0620   95th   1.6450   median   0.3717   area-mean   0.4006
+  smallest |shape-operator director| (umbilic proximity) 4.798e-01
+
+=== live_eps1_L1_aspin ===  a = 0.17161 m   A = 6.0100
+  L_gradB/a   min   3.4076   5th   3.5211   median   4.7490   area-mean   4.8004
+  pdrot [1/m] max  41.9493   95th  10.7596   median   1.9656   area-mean   2.5259
+  pdrot * a   max   7.1989   95th   1.8464   median   0.3373   area-mean   0.4335
+  smallest |shape-operator director| (umbilic proximity) 3.581e-01
+
+=== live_eps1_L1_aspin3 ===  a = 0.17236 m   A = 6.0100
+  L_gradB/a   min   2.4173   5th   2.5823   median   4.1150   area-mean   4.5179
+  pdrot [1/m] max  75.0134   95th  20.9907   median   2.4483   area-mean   3.4304
+  pdrot * a   max  12.9297   95th   3.6180   median   0.4220   area-mean   0.5913
+  smallest |shape-operator director| (umbilic proximity) 3.032e-01
+
+============================================================================================
+RELATIVE TO BASELINE  (L_gradB/a SMALLER = harder; pdrot*a LARGER = less planar)
+run                       Lg min    Lg 5th    Lg med   Lg mean    pd max   pd 95th    pd med   pd mean
+live_eps1_L1_aspin        +7.77%    +4.20%    -3.35%    -0.68%   +42.21%   +12.25%    -9.26%    +8.20%
+live_eps1_L1_aspin3      -23.55%   -23.58%   -16.26%    -6.53%  +155.43%  +119.94%   +13.52%   +47.59%
+### ASPIN3 ALL DONE 18:38:23

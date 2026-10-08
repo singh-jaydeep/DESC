@@ -1,0 +1,209 @@
+{
+ "settings": {
+  "eq": "sample_equilibria/helios_repro.h5",
+  "start": "work/helios/scan_polar/cut0/repair/result.h5",
+  "out": "work/helios/scan_polar/cut0/legA",
+  "mode": "stage2",
+  "length_mult": 1.0,
+  "margin": 0.0,
+  "fix_hinges": true,
+  "anchor_weight": 0.001,
+  "margin_skip": "",
+  "a": null,
+  "bounds": "bounds/helios_kruger2026.json",
+  "device": null,
+  "vacuum": false,
+  "maxiter": 50,
+  "check_every": 25,
+  "ckpt_every": 25,
+  "diag_log": "diag.jsonl",
+  "dcc_backoff": 0.025,
+  "dpc_backoff": 0.02,
+  "no_arc_backoffs": false,
+  "convex_form": "signed",
+  "convex_kmin": 0.0,
+  "convex_backoff": 0.5,
+  "coil_grid_n": 150,
+  "eval_m": 25,
+  "eval_n": 25,
+  "plasma_m": 64,
+  "plasma_n": 64,
+  "src_gl": 24,
+  "src_n": 400,
+  "vc_m": null,
+  "vc_n": null,
+  "vc_chunk": 64,
+  "dcc_k": 20000,
+  "dpc_k": 20000,
+  "no_signed": false,
+  "dcc_neighbors": null,
+  "dcc_chunk": 4,
+  "dpc_chunk": 1,
+  "qf_chunk": 25,
+  "no_second_order": false,
+  "so_chunk": 16,
+  "so_rtol": 0.05,
+  "max_tr": 0.5,
+  "max_inner_iter": 100,
+  "ctol": 0.0001
+ },
+ "eq_kind": "h5",
+ "device": "gpu",
+ "vacuum": false,
+ "length_multiplier": 1.0,
+ "bounds": {
+  "L": 36.0,
+  "kappa": 1.5,
+  "kms": null,
+  "convex": 0.001,
+  "dcc": 1.2,
+  "dpc": 1.2
+ },
+ "target": {
+  "L": 36.0,
+  "kappa": 1.5,
+  "kms": null,
+  "convex": 0.001,
+  "dcc": 1.2,
+  "dpc": 1.2
+ },
+ "enforced": {
+  "L": 36.0,
+  "kappa": 1.4925,
+  "kms": null,
+  "convex": 0.0005,
+  "dcc": 1.2451199999999998,
+  "dpc": 1.224
+ },
+ "solver": {
+  "wall_s": 344.1400411128998,
+  "message": "Maximum number of iterations has been exceeded.",
+  "nit": 50,
+  "n_outer": 6,
+  "constr_violation": 0.00010254199730042046,
+  "y_absmax_final": 0.48504797136661554
+ },
+ "start": {
+  "per_coil": [
+   {
+    "L": 34.992713606823585,
+    "kappa": 0.3366078266282664,
+    "kms": 0.027890598278031056,
+    "corner": 50.18850822151904,
+    "convex": 0.0007646169713387651,
+    "kappa_s_min": -0.0010931559481364185
+   },
+   {
+    "L": 35.85841648985266,
+    "kappa": 0.4007576402928088,
+    "kms": 0.049744768362103266,
+    "corner": 20.701125768305953,
+    "convex": 0.0006560201980659585,
+    "kappa_s_min": -0.0008515799874611303
+   },
+   {
+    "L": 35.7127160036622,
+    "kappa": 0.39747753206091546,
+    "kms": 0.047053081480786976,
+    "corner": 24.319395586784786,
+    "convex": 0.0003852204610799337,
+    "kappa_s_min": -0.0010145519702765805
+   }
+  ],
+  "L": 35.85841648985266,
+  "kappa": 0.4007576402928088,
+  "kms": 0.049744768362103266,
+  "corner": 50.18850822151904,
+  "convex": 0.0007646169713387651,
+  "d_cc": 2.1145018854178224,
+  "d_pc": 1.8405597372775229,
+  "linked": 0,
+  "linked_pairs": [],
+  "bn": 0.0449228417741937,
+  "bn_max": 0.1654928745775006,
+  "bn_local": 0.04382754502924479,
+  "bn_max_T": 1.0668327431355769,
+  "vacuum": false,
+  "n_coils": 12
+ },
+ "result": {
+  "per_coil": [
+   {
+    "L": 34.169881114367556,
+    "kappa": 0.2986394567871641,
+    "kms": 0.026342352032779105,
+    "corner": 51.82343845726684,
+    "convex": 0.0001701908037247921,
+    "kappa_s_min": -0.0006211276838525993
+   },
+   {
+    "L": 35.999927756727885,
+    "kappa": 0.4348805529794602,
+    "kms": 0.05295608993334213,
+    "corner": 34.75634236858239,
+    "convex": 3.8775324416047185e-07,
+    "kappa_s_min": -7.555278932039447e-06
+   },
+   {
+    "L": 36.00057937568329,
+    "kappa": 0.4041034884673881,
+    "kms": 0.05236519221885625,
+    "corner": 34.16294254930888,
+    "convex": 4.680685237870723e-05,
+    "kappa_s_min": -0.0003627806957198794
+   }
+  ],
+  "L": 36.00057937568329,
+  "kappa": 0.4348805529794602,
+  "kms": 0.05295608993334213,
+  "corner": 51.82343845726684,
+  "convex": 0.0001701908037247921,
+  "d_cc": 1.729398204919247,
+  "d_pc": 1.6128320687118514,
+  "linked": 0,
+  "linked_pairs": [],
+  "bn": 0.040861041441626916,
+  "bn_max": 0.14149283828950304,
+  "bn_local": 0.04049437813540487,
+  "bn_max_T": 0.9108469997593117,
+  "vacuum": false,
+  "n_coils": 12
+ },
+ "margins": {
+  "L": 1.0000160937689802,
+  "kappa": 0.2899203686529735,
+  "convex": 0.1701908037247921,
+  "d_cc": 1.4411651707660391,
+  "d_pc": 1.3440267239265429
+ },
+ "failed": [
+  "L"
+ ],
+ "active": [
+  "L"
+ ],
+ "history": [
+  {
+   "iter": 25,
+   "bn": 0.040851190716473085,
+   "L": 1.000010358681174,
+   "kappa": 0.2887976323513308,
+   "convex": 0.5518891293960452,
+   "d_cc": 1.4295412748347998,
+   "d_pc": 1.344396349689699,
+   "linked": 0,
+   "verdict": "FAILS L"
+  },
+  {
+   "iter": 50,
+   "bn": 0.040861041441626916,
+   "L": 1.0000160937689802,
+   "kappa": 0.2899203686529735,
+   "convex": 0.1701908037247921,
+   "d_cc": 1.4411651707660391,
+   "d_pc": 1.3440267239265429,
+   "linked": 0,
+   "verdict": "FAILS L"
+  }
+ ]
+}

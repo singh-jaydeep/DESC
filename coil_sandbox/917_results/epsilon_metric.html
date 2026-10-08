@@ -1,0 +1,343 @@
+<title>Piecewise-Planarity Defect</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  :root{
+    --plane:#f7f7f5; --surface:#fcfcfb; --sunk:#f0efec;
+    --ink:#0b0b0d; --ink-2:#4a4945; --muted:#898781;
+    --line:#e1e0d9; --rule:#c9c8c0;
+    --accent:#2a78d6; --accent-soft:rgba(42,120,214,.08);
+    --good:#0ca30c; --warn:#b06a10;
+    --c0:#2a78d6; --c1:#eb6834; --c2:#1baf7a;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --plane:#0d0d0d; --surface:#1a1a19; --sunk:#151514;
+      --ink:#ffffff; --ink-2:#c3c2b7; --muted:#898781;
+      --line:#2c2c2a; --rule:#383835;
+      --accent:#3987e5; --accent-soft:rgba(57,135,229,.14);
+      --good:#0ca30c; --warn:#d99a3c;
+      --c0:#3987e5; --c1:#d95926; --c2:#199e70;
+    }
+  }
+  :root[data-theme="dark"]{
+    --plane:#0d0d0d; --surface:#1a1a19; --sunk:#151514;
+    --ink:#ffffff; --ink-2:#c3c2b7; --muted:#898781;
+    --line:#2c2c2a; --rule:#383835;
+    --accent:#3987e5; --accent-soft:rgba(57,135,229,.14);
+    --good:#0ca30c; --warn:#d99a3c;
+    --c0:#3987e5; --c1:#d95926; --c2:#199e70;
+  }
+
+  body{
+    margin:0; background:var(--plane); color:var(--ink);
+    font-family:"IBM Plex Sans",system-ui,-apple-system,sans-serif;
+    font-size:15px; line-height:1.62;
+  }
+  .wrap{max-width:760px; margin:0 auto; padding-inline:16px; padding-block:34px 56px}
+
+  .eyebrow{
+    font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:11px; font-weight:500;
+    letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin:0 0 10px;
+  }
+  h1{font-size:30px; line-height:1.18; font-weight:600; letter-spacing:-.02em; margin:0; text-wrap:balance}
+  .lede{font-size:17px; color:var(--ink-2); margin:14px 0 0; text-wrap:pretty}
+  h2{
+    font-size:19px; font-weight:600; letter-spacing:-.01em; margin:44px 0 12px;
+    padding-top:18px; border-top:1px solid var(--line); text-wrap:balance;
+  }
+  h3{font-size:15px; font-weight:600; margin:26px 0 8px}
+  p{margin:0 0 14px}
+  ul{margin:0 0 14px; padding-left:20px}
+  li{margin-bottom:7px}
+  strong{font-weight:600}
+  code, .mono{font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:.88em}
+  code{background:var(--sunk); padding:1px 5px; border-radius:3px}
+
+  .eq{
+    background:var(--surface); border:1px solid var(--line); border-left:3px solid var(--accent);
+    border-radius:0 6px 6px 0; padding:14px 16px; margin:0 0 16px;
+    font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:13px; line-height:1.7;
+    overflow-x:auto;
+  }
+  .eq .note{display:block; margin-top:8px; font-family:inherit; color:var(--muted); font-size:12px}
+
+  .tbl{overflow-x:auto; margin:0 0 8px}
+  table{border-collapse:collapse; width:100%; font-size:13.5px}
+  th, td{padding:7px 10px; text-align:right; border-bottom:1px solid var(--line)}
+  th:first-child, td:first-child{text-align:left}
+  thead th{
+    font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:11px; font-weight:500;
+    letter-spacing:.05em; text-transform:uppercase; color:var(--muted); border-bottom:1px solid var(--rule);
+  }
+  td.num{font-family:"IBM Plex Mono",ui-monospace,monospace; font-variant-numeric:tabular-nums}
+  tbody tr:hover{background:var(--sunk)}
+  .zero{color:var(--good); font-weight:500}
+  caption{caption-side:bottom; text-align:left; color:var(--muted); font-size:12px; padding-top:9px; line-height:1.5}
+
+  .finding{
+    background:var(--accent-soft); border:1px solid var(--line); border-radius:7px;
+    padding:16px 18px; margin:0 0 18px;
+  }
+  .finding p:last-child{margin-bottom:0}
+  .finding .tag{
+    display:block; font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:11px;
+    font-weight:500; letter-spacing:.08em; text-transform:uppercase; color:var(--accent); margin-bottom:7px;
+  }
+  .caution{background:none; border-left:3px solid var(--warn); border-radius:0; padding-left:15px}
+  .caution .tag{color:var(--warn)}
+
+  figure{margin:0 0 10px; background:var(--surface); border:1px solid var(--line);
+         border-radius:7px; padding:14px 14px 8px}
+  figcaption{color:var(--muted); font-size:12px; line-height:1.5; margin-top:6px}
+  svg{display:block; width:100%; height:auto; max-width:100%}
+
+  footer{margin-top:46px; padding-top:18px; border-top:1px solid var(--line);
+         color:var(--muted); font-size:12.5px}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important; transition:none!important}}
+</style>
+
+<div class="wrap">
+  <p class="eyebrow">Helios coil study · 2026-09-18</p>
+  <h1>How piecewise-planar is a coil, and does it matter?</h1>
+  <p class="lede">A cheap, exact measure of how far a coil is from being made of <em>B</em> flat
+    pieces — what it computes, the validation that it recovers known structure, and the measurement
+    showing it ranks designs correctly while badly overstating what the restriction costs.</p>
+
+  <h2>What it measures</h2>
+
+  <p>Piecewise-planar coils are attractive because flat pieces are cheap to build. Given a coilset,
+    we want a number for <em>how far it is</em> from that form — ideally one cheap enough to sweep
+    across many equilibria, to ask which configurations admit simple coils at all.</p>
+
+  <p>Define the defect of a closed coil as the best achievable out-of-plane residual when the curve
+    is cut into <em>B</em> contiguous arcs, each fitted by its own plane:</p>
+
+  <div class="eq">
+    ε<sub>B</sub> = √( min<sub>segmentations</sub> Σ<sub>seg</sub> w<sub>seg</sub> · λ<sub>min</sub>(seg) / W ) ÷ (in-plane extent)
+    <span class="note">λ<sub>min</sub>(seg) = smallest eigenvalue of that segment's arclength-weighted
+      covariance = its mean squared distance from its own best-fit plane. Normalising by the coil's
+      own in-plane extent makes ε dimensionless and comparable across machines.</span>
+  </div>
+
+  <p>ε<sub>1</sub> is "how planar"; ε<sub>2</sub> is "how clamshell-able"; and the decay of
+    ε<sub>B</sub> with <em>B</em> is the real signature. A coil whose ε<sub>2</sub> is already
+    negligible suits a two-arc class; one still poor at ε<sub>4</sub> does not belong to this
+    family at all.</p>
+
+  <h2>How it is computed — exactly, not searched</h2>
+
+  <p>The apparent cost is a search over where to place <em>B</em> breakpoints. It isn't, for two
+    reasons that compose:</p>
+
+  <ul>
+    <li><strong>Every candidate arc is O(1).</strong> A covariance over any contiguous range follows
+      from prefix sums of <code>w</code>, <code>w·x</code> and <code>w·xxᵀ</code>, so the cost of
+      <em>all</em> O(n²) candidate arcs is one pass plus a batch of 3×3 eigendecompositions.</li>
+    <li><strong>The optimal segmentation is a dynamic program.</strong> Partitioning a sequence into
+      <em>B</em> contiguous pieces at minimum total cost is the classic segmented-least-squares DP.
+      The curve is closed, so fix one breakpoint, run the DP, and minimise over that choice.</li>
+  </ul>
+
+  <p>The result is the <em>exact</em> optimum in O(n²B) per fixed start — milliseconds per coil at
+    n = 180. The optimal breakpoints come out as a by-product, which is separately useful: they are
+    the hinge placement that a projection onto the arc classes should use, rather than a guess.
+    Implementation: <code>917_results/planarizability.py</code>.</p>
+
+  <h2>Validation: it recovers structure it was never told</h2>
+
+  <p>Every coilset below has a known construction, so the correct answer is known in advance. The DP
+    is given only sampled points.</p>
+
+  <div class="tbl">
+    <table>
+      <caption>ε<sub>B</sub> per coil (3 unique coils each), Helios. A coil built from <em>k</em>
+        planes must collapse to zero at B = <em>k</em> and not before.</caption>
+      <thead><tr><th>coilset</th><th>true planes</th><th>ε₁</th><th>ε₂</th><th>ε₃</th></tr></thead>
+      <tbody>
+        <tr><td>Planar N=7</td><td class="num">1</td><td class="num zero">0</td><td class="num zero">0</td><td class="num zero">0</td></tr>
+        <tr><td>Transverse arc B=2</td><td class="num">2</td><td class="num">0.105–0.290</td><td class="num zero">0</td><td class="num zero">0</td></tr>
+        <tr><td>Polar arc B=2 (cut 30°)</td><td class="num">2</td><td class="num">0.097–0.291</td><td class="num zero">~1e−8</td><td class="num zero">—</td></tr>
+        <tr><td>Spline, 2 C0 breaks</td><td class="num">2</td><td class="num">0.100–0.291</td><td class="num zero">~3e−6</td><td class="num zero">—</td></tr>
+        <tr><td>Arc B=3</td><td class="num">3</td><td class="num">0.082–0.293</td><td class="num">0.029–0.038</td><td class="num zero">~3e−8</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>It recovers the plane count in every case. Arc B=3 is the sharpest test — the only coilset that
+    genuinely needs three planes — and its ε₂ stays clearly non-zero before collapsing eight orders
+    of magnitude at B = 3.</p>
+
+  <div class="finding">
+    <span class="tag">Unexpected result</span>
+    <p><strong>ε₁ appears to be a property of the equilibrium, not of the coil family.</strong>
+      Coil 0 reads 0.105 / 0.097 / 0.100 / 0.082 and coil 2 reads 0.290 / 0.291 / 0.291 / 0.293
+      across four independently optimised families — including an unrestricted 3D coilset that
+      started from the <em>planar</em> optimum and was free to go anywhere.</p>
+    <p>The unconstrained optimiser does not use more out-of-plane content than a two-plane coil; it
+      distributes the same amount differently. That is the property a cross-equilibrium sweep needs,
+      and it also makes such a sweep cheap — a converged unconstrained coilset per equilibrium may
+      not be required, since a restricted run reports the same ε₁.</p>
+  </div>
+
+  <h2>The ε spectrum of an unrestricted coilset</h2>
+
+  <figure>
+    <svg id="spec" viewBox="0 0 660 300" role="img"
+         aria-label="Defect epsilon-B against number of planes B, for the three unique coils of the unrestricted FourierXYZ coilset, on a logarithmic scale. All three fall steeply from B=1 to B=2 and then flatten."></svg>
+    <figcaption>Unrestricted FourierXYZ coilset (12 coils, no planarity imposed). The first plane
+      buys a factor of 3–4; beyond B = 2 the returns flatten, so the residual non-planarity is
+      spread along the coil rather than concentrated at two folds.</figcaption>
+  </figure>
+
+  <h2>What it predicts — and what it does not</h2>
+
+  <p>The question that matters is whether ε<sub>B</sub> predicts the <em>field-error cost</em> of
+    restricting coils to <em>B</em> planes. We can check it on Helios, where both ends are measured:
+    an unrestricted optimum and several restricted optima under identical bounds.</p>
+
+  <div class="tbl">
+    <table>
+      <caption>bn = ⟨|B·n|⟩ / ⟨|B|⟩ over the full boundary, coils plus the plasma's own field.
+        All 12 coils, same bounds (L ≤ 36 m, κ ≤ 1.5 /m, clearances ≥ 1.2 m).</caption>
+      <thead><tr><th>coilset</th><th>planes</th><th>bn</th><th>× the ceiling</th></tr></thead>
+      <tbody>
+        <tr><td>Planar N=7</td><td class="num">1</td><td class="num">4.0223e−2</td><td class="num">4.78×</td></tr>
+        <tr><td>Transverse arc B=2</td><td class="num">2</td><td class="num">1.3201e−2</td><td class="num">1.57×</td></tr>
+        <tr><td>Polar arc B=2 (cut 30°)</td><td class="num">2</td><td class="num">1.0450e−2</td><td class="num">1.24×</td></tr>
+        <tr><td>Arc B=3</td><td class="num">3</td><td class="num">1.0086e−2</td><td class="num">1.20×</td></tr>
+        <tr><td>FourierXYZ (unrestricted)</td><td class="num">—</td><td class="num">8.4220e−3</td><td class="num">1.00×</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>It ranks correctly</h3>
+  <p>Two planes are worse than three both geometrically (the ceiling's ε₂ = 0.029–0.080 exceeds its
+    ε₃ = 0.023–0.031) and in field error (1.24× versus 1.20×). The ordering holds — on two points.</p>
+
+  <h3>It badly overstates the cost</h3>
+
+  <div class="finding caution">
+    <span class="tag">The decisive measurement</span>
+    <p>The unrestricted optimum sits at ε₂ ≈ 0.08 of its in-plane extent — a geometric distance of
+      order <strong>0.3 m</strong> from any two-plane coil, and a refit of a far milder case already
+      missed by 0.63 m. Yet the best two-plane coilset costs only <strong>1.24×</strong> the field
+      error.</p>
+    <p>Worse, the two quantities move at different rates: from B = 2 to B = 3 the geometric defect
+      falls <strong>2.6×</strong> while the field-error penalty improves only <strong>17%
+      relative</strong> (1.24× → 1.20×).</p>
+    <p>The reason is structural. The right quantity is the gap between two <em>constrained optima</em>,
+      which is not a distance in coil space at all. The objective is flat in precisely the directions
+      the restriction removes, so a coilset can be metres away and barely worse.</p>
+  </div>
+
+  <p>In engineering terms the restriction is nearly free: at the measured length elasticity
+    d(ln bn)/d(ln L) ≈ −2.1, a factor of 1.24 in field error is worth about <strong>11% more
+    conductor</strong>. Forcing every coil into two flat pieces costs roughly what shortening them
+    from 36 m to 32 m would.</p>
+
+  <h2>How to use it</h2>
+
+  <ul>
+    <li><strong>As a screen and a ranking, never as a penalty estimate.</strong> It is ~10³ times
+      cheaper than the real quantity, which needs two optimisation runs. That is its value; it has to
+      earn its correlation rather than assume it.</li>
+    <li><strong>As a hinge-placement generator.</strong> The DP's optimal breakpoints are a
+      principled projection onto the arc classes, and distinct <em>local</em> minima of the
+      segmentation landscape are candidate basins — a structured alternative to random or
+      centroid-line hinge choices.</li>
+    <li><strong>With an admissibility flag alongside it.</strong> ε<sub>B</sub> is a lower bound on
+      what a real class achieves. Polar arcs additionally require θ to advance monotonically about
+      each chord midpoint; we found a coilset that was planar per segment to 1e−14 m and still
+      outside the class, because a deep re-entrant corner made it overshoot θ = π.</li>
+  </ul>
+
+  <h3>A refinement worth building</h3>
+  <p>ε<sub>B</sub> weights every point equally, but a large out-of-plane excursion on the outboard
+    side, far from the plasma, costs far less field error than a small one inboard. Weighting each
+    point by its inverse distance to the boundary — or by the local B·n sensitivity — should
+    correlate much better, at no extra cost.</p>
+
+  <h2>Limits, and the result that reframes all of it</h2>
+
+  <ul>
+    <li><strong>One equilibrium, two points.</strong> The correlation is not established; it is only
+      not yet refuted. Establishing it means repeating the constrained/unconstrained pair on several
+      machines.</li>
+    <li><strong>The unrestricted reference is a lower bound.</strong> It started from the planar
+      optimum, so it may be basin-limited, and its resolution-independence rests on a spectral
+      argument rather than a completed convergence run.</li>
+  </ul>
+
+  <div class="finding">
+    <span class="tag">Context</span>
+    <p><strong>Coil count dominates coil shape by roughly an order of magnitude.</strong> Every shape
+      lever tested on Helios moved bn by 16–24%. Going from 12 to 16 coils moved it by
+      <strong>120%</strong> (8.4220e−3 → 3.7991e−3), closing 95% of the gap from the planar baseline
+      to the published planar-plus-shaping result, versus 82% for 12 coils of any shape.</p>
+    <p>Read the other way, this is the strongest case for the piecewise-planar concept: the flat-piece
+      restriction is cheap, so the engineering budget is better spent on <em>more</em> coils than on
+      more complicated ones. It also bounds how much a planarity metric can ever be worth — it is
+      screening a second-order effect.</p>
+  </div>
+
+  <footer>
+    Measurements from the Helios reproduction <code>helios_repro.h5</code> (NFP 2, R₀ 7.96 m,
+    a 1.77 m, ⟨β⟩ 2.6%), bounds after Kruger, Elder, Gates et al., <em>Fusion Eng. Des.</em> 230
+    (2026) 115893. Metric and data in <code>917_results/</code>; coilsets and B·n maps in the
+    companion viewer.
+  </footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var css = function(n){ return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); };
+  var DATA = [
+    {name:"coil 0", c:"--c0", v:[0.0858, 0.0285, 0.0229, 0.00964]},
+    {name:"coil 1", c:"--c1", v:[0.2020, 0.0521, 0.0316, 0.01820]},
+    {name:"coil 2", c:"--c2", v:[0.3010, 0.0797, 0.0305, 0.02120]}
+  ];
+  var W = 660, H = 300, L = 52, R = 104, T = 18, Bm = 42;
+  var lo = 0.005, hi = 0.5, lg = Math.log10;
+  var x = function(b){ return L + (b - 1) / 3 * (W - L - R); };
+  var y = function(v){ return T + (lg(hi) - lg(v)) / (lg(hi) - lg(lo)) * (H - T - Bm); };
+
+  function draw(){
+    var s = [], i, d, pts, ticks = [0.005, 0.01, 0.05, 0.1, 0.5];
+    var ink2 = css("--ink-2"), muted = css("--muted"), line = css("--line");
+    ticks.forEach(function(t){
+      s.push('<line x1="' + L + '" y1="' + y(t).toFixed(1) + '" x2="' + (W - R) +
+             '" y2="' + y(t).toFixed(1) + '" stroke="' + line + '" stroke-width="1"/>');
+      s.push('<text x="' + (L - 9) + '" y="' + (y(t) + 4).toFixed(1) + '" text-anchor="end" fill="' +
+             muted + '" font-size="11" font-family="IBM Plex Mono, monospace">' + t + '</text>');
+    });
+    for (i = 1; i <= 4; i++){
+      s.push('<text x="' + x(i) + '" y="' + (H - Bm + 22) + '" text-anchor="middle" fill="' + muted +
+             '" font-size="12" font-family="IBM Plex Mono, monospace">' + i + '</text>');
+    }
+    s.push('<text x="' + ((L + W - R) / 2) + '" y="' + (H - 6) + '" text-anchor="middle" fill="' +
+           ink2 + '" font-size="12">B — number of planes</text>');
+    s.push('<text transform="translate(13,' + ((T + H - Bm) / 2) + ') rotate(-90)" text-anchor="middle" fill="' +
+           ink2 + '" font-size="12">defect ε_B</text>');
+    DATA.forEach(function(d){
+      var col = css(d.c);
+      pts = d.v.map(function(v, k){ return x(k + 1).toFixed(1) + "," + y(v).toFixed(1); }).join(" ");
+      s.push('<polyline points="' + pts + '" fill="none" stroke="' + col + '" stroke-width="2" ' +
+             'stroke-linejoin="round" stroke-linecap="round"/>');
+      d.v.forEach(function(v, k){
+        s.push('<circle cx="' + x(k + 1).toFixed(1) + '" cy="' + y(v).toFixed(1) + '" r="4.5" fill="' +
+               col + '" stroke="' + css("--surface") + '" stroke-width="2"/>');
+      });
+      s.push('<text x="' + (x(4) + 12) + '" y="' + (y(d.v[3]) + 4).toFixed(1) + '" fill="' + ink2 +
+             '" font-size="12">' + d.name + '</text>');
+      s.push('<circle cx="' + (x(4) + 5) + '" cy="' + y(d.v[3]).toFixed(1) + '" r="3.5" fill="' + col + '"/>');
+    });
+    document.getElementById("spec").innerHTML = s.join("");
+  }
+  draw();
+  if (window.matchMedia){
+    var mq = window.matchMedia("(prefers-color-scheme: dark)");
+    (mq.addEventListener ? mq.addEventListener.bind(mq, "change") : mq.addListener.bind(mq))(draw);
+  }
+})();
+</script>

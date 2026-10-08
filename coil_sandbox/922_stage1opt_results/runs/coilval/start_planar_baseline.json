@@ -1,0 +1,97 @@
+{
+ "eq": "precise_QA",
+ "eq_kind": "desc.examples",
+ "vacuum": false,
+ "nc": 4,
+ "r_over_a": 2.5,
+ "rep": "planar",
+ "N": 7,
+ "B": 5,
+ "M": 3,
+ "knots": 32,
+ "method": "cubic2",
+ "from_coils": null,
+ "phase": "0",
+ "hinges": "phase",
+ "chord_angle": null,
+ "cut_angle": null,
+ "fit_deviation": null,
+ "bounds": {
+  "L": 3.2,
+  "Ltot": null,
+  "kappa": 8.0,
+  "kms": 8.0,
+  "dcc": 0.1,
+  "dpc": 0.05,
+  "convex": null,
+  "planar": null,
+  "f": 0.10104608496416137,
+  "a": 0.17177834443907433,
+  "scale": "absolute"
+ },
+ "metrics": {
+  "per_coil": [
+   {
+    "L": 2.6982879246780644,
+    "kappa": 2.3285822279063275,
+    "kms": 5.42229519212119,
+    "corner": 0.0,
+    "convex": 0.0,
+    "kappa_s_min": 2.3285822279063244,
+    "planar": 0.0
+   },
+   {
+    "L": 2.6982879246780644,
+    "kappa": 2.328582227906328,
+    "kms": 5.42229519212119,
+    "corner": 0.0,
+    "convex": 0.0,
+    "kappa_s_min": 2.3285822279063244,
+    "planar": 0.0
+   },
+   {
+    "L": 2.6982879246780644,
+    "kappa": 2.3285822279063275,
+    "kms": 5.42229519212119,
+    "corner": 0.0,
+    "convex": 0.0,
+    "kappa_s_min": 2.328582227906324,
+    "planar": 0.0
+   },
+   {
+    "L": 2.6982879246780644,
+    "kappa": 2.328582227906328,
+    "kms": 5.42229519212119,
+    "corner": 0.0,
+    "convex": 0.0,
+    "kappa_s_min": 2.3285822279063244,
+    "planar": 0.0
+   }
+  ],
+  "L": 2.6982879246780644,
+  "L_total": 10.793151698712258,
+  "kappa": 2.328582227906328,
+  "kms": 5.42229519212119,
+  "corner": 0.0,
+  "convex": 0.0,
+  "planar": 0.0,
+  "d_cc": 0.19393709046122334,
+  "d_pc": 0.05881441181598621,
+  "linked": 0,
+  "linked_pairs": [],
+  "bn": 0.12093685823405494,
+  "bn_max": 0.5483334055961111,
+  "bn_local": 0.11995695564771475,
+  "bn_max_T": 0.5760725588373155,
+  "vacuum": false,
+  "n_coils": 16
+ },
+ "margins": {
+  "L": 0.8432149764618951,
+  "kappa": 0.291072778488291,
+  "kMS": 0.6777868990151488,
+  "d_cc": 1.9393709046122334,
+  "d_pc": 1.1762882363197242
+ },
+ "verdict": "FEASIBLE"
+}

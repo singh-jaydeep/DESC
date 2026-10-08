@@ -1,0 +1,26 @@
+=== [L <= 28 m, corner <= 60 deg] from work/helios/arc16/cold_L28_d10/free/result.h5  14:06:48 ===
+RESULT bn 1.2804e-02  L 1.000  kappa 0.327  convex 0.028  d_cc 1.196  d_pc 1.098  linked 0  -> FAILS L  active ['L']
+DEVICE requested=cpu obtained=cpu (1x cpu)
+   corners [19.9 39.4 51.8 52.  54.1 60.  60.  60. ]  max 60.0 / limit 60  OK   currents min/max 0.88
+=== [L <= 30 m, corner <= 70 deg] from work/helios/arc16/dual_L28_c60/result.h5  14:19:31 ===
+RESULT bn 9.9952e-03  L 1.000  kappa 0.360  convex 0.015  d_cc 1.049  d_pc 1.112  linked 0  -> FAILS L  active ['L']
+DEVICE requested=cpu obtained=cpu (1x cpu)
+   corners [21.9 40.8 50.9 59.2 65.6 66.9 70.  70. ]  max 70.0 / limit 70  OK   currents min/max 0.90
+=== [L <= 32 m, corner <= 80 deg] from work/helios/arc16/dual_L30_c70/result.h5  14:38:22 ===
+RESULT bn 8.6201e-03  L 1.000  kappa 0.376  convex 0.053  d_cc 1.034  d_pc 1.081  linked 0  -> FAILS L  active ['L']
+DEVICE requested=cpu obtained=cpu (1x cpu)
+   corners [24.5 45.6 52.5 59.  69.5 72.5 75.9 80. ]  max 80.0 / limit 80  OK   currents min/max 0.93
+=== [L <= 34 m, corner <= 90 deg] from work/helios/arc16/dual_L32_c80/result.h5  15:12:00 ===
+RESULT bn 8.0020e-03  L 1.000  kappa 0.390  convex 1.294  d_cc 1.035  d_pc 1.073  linked 0  -> FAILS L,convex  active ['L']
+DEVICE requested=cpu obtained=cpu (1x cpu)
+   corners [25.  56.6 57.2 61.8 76.7 83.9 87.1 90. ]  max 90.0 / limit 90  OK   currents min/max 0.95
+=== [L <= 36 m, corner <= 100 deg] from work/helios/arc16/dual_L34_c90/result.h5  15:41:59 ===
+RESULT bn 7.7913e-03  L 1.000  kappa 0.416  convex 0.195  d_cc 1.037  d_pc 1.059  linked 0  -> FAILS L  active ['L']
+DEVICE requested=cpu obtained=cpu (1x cpu)
+   corners [ 24.3  61.   68.5  70.7  81.5  90.9 100.  100. ]  max 100.0 / limit 100  OK   currents min/max 0.95
+=== DUAL LADDER DONE 16:13:33 ===
+work/helios/arc16/dual_L28_c60     RESULT bn 1.2804e-02  L 1.000  kappa 0.327  convex 0.028  d_cc 1.196  d_pc 1.098  linked 0  -> FAILS L  active ['L']
+work/helios/arc16/dual_L30_c70     RESULT bn 9.9952e-03  L 1.000  kappa 0.360  convex 0.015  d_cc 1.049  d_pc 1.112  linked 0  -> FAILS L  active ['L']
+work/helios/arc16/dual_L32_c80     RESULT bn 8.6201e-03  L 1.000  kappa 0.376  convex 0.053  d_cc 1.034  d_pc 1.081  linked 0  -> FAILS L  active ['L']
+work/helios/arc16/dual_L34_c90     RESULT bn 8.0020e-03  L 1.000  kappa 0.390  convex 1.294  d_cc 1.035  d_pc 1.073  linked 0  -> FAILS L,convex  active ['L']
+work/helios/arc16/dual_L36_c100    RESULT bn 7.7913e-03  L 1.000  kappa 0.416  convex 0.195  d_cc 1.037  d_pc 1.059  linked 0  -> FAILS L  active ['L']

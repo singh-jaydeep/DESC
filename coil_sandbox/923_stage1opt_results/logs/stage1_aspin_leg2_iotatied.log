@@ -1,0 +1,191 @@
+Running as unit: run-p1365189-i1367291.scope; invocation ID: 7c148c9a29f546478aae9bd7aaf92457
+E0923 18:31:09.993820 1365661 cuda_executor.cc:1743] Could not get kernel mode driver version: ( INVALID_ARGUMENT: Version does not match the format X.Y.Z )
+E0923 18:31:10.006028 1365569 cuda_executor.cc:1743] Could not get kernel mode driver version: ( INVALID_ARGUMENT: Version does not match the format X.Y.Z )
+DEVICE requested=gpu obtained=gpu (1x NVIDIA GeForce RTX 5070 Laptop GPU)
+restarting from 922_stage1opt_results/runs/live_eps1_L1_aspin/eq_lo.h5 (DP re-frozen on this geometry)
+equilibrium L8 M8 N8 NFP2  dim_x=1462
+eps_1 normal: LIVE (exact, rotation-invariant)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+E0923 18:31:18.150211 1365679 xtile_compiler.cc:399] Fusion: input_reduce_fusion = f64[8,360]{1,0} fusion(a.1, b.1), kind=kCustom, calls=fused_reduce.clone, backend_config={"operation_queue_id":"0","wait_on_operation_queues":[],"fusion_backend_config":{"kind":"__triton","block_level_fusion_config":{"num_warps":"8","output_tiles":[{"sizes":["8","8"]}],"num_ctas":1,"num_stages":1,"is_tma_allowed":true,"is_warp_specialization_allowed":false}},"force_earliest_schedule":false,"reification_cost":[],"device_type":"DEVICE_TYPE_INVALID"}
+E0923 18:31:18.150247 1365679 xtile_compiler.cc:401] Computation: fused_reduce.clone {
+  param_0.4 = f64[8,360,144]{2,1,0} parameter(0)
+  param_1.5 = f64[144]{0} parameter(1)
+  broadcast.1.3 = f64[8,360,144]{2,1,0} broadcast(param_1.5), dimensions={2}
+  multiply.1.3 = f64[8,360,144]{2,1,0} multiply(param_0.4, broadcast.1.3)
+  constant_3 = f64[] constant(0)
+  ROOT reduce.1.1 = f64[8,360]{1,0} reduce(multiply.1.3, constant_3), dimensions={2}, to_apply=scalar_add_computation
+}
+  clamshell: K=8 contours, worst frozen segment lambda_1/lambda_2 = 0.007
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: FutureWarning: constants is deprecated and will be removed in a future release. Users should not include constants in the arguments of their objective compute methods. Instead declare all the constants in the build method and use as self._constants.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: FutureWarning: constants is deprecated and will be removed in a future release. Users should not include constants in the arguments of their objective compute methods. Instead declare all the constants in the build method and use as self._constants.
+  warnings.warn(msg, err)
+diagnostics: monotonic=True  dPhi/dzeta 6.530e+05..1.215e+06  I/G=-5.62e-19  newton_res=1.66e-16  gap_seg=0.0067
+baseline C    mean 0.9762  range 0.8611-1.1776
+baseline eps1 mean 0.0607  range 0.0323-0.0740
+leg baseline 0.06066; ORIGINAL baseline 0.06763 (cumulative -10.31%)
+optimizing eps1: target = 0.60 x baseline (mean 0.0607 -> 0.0364)
+objective residual at start = 1.000 (O(1) by construction)
+iota reference: ORIGINAL equilibrium (922_stage1opt_results/runs/live_eps1_L1_aspin/iota0_lo.npy); this leg starts at 0.41223..0.42768, bounds stay 0.41970..0.42018 +- 0.05
+baseline QS rms 1.9673e-01   iota 0.41970..0.42018
+free boundary DOF: R 24 + Z 24 = 48
+constraint handling: SOFT objective terms (2 bounded terms, residual 10 per bound-width of violation); constraints = force balance + linear fixes only
+soft ForceBalance in the objective at weight 500
+proximal re-solve: ftol=1e-06 xtol=1e-08 gtol=1e-10 maxiter=50
+outer ftol = 1e-08
+outer xtol = 1e-10
+outer gtol = 1e-10
+Building objective: clamshell eps1
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+  clamshell eps1: K=8 contours, worst frozen segment lambda_1/lambda_2 = 0.007
+Building objective: aspect ratio
+Precomputing transforms
+Timer: Precomputing transforms = 701 ms
+Building objective: Generic
+Building objective: force (soft)
+Precomputing transforms
+Timer: Precomputing transforms = 784 ms
+ObjectiveFunction deriv_mode : blocked
+clamshell eps1 jac_chunk_size: None
+aspect ratio jac_chunk_size: None
+Generic jac_chunk_size: None
+force (soft) jac_chunk_size: None
+Timer: Objective build = 9.96 sec
+Building objective: force
+Precomputing transforms
+Timer: Precomputing transforms = 48.9 ms
+ObjectiveFunction deriv_mode : batched
+ObjectiveFunction jac_chunk_size: 4382
+Timer: Objective build = 55.6 ms
+ObjectiveFunction deriv_mode : blocked
+lcfs R jac_chunk_size: None
+lcfs Z jac_chunk_size: None
+fixed Psi jac_chunk_size: None
+fixed pressure jac_chunk_size: None
+fixed current jac_chunk_size: None
+fixed sheet current jac_chunk_size: None
+self_consistency R jac_chunk_size: None
+self_consistency Z jac_chunk_size: None
+lambda gauge jac_chunk_size: None
+axis R self consistency jac_chunk_size: None
+axis Z self consistency jac_chunk_size: None
+Timer: Objective build = 1.28 ms
+Timer: Eq Update LinearConstraintProjection build = 3.47 sec
+Timer: Proximal projection build = 25.8 sec
+Building objective: lcfs R
+Building objective: lcfs Z
+Building objective: fixed pressure
+Building objective: fixed current
+Building objective: fixed Psi
+ObjectiveFunction deriv_mode : blocked
+lcfs R jac_chunk_size: None
+lcfs Z jac_chunk_size: None
+fixed pressure jac_chunk_size: None
+fixed current jac_chunk_size: None
+fixed Psi jac_chunk_size: None
+Timer: Objective build = 729 ms
+Timer: LinearConstraintProjection build = 1.65 sec
+Number of parameters: 48
+Number of objectives: 5360
+Timer: Initializing the optimization = 28.3 sec
+
+Starting optimization
+Using method: proximal-lsq-exact
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: FutureWarning: constants is deprecated and will be removed in a future release. Users should not include constants in the arguments of their objective compute methods. Instead declare all the constants in the build method and use as self._constants.
+  warnings.warn(msg, err)
+Solver options:
+------------------------------------------------------------
+Maximum Function Evaluations       : 3001
+Maximum Allowed Total Δx Norm      : inf
+Scaled Termination                 : True
+Trust Region Method                : qr
+Initial Trust Radius               : 5.418e+02
+Maximum Trust Radius               : inf
+Minimum Trust Radius               : 2.220e-16
+Trust Radius Increase Ratio        : 2.000e+00
+Trust Radius Decrease Ratio        : 2.500e-01
+Trust Radius Increase Threshold    : 7.500e-01
+Trust Radius Decrease Threshold    : 2.500e-01
+------------------------------------------------------------ 
+
+   Iteration     Total nfev        Cost      Cost reduction    Step norm     Optimality   
+       0              1          4.004e+00                                    2.250e+00   
+       1              6          2.312e+00      1.692e+00      5.053e-02      1.308e+00   
+       2              7          1.614e+00      6.972e-01      5.143e-02      1.076e+00   
+       3              8          1.173e+00      4.418e-01      5.287e-02      6.537e-01   
+       4              9          9.895e-01      1.830e-01      3.026e-02      6.524e-01   
+       5             10          8.696e-01      1.199e-01      8.978e-03      5.454e-01   
+       6             11          8.320e-01      3.762e-02      8.142e-03      4.853e-01   
+       7             12          8.245e-01      7.456e-03      2.118e-03      4.632e-01   
+       8             13          8.229e-01      1.581e-03      5.322e-04      4.571e-01   
+       9             14          8.225e-01      3.912e-04      1.331e-04      4.556e-01   
+      10             15          8.224e-01      1.229e-04      3.329e-05      4.553e-01   
+      11             16          8.224e-01      3.530e-05      8.323e-06      4.553e-01   
+      12             37          8.224e-01      0.000e+00      0.000e+00      4.553e-01   
+Warning: A bad approximation caused failure to predict improvement.
+         Current function value: 8.224e-01
+         Total delta_x: 2.024e-01
+         Iterations: 12
+         Function evaluations: 37
+         Jacobian evaluations: 12
+Timer: Solution time = 3.50 min
+Timer: Avg time per step = 16.1 sec
+==============================================================================================================
+                                                                 Start  -->   End
+Total (sum of squares):                                      4.004e+00  -->   8.224e-01, 
+Maximum Clamshell                                            7.403e-02  -->   6.460e-02 (dimensionless)
+Minimum Clamshell                                            3.231e-02  -->   1.902e-02 (dimensionless)
+Average Clamshell                                            6.066e-02  -->   4.542e-02 (dimensionless)
+Aspect ratio:                                                6.010e+00  -->   6.010e+00 (dimensionless)
+Maximum Generic objective value:                             4.277e-01  -->   4.733e-01 (~)
+Minimum Generic objective value:                             4.122e-01  -->   4.558e-01 (~)
+Average Generic objective value:                             4.185e-01  -->   4.620e-01 (~)
+Maximum Generic objective value:                             4.277e-01  -->   4.733e-01 (normalized)
+Minimum Generic objective value:                             4.122e-01  -->   4.558e-01 (normalized)
+Average Generic objective value:                             4.185e-01  -->   4.620e-01 (normalized)
+Maximum absolute Force error:                                1.048e+02  -->   2.503e+02 (N)
+Minimum absolute Force error:                                4.569e-05  -->   4.738e-03 (N)
+Average absolute Force error:                                2.305e+00  -->   7.925e+00 (N)
+Maximum absolute Force error:                                9.984e-05  -->   2.385e-04 (normalized)
+Minimum absolute Force error:                                4.354e-11  -->   4.515e-09 (normalized)
+Average absolute Force error:                                2.196e-06  -->   7.551e-06 (normalized)
+Maximum absolute Force error:                                1.048e+02  -->   2.503e+02 (N)
+Minimum absolute Force error:                                3.141e-04  -->   4.738e-03 (N)
+Average absolute Force error:                                2.304e+00  -->   7.925e+00 (N)
+Maximum absolute Force error:                                9.985e-05  -->   2.385e-04 (normalized)
+Minimum absolute Force error:                                2.993e-10  -->   4.515e-09 (normalized)
+Average absolute Force error:                                2.196e-06  -->   7.551e-06 (normalized)
+R boundary error:                                            6.313e-20  -->   1.941e-20 (m)
+Z boundary error:                                            1.234e-19  -->   5.519e-20 (m)
+Fixed pressure profile error:                                0.000e+00  -->   0.000e+00 (Pa)
+Fixed current profile error:                                 0.000e+00  -->   0.000e+00 (A)
+Fixed Psi error:                                             0.000e+00  -->   0.000e+00 (Wb)
+==============================================================================================================
+
+
+wall clock 241.8 s for 600 iterations -> 0.40 s/it
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: FutureWarning: constants is deprecated and will be removed in a future release. Users should not include constants in the arguments of their objective compute methods. Instead declare all the constants in the build method and use as self._constants.
+  warnings.warn(msg, err)
+C    : mean 0.9762 -> 1.0698  (+9.59%)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: FutureWarning: constants is deprecated and will be removed in a future release. Users should not include constants in the arguments of their objective compute methods. Instead declare all the constants in the build method and use as self._constants.
+  warnings.warn(msg, err)
+eps1 : mean 0.0607 -> 0.0454  (-25.12%)
+saved 922_stage1opt_results/runs/live_eps1_L1_aspin3/eq_lo.h5

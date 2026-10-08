@@ -1,0 +1,96 @@
+{
+ "eq": "sample_equilibria/helios_repro.h5",
+ "eq_kind": "h5",
+ "vacuum": false,
+ "nc": 4,
+ "r_over_a": 2.2,
+ "rep": "xyz",
+ "N": 10,
+ "B": 5,
+ "M": 3,
+ "knots": 32,
+ "method": "cubic2",
+ "from_coils": null,
+ "phase": "0",
+ "hinges": "phase",
+ "chord_angle": null,
+ "cut_angle": null,
+ "fit_deviation": null,
+ "bounds": {
+  "L": 36.0,
+  "Ltot": null,
+  "kappa": 1.5,
+  "kms": null,
+  "dcc": 1.2,
+  "dpc": 1.2,
+  "convex": null,
+  "planar": null,
+  "f": 1.0422686304491533,
+  "a": 1.7718566717635607,
+  "scale": "absolute"
+ },
+ "metrics": {
+  "per_coil": [
+   {
+    "L": 24.492388374196437,
+    "kappa": 0.2565362434722703,
+    "kms": 0.06581084421484983,
+    "corner": 0.0,
+    "convex": NaN,
+    "kappa_s_min": NaN,
+    "planar": 0.0
+   },
+   {
+    "L": 24.492388374196437,
+    "kappa": 0.2565362434722696,
+    "kms": 0.06581084421484983,
+    "corner": 0.0,
+    "convex": NaN,
+    "kappa_s_min": NaN,
+    "planar": 0.0
+   },
+   {
+    "L": 24.49238837419643,
+    "kappa": 0.25653624347227516,
+    "kms": 0.06581084421484985,
+    "corner": 0.0,
+    "convex": NaN,
+    "kappa_s_min": NaN,
+    "planar": 0.0
+   },
+   {
+    "L": 24.49238837419643,
+    "kappa": 0.2565362434722805,
+    "kms": 0.06581084421484985,
+    "corner": 0.0,
+    "convex": NaN,
+    "kappa_s_min": NaN,
+    "planar": 0.0
+   }
+  ],
+  "L": 24.492388374196437,
+  "L_total": 97.96955349678574,
+  "kappa": 0.2565362434722805,
+  "kms": 0.06581084421484985,
+  "corner": 0.0,
+  "convex": NaN,
+  "planar": 0.0,
+  "d_cc": 1.4236392583510593,
+  "d_pc": 0.5512060748190847,
+  "linked": 0,
+  "linked_pairs": [],
+  "bn": 0.08139988467785253,
+  "bn_max": 0.3957660138503788,
+  "bn_local": 0.0790330411940175,
+  "bn_max_T": 2.5718957827212505,
+  "vacuum": false,
+  "n_coils": 16
+ },
+ "margins": {
+  "L": 0.6803441215054566,
+  "kappa": 0.17102416231485365,
+  "d_cc": 1.186366048625883,
+  "d_pc": 0.45933839568257057
+ },
+ "verdict": "FAILS d_pc"
+}

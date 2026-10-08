@@ -1,0 +1,15 @@
+### start worst3 planar (20:12)
+  B.n (coils + plasma): <|B.n|>/<|B|> 1.179e-01  <|B.n|/|B|> 1.157e-01  max|B.n| 0.543 T
+  value / bound: L 0.844  kappa 0.291  kMS 0.677  d_cc 1.783  d_pc 1.482  -> FEASIBLE
+wrote 922_stage1opt_results/runs/coilval/start_planar_worst3.h5
+### stage2 worst3 planar attempt 1 (20:13)
+    attempt 1 failed: Traceback
+### stage2 worst3 planar attempt 2 (20:15)
+RESULT bn 5.5463e-02  L 1.000  kappa 0.801  kMS 1.000  d_cc 2.235  d_pc 3.179  linked 0  -> FAILS L  active ['L', 'kMS']
+### start worst3 xyz (20:28)
+  B.n (coils + plasma): <|B.n|>/<|B|> 1.179e-01  <|B.n|/|B|> 1.157e-01  max|B.n| 0.543 T
+  value / bound: L 0.844  kappa 0.291  kMS 0.677  d_cc 1.783  d_pc 1.482  -> FEASIBLE
+wrote 922_stage1opt_results/runs/coilval/start_xyz_worst3.h5
+### stage2 worst3 xyz attempt 1 (20:29)
+RESULT bn 1.5078e-02  L 1.000  kappa 0.669  kMS 0.927  d_cc 2.155  d_pc 4.123  linked 0  -> FAILS L  active ['L']
+### MATCHED-QUALITY DONE 20:53

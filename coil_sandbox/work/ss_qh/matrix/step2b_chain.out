@@ -1,0 +1,10 @@
+=== start ss xyz chunks 25/5 01:01:44
+=== end ss xyz chunks 25/5 exit 1 01:03:20
+=== start ss xyz chunks 10/2 01:03:30
+=== end ss xyz chunks 10/2 exit 1 01:04:11
+=== start k4b arcB2 01:04:21
+=== end k4b arcB2 exit 0 01:18:20
+=== start k4b planar 01:18:30
+=== end k4b planar exit 0 01:33:07
+=== skip k4b xyz (no coils_k4)
+STEP2B DONE 01:33:17

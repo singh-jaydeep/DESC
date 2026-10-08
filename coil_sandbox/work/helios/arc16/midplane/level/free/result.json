@@ -1,0 +1,453 @@
+{
+ "settings": {
+  "eq": "sample_equilibria/helios_repro.h5",
+  "start": "work/helios/arc16/midplane/level/repair/result.h5",
+  "out": "work/helios/arc16/midplane/level/free",
+  "mode": "stage2",
+  "length_mult": 1.0,
+  "margin": 0.0,
+  "fix_hinges": false,
+  "anchor_weight": 0.001,
+  "margin_skip": "",
+  "a": null,
+  "bounds": "bounds/helios_cold_L28_d10.json",
+  "device": null,
+  "vacuum": false,
+  "maxiter": 300,
+  "check_every": 25,
+  "ckpt_every": 50,
+  "diag_log": "diag.jsonl",
+  "dcc_backoff": 0.025,
+  "dpc_backoff": 0.02,
+  "no_arc_backoffs": false,
+  "convex_form": "signed",
+  "convex_kmin": 0.0,
+  "convex_backoff": 0.5,
+  "demount_margin": 0.3,
+  "demount_backoff": 0.02,
+  "demount_arcs": false,
+  "demount_delta": 0.5,
+  "demount_eps": 0.25,
+  "level_hinges": true,
+  "fix_hinge_z": null,
+  "corner_max": null,
+  "planarity": "auto",
+  "planarity_tol": 0.0,
+  "speed_floor": 0.0,
+  "arclength_weight": 0.0,
+  "torsion_weight": 0.0,
+  "coil_grid_n": 150,
+  "kappa_grid_n": null,
+  "eval_m": 25,
+  "eval_n": 25,
+  "plasma_m": 64,
+  "plasma_n": 64,
+  "src_gl": 24,
+  "src_n": 400,
+  "vc_m": null,
+  "vc_n": null,
+  "vc_chunk": 64,
+  "dcc_k": 20000,
+  "dpc_k": 20000,
+  "no_signed": false,
+  "dcc_neighbors": null,
+  "dcc_chunk": 4,
+  "dpc_chunk": 1,
+  "qf_chunk": 25,
+  "coil_jac_chunk": null,
+  "no_second_order": false,
+  "so_chunk": 8,
+  "so_rtol": 0.05,
+  "max_tr": 0.5,
+  "max_inner_iter": 100,
+  "ctol": 0.0001
+ },
+ "eq_kind": "h5",
+ "device": "gpu",
+ "vacuum": false,
+ "length_multiplier": 1.0,
+ "bounds": {
+  "L": 28.0,
+  "Ltot": null,
+  "kappa": 1.5,
+  "kms": null,
+  "convex": 0.001,
+  "planar": null,
+  "dcc": 1.0,
+  "dpc": 1.0
+ },
+ "target": {
+  "L": 28.0,
+  "Ltot": null,
+  "kappa": 1.5,
+  "kms": null,
+  "convex": 0.001,
+  "planar": null,
+  "dcc": 1.0,
+  "dpc": 1.0
+ },
+ "enforced": {
+  "L": 28.0,
+  "Ltot": null,
+  "kappa": 1.4925,
+  "kms": null,
+  "convex": 0.0005,
+  "planar": null,
+  "dcc": 1.0341466666666665,
+  "dpc": 1.02
+ },
+ "solver": {
+  "wall_s": 1017.7537577152252,
+  "message": "Augmented Lagrangian subproblems stalled at a feasible point: `ctol` is satisfied and no further progress is available at this precision, but `gtol` was not reached.",
+  "nit": 231,
+  "n_outer": 64,
+  "constr_violation": 7.505347915079175e-06,
+  "y_absmax_final": 0.052024109957101224
+ },
+ "start": {
+  "per_coil": [
+   {
+    "L": 27.87612945660453,
+    "kappa": 0.23299312833735933,
+    "kms": 0.0507758521485354,
+    "corner": 0.45376770817213646,
+    "convex": 0.0,
+    "kappa_s_min": 0.21727387267233894,
+    "planar": 0.0
+   },
+   {
+    "L": 27.83254791958393,
+    "kappa": 0.2295371746778768,
+    "kms": 0.05108104823222866,
+    "corner": 0.20695347580535525,
+    "convex": 0.0,
+    "kappa_s_min": 0.22489190384023033,
+    "planar": 0.0
+   },
+   {
+    "L": 27.832497658430523,
+    "kappa": 0.228890864303465,
+    "kms": 0.05106100120844289,
+    "corner": 0.17179774878632725,
+    "convex": 0.0,
+    "kappa_s_min": 0.2250473462723636,
+    "planar": 0.0
+   },
+   {
+    "L": 27.832290510460734,
+    "kappa": 0.22622247354262776,
+    "kms": 0.05097849179280976,
+    "corner": 0.02589930503356018,
+    "convex": 0.0,
+    "kappa_s_min": 0.2256537104436027,
+    "planar": 0.0
+   }
+  ],
+  "L": 27.87612945660453,
+  "L_total": 111.37346554507971,
+  "kappa": 0.23299312833735933,
+  "kms": 0.05108104823222866,
+  "corner": 0.45376770817213646,
+  "convex": 0.0,
+  "planar": 0.0,
+  "d_cc": 1.1337587533578,
+  "d_pc": 1.1155219066978517,
+  "linked": 0,
+  "linked_pairs": [],
+  "bn": 0.07711748541881017,
+  "bn_max": 0.23395532482120507,
+  "bn_local": 0.07429425595392374,
+  "bn_max_T": 1.5191785437863985,
+  "vacuum": false,
+  "n_coils": 16
+ },
+ "result": {
+  "per_coil": [
+   {
+    "L": 28.000030036618273,
+    "kappa": 0.416052303818695,
+    "kms": 0.08221741432726758,
+    "corner": 60.76223230129707,
+    "convex": 1.772027590794743e-05,
+    "kappa_s_min": -0.00020661756528533105,
+    "planar": 0.0
+   },
+   {
+    "L": 27.999999988906033,
+    "kappa": 0.47099499417684587,
+    "kms": 0.07517757626748207,
+    "corner": 41.06504854566719,
+    "convex": 1.6279378457577524e-05,
+    "kappa_s_min": -0.00017545449886899987,
+    "planar": 0.0
+   },
+   {
+    "L": 27.99999977992517,
+    "kappa": 0.6184286461749942,
+    "kms": 0.08470517837422949,
+    "corner": 54.27643598337597,
+    "convex": 5.6748958766747546e-05,
+    "kappa_s_min": -0.0003566817208519283,
+    "planar": 0.0
+   },
+   {
+    "L": 27.999999987068175,
+    "kappa": 0.6295625505369801,
+    "kms": 0.07390863219536928,
+    "corner": 63.50765615919624,
+    "convex": 1.3482080295562485e-05,
+    "kappa_s_min": -0.00018471815069880424,
+    "planar": 0.0
+   }
+  ],
+  "L": 28.000030036618273,
+  "L_total": 112.00002979251765,
+  "kappa": 0.6295625505369801,
+  "kms": 0.08470517837422949,
+  "corner": 63.50765615919624,
+  "convex": 5.6748958766747546e-05,
+  "planar": 0.0,
+  "d_cc": 1.521634864323104,
+  "d_pc": 1.1846240117093507,
+  "linked": 0,
+  "linked_pairs": [],
+  "bn": 0.02285662193402171,
+  "bn_max": 0.10614427777034299,
+  "bn_local": 0.0229268869026423,
+  "bn_max_T": 0.6841097766713274,
+  "vacuum": false,
+  "n_coils": 16
+ },
+ "margins": {
+  "L": 1.0000010727363668,
+  "kappa": 0.41970836702465336,
+  "convex": 0.05674895876674754,
+  "d_cc": 1.521634864323104,
+  "d_pc": 1.1846240117093507
+ },
+ "failed": [
+  "L"
+ ],
+ "active": [
+  "L"
+ ],
+ "history": [
+  {
+   "iter": 25,
+   "bn": 0.029734987739685994,
+   "L": 1.0002644585567226,
+   "kappa": 0.29946792368813385,
+   "convex": 0.0,
+   "d_cc": 1.072853059237544,
+   "d_pc": 1.1431080767449004,
+   "linked": 0,
+   "verdict": "FAILS L"
+  },
+  {
+   "iter": 50,
+   "bn": 0.023159544668782974,
+   "L": 1.0000017273280124,
+   "kappa": 0.4014196712367934,
+   "convex": 2.28221585284865,
+   "d_cc": 1.4859077419239937,
+   "d_pc": 1.1744240585466654,
+   "linked": 0,
+   "verdict": "FAILS L,convex"
+  },
+  {
+   "iter": 75,
+   "bn": 0.022851128245915408,
+   "L": 0.9999944976327918,
+   "kappa": 0.4207465066803373,
+   "convex": 2.406835299524941,
+   "d_cc": 1.5229716179047132,
+   "d_pc": 1.1847475582244915,
+   "linked": 0,
+   "verdict": "FAILS convex"
+  },
+  {
+   "iter": 100,
+   "bn": 0.02285502823717059,
+   "L": 1.0000000857637505,
+   "kappa": 0.41930724629628696,
+   "convex": 0.2577009260560635,
+   "d_cc": 1.5218300767425854,
+   "d_pc": 1.1845078880248077,
+   "linked": 0,
+   "verdict": "FAILS L"
+  },
+  {
+   "iter": 125,
+   "bn": 0.0228562515551509,
+   "L": 1.0000000150046233,
+   "kappa": 0.41970790702775984,
+   "convex": 0.10491615840375838,
+   "d_cc": 1.5218099236203557,
+   "d_pc": 1.1849244027300052,
+   "linked": 0,
+   "verdict": "FAILS L"
+  },
+  {
+   "iter": 150,
+   "bn": 0.02285649658435171,
+   "L": 1.0000000002907359,
+   "kappa": 0.419709236584588,
+   "convex": 0.0757754098245126,
+   "d_cc": 1.5217206787377193,
+   "d_pc": 1.1846214169483056,
+   "linked": 0,
+   "verdict": "FAILS L"
+  },
+  {
+   "iter": 175,
+   "bn": 0.0228566227264323,
+   "L": 1.0000001098301803,
+   "kappa": 0.41971993174316563,
+   "convex": 0.07251742196301196,
+   "d_cc": 1.5216813991532254,
+   "d_pc": 1.1844198889306747,
+   "linked": 0,
+   "verdict": "FAILS L"
+  },
+  {
+   "iter": 200,
+   "bn": 0.02285664409813976,
+   "L": 1.000000005059429,
+   "kappa": 0.419710487145335,
+   "convex": 0.060866223985791036,
+   "d_cc": 1.5216277499042987,
+   "d_pc": 1.1845111552487704,
+   "linked": 0,
+   "verdict": "FAILS L"
+  },
+  {
+   "iter": 225,
+   "bn": 0.02285662543188853,
+   "L": 1.0000007620516553,
+   "kappa": 0.419708277568259,
+   "convex": 0.057312874994050356,
+   "d_cc": 1.5216344836977096,
+   "d_pc": 1.1846193498394415,
+   "linked": 0,
+   "verdict": "FAILS L"
+  }
+ ],
+ "demount": [
+  {
+   "hinge_clearance": [
+    2.9303540237330044,
+    0.9409167014611848
+   ],
+   "hinge_R": [
+    12.734539386684586,
+    6.720197196275179
+   ],
+   "hinge_z": [
+    -0.28938175976101727,
+    -0.28938175976101727
+   ],
+   "arcs": [
+    {
+     "dir": -1.0,
+     "blocked_frac": 0.0,
+     "worst_depth": 1.0353619233191758,
+     "blocked_depth": 0.0
+    },
+    {
+     "dir": 1.0,
+     "blocked_frac": 0.0,
+     "worst_depth": 1.2678354507943306,
+     "blocked_depth": 0.0
+    }
+   ],
+   "ok": true
+  },
+  {
+   "hinge_clearance": [
+    2.788867845358766,
+    1.2676412020852084
+   ],
+   "hinge_R": [
+    12.479664368698264,
+    5.882654080075288
+   ],
+   "hinge_z": [
+    -0.5345988746204942,
+    -0.5345988746204977
+   ],
+   "arcs": [
+    {
+     "dir": -1.0,
+     "blocked_frac": 0.0,
+     "worst_depth": 1.4573188873720273,
+     "blocked_depth": 0.0
+    },
+    {
+     "dir": 1.0,
+     "blocked_frac": 0.0,
+     "worst_depth": 1.55726358687261,
+     "blocked_depth": 0.0
+    }
+   ],
+   "ok": true
+  },
+  {
+   "hinge_clearance": [
+    2.9197222404207217,
+    0.3106240688824897
+   ],
+   "hinge_R": [
+    12.335995555746454,
+    5.992833360916306
+   ],
+   "hinge_z": [
+    1.2680233914173134,
+    1.268023391417313
+   ],
+   "arcs": [
+    {
+     "dir": -1.0,
+     "blocked_frac": 0.0,
+     "worst_depth": 1.7076693388432034,
+     "blocked_depth": 0.0
+    },
+    {
+     "dir": 1.0,
+     "blocked_frac": 0.0,
+     "worst_depth": 1.729030221108668,
+     "blocked_depth": 0.0
+    }
+   ],
+   "ok": true
+  },
+  {
+   "hinge_clearance": [
+    2.930591214959934,
+    0.320464213994625
+   ],
+   "hinge_R": [
+    12.09718523087696,
+    5.372645097677807
+   ],
+   "hinge_z": [
+    2.1042782200242227,
+    2.1042782200242236
+   ],
+   "arcs": [
+    {
+     "dir": -1.0,
+     "blocked_frac": 0.0,
+     "worst_depth": 1.790657811149492,
+     "blocked_depth": 0.0
+    },
+    {
+     "dir": 1.0,
+     "blocked_frac": 0.0,
+     "worst_depth": 1.796514240417162,
+     "blocked_depth": 0.0
+    }
+   ],
+   "ok": true
+  }
+ ]
+}

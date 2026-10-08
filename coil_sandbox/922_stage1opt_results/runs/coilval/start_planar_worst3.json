@@ -1,0 +1,97 @@
+{
+ "eq": "922_stage1opt_results/runs/worst3/eq_lo.h5",
+ "eq_kind": "h5",
+ "vacuum": false,
+ "nc": 4,
+ "r_over_a": 2.5,
+ "rep": "planar",
+ "N": 7,
+ "B": 5,
+ "M": 3,
+ "knots": 32,
+ "method": "cubic2",
+ "from_coils": null,
+ "phase": "0",
+ "hinges": "phase",
+ "chord_angle": null,
+ "cut_angle": null,
+ "fit_deviation": null,
+ "bounds": {
+  "L": 3.2,
+  "Ltot": null,
+  "kappa": 8.0,
+  "kms": 8.0,
+  "dcc": 0.1,
+  "dpc": 0.05,
+  "convex": null,
+  "planar": null,
+  "f": 0.10111062977749115,
+  "a": 0.17188807062173495,
+  "scale": "absolute"
+ },
+ "metrics": {
+  "per_coil": [
+   {
+    "L": 2.7000114995248294,
+    "kappa": 2.327095758031163,
+    "kms": 5.415374667046623,
+    "corner": 0.0,
+    "convex": 0.0,
+    "kappa_s_min": 2.327095758031159,
+    "planar": 0.0
+   },
+   {
+    "L": 2.7000114995248294,
+    "kappa": 2.327095758031163,
+    "kms": 5.415374667046624,
+    "corner": 0.0,
+    "convex": 0.0,
+    "kappa_s_min": 2.327095758031159,
+    "planar": 0.0
+   },
+   {
+    "L": 2.7000114995248294,
+    "kappa": 2.327095758031163,
+    "kms": 5.415374667046626,
+    "corner": 0.0,
+    "convex": 0.0,
+    "kappa_s_min": 2.3270957580311586,
+    "planar": 0.0
+   },
+   {
+    "L": 2.7000114995248294,
+    "kappa": 2.3270957580311618,
+    "kms": 5.415374667046623,
+    "corner": 0.0,
+    "convex": 0.0,
+    "kappa_s_min": 2.3270957580311586,
+    "planar": 0.0
+   }
+  ],
+  "L": 2.7000114995248294,
+  "L_total": 10.800045998099318,
+  "kappa": 2.327095758031163,
+  "kms": 5.415374667046626,
+  "corner": 0.0,
+  "convex": 0.0,
+  "planar": 0.0,
+  "d_cc": 0.17829184609114898,
+  "d_pc": 0.07408301754572241,
+  "linked": 0,
+  "linked_pairs": [],
+  "bn": 0.11786109625461028,
+  "bn_max": 0.4968512710954237,
+  "bn_local": 0.11573148460586334,
+  "bn_max_T": 0.5427428824135803,
+  "vacuum": false,
+  "n_coils": 16
+ },
+ "margins": {
+  "L": 0.8437535936015091,
+  "kappa": 0.2908869697538954,
+  "kMS": 0.6769218333808282,
+  "d_cc": 1.7829184609114896,
+  "d_pc": 1.4816603509144481
+ },
+ "verdict": "FEASIBLE"
+}

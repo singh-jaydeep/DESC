@@ -1,0 +1,60 @@
+[repair] done already, skipping
+[free] done already, skipping
+[dual_L28_c60] done already, skipping
+DEVICE requested=cpu obtained=cpu (1x cpu)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+   corners max 53.3 / limit 60  OK   currents min/max 0.85   max |hinge z| 0.00e+00 m
+   demount: min hinge clearance +0.910 m, worst arc blocked 0.00%  -> REMOVABLE
+=== dual_L30_c70  21:12:30 ===
+START  bn 2.6778e-02  L 0.933  kappa 0.371  convex 0.036  d_cc 1.303  d_pc 1.018  linked 0  coils 16  -> FEASIBLE
+START  bn 2.6778e-02  L 0.933  kappa 0.371  convex 0.036  d_cc 1.303  d_pc 1.018  -> FEASIBLE
+RESULT bn 2.3468e-02  L 1.000  kappa 0.346  convex 0.202  d_cc 1.033  d_pc 1.064  linked 0  -> FAILS L  active ['L']
+DEVICE requested=cpu obtained=cpu (1x cpu)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+   corners max 61.6 / limit 70  OK   currents min/max 0.80   max |hinge z| 0.00e+00 m
+   demount: min hinge clearance +0.988 m, worst arc blocked 0.00%  -> REMOVABLE
+=== dual_L32_c80  21:46:13 ===
+START  bn 2.3468e-02  L 0.938  kappa 0.346  convex 0.202  d_cc 1.033  d_pc 1.064  linked 0  coils 16  -> FEASIBLE
+START  bn 2.3468e-02  L 0.938  kappa 0.346  convex 0.202  d_cc 1.033  d_pc 1.064  -> FEASIBLE
+RESULT bn 2.0813e-02  L 1.000  kappa 0.329  convex 0.037  d_cc 1.033  d_pc 1.074  linked 0  -> FAILS L  active ['L']
+DEVICE requested=cpu obtained=cpu (1x cpu)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+   corners max 73.8 / limit 80  OK   currents min/max 0.74   max |hinge z| 0.00e+00 m
+   demount: min hinge clearance +0.977 m, worst arc blocked 0.00%  -> REMOVABLE
+=== dual_L34_c90  22:15:07 ===
+START  bn 2.0813e-02  L 0.941  kappa 0.329  convex 0.037  d_cc 1.033  d_pc 1.074  linked 0  coils 16  -> FEASIBLE
+START  bn 2.0813e-02  L 0.941  kappa 0.329  convex 0.037  d_cc 1.033  d_pc 1.074  -> FEASIBLE
+RESULT bn 1.8848e-02  L 1.000  kappa 0.333  convex 0.075  d_cc 1.035  d_pc 1.086  linked 0  -> FAILS L  active ['L']
+DEVICE requested=cpu obtained=cpu (1x cpu)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+   corners max 80.0 / limit 90  OK   currents min/max 0.70   max |hinge z| 0.00e+00 m
+   demount: min hinge clearance +0.987 m, worst arc blocked 0.00%  -> REMOVABLE
+=== dual_L36_c100  22:43:20 ===
+START  bn 1.8848e-02  L 0.944  kappa 0.333  convex 0.075  d_cc 1.035  d_pc 1.086  linked 0  coils 16  -> FEASIBLE
+START  bn 1.8848e-02  L 0.944  kappa 0.333  convex 0.075  d_cc 1.035  d_pc 1.086  -> FEASIBLE
+RESULT bn 1.7341e-02  L 1.000  kappa 0.334  convex 0.049  d_cc 1.037  d_pc 1.109  linked 0  -> FAILS L  active ['L']
+DEVICE requested=cpu obtained=cpu (1x cpu)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+   corners max 83.3 / limit 100  OK   currents min/max 0.69   max |hinge z| 0.00e+00 m
+   demount: min hinge clearance +1.035 m, worst arc blocked 0.00%  -> REMOVABLE
+=== MIDPLANE LADDER DONE 23:13:05 ===
+work/helios/arc16/midplane/dual_L28_c60        RESULT bn 2.6778e-02  L 1.000  kappa 0.371  convex 0.036  d_cc 1.303  d_pc 1.018  linked 0  -> FAILS L  active ['L']  demount: min hinge clearance +0.910 m, worst arc blocked 0.00%  -> REMOVABLE
+work/helios/arc16/midplane/dual_L30_c70        RESULT bn 2.3468e-02  L 1.000  kappa 0.346  convex 0.202  d_cc 1.033  d_pc 1.064  linked 0  -> FAILS L  active ['L']
+work/helios/arc16/midplane/dual_L32_c80        RESULT bn 2.0813e-02  L 1.000  kappa 0.329  convex 0.037  d_cc 1.033  d_pc 1.074  linked 0  -> FAILS L  active ['L']
+work/helios/arc16/midplane/dual_L34_c90        RESULT bn 1.8848e-02  L 1.000  kappa 0.333  convex 0.075  d_cc 1.035  d_pc 1.086  linked 0  -> FAILS L  active ['L']
+work/helios/arc16/midplane/dual_L36_c100       RESULT bn 1.7341e-02  L 1.000  kappa 0.334  convex 0.049  d_cc 1.037  d_pc 1.109  linked 0  -> FAILS L  active ['L']

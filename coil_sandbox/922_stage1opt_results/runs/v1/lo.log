@@ -1,0 +1,579 @@
+Running as unit: run-p1192171-i1193864.scope; invocation ID: 9798a9780dc9432aa0de753329943838
+E0922 16:18:17.842315 1192263 cuda_executor.cc:1743] Could not get kernel mode driver version: ( INVALID_ARGUMENT: Version does not match the format X.Y.Z )
+E0922 16:18:17.854629 1192171 cuda_executor.cc:1743] Could not get kernel mode driver version: ( INVALID_ARGUMENT: Version does not match the format X.Y.Z )
+DEVICE requested=gpu obtained=gpu (1x NVIDIA GeForce RTX 5070 Laptop GPU)
+precise_QA  L8 M8 N8 NFP2  dim_x=1462
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+  clamshell: K=16 contours, worst frozen segment lambda_1/lambda_2 = 0.010
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: FutureWarning: constants is deprecated and will be removed in a future release. Users should not include constants in the arguments of their objective compute methods. Instead declare all the constants in the build method and use as self._constants.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: FutureWarning: constants is deprecated and will be removed in a future release. Users should not include constants in the arguments of their objective compute methods. Instead declare all the constants in the build method and use as self._constants.
+  warnings.warn(msg, err)
+diagnostics: monotonic=True  dPhi/dzeta 6.105e+05..1.137e+06  I/G=-5.06e-18  newton_res=1.71e-16  gap_seg=0.0103
+baseline C    mean 0.9933  range 0.8657-1.3724
+baseline eps1 mean 0.0676  range 0.0462-0.0769
+baseline QS rms 5.1750e-04   iota 0.41970..0.42018
+free boundary DOF: R 24 + Z 24 = 48
+Building objective: clamshell C
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+  clamshell C: K=16 contours, worst frozen segment lambda_1/lambda_2 = 0.010
+ObjectiveFunction deriv_mode : blocked
+clamshell C jac_chunk_size: None
+Timer: Objective build = 18.2 sec
+Building objective: lcfs R
+Building objective: lcfs Z
+Building objective: fixed pressure
+Building objective: fixed current
+Building objective: fixed Psi
+Building objective: self_consistency R
+Building objective: self_consistency Z
+Building objective: lambda gauge
+Building objective: axis R self consistency
+Building objective: axis Z self consistency
+ObjectiveFunction deriv_mode : blocked
+lcfs R jac_chunk_size: None
+lcfs Z jac_chunk_size: None
+fixed pressure jac_chunk_size: None
+fixed current jac_chunk_size: None
+fixed Psi jac_chunk_size: None
+self_consistency R jac_chunk_size: None
+self_consistency Z jac_chunk_size: None
+lambda gauge jac_chunk_size: None
+axis R self consistency jac_chunk_size: None
+axis Z self consistency jac_chunk_size: None
+Timer: Objective build = 972 ms
+Building objective: force
+Precomputing transforms
+Timer: Precomputing transforms = 769 ms
+Building objective: aspect ratio
+Precomputing transforms
+Timer: Precomputing transforms = 710 ms
+Building objective: Generic
+Building objective: QS two-term
+Precomputing transforms
+Timer: Precomputing transforms = 44.2 ms
+Building objective: eps1 hold
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+  eps1 hold: K=16 contours, worst frozen segment lambda_1/lambda_2 = 0.010
+ObjectiveFunction deriv_mode : blocked
+force jac_chunk_size: None
+aspect ratio jac_chunk_size: None
+Generic jac_chunk_size: None
+QS two-term jac_chunk_size: None
+eps1 hold jac_chunk_size: None
+Timer: Objective build = 16.5 sec
+Timer: LinearConstraintProjection build = 3.40 sec
+Timer: LinearConstraintProjection build = 190 ms
+Number of parameters: 904
+Number of objectives: 16
+Number of equality constraints: 5368
+Number of inequality constraints: 765
+Timer: Initializing the optimization = 40.0 sec
+
+Starting optimization
+Using method: lsq-auglag
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: FutureWarning: constants is deprecated and will be removed in a future release. Users should not include constants in the arguments of their objective compute methods. Instead declare all the constants in the build method and use as self._constants.
+  warnings.warn(msg, err)
+second_order: compiling constraint Hessian for blocks ForceBalance, AspectRatio, QuasisymmetryTwoTerm
+Solver options:
+------------------------------------------------------------
+Maximum Function Evaluations       : 2001
+Maximum Allowed Total Δx Norm      : inf
+Scaled Termination                 : True
+Trust Region Method                : qr
+Initial Trust Radius               : 2.025e-01
+Maximum Trust Radius               : inf
+Minimum Trust Radius               : 2.220e-16
+Trust Radius Increase Ratio        : 4.000e+00
+Trust Radius Decrease Ratio        : 2.500e-01
+Trust Radius Increase Threshold    : 7.500e-01
+Trust Radius Decrease Threshold    : 5.000e-01
+Alpha Omega                        : 1.000e+00
+Beta Omega                         : 1.000e+00
+Alpha Eta                          : 1.000e-01
+Beta Eta                           : 9.000e-01
+Omega                              : 1.000e-02
+Eta                                : 1.261e-03
+Tau                                : 1.000e+01
+------------------------------------------------------------ 
+
+   Iteration     Total nfev        Cost      Cost reduction    Step norm     Optimality    Constr viol.   Penalty param  max(|mltplr|)      gtolk     
+       0              1          8.009e+00                                    1.008e+00      1.261e-03      1.000e+01      0.000e+00      1.000e-03   
+second_order: compiling constraint Hessian for blocks ForceBalance, AspectRatio, GenericObjective, QuasisymmetryTwoTerm, ContourClamshell
+E0922 16:23:56.011220 1192290 xtile_compiler.cc:399] Fusion: input_reduce_fusion.240 = f64[16,480]{1,0} fusion(get-tuple-element.11820, loop_subtract_fusion.8, constant.28961.0, get-tuple-element.13090, get-tuple-element.11821, get-tuple-element.11766, constant.36431.0, constant.28986.0), kind=kCustom, calls=fused_reduce.253.clone, backend_config={"operation_queue_id":"0","wait_on_operation_queues":[],"fusion_backend_config":{"kind":"__triton","block_level_fusion_config":{"num_warps":"8","output_tiles":[{"sizes":["8","8"]}],"num_ctas":1,"num_stages":1,"is_tma_allowed":true,"is_warp_specialization_allowed":false}},"force_earliest_schedule":false,"reification_cost":[],"device_type":"DEVICE_TYPE_INVALID"}
+E0922 16:23:56.011326 1192290 xtile_compiler.cc:401] Computation: fused_reduce.253.clone {
+  param_2.81468 = f64[144]{0} parameter(2)
+  broadcast.34052.780 = f64[144,16,480]{2,1,0} broadcast(param_2.81468), dimensions={0}
+  param_7.23390 = f64[144]{0} parameter(7)
+  broadcast.34084.126 = f64[144,16,480]{2,1,0} broadcast(param_7.23390), dimensions={0}
+  param_6.27708 = pred[144]{0} parameter(6)
+  broadcast.34051.830 = pred[144,16,480]{2,1,0} broadcast(param_6.27708), dimensions={0}
+  param_5.31841 = f64[144,16,480]{2,1,0} parameter(5)
+  constant_7138_2251 = f64[] constant(0)
+  broadcast.35089.702 = f64[144,16,480]{2,1,0} broadcast(constant_7138_2251), dimensions={}
+  select.555.7 = f64[144,16,480]{2,1,0} select(broadcast.34051.830, param_5.31841, broadcast.35089.702)
+  multiply.18514.5 = f64[144,16,480]{2,1,0} multiply(broadcast.34084.126, select.555.7)
+  param_4.39794 = f64[144,480]{1,0} parameter(4)
+  broadcast.34141.32 = f64[144,16,480]{2,1,0} broadcast(param_4.39794), dimensions={0,2}
+  multiply.18515.7 = f64[144,16,480]{2,1,0} multiply(multiply.18514.5, broadcast.34141.32)
+  param_3.56468 = f64[144,480]{1,0} parameter(3)
+  broadcast.35187.3 = f64[144,16,480]{2,1,0} broadcast(param_3.56468), dimensions={0,2}
+  param_1.138458 = f64[16,480]{1,0} parameter(1)
+  broadcast.34139.35 = f64[144,16,480]{2,1,0} broadcast(param_1.138458), dimensions={1,2}
+  multiply.16605.35 = f64[144,16,480]{2,1,0} multiply(broadcast.34052.780, broadcast.34139.35)
+  param_0.114487 = f64[144,480]{1,0} parameter(0)
+  broadcast.34140.34 = f64[144,16,480]{2,1,0} broadcast(param_0.114487), dimensions={0,2}
+  multiply.16606.19 = f64[144,16,480]{2,1,0} multiply(multiply.16605.35, broadcast.34140.34)
+  negate.1132.17 = f64[144,16,480]{2,1,0} negate(multiply.16606.19)
+  multiply.18516.3 = f64[144,16,480]{2,1,0} multiply(broadcast.35187.3, negate.1132.17)
+  add.22446.5 = f64[144,16,480]{2,1,0} add(multiply.18515.7, multiply.18516.3)
+  multiply.18517.3 = f64[144,16,480]{2,1,0} multiply(broadcast.34052.780, add.22446.5)
+  ROOT reduce_sum.13675.1 = f64[16,480]{1,0} reduce(multiply.18517.3, constant_7138_2251), dimensions={0}, to_apply=region_2.2.clone.929
+}
+E0922 16:23:56.020506 1192270 xtile_compiler.cc:399] Fusion: input_reduce_fusion.224 = f64[16,480]{1,0} fusion(get-tuple-element.11646, loop_subtract_fusion.8, constant.28768.0, get-tuple-element.13275, get-tuple-element.11645, get-tuple-element.11594, constant.36400.0), kind=kCustom, calls=fused_reduce.237.clone, backend_config={"operation_queue_id":"0","wait_on_operation_queues":[],"fusion_backend_config":{"kind":"__triton","block_level_fusion_config":{"num_warps":"8","output_tiles":[{"sizes":["8","8"]}],"num_ctas":1,"num_stages":1,"is_tma_allowed":true,"is_warp_specialization_allowed":false}},"force_earliest_schedule":false,"reification_cost":[],"device_type":"DEVICE_TYPE_INVALID"}
+E0922 16:23:56.020612 1192270 xtile_compiler.cc:401] Computation: fused_reduce.237.clone {
+  param_2.81469 = f64[145]{0} parameter(2)
+  broadcast.33968.1194 = f64[145,16,480]{2,1,0} broadcast(param_2.81469), dimensions={0}
+  param_6.27709 = pred[145]{0} parameter(6)
+  broadcast.33967.734 = pred[145,16,480]{2,1,0} broadcast(param_6.27709), dimensions={0}
+  constant_7138_2256 = f64[] constant(0)
+  broadcast.35104.606 = f64[145,16,480]{2,1,0} broadcast(constant_7138_2256), dimensions={}
+  param_5.31842 = f64[145,16,480]{2,1,0} parameter(5)
+  select.558.9 = f64[145,16,480]{2,1,0} select(broadcast.33967.734, broadcast.35104.606, param_5.31842)
+  multiply.18529.7 = f64[145,16,480]{2,1,0} multiply(broadcast.33968.1194, select.558.9)
+  negate.1379.5 = f64[145,16,480]{2,1,0} negate(multiply.18529.7)
+  param_4.39795 = f64[145,480]{1,0} parameter(4)
+  broadcast.34135.46 = f64[145,16,480]{2,1,0} broadcast(param_4.39795), dimensions={0,2}
+  multiply.18530.7 = f64[145,16,480]{2,1,0} multiply(negate.1379.5, broadcast.34135.46)
+  param_3.56469 = f64[145,480]{1,0} parameter(3)
+  broadcast.35193.3 = f64[145,16,480]{2,1,0} broadcast(param_3.56469), dimensions={0,2}
+  param_1.138461 = f64[16,480]{1,0} parameter(1)
+  broadcast.34134.47 = f64[145,16,480]{2,1,0} broadcast(param_1.138461), dimensions={1,2}
+  multiply.16598.47 = f64[145,16,480]{2,1,0} multiply(broadcast.33968.1194, broadcast.34134.47)
+  param_0.114490 = f64[145,480]{1,0} parameter(0)
+  broadcast.34136.42 = f64[145,16,480]{2,1,0} broadcast(param_0.114490), dimensions={0,2}
+  multiply.16600.21 = f64[145,16,480]{2,1,0} multiply(multiply.16598.47, broadcast.34136.42)
+  multiply.18531.3 = f64[145,16,480]{2,1,0} multiply(broadcast.35193.3, multiply.16600.21)
+  add.22451.5 = f64[145,16,480]{2,1,0} add(multiply.18530.7, multiply.18531.3)
+  multiply.18532.3 = f64[145,16,480]{2,1,0} multiply(broadcast.33968.1194, add.22451.5)
+  ROOT reduce_sum.13683.1 = f64[16,480]{1,0} reduce(multiply.18532.3, constant_7138_2256), dimensions={0}, to_apply=region_2.2.clone.932
+}
+E0922 16:23:56.232005 1192277 cuda_timer.cc:87] Delay kernel timed out: measured time has sub-optimal accuracy. There may be a missing warmup execution, please investigate in Nsight Systems.
+E0922 16:23:56.265936 1192272 xtile_compiler.cc:399] Fusion: input_reduce_fusion.187 = f64[16,480]{1,0} fusion(get-tuple-element.11645, loop_subtract_fusion.8, constant.28768.0, get-tuple-element.13277, get-tuple-element.11646, get-tuple-element.11596, constant.36400.0), kind=kCustom, calls=fused_reduce.200.clone, backend_config={"operation_queue_id":"0","wait_on_operation_queues":[],"fusion_backend_config":{"kind":"__triton","block_level_fusion_config":{"num_warps":"8","output_tiles":[{"sizes":["8","8"]}],"num_ctas":1,"num_stages":1,"is_tma_allowed":true,"is_warp_specialization_allowed":false}},"force_earliest_schedule":false,"reification_cost":[],"device_type":"DEVICE_TYPE_INVALID"}
+E0922 16:23:56.266128 1192272 xtile_compiler.cc:401] Computation: fused_reduce.200.clone {
+  param_2.81473 = f64[145]{0} parameter(2)
+  broadcast.33968.1016 = f64[145,16,480]{2,1,0} broadcast(param_2.81473), dimensions={0}
+  param_6.27713 = pred[145]{0} parameter(6)
+  broadcast.33967.660 = pred[145,16,480]{2,1,0} broadcast(param_6.27713), dimensions={0}
+  constant_7138_2265 = f64[] constant(0)
+  broadcast.35104.532 = f64[145,16,480]{2,1,0} broadcast(constant_7138_2265), dimensions={}
+  param_5.31846 = f64[145,16,480]{2,1,0} parameter(5)
+  select.564.5 = f64[145,16,480]{2,1,0} select(broadcast.33967.660, broadcast.35104.532, param_5.31846)
+  param_4.39799 = f64[145,480]{1,0} parameter(4)
+  broadcast.34136.34 = f64[145,16,480]{2,1,0} broadcast(param_4.39799), dimensions={0,2}
+  multiply.18557.7 = f64[145,16,480]{2,1,0} multiply(select.564.5, broadcast.34136.34)
+  param_3.56473 = f64[145,480]{1,0} parameter(3)
+  broadcast.35203.3 = f64[145,16,480]{2,1,0} broadcast(param_3.56473), dimensions={0,2}
+  param_1.138468 = f64[16,480]{1,0} parameter(1)
+  broadcast.34134.39 = f64[145,16,480]{2,1,0} broadcast(param_1.138468), dimensions={1,2}
+  multiply.16598.39 = f64[145,16,480]{2,1,0} multiply(broadcast.33968.1016, broadcast.34134.39)
+  param_0.114497 = f64[145,480]{1,0} parameter(0)
+  broadcast.34135.38 = f64[145,16,480]{2,1,0} broadcast(param_0.114497), dimensions={0,2}
+  multiply.16599.21 = f64[145,16,480]{2,1,0} multiply(multiply.16598.39, broadcast.34135.38)
+  negate.1131.19 = f64[145,16,480]{2,1,0} negate(multiply.16599.21)
+  multiply.18558.3 = f64[145,16,480]{2,1,0} multiply(broadcast.35203.3, negate.1131.19)
+  add.22460.5 = f64[145,16,480]{2,1,0} add(multiply.18557.7, multiply.18558.3)
+  multiply.18559.3 = f64[145,16,480]{2,1,0} multiply(broadcast.33968.1016, add.22460.5)
+  ROOT reduce_sum.13701.1 = f64[16,480]{1,0} reduce(multiply.18559.3, constant_7138_2265), dimensions={0}, to_apply=region_2.2.clone.938
+}
+E0922 16:23:56.289603 1192283 xtile_compiler.cc:399] Fusion: input_multiply_reduce_fusion.87 = (f64[16,480]{1,0}, f64[144,16,480]{2,1,0}) fusion(loop_gather_fusion, get-tuple-element.13197, get-tuple-element.13196, get-tuple-element.12610, constant.28961.0, constant.36431.0, get-tuple-element.13198), kind=kCustom, calls=fused_multiply_reduce.87.clone, backend_config={"operation_queue_id":"0","wait_on_operation_queues":[],"fusion_backend_config":{"kind":"__triton","block_level_fusion_config":{"num_warps":"8","output_tiles":[{"sizes":["8","8"]},{"sizes":["144","8","8"]}],"num_ctas":1,"num_stages":1,"is_tma_allowed":true,"is_warp_specialization_allowed":false}},"force_earliest_schedule":false,"reification_cost":[],"device_type":"DEVICE_TYPE_INVALID"}
+E0922 16:23:56.289669 1192283 xtile_compiler.cc:401] Computation: fused_multiply_reduce.87.clone {
+  param_6.62424 = f64[144,480]{1,0} parameter(6)
+  broadcast.34083.16.clone.1 = f64[144,16,480]{2,1,0} broadcast(param_6.62424), dimensions={0,2}
+  param_5.70598 = pred[144]{0} parameter(5)
+  broadcast.34051.738.clone.1 = pred[144,16,480]{2,1,0} broadcast(param_5.70598), dimensions={0}
+  param_4.86291 = f64[144]{0} parameter(4)
+  broadcast.34052.596.clone.1 = f64[144,16,480]{2,1,0} broadcast(param_4.86291), dimensions={0}
+  param_3.120534 = f64[16,480]{1,0} parameter(3)
+  broadcast.34997.29.clone.1 = f64[144,16,480]{2,1,0} broadcast(param_3.120534), dimensions={1,2}
+  multiply.18209.29.clone.1 = f64[144,16,480]{2,1,0} multiply(broadcast.34052.596.clone.1, broadcast.34997.29.clone.1)
+  param_2.168050 = f64[144,480]{1,0} parameter(2)
+  broadcast.34998.30.clone.1 = f64[144,16,480]{2,1,0} broadcast(param_2.168050), dimensions={0,2}
+  multiply.18210.15.clone.1 = f64[144,16,480]{2,1,0} multiply(multiply.18209.29.clone.1, broadcast.34998.30.clone.1)
+  negate.1356.13.clone.1 = f64[144,16,480]{2,1,0} negate(multiply.18210.15.clone.1)
+  param_1.281372 = f64[144,480]{1,0} parameter(1)
+  broadcast.34999.28.clone.1 = f64[144,16,480]{2,1,0} broadcast(param_1.281372), dimensions={0,2}
+  multiply.18211.13.clone.1 = f64[144,16,480]{2,1,0} multiply(multiply.18209.29.clone.1, broadcast.34999.28.clone.1)
+  select.518.3.clone.1 = f64[144,16,480]{2,1,0} select(broadcast.34051.738.clone.1, negate.1356.13.clone.1, multiply.18211.13.clone.1)
+  multiply.18228.1.clone.1 = f64[144,16,480]{2,1,0} multiply(broadcast.34083.16.clone.1, select.518.3.clone.1)
+  param_0.232835 = f64[144,1]{1,0} parameter(0)
+  bitcast.835.391 = f64[144]{0} bitcast(param_0.232835)
+  broadcast.34056.101 = f64[144,16,480]{2,1,0} broadcast(bitcast.835.391), dimensions={0}
+  multiply.18229.3 = f64[144,16,480]{2,1,0} multiply(multiply.18228.1.clone.1, broadcast.34056.101)
+  constant_7138_2898 = f64[] constant(0)
+  reduce.3583.1 = f64[16,480]{1,0} reduce(multiply.18229.3, constant_7138_2898), dimensions={0}, to_apply=region_2.2.clone.2326
+  ROOT tuple.12033 = (f64[16,480]{1,0}, f64[144,16,480]{2,1,0}) tuple(reduce.3583.1, multiply.18228.1.clone.1)
+}
+E0922 16:23:56.754183 1192277 xtile_compiler.cc:399] Fusion: input_multiply_reduce_fusion.86 = (f64[16,480]{1,0}, f64[144,16,480]{2,1,0}) fusion(loop_gather_fusion, get-tuple-element.13196, get-tuple-element.13197, get-tuple-element.12610, constant.28961.0, constant.28986.0, constant.36431.0, get-tuple-element.13148), kind=kCustom, calls=fused_multiply_reduce.86.clone, backend_config={"operation_queue_id":"0","wait_on_operation_queues":[],"fusion_backend_config":{"kind":"__triton","block_level_fusion_config":{"num_warps":"8","output_tiles":[{"sizes":["8","8"]},{"sizes":["144","8","8"]}],"num_ctas":1,"num_stages":1,"is_tma_allowed":true,"is_warp_specialization_allowed":false}},"force_earliest_schedule":false,"reification_cost":[],"device_type":"DEVICE_TYPE_INVALID"}
+E0922 16:23:56.754253 1192277 xtile_compiler.cc:401] Computation: fused_multiply_reduce.86.clone {
+  param_7.52091 = f64[144,480]{1,0} parameter(7)
+  broadcast.34050.32.clone.1 = f64[144,16,480]{2,1,0} broadcast(param_7.52091), dimensions={0,2}
+  param_6.62764 = pred[144]{0} parameter(6)
+  broadcast.34051.130.clone.1 = pred[144,16,480]{2,1,0} broadcast(param_6.62764), dimensions={0}
+  param_5.71120 = f64[144]{0} parameter(5)
+  broadcast.34084.34.clone.1 = f64[144,16,480]{2,1,0} broadcast(param_5.71120), dimensions={0}
+  param_4.86947 = f64[144]{0} parameter(4)
+  broadcast.34052.214.clone.1 = f64[144,16,480]{2,1,0} broadcast(param_4.86947), dimensions={0}
+  param_3.121217 = f64[16,480]{1,0} parameter(3)
+  broadcast.34997.7.clone.1 = f64[144,16,480]{2,1,0} broadcast(param_3.121217), dimensions={1,2}
+  multiply.18209.7.clone.1 = f64[144,16,480]{2,1,0} multiply(broadcast.34052.214.clone.1, broadcast.34997.7.clone.1)
+  param_2.168670 = f64[144,480]{1,0} parameter(2)
+  broadcast.34999.18.clone.1 = f64[144,16,480]{2,1,0} broadcast(param_2.168670), dimensions={0,2}
+  multiply.18211.3.clone.1 = f64[144,16,480]{2,1,0} multiply(multiply.18209.7.clone.1, broadcast.34999.18.clone.1)
+  multiply.18230.3.clone.1 = f64[144,16,480]{2,1,0} multiply(broadcast.34084.34.clone.1, multiply.18211.3.clone.1)
+  param_1.281419 = f64[144,480]{1,0} parameter(1)
+  broadcast.34998.20.clone.1 = f64[144,16,480]{2,1,0} broadcast(param_1.281419), dimensions={0,2}
+  multiply.18210.5.clone.1 = f64[144,16,480]{2,1,0} multiply(multiply.18209.7.clone.1, broadcast.34998.20.clone.1)
+  negate.1356.3.clone.1 = f64[144,16,480]{2,1,0} negate(multiply.18210.5.clone.1)
+  multiply.18231.3.clone.1 = f64[144,16,480]{2,1,0} multiply(broadcast.34052.214.clone.1, negate.1356.3.clone.1)
+  select.520.3.clone.1 = f64[144,16,480]{2,1,0} select(broadcast.34051.130.clone.1, multiply.18230.3.clone.1, multiply.18231.3.clone.1)
+  multiply.18232.1.clone.1 = f64[144,16,480]{2,1,0} multiply(broadcast.34050.32.clone.1, select.520.3.clone.1)
+  param_0.232866 = f64[144,1]{1,0} parameter(0)
+  bitcast.835.389 = f64[144]{0} bitcast(param_0.232866)
+  broadcast.34056.99 = f64[144,16,480]{2,1,0} broadcast(bitcast.835.389), dimensions={0}
+  multiply.18233.3 = f64[144,16,480]{2,1,0} multiply(multiply.18232.1.clone.1, broadcast.34056.99)
+  constant_7138_2896 = f64[] constant(0)
+  reduce.3584.1 = f64[16,480]{1,0} reduce(multiply.18233.3, constant_7138_2896), dimensions={0}, to_apply=region_2.2.clone.2327
+  ROOT tuple.12435 = (f64[16,480]{1,0}, f64[144,16,480]{2,1,0}) tuple(reduce.3584.1, multiply.18232.1.clone.1)
+}
+E0922 16:23:56.982138 1192275 xtile_compiler.cc:399] Fusion: input_multiply_reduce_fusion.255 = (f64[8,480]{1,0}, f64[144,8,480]{2,1,0}) fusion(loop_gather_fusion.4, get-tuple-element.20718, get-tuple-element.20719, get-tuple-element.20202, constant.21102.0, constant.36170.0, get-tuple-element.20813), kind=kCustom, calls=fused_multiply_reduce.256.clone, backend_config={"operation_queue_id":"0","wait_on_operation_queues":[],"fusion_backend_config":{"kind":"__triton","block_level_fusion_config":{"num_warps":"8","output_tiles":[{"sizes":["8","8"]},{"sizes":["144","8","8"]}],"num_ctas":1,"num_stages":1,"is_tma_allowed":true,"is_warp_specialization_allowed":false}},"force_earliest_schedule":false,"reification_cost":[],"device_type":"DEVICE_TYPE_INVALID"}
+E0922 16:23:56.982206 1192275 xtile_compiler.cc:401] Computation: fused_multiply_reduce.256.clone {
+  param_6.66477 = f64[144,480]{1,0} parameter(6)
+  broadcast.37304.13.clone.1 = f64[144,8,480]{2,1,0} broadcast(param_6.66477), dimensions={0,2}
+  param_5.75038 = pred[144]{0} parameter(5)
+  broadcast.37272.494.clone.1 = pred[144,8,480]{2,1,0} broadcast(param_5.75038), dimensions={0}
+  param_4.89878 = f64[144]{0} parameter(4)
+  broadcast.37273.652.clone.1 = f64[144,8,480]{2,1,0} broadcast(param_4.89878), dimensions={0}
+  param_3.123140 = f64[8,480]{1,0} parameter(3)
+  broadcast.38032.29.clone.1 = f64[144,8,480]{2,1,0} broadcast(param_3.123140), dimensions={1,2}
+  multiply.24506.29.clone.1 = f64[144,8,480]{2,1,0} multiply(broadcast.37273.652.clone.1, broadcast.38032.29.clone.1)
+  param_2.170051 = f64[144,480]{1,0} parameter(2)
+  broadcast.38033.30.clone.1 = f64[144,8,480]{2,1,0} broadcast(param_2.170051), dimensions={0,2}
+  multiply.24507.15.clone.1 = f64[144,8,480]{2,1,0} multiply(multiply.24506.29.clone.1, broadcast.38033.30.clone.1)
+  negate.1765.13.clone.1 = f64[144,8,480]{2,1,0} negate(multiply.24507.15.clone.1)
+  param_1.282569 = f64[144,480]{1,0} parameter(1)
+  broadcast.38034.28.clone.1 = f64[144,8,480]{2,1,0} broadcast(param_1.282569), dimensions={0,2}
+  multiply.24508.13.clone.1 = f64[144,8,480]{2,1,0} multiply(multiply.24506.29.clone.1, broadcast.38034.28.clone.1)
+  select.1106.3.clone.1 = f64[144,8,480]{2,1,0} select(broadcast.37272.494.clone.1, negate.1765.13.clone.1, multiply.24508.13.clone.1)
+  multiply.24525.1.clone.1 = f64[144,8,480]{2,1,0} multiply(broadcast.37304.13.clone.1, select.1106.3.clone.1)
+  param_0.233249 = f64[144,1]{1,0} parameter(0)
+  bitcast.5375.857 = f64[144]{0} bitcast(param_0.233249)
+  broadcast.37277.119 = f64[144,8,480]{2,1,0} broadcast(bitcast.5375.857), dimensions={0}
+  multiply.24526.3 = f64[144,8,480]{2,1,0} multiply(multiply.24525.1.clone.1, broadcast.37277.119)
+  constant_3123_919 = f64[] constant(0)
+  reduce.4414.1 = f64[8,480]{1,0} reduce(multiply.24526.3, constant_3123_919), dimensions={0}, to_apply=region_2.2.clone.4742
+  ROOT tuple.17193 = (f64[8,480]{1,0}, f64[144,8,480]{2,1,0}) tuple(reduce.4414.1, multiply.24525.1.clone.1)
+}
+E0922 16:23:57.059645 1192292 xtile_compiler.cc:399] Fusion: input_reduce_fusion.256 = f64[16,480]{1,0} fusion(get-tuple-element.11821, loop_subtract_fusion.8, constant.28961.0, get-tuple-element.13091, get-tuple-element.11820, get-tuple-element.11766, constant.36431.0), kind=kCustom, calls=fused_reduce.269.clone, backend_config={"operation_queue_id":"0","wait_on_operation_queues":[],"fusion_backend_config":{"kind":"__triton","block_level_fusion_config":{"num_warps":"8","output_tiles":[{"sizes":["8","8"]}],"num_ctas":1,"num_stages":1,"is_tma_allowed":true,"is_warp_specialization_allowed":false}},"force_earliest_schedule":false,"reification_cost":[],"device_type":"DEVICE_TYPE_INVALID"}
+E0922 16:23:57.059707 1192292 xtile_compiler.cc:401] Computation: fused_reduce.269.clone {
+  param_2.81467 = f64[144]{0} parameter(2)
+  broadcast.34052.874 = f64[144,16,480]{2,1,0} broadcast(param_2.81467), dimensions={0}
+  param_6.27707 = pred[144]{0} parameter(6)
+  broadcast.34051.862 = pred[144,16,480]{2,1,0} broadcast(param_6.27707), dimensions={0}
+  constant_7138_2250 = f64[] constant(0)
+  broadcast.35089.734 = f64[144,16,480]{2,1,0} broadcast(constant_7138_2250), dimensions={}
+  param_5.31840 = f64[144,16,480]{2,1,0} parameter(5)
+  select.554.7 = f64[144,16,480]{2,1,0} select(broadcast.34051.862, broadcast.35089.734, param_5.31840)
+  multiply.18510.5 = f64[144,16,480]{2,1,0} multiply(broadcast.34052.874, select.554.7)
+  negate.1377.7 = f64[144,16,480]{2,1,0} negate(multiply.18510.5)
+  param_4.39793 = f64[144,480]{1,0} parameter(4)
+  broadcast.34140.36 = f64[144,16,480]{2,1,0} broadcast(param_4.39793), dimensions={0,2}
+  multiply.18511.7 = f64[144,16,480]{2,1,0} multiply(negate.1377.7, broadcast.34140.36)
+  param_3.56467 = f64[144,480]{1,0} parameter(3)
+  broadcast.35185.3 = f64[144,16,480]{2,1,0} broadcast(param_3.56467), dimensions={0,2}
+  param_1.138457 = f64[16,480]{1,0} parameter(1)
+  broadcast.34139.37 = f64[144,16,480]{2,1,0} broadcast(param_1.138457), dimensions={1,2}
+  multiply.16605.37 = f64[144,16,480]{2,1,0} multiply(broadcast.34052.874, broadcast.34139.37)
+  param_0.114486 = f64[144,480]{1,0} parameter(0)
+  broadcast.34141.34 = f64[144,16,480]{2,1,0} broadcast(param_0.114486), dimensions={0,2}
+  multiply.16607.17 = f64[144,16,480]{2,1,0} multiply(multiply.16605.37, broadcast.34141.34)
+  multiply.18512.3 = f64[144,16,480]{2,1,0} multiply(broadcast.35185.3, multiply.16607.17)
+  add.22445.5 = f64[144,16,480]{2,1,0} add(multiply.18511.7, multiply.18512.3)
+  multiply.18513.3 = f64[144,16,480]{2,1,0} multiply(broadcast.34052.874, add.22445.5)
+  ROOT reduce_sum.13674.1 = f64[16,480]{1,0} reduce(multiply.18513.3, constant_7138_2250), dimensions={0}, to_apply=region_2.2.clone.928
+}
+E0922 16:23:57.172598 1192279 xtile_compiler.cc:399] Fusion: input_multiply_reduce_fusion.82 = (f64[16,480]{1,0}, f64[145,16,480]{2,1,0}) fusion(loop_gather_fusion.2, get-tuple-element.11646, get-tuple-element.11645, loop_subtract_fusion.8, constant.28768.0, constant.36400.0, get-tuple-element.13297), kind=kCustom, calls=fused_multiply_reduce.82.clone, backend_config={"operation_queue_id":"0","wait_on_operation_queues":[],"fusion_backend_config":{"kind":"__triton","block_level_fusion_config":{"num_warps":"8","output_tiles":[{"sizes":["8","8"]},{"sizes":["145","8","8"]}],"num_ctas":1,"num_stages":1,"is_tma_allowed":true,"is_warp_specialization_allowed":false}},"force_earliest_schedule":false,"reification_cost":[],"device_type":"DEVICE_TYPE_INVALID"}
+E0922 16:23:57.172648 1192279 xtile_compiler.cc:401] Computation: fused_multiply_reduce.82.clone {
+  param_6.60260 = f64[145,480]{1,0} parameter(6)
+  broadcast.33966.3.clone.1 = f64[145,16,480]{2,1,0} broadcast(param_6.60260), dimensions={0,2}
+  param_5.68016 = pred[145]{0} parameter(5)
+  broadcast.33967.540.clone.1 = pred[145,16,480]{2,1,0} broadcast(param_5.68016), dimensions={0}
+  param_4.84285 = f64[145]{0} parameter(4)
+  broadcast.33968.776.clone.1 = f64[145,16,480]{2,1,0} broadcast(param_4.84285), dimensions={0}
+  param_3.119168 = f64[16,480]{1,0} parameter(3)
+  broadcast.34134.35.clone.1 = f64[145,16,480]{2,1,0} broadcast(param_3.119168), dimensions={1,2}
+  multiply.16598.35.clone.1 = f64[145,16,480]{2,1,0} multiply(broadcast.33968.776.clone.1, broadcast.34134.35.clone.1)
+  param_2.166889 = f64[145,480]{1,0} parameter(2)
+  broadcast.34135.34.clone.1 = f64[145,16,480]{2,1,0} broadcast(param_2.166889), dimensions={0,2}
+  multiply.16599.19.clone.1 = f64[145,16,480]{2,1,0} multiply(multiply.16598.35.clone.1, broadcast.34135.34.clone.1)
+  negate.1131.17.clone.1 = f64[145,16,480]{2,1,0} negate(multiply.16599.19.clone.1)
+  param_1.280464 = f64[145,480]{1,0} parameter(1)
+  broadcast.34136.30.clone.1 = f64[145,16,480]{2,1,0} broadcast(param_1.280464), dimensions={0,2}
+  multiply.16600.15.clone.1 = f64[145,16,480]{2,1,0} multiply(multiply.16598.35.clone.1, broadcast.34136.30.clone.1)
+  select.275.5.clone.1 = f64[145,16,480]{2,1,0} select(broadcast.33967.540.clone.1, negate.1131.17.clone.1, multiply.16600.15.clone.1)
+  multiply.16601.1.clone.1 = f64[145,16,480]{2,1,0} multiply(broadcast.33966.3.clone.1, select.275.5.clone.1)
+  param_0.232461 = f64[145,1]{1,0} parameter(0)
+  bitcast.831.477 = f64[145]{0} bitcast(param_0.232461)
+  broadcast.34032.187 = f64[145,16,480]{2,1,0} broadcast(bitcast.831.477), dimensions={0}
+  multiply.16602.3 = f64[145,16,480]{2,1,0} multiply(multiply.16601.1.clone.1, broadcast.34032.187)
+  constant_7138_823 = f64[] constant(0)
+  reduce.3060.1 = f64[16,480]{1,0} reduce(multiply.16602.3, constant_7138_823), dimensions={0}, to_apply=region_2.2.clone.2197
+  ROOT tuple.10208 = (f64[16,480]{1,0}, f64[145,16,480]{2,1,0}) tuple(reduce.3060.1, multiply.16601.1.clone.1)
+}
+E0922 16:23:57.546257 1192283 xtile_compiler.cc:399] Fusion: input_multiply_reduce_fusion.206 = (f64[8,480]{1,0}, f64[145,8,480]{2,1,0}) fusion(loop_gather_fusion.6, get-tuple-element.20534, get-tuple-element.20533, get-tuple-element.20202, constant.20909.0, constant.21064.0, constant.36139.0, get-tuple-element.20855), kind=kCustom, calls=fused_multiply_reduce.207.clone, backend_config={"operation_queue_id":"0","wait_on_operation_queues":[],"fusion_backend_config":{"kind":"__triton","block_level_fusion_config":{"num_warps":"8","output_tiles":[{"sizes":["8","8"]},{"sizes":["145","8","8"]}],"num_ctas":1,"num_stages":1,"is_tma_allowed":true,"is_warp_specialization_allowed":false}},"force_earliest_schedule":false,"reification_cost":[],"device_type":"DEVICE_TYPE_INVALID"}
+E0922 16:23:57.546315 1192283 xtile_compiler.cc:401] Computation: fused_multiply_reduce.207.clone {
+  param_7.55021 = f64[145,480]{1,0} parameter(7)
+  broadcast.37187.26.clone.1 = f64[145,8,480]{2,1,0} broadcast(param_7.55021), dimensions={0,2}
+  param_6.66467 = pred[145]{0} parameter(6)
+  broadcast.37188.136.clone.1 = pred[145,8,480]{2,1,0} broadcast(param_6.66467), dimensions={0}
+  param_5.75020 = f64[145]{0} parameter(5)
+  broadcast.37294.72.clone.1 = f64[145,8,480]{2,1,0} broadcast(param_5.75020), dimensions={0}
+  param_4.89866 = f64[145]{0} parameter(4)
+  broadcast.37189.318.clone.1 = f64[145,8,480]{2,1,0} broadcast(param_4.89866), dimensions={0}
+  param_3.123130 = f64[8,480]{1,0} parameter(3)
+  broadcast.38027.7.clone.1 = f64[145,8,480]{2,1,0} broadcast(param_3.123130), dimensions={1,2}
+  multiply.24499.7.clone.1 = f64[145,8,480]{2,1,0} multiply(broadcast.37189.318.clone.1, broadcast.38027.7.clone.1)
+  param_2.170043 = f64[145,480]{1,0} parameter(2)
+  broadcast.38029.18.clone.1 = f64[145,8,480]{2,1,0} broadcast(param_2.170043), dimensions={0,2}
+  multiply.24501.3.clone.1 = f64[145,8,480]{2,1,0} multiply(multiply.24499.7.clone.1, broadcast.38029.18.clone.1)
+  multiply.24513.3.clone.1 = f64[145,8,480]{2,1,0} multiply(broadcast.37294.72.clone.1, multiply.24501.3.clone.1)
+  param_1.282565 = f64[145,480]{1,0} parameter(1)
+  broadcast.38028.20.clone.1 = f64[145,8,480]{2,1,0} broadcast(param_1.282565), dimensions={0,2}
+  multiply.24500.5.clone.1 = f64[145,8,480]{2,1,0} multiply(multiply.24499.7.clone.1, broadcast.38028.20.clone.1)
+  negate.1764.3.clone.1 = f64[145,8,480]{2,1,0} negate(multiply.24500.5.clone.1)
+  multiply.24514.3.clone.1 = f64[145,8,480]{2,1,0} multiply(broadcast.37189.318.clone.1, negate.1764.3.clone.1)
+  select.1107.3.clone.1 = f64[145,8,480]{2,1,0} select(broadcast.37188.136.clone.1, multiply.24513.3.clone.1, multiply.24514.3.clone.1)
+  multiply.24515.1.clone.1 = f64[145,8,480]{2,1,0} multiply(broadcast.37187.26.clone.1, select.1107.3.clone.1)
+  param_0.233247 = f64[145,1]{1,0} parameter(0)
+  bitcast.5371.791 = f64[145]{0} bitcast(param_0.233247)
+  broadcast.37253.117 = f64[145,8,480]{2,1,0} broadcast(bitcast.5371.791), dimensions={0}
+  multiply.24516.3 = f64[145,8,480]{2,1,0} multiply(multiply.24515.1.clone.1, broadcast.37253.117)
+  constant_3123_1509 = f64[] constant(0)
+  reduce.4411.1 = f64[8,480]{1,0} reduce(multiply.24516.3, constant_3123_1509), dimensions={0}, to_apply=region_2.2.clone.4741
+  ROOT tuple.17189 = (f64[8,480]{1,0}, f64[145,8,480]{2,1,0}) tuple(reduce.4411.1, multiply.24515.1.clone.1)
+}
+E0922 16:23:57.583474 1192278 xtile_compiler.cc:399] Fusion: input_multiply_reduce_fusion.71 = (f64[16,480]{1,0}, f64[145,16,480]{2,1,0}) fusion(loop_gather_fusion.2, get-tuple-element.12862, get-tuple-element.12861, get-tuple-element.12612, constant.28768.0, constant.28923.0, constant.36400.0, get-tuple-element.13297), kind=kCustom, calls=fused_multiply_reduce.71.clone, backend_config={"operation_queue_id":"0","wait_on_operation_queues":[],"fusion_backend_config":{"kind":"__triton","block_level_fusion_config":{"num_warps":"8","output_tiles":[{"sizes":["8","8"]},{"sizes":["145","8","8"]}],"num_ctas":1,"num_stages":1,"is_tma_allowed":true,"is_warp_specialization_allowed":false}},"force_earliest_schedule":false,"reification_cost":[],"device_type":"DEVICE_TYPE_INVALID"}
+E0922 16:23:57.583713 1192278 xtile_compiler.cc:401] Computation: fused_multiply_reduce.71.clone {
+  param_7.50500 = f64[145,480]{1,0} parameter(7)
+  broadcast.33966.10.clone.1 = f64[145,16,480]{2,1,0} broadcast(param_7.50500), dimensions={0,2}
+  param_6.60684 = pred[145]{0} parameter(6)
+  broadcast.33967.152.clone.1 = pred[145,16,480]{2,1,0} broadcast(param_6.60684), dimensions={0}
+  param_5.68544 = f64[145]{0} parameter(5)
+  broadcast.34073.88.clone.1 = f64[145,16,480]{2,1,0} broadcast(param_5.68544), dimensions={0}
+  param_4.84705 = f64[145]{0} parameter(4)
+  broadcast.33968.532.clone.1 = f64[145,16,480]{2,1,0} broadcast(param_4.84705), dimensions={0}
+  param_3.119455 = f64[16,480]{1,0} parameter(3)
+  broadcast.34317.7.clone.1 = f64[145,16,480]{2,1,0} broadcast(param_3.119455), dimensions={1,2}
+  multiply.16940.7.clone.1 = f64[145,16,480]{2,1,0} multiply(broadcast.33968.532.clone.1, broadcast.34317.7.clone.1)
+  param_2.167130 = f64[145,480]{1,0} parameter(2)
+  broadcast.34319.18.clone.1 = f64[145,16,480]{2,1,0} broadcast(param_2.167130), dimensions={0,2}
+  multiply.16942.3.clone.1 = f64[145,16,480]{2,1,0} multiply(multiply.16940.7.clone.1, broadcast.34319.18.clone.1)
+  multiply.16954.3.clone.1 = f64[145,16,480]{2,1,0} multiply(broadcast.34073.88.clone.1, multiply.16942.3.clone.1)
+  param_1.280656 = f64[145,480]{1,0} parameter(1)
+  broadcast.34318.20.clone.1 = f64[145,16,480]{2,1,0} broadcast(param_1.280656), dimensions={0,2}
+  multiply.16941.5.clone.1 = f64[145,16,480]{2,1,0} multiply(multiply.16940.7.clone.1, broadcast.34318.20.clone.1)
+  negate.1179.3.clone.1 = f64[145,16,480]{2,1,0} negate(multiply.16941.5.clone.1)
+  multiply.16955.3.clone.1 = f64[145,16,480]{2,1,0} multiply(broadcast.33968.532.clone.1, negate.1179.3.clone.1)
+  select.328.3.clone.1 = f64[145,16,480]{2,1,0} select(broadcast.33967.152.clone.1, multiply.16954.3.clone.1, multiply.16955.3.clone.1)
+  multiply.16956.1.clone.1 = f64[145,16,480]{2,1,0} multiply(broadcast.33966.10.clone.1, select.328.3.clone.1)
+  param_0.232540 = f64[145,1]{1,0} parameter(0)
+  bitcast.831.455 = f64[145]{0} bitcast(param_0.232540)
+  broadcast.34032.165 = f64[145,16,480]{2,1,0} broadcast(bitcast.831.455), dimensions={0}
+  multiply.16957.3 = f64[145,16,480]{2,1,0} multiply(multiply.16956.1.clone.1, broadcast.34032.165)
+  constant_7138_2754 = f64[] constant(0)
+  reduce.3173.1 = f64[16,480]{1,0} reduce(multiply.16957.3, constant_7138_2754), dimensions={0}, to_apply=region_2.2.clone.2226
+  ROOT tuple.10545 = (f64[16,480]{1,0}, f64[145,16,480]{2,1,0}) tuple(reduce.3173.1, multiply.16956.1.clone.1)
+}
+E0922 16:23:57.644357 1192284 xtile_compiler.cc:399] Fusion: input_multiply_reduce_fusion.254 = (f64[8,480]{1,0}, f64[144,8,480]{2,1,0}) fusion(loop_gather_fusion.4, get-tuple-element.20719, get-tuple-element.20718, get-tuple-element.20202, constant.21102.0, constant.21127.0, constant.36170.0, get-tuple-element.20805), kind=kCustom, calls=fused_multiply_reduce.255.clone, backend_config={"operation_queue_id":"0","wait_on_operation_queues":[],"fusion_backend_config":{"kind":"__triton","block_level_fusion_config":{"num_warps":"8","output_tiles":[{"sizes":["8","8"]},{"sizes":["144","8","8"]}],"num_ctas":1,"num_stages":1,"is_tma_allowed":true,"is_warp_specialization_allowed":false}},"force_earliest_schedule":false,"reification_cost":[],"device_type":"DEVICE_TYPE_INVALID"}
+E0922 16:23:57.644568 1192284 xtile_compiler.cc:401] Computation: fused_multiply_reduce.255.clone {
+  param_7.55030 = f64[144,480]{1,0} parameter(7)
+  broadcast.37271.26.clone.1 = f64[144,8,480]{2,1,0} broadcast(param_7.55030), dimensions={0,2}
+  param_6.66485 = pred[144]{0} parameter(6)
+  broadcast.37272.136.clone.1 = pred[144,8,480]{2,1,0} broadcast(param_6.66485), dimensions={0}
+  param_5.75047 = f64[144]{0} parameter(5)
+  broadcast.37305.72.clone.1 = f64[144,8,480]{2,1,0} broadcast(param_5.75047), dimensions={0}
+  param_4.89886 = f64[144]{0} parameter(4)
+  broadcast.37273.318.clone.1 = f64[144,8,480]{2,1,0} broadcast(param_4.89886), dimensions={0}
+  param_3.123145 = f64[8,480]{1,0} parameter(3)
+  broadcast.38032.7.clone.1 = f64[144,8,480]{2,1,0} broadcast(param_3.123145), dimensions={1,2}
+  multiply.24506.7.clone.1 = f64[144,8,480]{2,1,0} multiply(broadcast.37273.318.clone.1, broadcast.38032.7.clone.1)
+  param_2.170055 = f64[144,480]{1,0} parameter(2)
+  broadcast.38034.18.clone.1 = f64[144,8,480]{2,1,0} broadcast(param_2.170055), dimensions={0,2}
+  multiply.24508.3.clone.1 = f64[144,8,480]{2,1,0} multiply(multiply.24506.7.clone.1, broadcast.38034.18.clone.1)
+  multiply.24527.3.clone.1 = f64[144,8,480]{2,1,0} multiply(broadcast.37305.72.clone.1, multiply.24508.3.clone.1)
+  param_1.282571 = f64[144,480]{1,0} parameter(1)
+  broadcast.38033.20.clone.1 = f64[144,8,480]{2,1,0} broadcast(param_1.282571), dimensions={0,2}
+  multiply.24507.5.clone.1 = f64[144,8,480]{2,1,0} multiply(multiply.24506.7.clone.1, broadcast.38033.20.clone.1)
+  negate.1765.3.clone.1 = f64[144,8,480]{2,1,0} negate(multiply.24507.5.clone.1)
+  multiply.24528.3.clone.1 = f64[144,8,480]{2,1,0} multiply(broadcast.37273.318.clone.1, negate.1765.3.clone.1)
+  select.1108.3.clone.1 = f64[144,8,480]{2,1,0} select(broadcast.37272.136.clone.1, multiply.24527.3.clone.1, multiply.24528.3.clone.1)
+  multiply.24529.1.clone.1 = f64[144,8,480]{2,1,0} multiply(broadcast.37271.26.clone.1, select.1108.3.clone.1)
+  param_0.233250 = f64[144,1]{1,0} parameter(0)
+  bitcast.5375.855 = f64[144]{0} bitcast(param_0.233250)
+  broadcast.37277.117 = f64[144,8,480]{2,1,0} broadcast(bitcast.5375.855), dimensions={0}
+  multiply.24530.3 = f64[144,8,480]{2,1,0} multiply(multiply.24529.1.clone.1, broadcast.37277.117)
+  constant_3123_1277 = f64[] constant(0)
+  reduce.4415.1 = f64[8,480]{1,0} reduce(multiply.24530.3, constant_3123_1277), dimensions={0}, to_apply=region_2.2.clone.4743
+  ROOT tuple.17194 = (f64[8,480]{1,0}, f64[144,8,480]{2,1,0}) tuple(reduce.4415.1, multiply.24529.1.clone.1)
+}
+E0922 16:23:57.823195 1192286 xtile_compiler.cc:399] Fusion: input_reduce_fusion.208 = f64[16,480]{1,0} fusion(get-tuple-element.11645, loop_subtract_fusion.8, constant.28768.0, get-tuple-element.13274, get-tuple-element.11646, get-tuple-element.11594, constant.36400.0, constant.28923.0), kind=kCustom, calls=fused_reduce.221.clone, backend_config={"operation_queue_id":"0","wait_on_operation_queues":[],"fusion_backend_config":{"kind":"__triton","block_level_fusion_config":{"num_warps":"8","output_tiles":[{"sizes":["8","8"]}],"num_ctas":1,"num_stages":1,"is_tma_allowed":true,"is_warp_specialization_allowed":false}},"force_earliest_schedule":false,"reification_cost":[],"device_type":"DEVICE_TYPE_INVALID"}
+E0922 16:23:57.823458 1192286 xtile_compiler.cc:401] Computation: fused_reduce.221.clone {
+  param_2.81470 = f64[145]{0} parameter(2)
+  broadcast.33968.1100 = f64[145,16,480]{2,1,0} broadcast(param_2.81470), dimensions={0}
+  param_7.23391 = f64[145]{0} parameter(7)
+  broadcast.34073.126 = f64[145,16,480]{2,1,0} broadcast(param_7.23391), dimensions={0}
+  param_6.27710 = pred[145]{0} parameter(6)
+  broadcast.33967.702 = pred[145,16,480]{2,1,0} broadcast(param_6.27710), dimensions={0}
+  param_5.31843 = f64[145,16,480]{2,1,0} parameter(5)
+  constant_7138_2257 = f64[] constant(0)
+  broadcast.35104.574 = f64[145,16,480]{2,1,0} broadcast(constant_7138_2257), dimensions={}
+  select.559.5 = f64[145,16,480]{2,1,0} select(broadcast.33967.702, param_5.31843, broadcast.35104.574)
+  multiply.18533.5 = f64[145,16,480]{2,1,0} multiply(broadcast.34073.126, select.559.5)
+  param_4.39796 = f64[145,480]{1,0} parameter(4)
+  broadcast.34136.40 = f64[145,16,480]{2,1,0} broadcast(param_4.39796), dimensions={0,2}
+  multiply.18534.7 = f64[145,16,480]{2,1,0} multiply(multiply.18533.5, broadcast.34136.40)
+  param_3.56470 = f64[145,480]{1,0} parameter(3)
+  broadcast.35195.5 = f64[145,16,480]{2,1,0} broadcast(param_3.56470), dimensions={0,2}
+  param_1.138462 = f64[16,480]{1,0} parameter(1)
+  broadcast.34134.45 = f64[145,16,480]{2,1,0} broadcast(param_1.138462), dimensions={1,2}
+  multiply.16598.45 = f64[145,16,480]{2,1,0} multiply(broadcast.33968.1100, broadcast.34134.45)
+  param_0.114491 = f64[145,480]{1,0} parameter(0)
+  broadcast.34135.44 = f64[145,16,480]{2,1,0} broadcast(param_0.114491), dimensions={0,2}
+  multiply.16599.25 = f64[145,16,480]{2,1,0} multiply(multiply.16598.45, broadcast.34135.44)
+  negate.1131.23 = f64[145,16,480]{2,1,0} negate(multiply.16599.25)
+  multiply.18535.5 = f64[145,16,480]{2,1,0} multiply(broadcast.35195.5, negate.1131.23)
+  add.22452.5 = f64[145,16,480]{2,1,0} add(multiply.18534.7, multiply.18535.5)
+  multiply.18536.3 = f64[145,16,480]{2,1,0} multiply(broadcast.33968.1100, add.22452.5)
+  ROOT reduce_sum.13687.1 = f64[16,480]{1,0} reduce(multiply.18536.3, constant_7138_2257), dimensions={0}, to_apply=region_2.2.clone.933
+}
+E0922 16:23:57.881313 1192292 xtile_compiler.cc:399] Fusion: input_multiply_reduce_fusion.207 = (f64[8,480]{1,0}, f64[145,8,480]{2,1,0}) fusion(loop_gather_fusion.6, get-tuple-element.20533, get-tuple-element.20534, get-tuple-element.20202, constant.20909.0, constant.36139.0, get-tuple-element.20589), kind=kCustom, calls=fused_multiply_reduce.208.clone, backend_config={"operation_queue_id":"0","wait_on_operation_queues":[],"fusion_backend_config":{"kind":"__triton","block_level_fusion_config":{"num_warps":"8","output_tiles":[{"sizes":["8","8"]},{"sizes":["145","8","8"]}],"num_ctas":1,"num_stages":1,"is_tma_allowed":true,"is_warp_specialization_allowed":false}},"force_earliest_schedule":false,"reification_cost":[],"device_type":"DEVICE_TYPE_INVALID"}
+E0922 16:23:57.881378 1192292 xtile_compiler.cc:401] Computation: fused_multiply_reduce.208.clone {
+  param_6.66459 = f64[145,480]{1,0} parameter(6)
+  broadcast.37293.13.clone.1 = f64[145,8,480]{2,1,0} broadcast(param_6.66459), dimensions={0,2}
+  param_5.75011 = pred[145]{0} parameter(5)
+  broadcast.37188.430.clone.1 = pred[145,8,480]{2,1,0} broadcast(param_5.75011), dimensions={0}
+  param_4.89858 = f64[145]{0} parameter(4)
+  broadcast.37189.780.clone.1 = f64[145,8,480]{2,1,0} broadcast(param_4.89858), dimensions={0}
+  param_3.123125 = f64[8,480]{1,0} parameter(3)
+  broadcast.38027.33.clone.1 = f64[145,8,480]{2,1,0} broadcast(param_3.123125), dimensions={1,2}
+  multiply.24499.33.clone.1 = f64[145,8,480]{2,1,0} multiply(broadcast.37189.780.clone.1, broadcast.38027.33.clone.1)
+  param_2.170039 = f64[145,480]{1,0} parameter(2)
+  broadcast.38028.34.clone.1 = f64[145,8,480]{2,1,0} broadcast(param_2.170039), dimensions={0,2}
+  multiply.24500.15.clone.1 = f64[145,8,480]{2,1,0} multiply(multiply.24499.33.clone.1, broadcast.38028.34.clone.1)
+  negate.1764.13.clone.1 = f64[145,8,480]{2,1,0} negate(multiply.24500.15.clone.1)
+  param_1.282563 = f64[145,480]{1,0} parameter(1)
+  broadcast.38029.32.clone.1 = f64[145,8,480]{2,1,0} broadcast(param_1.282563), dimensions={0,2}
+  multiply.24501.17.clone.1 = f64[145,8,480]{2,1,0} multiply(multiply.24499.33.clone.1, broadcast.38029.32.clone.1)
+  select.1105.3.clone.1 = f64[145,8,480]{2,1,0} select(broadcast.37188.430.clone.1, negate.1764.13.clone.1, multiply.24501.17.clone.1)
+  multiply.24511.1.clone.1 = f64[145,8,480]{2,1,0} multiply(broadcast.37293.13.clone.1, select.1105.3.clone.1)
+  param_0.233246 = f64[145,1]{1,0} parameter(0)
+  bitcast.5371.793 = f64[145]{0} bitcast(param_0.233246)
+  broadcast.37253.119 = f64[145,8,480]{2,1,0} broadcast(bitcast.5371.793), dimensions={0}
+  multiply.24512.3 = f64[145,8,480]{2,1,0} multiply(multiply.24511.1.clone.1, broadcast.37253.119)
+  constant_3123_1493 = f64[] constant(0)
+  reduce.4410.1 = f64[8,480]{1,0} reduce(multiply.24512.3, constant_3123_1493), dimensions={0}, to_apply=region_2.2.clone.4740
+  ROOT tuple.17188 = (f64[8,480]{1,0}, f64[145,8,480]{2,1,0}) tuple(reduce.4410.1, multiply.24511.1.clone.1)
+}
+E0922 16:23:58.022383 1192282 xtile_compiler.cc:399] Fusion: input_reduce_fusion.1507 = f64[8,480]{1,0} fusion(get-tuple-element.20563, get-tuple-element.20217, constant.20909.0, get-tuple-element.19148, get-tuple-element.15308, get-tuple-element.20564), kind=kCustom, calls=fused_reduce.1565.clone, backend_config={"operation_queue_id":"0","wait_on_operation_queues":[],"fusion_backend_config":{"kind":"__triton","block_level_fusion_config":{"num_warps":"8","output_tiles":[{"sizes":["8","8"]}],"num_ctas":1,"num_stages":1,"is_tma_allowed":true,"is_warp_specialization_allowed":false}},"force_earliest_schedule":false,"reification_cost":[],"device_type":"DEVICE_TYPE_INVALID"}
+E0922 16:23:58.022475 1192282 xtile_compiler.cc:401] Computation: fused_reduce.1565.clone {
+  param_2.164771 = f64[145]{0} parameter(2)
+  broadcast.37189.700 = f64[145,8,480]{2,1,0} broadcast(param_2.164771), dimensions={0}
+  param_4.81973 = f64[145,8,480]{2,1,0} parameter(4)
+  param_5.65593 = f64[145,480]{1,0} parameter(5)
+  broadcast.37661.30 = f64[145,8,480]{2,1,0} broadcast(param_5.65593), dimensions={0,2}
+  multiply.25929.7 = f64[145,8,480]{2,1,0} multiply(param_4.81973, broadcast.37661.30)
+  param_3.116781 = f64[145,480]{1,0} parameter(3)
+  broadcast.38832.3 = f64[145,8,480]{2,1,0} broadcast(param_3.116781), dimensions={0,2}
+  param_1.277948 = f64[8,480]{1,0} parameter(1)
+  broadcast.37660.27 = f64[145,8,480]{2,1,0} broadcast(param_1.277948), dimensions={1,2}
+  multiply.23813.27 = f64[145,8,480]{2,1,0} multiply(broadcast.37189.700, broadcast.37660.27)
+  param_0.230342 = f64[145,480]{1,0} parameter(0)
+  broadcast.37662.28 = f64[145,8,480]{2,1,0} broadcast(param_0.230342), dimensions={0,2}
+  multiply.23815.13 = f64[145,8,480]{2,1,0} multiply(multiply.23813.27, broadcast.37662.28)
+  multiply.25930.3 = f64[145,8,480]{2,1,0} multiply(broadcast.38832.3, multiply.23815.13)
+  add.25597.5 = f64[145,8,480]{2,1,0} add(multiply.25929.7, multiply.25930.3)
+  multiply.25931.3 = f64[145,8,480]{2,1,0} multiply(broadcast.37189.700, add.25597.5)
+  constant_3123_2934 = f64[] constant(0)
+  ROOT reduce_sum.23649.1 = f64[8,480]{1,0} reduce(multiply.25931.3, constant_3123_2934), dimensions={0}, to_apply=region_2.2.clone.3486
+}
+E0922 16:23:58.559604 1192281 xtile_compiler.cc:399] Fusion: input_reduce_fusion.186 = f64[16,480]{1,0} fusion(get-tuple-element.11646, loop_subtract_fusion.8, constant.28768.0, get-tuple-element.13276, get-tuple-element.11645, get-tuple-element.11596, constant.36400.0), kind=kCustom, calls=fused_reduce.199.clone, backend_config={"operation_queue_id":"0","wait_on_operation_queues":[],"fusion_backend_config":{"kind":"__triton","block_level_fusion_config":{"num_warps":"8","output_tiles":[{"sizes":["8","8"]}],"num_ctas":1,"num_stages":1,"is_tma_allowed":true,"is_warp_specialization_allowed":false}},"force_earliest_schedule":false,"reification_cost":[],"device_type":"DEVICE_TYPE_INVALID"}
+E0922 16:23:58.559848 1192281 xtile_compiler.cc:401] Computation: fused_reduce.199.clone {
+  param_2.81474 = f64[145]{0} parameter(2)
+  broadcast.33968.1012 = f64[145,16,480]{2,1,0} broadcast(param_2.81474), dimensions={0}
+  param_6.27714 = pred[145]{0} parameter(6)
+  broadcast.33967.658 = pred[145,16,480]{2,1,0} broadcast(param_6.27714), dimensions={0}
+  param_5.31847 = f64[145,16,480]{2,1,0} parameter(5)
+  constant_7138_2266 = f64[] constant(0)
+  broadcast.35104.530 = f64[145,16,480]{2,1,0} broadcast(constant_7138_2266), dimensions={}
+  select.565.7 = f64[145,16,480]{2,1,0} select(broadcast.33967.658, param_5.31847, broadcast.35104.530)
+  negate.1382.5 = f64[145,16,480]{2,1,0} negate(select.565.7)
+  param_4.39800 = f64[145,480]{1,0} parameter(4)
+  broadcast.34135.36 = f64[145,16,480]{2,1,0} broadcast(param_4.39800), dimensions={0,2}
+  multiply.18560.7 = f64[145,16,480]{2,1,0} multiply(negate.1382.5, broadcast.34135.36)
+  param_3.56474 = f64[145,480]{1,0} parameter(3)
+  broadcast.35204.3 = f64[145,16,480]{2,1,0} broadcast(param_3.56474), dimensions={0,2}
+  param_1.138469 = f64[16,480]{1,0} parameter(1)
+  broadcast.34134.37 = f64[145,16,480]{2,1,0} broadcast(param_1.138469), dimensions={1,2}
+  multiply.16598.37 = f64[145,16,480]{2,1,0} multiply(broadcast.33968.1012, broadcast.34134.37)
+  param_0.114498 = f64[145,480]{1,0} parameter(0)
+  broadcast.34136.32 = f64[145,16,480]{2,1,0} broadcast(param_0.114498), dimensions={0,2}
+  multiply.16600.17 = f64[145,16,480]{2,1,0} multiply(multiply.16598.37, broadcast.34136.32)
+  multiply.18561.3 = f64[145,16,480]{2,1,0} multiply(broadcast.35204.3, multiply.16600.17)
+  add.22461.5 = f64[145,16,480]{2,1,0} add(multiply.18560.7, multiply.18561.3)
+  multiply.18562.3 = f64[145,16,480]{2,1,0} multiply(broadcast.33968.1012, add.22461.5)
+  ROOT reduce_sum.13702.1 = f64[16,480]{1,0} reduce(multiply.18562.3, constant_7138_2266), dimensions={0}, to_apply=region_2.2.clone.939
+}
+E0922 16:23:58.818145 1192291 cuda_timer.cc:87] Delay kernel timed out: measured time has sub-optimal accuracy. There may be a missing warmup execution, please investigate in Nsight Systems.
+E0922 16:23:58.912419 1192281 cuda_timer.cc:87] Delay kernel timed out: measured time has sub-optimal accuracy. There may be a missing warmup execution, please investigate in Nsight Systems.
+W0922 16:25:44.685375 1192171 bfc_allocator.cc:502] Allocator (GPU_0_bfc) ran out of memory trying to allocate 4.42GiB (rounded to 4750987264)requested by op 
+If the cause is memory fragmentation maybe the environment variable 'TF_GPU_ALLOCATOR=cuda_malloc_async' will improve the situation. 
+Current allocation summary follows.
+Current allocation summary follows.
+W0922 16:25:44.686043 1192171 bfc_allocator.cc:513] **********x___****__***_____________________________________________________________________________
+       1              2          7.240e+00      7.695e-01      1.553e-03      9.400e-01      2.629e-02      1.000e+01      0.000e+00      1.000e-03   
+Traceback (most recent call last):
+  File "/home/singh/Documents/DESC2/coil_sandbox/922_stage1opt_results/stage1_v1.py", line 120, in <module>
+    (eq_new,), result = opt.optimize((eq,), objective, constraints, maxiter=args.maxiter,
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/optimize/optimizer.py", line 318, in optimize
+    result = optimizers[method]["fun"](
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/optimize/_desc_wrappers.py", line 394, in _optimize_desc_aug_lagrangian_least_squares
+    result = lsq_auglag(
+             ^^^^^^^^^^^
+  File "/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/optimize/aug_lagrangian_ls.py", line 983, in lsq_auglag
+    so_lam_min = float(eig_h[0][0])
+                 ^^^^^^^^^^^^^^^^^^
+  File "/home/singh/miniforge3/envs/desc-env2/lib/python3.12/site-packages/jax/_src/array.py", line 299, in __float__
+    return self._value.__float__()
+           ^^^^^^^^^^^
+  File "/home/singh/miniforge3/envs/desc-env2/lib/python3.12/site-packages/jax/_src/profiler.py", line 384, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/singh/miniforge3/envs/desc-env2/lib/python3.12/site-packages/jax/_src/array.py", line 641, in _value
+    npy_value, did_copy = self._single_device_array_to_np_array_did_copy()
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+jax.errors.JaxRuntimeError: RESOURCE_EXHAUSTED: Out of memory while trying to allocate 4.42GiB.

@@ -1,0 +1,14 @@
+{
+  "_note": "QUASR 1328095 AS BUILT: every bound is the device's own achieved value, so the viewer's margins read 1.000 exactly when the reconstruction is faithful. Absolute -- these devices live at R0 ~ 1 m with a = 0.1250 m, so reactor-scaled defaults would judge a different problem entirely.",
+  "_note2": "Pinned at a round threshold for this device: L_total (100/8 = 12.500), kappa_MS (35.0000), d_cc (0.1000). NOT pinned: kappa (10.8349) and d_pc (0.1500) -- recorded as-built for reference.",
+  "_note3": "L is null: QUASR constrains the SUM over a half period, not each coil. convex_excess / planar_max null: FourierXYZ coils carry neither.",
+  "scale": "absolute",
+  "L": null,
+  "L_total": 12.5,
+  "kappa": 10.8349422297,
+  "kappa_MS": 35.0000001032,
+  "d_cc": 0.0999998089,
+  "d_pc": 0.1499999746,
+  "convex_excess": null,
+  "planar_max": null
+}

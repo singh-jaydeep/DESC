@@ -1,0 +1,10 @@
+{
+  "_source": "Kruger, Elder, Gates et al., Planar coil design for the Helios stellarator fusion power plant, Fusion Eng. Des. 230 (2026) 115893, Table 2 (encircling coils) and Sec. 4.1. L = 36 m is the paper's AVERAGE encircling-coil length, used here as a per-coil cap (user's choice, 2026-09-16). The paper has no kappa_MS bound. convex_excess: allowed total-curvature excess per coil, int |kappa| ds - 2 pi (paper Eq. 5), in radians. || helios_L36_ladder = the UNMODIFIED paper bounds (L 36). Final rung of the grow-into-the-length ladder (28 cold -> 32 -> 34 -> 36), warm started from warm_L34_paper. This is the TRUE like-for-like comparison against the sacrificed baseline cut30 (8.7195e-3, 576 m, one coil at 5.3 MA): same bounds, same conductor, but reached by growing from short even coils instead of starting long.",
+  "scale": "absolute",
+  "L": 36.0,
+  "kappa": 1.5,
+  "kappa_MS": null,
+  "d_cc": 1.2,
+  "d_pc": 1.2,
+  "convex_excess": 0.001
+}

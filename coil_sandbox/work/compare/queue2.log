@@ -1,0 +1,14 @@
+CHAIN Q1 (noautotune) start 15:47:23
+CHAIN Q1 (noautotune) FAILED 15:47:53
+CHAIN Q1 (cpu) start 15:47:53
+CHAIN Q1 (cpu) ok 16:29:57
+CHAIN Q2 start 16:29:57
+CHAIN Q2 FAILED 16:30:41
+CHAIN H3 (noautotune) start 16:30:41
+CHAIN H3 (noautotune) FAILED 16:31:11
+CHAIN H3 (cpu) start 16:31:11
+Terminated                 $CAP $PY run_one.py "$@" --vacuum --start "$start" --out $out --maxiter 400 --device cpu > $out/run.log 2>&1
+CHAIN H3 (cpu) FAILED 17:33:56
+CHAIN H2-k4 start 17:33:56
+CHAIN H2-k4 ok 17:51:39
+CHAIN all done 17:51:39

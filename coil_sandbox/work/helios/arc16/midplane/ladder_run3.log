@@ -1,0 +1,9 @@
+[repair] done already, skipping
+[free] done already, skipping
+[dual_L28_c60] done already, skipping
+DEVICE requested=cpu obtained=cpu (1x cpu)
+   corners max 53.3 / limit 60  OK   currents min/max 0.85   max |hinge z| 0.00e+00 m
+=== dual_L30_c70  20:49:36 ===
+work/helios/arc16/midplane/run_midplane_ladder.sh: line 33: 976010 Killed                     "${CAP[@]}" "$PY" run_one.py --eq $EQ "$@" --out "$out" > "$D/$log" 2>&1
+START  bn 2.6778e-02  L 0.933  kappa 0.371  convex 0.036  d_cc 1.303  d_pc 1.018  linked 0  coils 16  -> FEASIBLE  demount: min hinge clearance +0.910 m, worst arc blocked 0.00%  -> REMOVABLE
+  FAILED: no result.h5 -- see work/helios/arc16/midplane/dual_L30_c70.log

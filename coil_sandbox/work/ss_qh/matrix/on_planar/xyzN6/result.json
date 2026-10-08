@@ -1,0 +1,176 @@
+{
+ "settings": {
+  "eq": "work/ss_qh/matrix/ss/planar_k4b/eq_k4.h5",
+  "start": "work/ss_qh/matrix/base/xyzN6/result.h5",
+  "bounds": "bounds/precise_qh_gil.json",
+  "out": "work/ss_qh/matrix/on_planar/xyzN6",
+  "vacuum": true,
+  "a": null,
+  "maxiter": 800,
+  "gtol": 1e-06,
+  "ctol": 1e-06,
+  "field_n": 50,
+  "curv_n": 300,
+  "row_n": 256,
+  "cc_k": 20000,
+  "cc_gap": "bounds",
+  "options": "{}",
+  "device": null
+ },
+ "bounds": {
+  "L": 2.9255111576633253,
+  "Ltot": null,
+  "kappa": 13.672824284132604,
+  "kms": 18.694612390476625,
+  "dcc": 0.05851022315326651,
+  "dpc": 0.1097066684123747,
+  "convex": null,
+  "planar": null,
+  "f": 0.07289216561289139,
+  "a": 0.12391668154191535,
+  "scale": "absolute"
+ },
+ "info": {
+  "kind": "FourierXYZCoil",
+  "gauge": "phase pinned (['Z_n', 'Z_n', 'Z_n', 'Y_n']), relative speed within +-0.5",
+  "field_grid": "uniform N=50 (101 nodes)",
+  "n_nodes": 513,
+  "speed_ratio": 1.5,
+  "cc_gap_mode": "bounds",
+  "cc_gap": 0.001313133406666363,
+  "pc_node_margin": 0.0003126508111110389
+ },
+ "solver": {
+  "message": "`gtol` condition satisfied.",
+  "nit": 17,
+  "n_outer": 5,
+  "optimality": 2.862452491173192e-07,
+  "constr_violation": 2.191555497077502e-07,
+  "wall_s": 88.09373831748962
+ },
+ "start": {
+  "per_coil": [
+   {
+    "L": 2.9255111561042466,
+    "kappa": 12.814349856921298,
+    "kms": 14.465683698544927,
+    "corner": 0.0,
+    "convex": NaN,
+    "kappa_s_min": NaN,
+    "planar": 0.0
+   },
+   {
+    "L": 2.92551115726937,
+    "kappa": 13.6730118979981,
+    "kms": 18.69461235181907,
+    "corner": 0.0,
+    "convex": NaN,
+    "kappa_s_min": NaN,
+    "planar": 0.0
+   },
+   {
+    "L": 2.925511156937452,
+    "kappa": 13.672817945425196,
+    "kms": 18.69461234548027,
+    "corner": 0.0,
+    "convex": NaN,
+    "kappa_s_min": NaN,
+    "planar": 0.0
+   },
+   {
+    "L": 2.925511157668107,
+    "kappa": 11.431847255277196,
+    "kms": 18.694612388367993,
+    "corner": 0.0,
+    "convex": NaN,
+    "kappa_s_min": NaN,
+    "planar": 0.0
+   }
+  ],
+  "L": 2.925511157668107,
+  "L_total": 11.702044627979177,
+  "kappa": 13.6730118979981,
+  "kms": 18.694612388367993,
+  "corner": 0.0,
+  "convex": NaN,
+  "planar": 0.0,
+  "d_cc": 0.0598036588647674,
+  "d_pc": 0.15673211745186516,
+  "linked": 0,
+  "linked_pairs": [],
+  "bn": 0.0636837286975849,
+  "bn_max": 0.15031287540412352,
+  "bn_local": 0.06431445158508386,
+  "bn_max_T": 0.14643104600149248,
+  "vacuum": true,
+  "n_coils": 32
+ },
+ "result": {
+  "per_coil": [
+   {
+    "L": 2.9255111557326825,
+    "kappa": 9.026488015902816,
+    "kms": 12.845528246774775,
+    "corner": 0.0,
+    "convex": NaN,
+    "kappa_s_min": NaN,
+    "planar": 0.0
+   },
+   {
+    "L": 2.925511149156179,
+    "kappa": 9.228984352215155,
+    "kms": 15.432734359030931,
+    "corner": 0.0,
+    "convex": NaN,
+    "kappa_s_min": NaN,
+    "planar": 0.0
+   },
+   {
+    "L": 2.925511156115658,
+    "kappa": 11.265779833411715,
+    "kms": 14.637824770316929,
+    "corner": 0.0,
+    "convex": NaN,
+    "kappa_s_min": NaN,
+    "planar": 0.0
+   },
+   {
+    "L": 2.9255111495249655,
+    "kappa": 13.673011216107527,
+    "kms": 17.95973676845792,
+    "corner": 0.0,
+    "convex": NaN,
+    "kappa_s_min": NaN,
+    "planar": 0.0
+   }
+  ],
+  "L": 2.925511156115658,
+  "L_total": 11.702044610529486,
+  "kappa": 13.673011216107527,
+  "kms": 17.95973676845792,
+  "corner": 0.0,
+  "convex": NaN,
+  "planar": 0.0,
+  "d_cc": 0.059822364011171664,
+  "d_pc": 0.15433418326971324,
+  "linked": 0,
+  "linked_pairs": [],
+  "bn": 0.0010974672483053485,
+  "bn_max": 0.010538592413876148,
+  "bn_local": 0.0010803822225463455,
+  "bn_max_T": 0.01021752272689444,
+  "vacuum": true,
+  "n_coils": 32
+ },
+ "margins": {
+  "L": 0.9999999994709754,
+  "kappa": 1.000013671789459,
+  "kMS": 0.9606905130382343,
+  "d_cc": 1.0224258392327101,
+  "d_pc": 1.4067894459212713
+ },
+ "active": [
+  "L",
+  "kappa"
+ ]
+}

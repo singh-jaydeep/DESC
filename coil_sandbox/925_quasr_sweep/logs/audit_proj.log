@@ -1,0 +1,41 @@
+Running as unit: run-p1497966-i1500210.scope; invocation ID: 23ad423f1ffa45b2946fc4322238ff34
+DEVICE requested=gpu obtained=gpu (1x NVIDIA GeForce RTX 5070 Laptop GPU)
+Converting VMEC input to DESC input
+Generated DESC input file /tmp/claude-1000/-home-singh-Documents-DESC2-coil-sandbox/91f880f0-34c8-4d34-ba49-8b36d79ca617/scratchpad/quasr_cache/input.q1630198_desc:
+=== QUASR 1630198: nfp 4 QH, 5 unique coils, a 0.1250, qs 1e-3.12 ===
+
+-- (A) eps_1 / eps_2 of QUASR's REAL coils (arclength-weighted) --
+   coil 0: eps_1 0.09868  eps_2 0.04509  C 1.828  eta_SVD 0.04698 (unweighted 0.04698)
+   coil 1: eps_1 0.14971  eps_2 0.07296  C 1.949  eta_SVD 0.06944 (unweighted 0.06944)
+   coil 2: eps_1 0.18622  eps_2 0.09109  C 1.957  eta_SVD 0.08473 (unweighted 0.08473)
+   coil 3: eps_1 0.19607  eps_2 0.06674  C 1.361  eta_SVD 0.08902 (unweighted 0.08902)
+   coil 4: eps_1 0.23119  eps_2 0.08271  C 1.431  eta_SVD 0.10329 (unweighted 0.10329)
+   MEAN  eps_1 0.17238  eps_2 0.07172  eta_SVD 0.07869
+
+-- (B) baseline and planar projection --
+  QUASR FourierXYZ N=16 (baseline)   bn 6.2597e-04  max 3.994e-03  d_cc 0.0995  d_pc 0.1474  kappa  13.954  L/hp  13.000  linked 0
+  to_FourierPlanar N=8               bn 5.1419e-02  max 2.300e-01  d_cc 0.0613  d_pc 0.1184  kappa  15.580  L/hp  12.219  linked 0
+   planar fit deviation: max 0.12046 m = 0.964 a
+   bn ratio planar/xyz = 82.14x
+
+-- (C) polar arcs B=2 M=5: hinge placement sweep --
+  cut-angle 0 deg                    bn 4.8360e-02  max 3.062e-01  d_cc 0.0431  d_pc 0.0966  kappa   5.904  L/hp  12.195  linked 0
+  cut-angle 20 deg                   bn 3.8881e-02  max 2.545e-01  d_cc 0.0161  d_pc 0.0998  kappa   5.958  L/hp  12.276  linked 0
+  cut-angle 40 deg                   bn 4.0752e-02  max 2.018e-01  d_cc 0.0191  d_pc 0.0954  kappa   5.101  L/hp  12.244  linked 8
+  cut-angle 60 deg                   bn 4.9995e-02  max 3.059e-01  d_cc 0.0312  d_pc 0.1109  kappa   5.760  L/hp  12.273  linked 0
+  cut-angle 80 deg                   bn 4.6631e-02  max 2.670e-01  d_cc 0.0224  d_pc 0.1253  kappa   5.040  L/hp  12.234  linked 0
+  cut-angle 100 deg                  bn 3.8006e-02  max 1.929e-01  d_cc 0.0426  d_pc 0.1215  kappa   5.359  L/hp  12.255  linked 0
+  cut-angle 120 deg                  bn 4.3142e-02  max 2.030e-01  d_cc 0.0028  d_pc 0.1234  kappa   6.358  L/hp  12.188  linked 0
+  cut-angle 140 deg                  bn 4.8842e-02  max 2.306e-01  d_cc 0.0084  d_pc 0.0926  kappa   6.612  L/hp  12.152  linked 12
+  cut-angle 160 deg                  bn 5.1803e-02  max 4.199e-01  d_cc 0.0333  d_pc 0.0794  kappa   6.294  L/hp  12.144  linked 0
+  equal parameter, phase 0.0         bn 5.1959e-02  max 2.747e-01  d_cc 0.0030  d_pc 0.1168  kappa   5.763  L/hp  12.150  linked 8
+  equal parameter, phase 0.125       bn 3.3896e-02  max 1.616e-01  d_cc 0.0058  d_pc 0.0955  kappa   5.376  L/hp  12.314  linked 0
+  equal parameter, phase 0.25        bn 4.8249e-02  max 3.532e-01  d_cc 0.0222  d_pc 0.0885  kappa   6.516  L/hp  12.188  linked 8
+  equal parameter, phase 0.375       bn 3.4765e-02  max 1.801e-01  d_cc 0.0437  d_pc 0.0831  kappa   5.741  L/hp  12.205  linked 0
+  long-axis hinges                   bn 5.6075e-02  max 2.959e-01  d_cc 0.0484  d_pc 0.0958  kappa   4.567  L/hp  12.150  linked 0
+  DP-optimal (min out-of-plane RMS)  bn 2.3211e-02  max 1.021e-01  d_cc 0.0498  d_pc 0.1091  kappa 357.880  L/hp  12.616  linked 0
+
+   arcB2 bn over hinge placements: best 2.3211e-02 (DP-optimal eps_2)  worst 5.6075e-02 (long axis)  ratio 2.42x
+   vs xyz baseline 6.2597e-04: best 37.1x, worst 89.6x
+   vs planar projection 5.1419e-02
+PROJ exit 0

@@ -1,0 +1,247 @@
+Running as unit: run-p203274-i203920.scope; invocation ID: 2ad6e1e4b35d44048e73de1e71f7c42b
+E0916 20:41:31.343667  203361 cuda_executor.cc:1743] Could not get kernel mode driver version: ( INVALID_ARGUMENT: Version does not match the format X.Y.Z )
+E0916 20:41:31.356360  203274 cuda_executor.cc:1743] Could not get kernel mode driver version: ( INVALID_ARGUMENT: Version does not match the format X.Y.Z )
+DEVICE requested=gpu obtained=gpu (1x NVIDIA GeForce RTX 5070 Laptop GPU)
+  [mem] RSS 0.83 GB  peak 0.83 GB
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+eq sample_equilibria/helios_repro.h5 (h5) NFP 2 sym True; start work/helios/scan_polar/cut90/legA/result.h5: 3 unique coils, arc=True, expect 12 coils; source grid gl (48 nodes/coil); mode stage2; plasma field included (virtual casing)
+SETTINGS {'eq': 'sample_equilibria/helios_repro.h5', 'start': 'work/helios/scan_polar/cut90/legA/result.h5', 'out': 'work/helios/scan_polar/cut90/legB', 'mode': 'stage2', 'length_mult': 1.0, 'margin': 0.0, 'fix_hinges': False, 'anchor_weight': 0.001, 'margin_skip': '', 'a': None, 'bounds': 'bounds/helios_kruger2026.json', 'device': None, 'vacuum': False, 'maxiter': 100, 'check_every': 25, 'ckpt_every': 25, 'diag_log': 'diag.jsonl', 'dcc_backoff': 0.025, 'dpc_backoff': 0.02, 'no_arc_backoffs': False, 'convex_form': 'signed', 'convex_kmin': 0.0, 'convex_backoff': 0.5, 'coil_grid_n': 150, 'eval_m': 25, 'eval_n': 25, 'plasma_m': 64, 'plasma_n': 64, 'src_gl': 24, 'src_n': 400, 'vc_m': None, 'vc_n': None, 'vc_chunk': 64, 'dcc_k': 20000, 'dpc_k': 20000, 'no_signed': False, 'dcc_neighbors': None, 'dcc_chunk': 4, 'dpc_chunk': 1, 'qf_chunk': 25, 'no_second_order': False, 'so_chunk': 16, 'so_rtol': 0.05, 'max_tr': 0.5, 'max_inner_iter': 100, 'ctol': 0.0001}
+BOUNDS (judged, absolute, a=1.77186) L 36  kappa 1.5  kms -  convex 0.001  dcc 1.2  dpc 1.2
+ENFORCED L 36  kappa 1.492  kms -  convex 0.0005  dcc 1.245  dpc 1.224  (convexity: signed, kappa_s >= 0.0)
+  [mem] RSS 2.91 GB  peak 2.91 GB
+START  bn 3.2764e-02  L 1.000  kappa 0.332  convex 0.460  d_cc 1.127  d_pc 1.498  linked 0  coils 12  -> FEASIBLE
+Building objective: Quadratic flux
+Precomputing transforms
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Could not build fft interpolator, switching to dft which is slow.
+Reason: Got False for eval_grid.can_fft2.
+  warnings.warn(msg, err)
+  [mem] RSS 7.45 GB  peak 7.45 GB
+  [mem] RSS 7.66 GB  peak 7.66 GB
+Timer: Precomputing transforms = 1.27 min
+Timer: Objective build = 1.29 min
+Building objective: summed coil current
+Building objective: fixed shift
+Building objective: fixed rotation
+Building objective: fixed arc reference
+Timer: Objective build = 541 ms
+Timer: Objective build = 2.25 ms
+  [mem] RSS 4.56 GB  peak 7.79 GB
+Timer: LinearConstraintProjection build = 2.33 sec
+Timer: LinearConstraintProjection build = 108 ms
+Number of parameters: 56
+Number of objectives: 1326
+Number of equality constraints: 0
+Number of inequality constraints: 1845
+Timer: Initializing the optimization = 1.35 min
+
+Starting optimization
+Using method: lsq-auglag
+E0916 20:43:38.627376  203377 cuda_timer.cc:87] Delay kernel timed out: measured time has sub-optimal accuracy. There may be a missing warmup execution, please investigate in Nsight Systems.
+E0916 20:43:50.867494  203388 cuda_timer.cc:87] Delay kernel timed out: measured time has sub-optimal accuracy. There may be a missing warmup execution, please investigate in Nsight Systems.
+  [mem] RSS 5.29 GB  peak 7.79 GB
+second_order: compiling constraint Hessian for blocks CoilSignedCurvature
+  [mem] RSS 5.89 GB  peak 7.79 GB
+Solver options:
+------------------------------------------------------------
+Maximum Function Evaluations       : 501
+Maximum Allowed Total Δx Norm      : inf
+Scaled Termination                 : True
+Trust Region Method                : svd
+Initial Trust Radius               : 1.160e+00
+Maximum Trust Radius               : 5.000e-01
+Minimum Trust Radius               : 2.220e-16
+Trust Radius Increase Ratio        : 4.000e+00
+Trust Radius Decrease Ratio        : 2.500e-01
+Trust Radius Increase Threshold    : 7.500e-01
+Trust Radius Decrease Threshold    : 5.000e-01
+Alpha Omega                        : 1.000e+00
+Beta Omega                         : 1.000e+00
+Alpha Eta                          : 1.000e-01
+Beta Eta                           : 9.000e-01
+Omega                              : 1.000e-02
+Eta                                : 1.104e-04
+Tau                                : 1.000e+01
+------------------------------------------------------------ 
+
+   Iteration     Total nfev        Cost      Cost reduction    Step norm     Optimality    Constr viol.   Penalty param  max(|mltplr|)      gtolk     
+       0              1          6.698e-02                                    4.710e-02      1.104e-04      1.000e+01      0.000e+00      1.000e-03   
+second_order: compiling constraint Hessian for blocks CoilLength
+E0916 20:44:49.345517  203369 cuda_timer.cc:87] Delay kernel timed out: measured time has sub-optimal accuracy. There may be a missing warmup execution, please investigate in Nsight Systems.
+       1              2          6.266e-02      4.326e-03      4.246e-01      5.743e-02      1.500e-02      1.000e+01      0.000e+00      1.000e-03   
+second_order: compiling constraint Hessian for blocks CoilLength, CoilCurvature, CoilSignedCurvature
+  [mem] RSS 6.00 GB  peak 7.79 GB
+  [mem] RSS 6.87 GB  peak 7.79 GB
+       2              3          6.239e-02      2.655e-04      5.830e-02      4.239e-02      5.381e-04      1.000e+01      0.000e+00      1.000e-03   
+       3              4          6.191e-02      4.780e-04      4.695e-02      9.008e-02      2.406e-03      1.000e+01      0.000e+00      1.000e-03   
+       4              6          6.110e-02      8.161e-04      1.142e-01      1.517e-02      1.200e-03      1.000e+01      0.000e+00      1.000e-03   
+second_order: compiling constraint Hessian for blocks CoilLength, CoilCurvature, CoilSignedCurvature, CoilSetDistancePenalty
+  [mem] RSS 6.93 GB  peak 7.79 GB
+E0916 20:46:22.867260  203375 cuda_timer.cc:87] Delay kernel timed out: measured time has sub-optimal accuracy. There may be a missing warmup execution, please investigate in Nsight Systems.
+  [mem] RSS 7.65 GB  peak 7.79 GB
+       5              7          5.814e-02      2.956e-03      4.322e-01      2.093e-02      1.691e-03      1.000e+01      0.000e+00      1.000e-03   
+  [mem] RSS 7.71 GB  peak 7.79 GB
+       6              8          5.142e-02      6.723e-03      7.529e-01      2.050e-02      2.666e-03      1.000e+01      0.000e+00      1.000e-03   
+       7             10          4.941e-02      2.011e-03      2.849e-01      1.381e-02      8.876e-04      1.000e+01      0.000e+00      1.000e-03   
+       8             12          4.758e-02      1.829e-03      2.571e-01      1.068e-02      2.057e-03      1.000e+01      0.000e+00      1.000e-03   
+       9             14          4.601e-02      1.567e-03      2.160e-01      8.347e-03      1.333e-03      1.000e+01      0.000e+00      1.000e-03   
+      10             16          4.456e-02      1.448e-03      2.042e-01      2.020e-02      6.304e-03      1.000e+01      0.000e+00      1.000e-03   
+      11             17          4.363e-02      9.351e-04      4.826e-01      1.312e-02      1.219e-03      1.000e+01      0.000e+00      1.000e-03   
+      12             18          4.312e-02      5.088e-04      7.330e-02      8.076e-03      8.379e-04      1.000e+01      0.000e+00      1.000e-03   
+      13             19          4.303e-02      8.693e-05      1.160e-02      7.761e-03      8.259e-04      1.000e+01      0.000e+00      1.000e-03   
+      14             20          4.295e-02      7.735e-05      1.036e-02      7.490e-03      8.156e-04      1.000e+01      0.000e+00      1.000e-03   
+      15             21          4.285e-02      1.005e-04      1.350e-02      7.161e-03      8.026e-04      1.000e+01      0.000e+00      1.000e-03   
+      16             22          4.279e-02      6.160e-05      8.300e-03      6.965e-03      7.948e-04      1.000e+01      0.000e+00      1.000e-03   
+      17             23          4.281e-02     -1.348e-05      5.250e-03      6.746e-03      5.635e-04      1.000e+01      0.000e+00      1.000e-03   
+      18             24          4.272e-02      8.294e-05      1.164e-02      6.488e-03      5.656e-04      1.000e+01      0.000e+00      1.000e-03   
+  [mem] RSS 7.71 GB  peak 7.79 GB
+      19             25          4.234e-02      3.781e-04      5.368e-02      5.171e-03      5.815e-04      1.000e+01      0.000e+00      1.000e-03   
+      20             26          4.224e-02      1.017e-04      1.466e-02      6.961e-03      8.892e-04      1.000e+01      0.000e+00      1.000e-03   
+      21             27          4.129e-02      9.556e-04      1.329e-01      4.867e-03      7.529e-04      1.000e+01      0.000e+00      1.000e-03   
+      22             28          3.830e-02      2.985e-03      3.878e-01      1.221e-02      1.194e-03      1.000e+01      0.000e+00      1.000e-03   
+      23             29          3.575e-02      2.549e-03      3.319e-01      7.031e-03      8.321e-04      1.000e+01      0.000e+00      1.000e-03   
+      24             30          3.323e-02      2.526e-03      3.441e-01      8.066e-03      1.355e-03      1.000e+01      0.000e+00      1.000e-03   
+  [it   25] bn 2.1106e-02  L 1.000  kappa 0.302  convex 19.733  d_cc 1.101  d_pc 1.359  -> FAILS L,convex
+      25             31          3.099e-02      2.237e-03      3.278e-01      7.122e-03      1.097e-03      1.000e+01      0.000e+00      1.000e-03   
+      26             32          2.934e-02      1.647e-03      2.505e-01      6.277e-03      1.122e-03      1.000e+01      0.000e+00      1.000e-03   
+      27             33          2.730e-02      2.041e-03      3.302e-01      7.606e-03      1.285e-03      1.000e+01      0.000e+00      1.000e-03   
+      28             34          2.554e-02      1.759e-03      3.131e-01      6.770e-03      1.321e-03      1.000e+01      0.000e+00      1.000e-03   
+      29             35          2.380e-02      1.744e-03      3.316e-01      7.881e-03      1.570e-03      1.000e+01      0.000e+00      1.000e-03   
+      30             36          2.277e-02      1.027e-03      2.169e-01      6.047e-03      1.181e-03      1.000e+01      0.000e+00      1.000e-03   
+      31             37          2.279e-02     -1.311e-05      3.179e-03      1.179e-03      1.182e-03      1.000e+01      0.000e+00      1.000e-03   
+  [mem] RSS 7.75 GB  peak 7.79 GB
+      32             38          2.277e-02      1.944e-05      4.197e-03      1.173e-03      1.183e-03      1.000e+01      0.000e+00      1.000e-03   
+      33             39          2.273e-02      3.466e-05      6.777e-03      4.103e-03      1.233e-03      1.000e+01      0.000e+00      1.000e-03   
+      34             40          2.124e-02      1.492e-03      3.409e-01      8.416e-03      2.045e-03      1.000e+01      0.000e+00      1.000e-03   
+      35             41          1.996e-02      1.276e-03      3.298e-01      6.989e-03      1.711e-03      1.000e+01      0.000e+00      1.000e-03   
+      36             42          1.877e-02      1.198e-03      3.437e-01      8.164e-03      2.189e-03      1.000e+01      0.000e+00      1.000e-03   
+      37             43          1.774e-02      1.025e-03      3.372e-01      7.122e-03      1.950e-03      1.000e+01      0.000e+00      1.000e-03   
+      38             44          1.678e-02      9.601e-04      3.485e-01      8.009e-03      2.328e-03      1.000e+01      0.000e+00      1.000e-03   
+      39             45          1.595e-02      8.297e-04      3.446e-01      6.880e-03      2.037e-03      1.000e+01      0.000e+00      1.000e-03   
+      40             46          1.518e-02      7.743e-04      3.512e-01      7.393e-03      2.289e-03      1.000e+01      0.000e+00      1.000e-03   
+      41             47          1.448e-02      6.976e-04      3.500e-01      6.568e-03      2.070e-03      1.000e+01      0.000e+00      1.000e-03   
+      42             48          1.382e-02      6.617e-04      3.557e-01      6.754e-03      2.202e-03      1.000e+01      0.000e+00      1.000e-03   
+      43             49          1.322e-02      6.008e-04      3.522e-01      6.133e-03      2.019e-03      1.000e+01      0.000e+00      1.000e-03   
+      44             50          1.303e-02      1.823e-04      1.133e-01      4.795e-03      1.584e-03      1.000e+01      0.000e+00      1.000e-03   
+second_order: compiling constraint Hessian for blocks CoilLength, CoilSignedCurvature
+  [mem] RSS 7.75 GB  peak 7.79 GB
+  [mem] RSS 7.79 GB  peak 7.83 GB
+      45             51          1.304e-02     -7.996e-06      3.008e-03      6.897e-03      6.664e-04      1.078e+01      9.445e-04      6.897e-04   
+      46             52          1.261e-02      4.334e-04      2.783e-01      8.103e-03      2.661e-03      1.078e+01      9.445e-04      6.897e-04   
+      47             53          1.225e-02      3.553e-04      2.380e-01      4.189e-03      1.414e-03      1.078e+01      9.445e-04      6.897e-04   
+      48             54          1.222e-02      3.598e-05      2.383e-02      3.783e-03      1.284e-03      1.078e+01      9.445e-04      6.897e-04   
+      49             55          1.200e-02      2.143e-04      1.480e-01      3.250e-03      1.119e-03      1.078e+01      9.445e-04      6.897e-04   
+  [it   50] bn 1.3548e-02  L 1.000  kappa 0.241  convex 0.289  d_cc 1.034  d_pc 1.398  -> FAILS L
+      50             56          1.171e-02      2.907e-04      2.192e-01      4.501e-03      1.391e-03      1.078e+01      9.445e-04      6.897e-04   
+      51             57          1.152e-02      1.950e-04      1.578e-01      3.131e-03      8.851e-04      1.078e+01      9.445e-04      6.897e-04   
+      52             58          1.136e-02      1.610e-04      1.414e-01      3.049e-03      8.673e-04      1.078e+01      9.445e-04      6.897e-04   
+      53             59          1.117e-02      1.805e-04      1.710e-01      3.645e-03      7.632e-04      1.078e+01      9.445e-04      6.897e-04   
+      54             60          1.100e-02      1.752e-04      1.915e-01      3.475e-03      9.011e-04      1.078e+01      9.445e-04      6.897e-04   
+      55             61          1.085e-02      1.523e-04      1.872e-01      3.435e-03      6.844e-04      1.078e+01      9.445e-04      6.897e-04   
+      56             62          1.074e-02      1.081e-04      1.535e-01      2.676e-03      7.125e-04      1.078e+01      9.445e-04      6.897e-04   
+      57             63          1.062e-02      1.233e-04      1.917e-01      3.674e-03      7.313e-04      1.078e+01      9.445e-04      6.897e-04   
+  [mem] RSS 7.79 GB  peak 7.83 GB
+      58             64          1.052e-02      9.185e-05      1.712e-01      2.716e-03      6.685e-04      1.078e+01      9.445e-04      6.897e-04   
+      59             65          1.044e-02      8.539e-05      1.705e-01      3.372e-03      6.651e-04      1.078e+01      9.445e-04      6.897e-04   
+      60             66          1.039e-02      5.094e-05      1.171e-01      2.605e-03      5.352e-04      1.078e+01      9.445e-04      6.897e-04   
+      61             67          1.031e-02      8.110e-05      1.962e-01      4.192e-03      7.495e-04      1.078e+01      9.445e-04      6.897e-04   
+      62             68          1.025e-02      6.058e-05      1.767e-01      2.991e-03      5.158e-04      1.078e+01      9.445e-04      6.897e-04   
+      63             69          1.023e-02      1.391e-05      4.054e-02      2.541e-03      4.659e-04      1.078e+01      9.445e-04      6.897e-04   
+      64             70          1.023e-02     -1.093e-06      5.248e-04      2.782e-03      2.997e-04      1.102e+01      9.219e-03      2.782e-04   
+      65             71          1.023e-02     -7.268e-07      5.520e-04      1.045e-02      2.831e-04      1.102e+01      9.219e-03      2.782e-04   
+      66             72          1.023e-02      3.752e-10      9.740e-05      9.817e-04      2.777e-04      1.102e+01      9.219e-03      2.782e-04   
+      67             73          1.023e-02      3.274e-06      8.617e-03      9.376e-04      2.705e-04      1.102e+01      9.219e-03      2.782e-04   
+      68             74          1.023e-02     -4.896e-07      6.167e-04      5.016e-02      2.331e-04      1.102e+01      9.219e-03      2.782e-04   
+      69             75          1.023e-02      2.343e-07      1.736e-04      4.428e-04      2.330e-04      1.102e+01      9.219e-03      2.782e-04   
+      70             76          1.023e-02      5.212e-06      1.401e-02      3.691e-04      2.252e-04      1.102e+01      9.219e-03      2.782e-04   
+      71             77          1.022e-02      1.336e-06      3.611e-03      3.595e-04      2.233e-04      1.102e+01      9.219e-03      2.782e-04   
+      72             78          1.022e-02     -1.074e-07      8.307e-04      2.015e-02      1.837e-04      1.102e+01      9.219e-03      2.782e-04   
+      73             79          1.022e-02     -2.210e-08      5.537e-05      5.676e-04      1.835e-04      1.102e+01      9.219e-03      2.782e-04   
+  [mem] RSS 7.81 GB  peak 7.83 GB
+      74             80          1.022e-02      5.527e-06      1.558e-02      5.240e-04      1.777e-04      1.102e+01      9.219e-03      2.782e-04   
+  [it   75] bn 1.2718e-02  L 1.000  kappa 0.264  convex 0.328  d_cc 1.088  d_pc 1.279  -> FAILS L
+      75             81          1.022e-02      1.959e-06      5.584e-03      5.090e-04      1.758e-04      1.102e+01      9.219e-03      2.782e-04   
+      76             82          1.016e-02      6.201e-05      1.866e-01      9.461e-03      9.588e-04      1.102e+01      9.219e-03      2.782e-04   
+      77             83          1.015e-02      8.886e-06      3.709e-02      5.394e-04      6.792e-05      1.102e+01      1.172e-02      5.394e-05   
+      78             84          1.010e-02      5.029e-05      1.751e-01      6.962e-03      6.828e-04      1.102e+01      1.172e-02      5.394e-05   
+      79             85          1.009e-02      8.537e-06      3.731e-02      2.378e-04      4.891e-05      1.102e+01      1.172e-02      5.394e-05   
+      80             86          1.005e-02      3.687e-05      1.455e-01      5.105e-03      4.958e-04      1.102e+01      1.172e-02      5.394e-05   
+      81             87          1.004e-02      1.302e-05      6.217e-02      2.970e-03      2.828e-04      1.102e+01      1.172e-02      5.394e-05   
+      82             88          1.002e-02      1.774e-05      8.252e-02      2.124e-03      1.971e-04      1.102e+01      1.172e-02      5.394e-05   
+      83             89          1.000e-02      1.971e-05      9.446e-02      2.239e-03      2.081e-04      1.102e+01      1.172e-02      5.394e-05   
+      84             90          9.981e-03      1.944e-05      1.004e-01      2.309e-03      2.335e-04      1.102e+01      1.172e-02      5.394e-05   
+      85             91          9.964e-03      1.686e-05      9.608e-02      2.244e-03      2.632e-04      1.102e+01      1.172e-02      5.394e-05   
+      86             92          9.954e-03      9.679e-06      5.988e-02      1.904e-03      2.797e-04      1.102e+01      1.172e-02      5.394e-05   
+      87             93          9.942e-03      1.180e-05      7.511e-02      1.969e-03      2.960e-04      1.102e+01      1.172e-02      5.394e-05   
+  [mem] RSS 7.84 GB  peak 7.84 GB
+      88             94          9.936e-03      6.054e-06      4.096e-02      1.695e-03      3.015e-04      1.102e+01      1.172e-02      5.394e-05   
+      89             95          9.927e-03      9.567e-06      6.671e-02      1.794e-03      3.090e-04      1.102e+01      1.172e-02      5.394e-05   
+      90             96          9.917e-03      9.551e-06      7.054e-02      1.829e-03      3.164e-04      1.102e+01      1.172e-02      5.394e-05   
+      91             97          9.906e-03      1.084e-05      8.549e-02      2.043e-03      3.244e-04      1.102e+01      1.172e-02      5.394e-05   
+      92             98          9.898e-03      8.726e-06      7.583e-02      1.722e-03      3.142e-04      1.102e+01      1.172e-02      5.394e-05   
+      93             99          9.888e-03      9.887e-06      9.239e-02      2.121e-03      3.061e-04      1.102e+01      1.172e-02      5.394e-05   
+      94             100         9.884e-03      3.220e-06      3.341e-02      1.477e-03      3.086e-04      1.102e+01      1.172e-02      5.394e-05   
+      95             101         9.879e-03      5.640e-06      6.001e-02      1.458e-03      3.120e-04      1.102e+01      1.172e-02      5.394e-05   
+second_order: compiling constraint Hessian for blocks CoilLength, CoilSignedCurvature, CoilSetDistancePenalty
+  [mem] RSS 7.97 GB  peak 7.97 GB
+E0916 20:51:12.073461  203391 cuda_timer.cc:87] Delay kernel timed out: measured time has sub-optimal accuracy. There may be a missing warmup execution, please investigate in Nsight Systems.
+  [mem] RSS 8.53 GB  peak 8.53 GB
+      96             102         9.876e-03      3.188e-06      3.631e-02      1.217e-03      3.136e-04      1.102e+01      1.172e-02      5.394e-05   
+      97             103         9.876e-03     -2.441e-07      1.801e-04      7.045e-05      3.131e-04      1.102e+01      1.172e-02      5.394e-05   
+      98             105         9.872e-03      3.493e-06      3.376e-02      6.214e-04      3.165e-04      1.102e+01      1.172e-02      5.394e-05   
+      99             106         9.865e-03      7.578e-06      9.452e-02      2.354e-03      3.216e-04      1.102e+01      1.172e-02      5.394e-05   
+  [it  100] bn 1.2502e-02  L 1.000  kappa 0.296  convex 1.786  d_cc 1.029  d_pc 1.288  -> FAILS L,convex
+      100            107         9.863e-03      1.754e-06      2.981e-02      1.224e-03      3.224e-04      1.102e+01      1.172e-02      5.394e-05   
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 9.863e-03
+         Constraint violation: 3.224e-04
+         Total delta_x: 1.011e+01
+         Iterations: 100
+         Function evaluations: 107
+         Jacobian evaluations: 100
+Timer: Solution time = 8.40 min
+Timer: Avg time per step = 4.99 sec
+==============================================================================================================
+                                                                 Start  -->   End
+Total (sum of squares):                                      6.698e-02  -->   9.863e-03, 
+Maximum absolute Boundary normal field error:                2.795e+00  -->   1.200e+00 (T m^2)
+Minimum absolute Boundary normal field error:                9.278e-05  -->   3.258e-05 (T m^2)
+Average absolute Boundary normal field error:                8.427e-01  -->   3.169e-01 (T m^2)
+Maximum absolute Boundary normal field error:                2.477e-02  -->   1.063e-02 (normalized)
+Minimum absolute Boundary normal field error:                8.223e-07  -->   2.887e-07 (normalized)
+Average absolute Boundary normal field error:                7.468e-03  -->   2.808e-03 (normalized)
+Maximum Coil length:                                         3.600e+01  -->   3.600e+01 (m)
+Minimum Coil length:                                         3.600e+01  -->   3.600e+01 (m)
+Average Coil length:                                         3.600e+01  -->   3.600e+01 (m)
+Maximum Coil length:                                         6.286e+00  -->   6.286e+00 (normalized)
+Minimum Coil length:                                         6.286e+00  -->   6.286e+00 (normalized)
+Average Coil length:                                         6.286e+00  -->   6.286e+00 (normalized)
+  [mem] RSS 8.49 GB  peak 8.56 GB
+Maximum Coil curvature:                                      4.983e-01  -->   4.437e-01 (m^-1)
+Minimum Coil curvature:                                      6.376e-06  -->   4.911e-05 (m^-1)
+Average Coil curvature:                                      1.760e-01  -->   1.940e-01 (m^-1)
+Maximum Coil curvature:                                      2.854e+00  -->   2.541e+00 (normalized)
+Minimum Coil curvature:                                      3.651e-05  -->   2.813e-04 (normalized)
+Average Coil curvature:                                      1.008e+00  -->   1.111e+00 (normalized)
+Maximum Signed in-plane curvature:                           4.983e-01  -->   4.437e-01 (m^-1)
+Minimum Signed in-plane curvature:                          -9.231e-04  -->  -2.697e-03 (m^-1)
+Average Signed in-plane curvature:                           1.760e-01  -->   1.940e-01 (m^-1)
+Maximum Signed in-plane curvature:                           2.854e+00  -->   2.541e+00 (normalized)
+Minimum Signed in-plane curvature:                          -5.287e-03  -->  -1.545e-02 (normalized)
+Average Signed in-plane curvature:                           1.008e+00  -->   1.111e+00 (normalized)
+Maximum Coil-coil distance penalty:                          0.000e+00  -->   7.409e-05 (dimensionless)
+Minimum Coil-coil distance penalty:                          0.000e+00  -->   0.000e+00 (dimensionless)
+Average Coil-coil distance penalty:                          0.000e+00  -->   2.470e-06 (dimensionless)
+Maximum Plasma-coil distance penalty:                        0.000e+00  -->   0.000e+00 (dimensionless)
+Minimum Plasma-coil distance penalty:                        0.000e+00  -->   0.000e+00 (dimensionless)
+Average Plasma-coil distance penalty:                        0.000e+00  -->   0.000e+00 (dimensionless)
+Summed coil current error:                                   0.000e+00  -->   2.235e-08 (A)
+==============================================================================================================
+
+
+SOLVER {'wall_s': 598.4221367835999, 'message': 'Maximum number of iterations has been exceeded.', 'nit': 100, 'n_outer': 3, 'constr_violation': 0.0003224054528346909, 'y_absmax_final': 0.011721952751586934}
+START  bn 3.2764e-02  L 1.000  kappa 0.332  convex 0.460  d_cc 1.127  d_pc 1.498  -> FEASIBLE
+RESULT bn 1.2502e-02  L 1.000  kappa 0.296  convex 1.786  d_cc 1.029  d_pc 1.288  linked 0  -> FAILS L,convex  active ['L']
+wrote work/helios/scan_polar/cut90/legB/result.h5, result.json, result.png

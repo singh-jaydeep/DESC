@@ -1,0 +1,5 @@
+DEVICE requested=cpu obtained=cpu (1x cpu)
+coil 0 fit: corner 20°, κ 0.47, arc_ref margin [0. 0.], min r/(L/2) 1.00, hinge gap 7.0 m, self-approach 1.76 m
+coil 1 fit: corner 39°, κ 0.44, arc_ref margin [0. 0.], min r/(L/2) 0.55, hinge gap 12.7 m, self-approach 1.77 m
+coil 2 fit: corner 25°, κ 0.70, arc_ref margin [0. 0.], min r/(L/2) 0.57, hinge gap 10.2 m, self-approach 1.55 m
+wrote work/helios/scan_polar/cutc0x90_c1x60_c2x30/fit_diag.png

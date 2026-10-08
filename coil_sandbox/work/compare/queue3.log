@@ -1,0 +1,9 @@
+CHAIN Q2 (gpu-src100) start 17:51:40
+CHAIN Q2 (gpu-src100) FAILED 17:53:18
+CHAIN Q2 (gpu-src100-chunked) start 17:53:18
+CHAIN Q2 (gpu-src100-chunked) ok 18:39:12
+CHAIN H4 (gpu-src100) start 18:39:12
+CHAIN H4 (gpu-src100) FAILED 18:39:57
+CHAIN H4 (gpu-src100-chunked) start 18:39:57
+CHAIN H4 (gpu-src100-chunked) FAILED 18:40:41
+CHAIN H4 (cpu-src100) start 18:40:41

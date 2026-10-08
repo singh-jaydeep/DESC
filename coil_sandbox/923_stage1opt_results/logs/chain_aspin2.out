@@ -1,0 +1,47 @@
+### continuation: 600 more iters from the aspect-pinned result, 18:19:29
+### done 18:24:01: leg baseline 0.06066; ORIGINAL baseline 0.06763 (cumulative -10.31%) C    : mean 0.9762 -> 1.1143  (+14.16%) eps1 : mean 0.0607 -> 0.0448  (-26.17%) 
+###   stop: Warning: A bad approximation caused failure to predict improvement.
+###   iters: 13  Aspect ratio:                                                6.010e+00  -->   6.010e+00 (dimensionless)
+###   force: Maximum absolute Force error:                                9.984e-05  -->   2.086e-04 (normalized)
+### resolution check 18:24:01
+Running as unit: run-p1360884-i1362982.scope; invocation ID: e50239101fe443d08b6a718634c4d85c
+DEVICE requested=gpu obtained=gpu (1x NVIDIA GeForce RTX 5070 Laptop GPU)
+run                        L=8 eps1        |f|          L=12 eps1        |f|      GAP       A
+E0923 18:24:12.258251 1361364 xtile_compiler.cc:399] Fusion: input_reduce_fusion = f64[8,360]{1,0} fusion(a.1, b.1), kind=kCustom, calls=fused_reduce.clone, backend_config={"operation_queue_id":"0","wait_on_operation_queues":[],"fusion_backend_config":{"kind":"__triton","block_level_fusion_config":{"num_warps":"8","output_tiles":[{"sizes":["8","8"]}],"num_ctas":1,"num_stages":1,"is_tma_allowed":true,"is_warp_specialization_allowed":false}},"force_earliest_schedule":false,"reification_cost":[],"device_type":"DEVICE_TYPE_INVALID"}
+E0923 18:24:12.258284 1361364 xtile_compiler.cc:401] Computation: fused_reduce.clone {
+  param_0.4 = f64[8,360,144]{2,1,0} parameter(0)
+  param_1.5 = f64[144]{0} parameter(1)
+  broadcast.1.3 = f64[8,360,144]{2,1,0} broadcast(param_1.5), dimensions={2}
+  multiply.1.3 = f64[8,360,144]{2,1,0} multiply(param_0.4, broadcast.1.3)
+  constant_3 = f64[] constant(0)
+  ROOT reduce.1.1 = f64[8,360]{1,0} reduce(multiply.1.3, constant_3), dimensions={2}, to_apply=scalar_add_computation
+}
+live_eps1_L1_aspin2 0.044784 ( -33.78%)  1.033e-04 0.044794 ( -33.77%)  1.200e-05    0.01p  6.0100
+### coil complexity 18:26:08
+Running as unit: run-p1363059-i1365160.scope; invocation ID: f0a27c3e42f4477987a6fe41f6f45c28
+DEVICE requested=cpu obtained=cpu (1x cpu)
+
+=== baseline precise_QA ===  a = 0.17178 m   A = 6.0000
+  L_gradB/a   min   3.1620   5th   3.3790   median   4.9137   area-mean   4.8334
+  pdrot [1/m] max  29.4682   95th   9.5763   median   2.1641   area-mean   2.3321
+  pdrot * a   max   5.0620   95th   1.6450   median   0.3717   area-mean   0.4006
+  smallest |shape-operator director| (umbilic proximity) 4.798e-01
+
+=== live_eps1_L1_aspin ===  a = 0.17161 m   A = 6.0100
+  L_gradB/a   min   3.4076   5th   3.5211   median   4.7490   area-mean   4.8004
+  pdrot [1/m] max  41.9493   95th  10.7596   median   1.9656   area-mean   2.5259
+  pdrot * a   max   7.1989   95th   1.8464   median   0.3373   area-mean   0.4335
+  smallest |shape-operator director| (umbilic proximity) 3.581e-01
+
+=== live_eps1_L1_aspin2 ===  a = 0.17233 m   A = 6.0100
+  L_gradB/a   min   2.3459   5th   2.5100   median   4.1391   area-mean   4.5102
+  pdrot [1/m] max  75.6092   95th  21.5038   median   2.4165   area-mean   3.5020
+  pdrot * a   max  13.0294   95th   3.7057   median   0.4164   area-mean   0.6035
+  smallest |shape-operator director| (umbilic proximity) 3.103e-01
+
+============================================================================================
+RELATIVE TO BASELINE  (L_gradB/a SMALLER = harder; pdrot*a LARGER = less planar)
+run                       Lg min    Lg 5th    Lg med   Lg mean    pd max   pd 95th    pd med   pd mean
+live_eps1_L1_aspin        +7.77%    +4.20%    -3.35%    -0.68%   +42.21%   +12.25%    -9.26%    +8.20%
+live_eps1_L1_aspin2      -25.81%   -25.72%   -15.76%    -6.69%  +157.40%  +125.27%   +12.02%   +50.64%
+### ASPIN2 ALL DONE 18:26:18

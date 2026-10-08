@@ -1,0 +1,3 @@
+=== start base_free_link 12:41:34
+Terminated                 $CAP $PY run_al.py $COMMON --start $START --out $J/$name "$@" > $J/$name/run.log 2>&1
+=== end base_free_link exit 143 13:02:37

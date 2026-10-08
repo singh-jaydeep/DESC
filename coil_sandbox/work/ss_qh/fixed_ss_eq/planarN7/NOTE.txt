@@ -1,0 +1,1 @@
+Stopped after it 150 on 2026-10-02 (user's call): steps capped at ~0.048 for the whole first 100-iteration subproblem. Continued from ckpt_it0150.h5 with --max-tr inf in ../planarN7_trinf/.

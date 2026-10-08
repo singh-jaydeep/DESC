@@ -1,0 +1,6 @@
+[relax90] start 14:29
+[relax90] done 14:39
+[tight60] start 14:39
+Terminated                 "${CAP[@]}" "$PY" run_one.py --eq $EQ --bounds "$3" --start "$2" --out "$4" --maxiter 250 --check-every 25 --ckpt-every 25 --convex-form signed --diag-log diag.jsonl > "$4.log" 2>&1
+[tight60] FAILED, see work/helios/clearance/tight60.log
+CLEARANCE TEST DONE

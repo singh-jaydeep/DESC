@@ -1,0 +1,13 @@
+### start fb500 planar (16:50)
+  B.n (coils + plasma): <|B.n|>/<|B|> 1.282e-01  <|B.n|/|B|> 1.244e-01  max|B.n| 0.516 T
+  value / bound: L 0.821  kappa 0.299  kMS 0.715  d_cc 2.243  d_pc 1.568  -> FEASIBLE
+wrote 922_stage1opt_results/runs/coilval/start_planar_fb500.h5
+### stage2 fb500 planar attempt 1 (16:51)
+RESULT bn 6.0826e-02  L 1.000  kappa 0.854  kMS 1.000  d_cc 2.601  d_pc 3.123  linked 0  -> FAILS L,kMS  active ['L', 'kMS']
+### start fb500 xyz (17:04)
+  B.n (coils + plasma): <|B.n|>/<|B|> 1.282e-01  <|B.n|/|B|> 1.244e-01  max|B.n| 0.516 T
+  value / bound: L 0.821  kappa 0.299  kMS 0.715  d_cc 2.243  d_pc 1.568  -> FEASIBLE
+wrote 922_stage1opt_results/runs/coilval/start_xyz_fb500.h5
+### stage2 fb500 xyz attempt 1 (17:04)
+RESULT bn 1.5616e-02  L 1.000  kappa 0.683  kMS 1.000  d_cc 2.125  d_pc 3.892  linked 0  -> FAILS L,kMS  active ['L', 'kMS']
+### MATCHED-QUALITY DONE 17:29

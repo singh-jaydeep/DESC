@@ -1,0 +1,14 @@
+=== cold fit: circles r/a 2.5, cut 30 ===
+  fit max deviation from the source coil: 3.5 mm, 3.5 mm, 3.5 mm, 3.5 mm
+  L 27.8323 m  kappa 0.226  kappa_MS 0.051  d_cc 1133.3 mm  d_pc 1081.7 mm  convexity excess 0.00e+00  corner 0 deg  linked 0
+  B.n (coils + plasma): <|B.n|>/<|B|> 7.719e-02  <|B.n|/|B|> 7.439e-02  max|B.n| 1.525 T
+  value / bound: L 0.994  kappa 0.151  convex 0.000  d_cc 1.133  d_pc 1.082  -> FEASIBLE
+=== feasibility repair (0.10 margin, length skipped) ===
+START  bn 7.7194e-02  L 0.994  kappa 0.151  convex 0.000  d_cc 1.133  d_pc 1.082  linked 0  coils 16  -> FEASIBLE
+START  bn 7.7194e-02  L 0.994  kappa 0.151  convex 0.000  d_cc 1.133  d_pc 1.082  -> FEASIBLE
+RESULT bn 7.7116e-02  L 0.996  kappa 0.165  convex 0.000  d_cc 1.135  d_pc 1.115  linked 0  -> FEASIBLE  active ['L']  target FEASIBLE
+=== free stage, no leg A ===
+START  bn 7.7116e-02  L 0.996  kappa 0.165  convex 0.000  d_cc 1.135  d_pc 1.115  linked 0  coils 16  -> FEASIBLE
+SOLVER {'wall_s': 1444.5183579921722, 'message': 'Maximum number of iterations has been exceeded.', 'nit': 400, 'n_outer': 93, 'constr_violation': 6.364253373904054e-06, 'y_absmax_final': 0.023040140303793113}
+START  bn 7.7116e-02  L 0.996  kappa 0.165  convex 0.000  d_cc 1.135  d_pc 1.115  -> FEASIBLE
+RESULT bn 1.2351e-02  L 1.000  kappa 0.360  convex 0.027  d_cc 1.412  d_pc 1.348  linked 0  -> FAILS L  active ['L']

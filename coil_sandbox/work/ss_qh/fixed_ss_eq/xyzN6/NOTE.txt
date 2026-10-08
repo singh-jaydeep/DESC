@@ -1,0 +1,1 @@
+result.h5 <- ckpt_it0200.h5 (stopped on GPU after it 200 on 2026-10-02: B.n changed 0.36% between dense checks it 150->200, under the agreed 1% rule; dense bn 5.2306e-04, L 1.000 kappa 1.000 kMS 0.828 d_cc 1.022 d_pc 1.335). First GPU attempt crashed with CUDA_ERROR_ILLEGAL_ADDRESS before it 1 (run_gpu_crash1.log); identical rerun ran clean.

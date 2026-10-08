@@ -1,0 +1,203 @@
+{
+ "settings": {
+  "eq": "sample_equilibria/helios_repro.h5",
+  "start": "work/helios/starts/arcB2_M5_fit.h5",
+  "out": "work/helios/arcB2_M5_feas_m25",
+  "mode": "feasibility",
+  "length_mult": 1.0,
+  "margin": 0.25,
+  "margin_skip": "L",
+  "a": null,
+  "bounds": "bounds/helios_kruger2026.json",
+  "device": null,
+  "vacuum": false,
+  "maxiter": 300,
+  "check_every": 10,
+  "ckpt_every": 50,
+  "diag_log": "diag.jsonl",
+  "dcc_backoff": 0.025,
+  "dpc_backoff": 0.02,
+  "no_arc_backoffs": false,
+  "convex_form": "signed",
+  "convex_kmin": 0.0,
+  "convex_backoff": 0.5,
+  "coil_grid_n": 150,
+  "eval_m": 25,
+  "eval_n": 25,
+  "plasma_m": 64,
+  "plasma_n": 64,
+  "src_gl": 24,
+  "src_n": 400,
+  "vc_m": null,
+  "vc_n": null,
+  "vc_chunk": 64,
+  "dcc_k": 20000,
+  "dpc_k": 20000,
+  "no_signed": false,
+  "dcc_neighbors": null,
+  "dcc_chunk": 4,
+  "dpc_chunk": 1,
+  "qf_chunk": 25,
+  "no_second_order": false,
+  "so_chunk": 16,
+  "so_rtol": 0.05,
+  "max_tr": 0.5,
+  "max_inner_iter": 100,
+  "ctol": 0.0001
+ },
+ "eq_kind": "h5",
+ "device": "gpu",
+ "vacuum": false,
+ "length_multiplier": 1.0,
+ "bounds": {
+  "L": 36.0,
+  "kappa": 1.5,
+  "kms": null,
+  "convex": 0.001,
+  "dcc": 1.2,
+  "dpc": 1.2
+ },
+ "target": {
+  "L": 36.0,
+  "kappa": 1.125,
+  "kms": null,
+  "convex": 0.001,
+  "dcc": 1.5,
+  "dpc": 1.5
+ },
+ "enforced": {
+  "L": 36.0,
+  "kappa": 1.119375,
+  "kms": null,
+  "convex": 0.0005,
+  "dcc": 1.55262,
+  "dpc": 1.53
+ },
+ "solver": {
+  "wall_s": 199.83845782279968,
+  "message": "User supplied callback triggered termination",
+  "nit": 20,
+  "n_outer": 1,
+  "constr_violation": 0.0,
+  "y_absmax_final": 0.006155432780051702
+ },
+ "start": {
+  "per_coil": [
+   {
+    "L": 36.02594629790286,
+    "kappa": 0.5747300193353122,
+    "kms": 0.055091798230175806,
+    "corner": 60.83270505055183,
+    "convex": 2.523744239950216,
+    "kappa_s_min": -0.25007743778654234
+   },
+   {
+    "L": 35.997931070733486,
+    "kappa": 0.5881421172203212,
+    "kms": 0.052344775870557386,
+    "corner": 59.17686968510136,
+    "convex": 2.156887128852956,
+    "kappa_s_min": -0.27801782359205984
+   },
+   {
+    "L": 36.08866702707073,
+    "kappa": 0.6511514780568204,
+    "kms": 0.05675937669583661,
+    "corner": 63.48440543346711,
+    "convex": 2.3194080392976844,
+    "kappa_s_min": -0.2977099317546057
+   }
+  ],
+  "L": 36.08866702707073,
+  "kappa": 0.6511514780568204,
+  "kms": 0.05675937669583661,
+  "corner": 63.48440543346711,
+  "convex": 2.523744239950216,
+  "d_cc": 2.0757981871465483,
+  "d_pc": 1.531161754909869,
+  "linked": 0,
+  "linked_pairs": [],
+  "bn": 0.040884330954235264,
+  "bn_max": 0.15436394308583185,
+  "bn_local": 0.04032853064548028,
+  "bn_max_T": 0.9945726864910934,
+  "vacuum": false,
+  "n_coils": 12
+ },
+ "result": {
+  "per_coil": [
+   {
+    "L": 35.12865270195377,
+    "kappa": 0.2766841895015845,
+    "kms": 0.020058696673008462,
+    "corner": 66.20736904162769,
+    "convex": 0.0,
+    "kappa_s_min": 0.0
+   },
+   {
+    "L": 34.79786002831575,
+    "kappa": 0.3073253703593834,
+    "kms": 0.022072839920290858,
+    "corner": 64.5423104596023,
+    "convex": 0.0,
+    "kappa_s_min": 0.0
+   },
+   {
+    "L": 34.81878761543582,
+    "kappa": 0.3587418758412415,
+    "kms": 0.02391020624240964,
+    "corner": 66.07808046956015,
+    "convex": 0.0,
+    "kappa_s_min": 0.0
+   }
+  ],
+  "L": 35.12865270195377,
+  "kappa": 0.3587418758412415,
+  "kms": 0.02391020624240964,
+  "corner": 66.20736904162769,
+  "convex": 0.0,
+  "d_cc": 1.8794773314522908,
+  "d_pc": 2.1171705357147665,
+  "linked": 0,
+  "linked_pairs": [],
+  "bn": 0.053108773627917875,
+  "bn_max": 0.24228423676589692,
+  "bn_local": 0.05111699696558683,
+  "bn_max_T": 1.5648120617607366,
+  "vacuum": false,
+  "n_coils": 12
+ },
+ "margins": {
+  "L": 0.9757959083876047,
+  "kappa": 0.23916125056082768,
+  "convex": 0.0,
+  "d_cc": 1.5662311095435757,
+  "d_pc": 1.7643087797623056
+ },
+ "failed": [],
+ "active": [],
+ "history": [
+  {
+   "iter": 10,
+   "bn": 0.05054093946885572,
+   "L": 0.9790245433216079,
+   "kappa": 0.2889502868036496,
+   "convex": 494.2753147082348,
+   "d_cc": 1.533357450201794,
+   "d_pc": 1.7045672701076529,
+   "linked": 0,
+   "verdict": "FAILS convex"
+  },
+  {
+   "iter": 20,
+   "bn": 0.053108773627917875,
+   "L": 0.9757959083876047,
+   "kappa": 0.23916125056082768,
+   "convex": 0.0,
+   "d_cc": 1.5662311095435757,
+   "d_pc": 1.7643087797623056,
+   "linked": 0,
+   "verdict": "FEASIBLE"
+  }
+ ]
+}

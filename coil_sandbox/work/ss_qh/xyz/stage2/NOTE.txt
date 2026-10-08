@@ -1,0 +1,1 @@
+result.h5 <- ckpt_it0300.h5 (H3 killed on CPU at ~it 300+ on 2026-09-29 17:34, user's call: AL tail not needed; dense bn 9.347e-4 at it 300)

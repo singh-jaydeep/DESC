@@ -1,0 +1,11 @@
+{
+  "_source": "Kruger, Elder, Gates et al., Planar coil design for the Helios stellarator fusion power plant, Fusion Eng. Des. 230 (2026) 115893, Table 2 (encircling coils) and Sec. 4.1. L = 36 m is the paper's AVERAGE encircling-coil length, used here as a per-coil cap (user's choice, 2026-09-16). The paper has no kappa_MS bound. convex_excess: allowed total-curvature excess per coil, int |kappa| ds - 2 pi (paper Eq. 5), in radians. MODIFIED 2026-09-17 (user's total-length rule): the per-coil cap is replaced by a budget over the 3 independent coils, L_total = 3 x 36 = 108 m per half period.",
+  "scale": "absolute",
+  "L": null,
+  "kappa": 1.5,
+  "kappa_MS": null,
+  "d_cc": 1.2,
+  "d_pc": 1.2,
+  "convex_excess": 0.001,
+  "L_total": 108.0
+}

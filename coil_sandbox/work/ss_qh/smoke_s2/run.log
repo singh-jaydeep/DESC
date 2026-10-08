@@ -1,0 +1,145 @@
+E0929 13:59:33.709753 1675435 cuda_executor.cc:1743] Could not get kernel mode driver version: ( INVALID_ARGUMENT: Version does not match the format X.Y.Z )
+E0929 13:59:33.723021 1675348 cuda_executor.cc:1743] Could not get kernel mode driver version: ( INVALID_ARGUMENT: Version does not match the format X.Y.Z )
+DEVICE requested=gpu obtained=gpu (1x NVIDIA GeForce RTX 5070 Laptop GPU)
+  [mem] RSS 0.83 GB  peak 0.83 GB
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 4.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 4.
+  warnings.warn(msg, err)
+eq precise_QH (desc.examples) NFP 4 sym True; start work/ss_qh/start_arcB2_M5.h5: 4 unique coils, arc=True, expect 32 coils; source grid gl (48 nodes/coil), length grid gl (48), constraint grid 301, curvature grid 301; mode stage2; VACUUM (plasma field ignored)
+SETTINGS {'eq': 'precise_QH', 'start': 'work/ss_qh/start_arcB2_M5.h5', 'out': 'work/ss_qh/smoke_s2', 'mode': 'stage2', 'length_mult': 1.0, 'margin': 0.0, 'fix_hinges': False, 'anchor_weight': 0.001, 'margin_skip': '', 'a': None, 'bounds': 'bounds/precise_qh_gil.json', 'device': None, 'vacuum': True, 'maxiter': 3, 'check_every': 3, 'ckpt_every': 0, 'diag_log': None, 'dcc_backoff': 0.025, 'dpc_backoff': 0.02, 'no_arc_backoffs': False, 'convex_form': 'signed', 'convex_kmin': 0.0, 'convex_backoff': 0.5, 'demount_margin': None, 'demount_backoff': 0.02, 'demount_arcs': False, 'demount_delta': 0.5, 'demount_eps': 0.25, 'level_hinges': False, 'fix_hinge_z': None, 'corner_max': None, 'planarity': 'auto', 'planarity_tol': 0.0, 'speed_floor': 0.0, 'arclength_weight': 0.0, 'torsion_weight': 0.0, 'coil_grid_n': 150, 'kappa_grid_n': None, 'eval_m': 25, 'eval_n': 25, 'plasma_m': 64, 'plasma_n': 64, 'src_gl': 24, 'src_n': 400, 'vc_m': None, 'vc_n': None, 'vc_chunk': 64, 'dcc_k': 20000, 'dpc_k': 20000, 'no_signed': False, 'dcc_neighbors': None, 'dcc_chunk': 4, 'dpc_chunk': 1, 'qf_chunk': 25, 'coil_jac_chunk': None, 'no_second_order': False, 'so_chunk': 16, 'so_rtol': 0.05, 'max_tr': 0.5, 'max_inner_iter': 100, 'ctol': 0.0001}
+BOUNDS (judged, absolute, a=0.12433) L 2.926  Ltot -  kappa 13.67  kms 18.69  convex -  planar -  dcc 0.05851  dpc 0.1097
+ENFORCED L 2.926  Ltot -  kappa 13.6  kms 18.51  convex -  planar -  dcc 0.06088  dpc 0.1119
+START  bn 1.1166e-01  L 0.740  kappa 0.503  kMS 0.393  d_cc 1.598  d_pc 1.273  linked 0  coils 32  -> FEASIBLE
+Building objective: Quadratic flux
+Precomputing transforms
+Timer: Precomputing transforms = 1.67 sec
+ObjectiveFunction deriv_mode : blocked
+Quadratic flux jac_chunk_size: 25
+Timer: Objective build = 2.19 sec
+Building objective: summed coil current
+Building objective: fixed shift
+Building objective: fixed rotation
+Building objective: fixed arc reference
+ObjectiveFunction deriv_mode : blocked
+summed coil current jac_chunk_size: None
+fixed shift jac_chunk_size: None
+fixed rotation jac_chunk_size: None
+fixed arc reference jac_chunk_size: None
+Timer: Objective build = 486 ms
+Building objective: coil length
+Precomputing transforms
+Timer: Precomputing transforms = 110 us
+Building objective: coil curvature
+Precomputing transforms
+Timer: Precomputing transforms = 63.1 us
+Building objective: coil mean squared curvature
+Precomputing transforms
+Timer: Precomputing transforms = 64.2 us
+Building objective: coil-coil distance penalty
+Building objective: plasma-coil distance penalty
+  [mem] RSS 3.05 GB  peak 3.05 GB
+ObjectiveFunction deriv_mode : blocked
+coil length jac_chunk_size: None
+coil curvature jac_chunk_size: None
+coil mean squared curvature jac_chunk_size: None
+coil-coil distance penalty jac_chunk_size: 4
+plasma-coil distance penalty jac_chunk_size: 1
+Timer: Objective build = 4.62 sec
+Timer: LinearConstraintProjection build = 2.50 sec
+Timer: LinearConstraintProjection build = 291 ms
+Number of parameters: 75
+Number of objectives: 1326
+Number of equality constraints: 0
+Number of inequality constraints: 1338
+Timer: Initializing the optimization = 10.8 sec
+
+Starting optimization
+Using method: lsq-auglag
+E0929 14:00:13.185305 1675445 cuda_timer.cc:87] Delay kernel timed out: measured time has sub-optimal accuracy. There may be a missing warmup execution, please investigate in Nsight Systems.
+E0929 14:00:13.262986 1675455 cuda_timer.cc:87] Delay kernel timed out: measured time has sub-optimal accuracy. There may be a missing warmup execution, please investigate in Nsight Systems.
+  [mem] RSS 3.67 GB  peak 3.67 GB
+E0929 14:00:41.310391 1675448 cuda_timer.cc:87] Delay kernel timed out: measured time has sub-optimal accuracy. There may be a missing warmup execution, please investigate in Nsight Systems.
+E0929 14:00:41.479489 1675448 cuda_timer.cc:87] Delay kernel timed out: measured time has sub-optimal accuracy. There may be a missing warmup execution, please investigate in Nsight Systems.
+Solver options:
+------------------------------------------------------------
+Maximum Function Evaluations       : 16
+Maximum Allowed Total Δx Norm      : inf
+Scaled Termination                 : True
+Trust Region Method                : svd
+Initial Trust Radius               : 1.822e-01
+Maximum Trust Radius               : 5.000e-01
+Minimum Trust Radius               : 2.220e-16
+Trust Radius Increase Ratio        : 4.000e+00
+Trust Radius Decrease Ratio        : 2.500e-01
+Trust Radius Increase Threshold    : 7.500e-01
+Trust Radius Decrease Threshold    : 5.000e-01
+Alpha Omega                        : 1.000e+00
+Beta Omega                         : 1.000e+00
+Alpha Eta                          : 1.000e-01
+Beta Eta                           : 9.000e-01
+Omega                              : 1.000e-02
+Eta                                : 1.000e-02
+Tau                                : 1.000e+01
+------------------------------------------------------------ 
+
+   Iteration     Total nfev        Cost      Cost reduction    Step norm     Optimality    Constr viol.   Penalty param  max(|mltplr|)      gtolk     
+       0              1          2.023e+02                                    1.139e+01      0.000e+00      1.000e+01      0.000e+00      1.000e-03   
+second_order: compiling constraint Hessian for blocks CoilLength, CoilCurvature, CoilMeanSquaredCurvature
+  [mem] RSS 4.30 GB  peak 4.30 GB
+  [mem] RSS 5.35 GB  peak 5.35 GB
+       1              2          1.965e+02      5.754e+00      7.469e-03      1.107e+01      0.000e+00      1.000e+01      0.000e+00      1.000e-03   
+       2              3          1.817e+02      1.487e+01      2.063e-02      1.024e+01      0.000e+00      1.000e+01      0.000e+00      1.000e-03   
+  [it    3] bn 1.0400e-01  L 0.744  kappa 0.543  kMS 0.406  d_cc 1.711  d_pc 1.242  -> FEASIBLE
+       3              4          1.681e+02      1.352e+01      2.098e-02      9.439e+00      0.000e+00      1.000e+01      0.000e+00      1.000e-03   
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 1.681e+02
+         Constraint violation: 0.000e+00
+         Total delta_x: 4.755e-02
+         Iterations: 3
+         Function evaluations: 4
+         Jacobian evaluations: 3
+Timer: Solution time = 1.70 min
+Timer: Avg time per step = 25.5 sec
+==============================================================================================================
+                                                                 Start  -->   End
+Total (sum of squares):                                      2.023e+02  -->   1.681e+02, 
+Maximum absolute Boundary normal field error:                1.357e-01  -->   1.203e-01 (T m^2)
+Minimum absolute Boundary normal field error:                4.174e-06  -->   3.404e-05 (T m^2)
+Average absolute Boundary normal field error:                4.697e-02  -->   4.333e-02 (T m^2)
+Maximum absolute Boundary normal field error:                1.250e+00  -->   1.108e+00 (normalized)
+Minimum absolute Boundary normal field error:                3.843e-05  -->   3.135e-04 (normalized)
+Average absolute Boundary normal field error:                4.325e-01  -->   3.990e-01 (normalized)
+Maximum Coil length:                                         2.164e+00  -->   2.178e+00 (m)
+Minimum Coil length:                                         2.014e+00  -->   2.011e+00 (m)
+Average Coil length:                                         2.089e+00  -->   2.091e+00 (m)
+Maximum Coil length:                                         6.504e+00  -->   6.546e+00 (normalized)
+Minimum Coil length:                                         6.055e+00  -->   6.045e+00 (normalized)
+Average Coil length:                                         6.281e+00  -->   6.287e+00 (normalized)
+Maximum Coil curvature:                                      6.871e+00  -->   7.429e+00 (m^-1)
+Minimum Coil curvature:                                      0.000e+00  -->   0.000e+00 (m^-1)
+Average Coil curvature:                                      2.076e+00  -->   2.069e+00 (m^-1)
+Maximum Coil curvature:                                      2.286e+00  -->   2.471e+00 (normalized)
+Minimum Coil curvature:                                      0.000e+00  -->   0.000e+00 (normalized)
+Average Coil curvature:                                      6.906e-01  -->   6.884e-01 (normalized)
+Maximum Coil mean squared curvature:                         7.335e+00  -->   7.587e+00 (m^-2)
+Minimum Coil mean squared curvature:                         4.666e+00  -->   4.588e+00 (m^-2)
+Average Coil mean squared curvature:                         5.980e+00  -->   6.117e+00 (m^-2)
+Maximum Coil mean squared curvature:                         8.118e-01  -->   8.396e-01 (normalized)
+Minimum Coil mean squared curvature:                         5.164e-01  -->   5.077e-01 (normalized)
+Average Coil mean squared curvature:                         6.618e-01  -->   6.769e-01 (normalized)
+Maximum Coil-coil distance penalty:                          0.000e+00  -->   0.000e+00 (dimensionless)
+Minimum Coil-coil distance penalty:                          0.000e+00  -->   0.000e+00 (dimensionless)
+Average Coil-coil distance penalty:                          0.000e+00  -->   0.000e+00 (dimensionless)
+Maximum Plasma-coil distance penalty:                        0.000e+00  -->   0.000e+00 (dimensionless)
+Minimum Plasma-coil distance penalty:                        0.000e+00  -->   0.000e+00 (dimensionless)
+Average Plasma-coil distance penalty:                        0.000e+00  -->   0.000e+00 (dimensionless)
+Summed coil current error:                                   0.000e+00  -->   0.000e+00 (A)
+==============================================================================================================
+
+  [mem] RSS 5.36 GB  peak 5.36 GB
+
+SOLVER {'wall_s': 125.89186692237854, 'message': 'Maximum number of iterations has been exceeded.', 'nit': 3, 'n_outer': 0, 'constr_violation': 0.0, 'y_absmax_final': 0.0}
+START  bn 1.1166e-01  L 0.740  kappa 0.503  kMS 0.393  d_cc 1.598  d_pc 1.273  -> FEASIBLE
+RESULT bn 1.0400e-01  L 0.744  kappa 0.543  kMS 0.406  d_cc 1.711  d_pc 1.242  linked 0  -> FEASIBLE  active []
+wrote work/ss_qh/smoke_s2/result.h5, result.json, result.png

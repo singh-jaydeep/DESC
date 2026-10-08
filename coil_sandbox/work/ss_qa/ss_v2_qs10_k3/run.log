@@ -1,0 +1,348 @@
+E0928 15:48:35.024247 1620440 cuda_executor.cc:1743] Could not get kernel mode driver version: ( INVALID_ARGUMENT: Version does not match the format X.Y.Z )
+E0928 15:48:35.036862 1620336 cuda_executor.cc:1743] Could not get kernel mode driver version: ( INVALID_ARGUMENT: Version does not match the format X.Y.Z )
+DEVICE requested=gpu obtained=gpu (1x NVIDIA GeForce RTX 5070 Laptop GPU)
+--field-term bn is blind to the current scale: holding the coil current SUM fixed
+  [mem] RSS 0.82 GB  peak 0.82 GB
+eq work/ss_qa/ss_v2_qs10/eq_k2.h5 (h5) NFP 2 sym True L,M,N 8,8,8 dim_x 1462; start work/ss_qa/ss_v2_qs10/coils_k2.h5: 4 unique coils (PiecewisePlanarArcCoil), 16 total
+SETTINGS {'eq': 'work/ss_qa/ss_v2_qs10/eq_k2.h5', 'start': 'work/ss_qa/ss_v2_qs10/coils_k2.h5', 'out': 'work/ss_qa/ss_v2_qs10_k3', 'bounds': '/home/singh/Documents/DESC2/coil_sandbox/bounds/precise_qa_sweep910.json', 'a': None, 'device': None, 'length_mult': 0.8, 'fix_coils': False, 'dry': False, 'field_term': 'bn', 'fix_current_sum': True, 'helicity': '1,0', 'qs_rho': '0.2,0.4,0.6,0.8,1.0', 'A_min': 5.5, 'A_max': 6.5, 'vol_band': 0.02, 'V0': 0.60032, 'bn_norm': 0.48316, 'qs_form': 'scale-invariant', 'iota_min': 0.4, 'kmin': 3, 'kmax': 3, 'maxiter': 100, 'ftol': 1e-06, 'xtol': 1e-06, 'gtol': 1e-08, 'max_tr': None, 'perturb_order': 2, 'solve_tol': 1e-10, 'tau_bn': 0.005, 'tau_qs': 0.002046, 'tau_qs_rel': 2.0, 'tau_A': 0.01, 'tau_V': 0.005, 'tau_iota': 0.01, 'tau_L': 0.01, 'tau_kappa': 0.01, 'tau_kms': 0.01, 'tau_dpc': 0.01, 'tau_dcc': 1e-06, 'dcc_backoff': 0.025, 'dpc_backoff': 0.02, 'no_arc_backoffs': False, 'eval_m': 25, 'eval_n': 25, 'plasma_m': 32, 'plasma_n': 32, 'coil_grid_n': 150, 'src_gl': 24, 'src_n': 400, 'bs_chunk': None, 'jac_chunk': None, 'dcc_k': 20000}
+BOUNDS (judged, absolute) L 4.123  Ltot -  kappa 11.64  kms 5.648  convex -  planar -  dcc 0.08555  dpc 0.1711
+ENFORCED L 4.123  Ltot -  kappa 11.58  kms 5.592  convex -  planar -  dcc 0.08922  dpc 0.1745
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+START physics  A 6.093  R0 1.0343  a 0.1697  iota [0.4041, 0.4059]  QS(Boozer, |B_nonsym|/<B>) rho 0.25 8.50e-05  rho 0.5 1.24e-04  rho 0.75 2.67e-04  rho 1 6.03e-04
+START coils    bn 4.6721e-03 (max 2.927e-02)  L 1.000  kappa 0.697  kMS 0.741  d_cc 1.032  d_pc 1.410  linked 0  -> FAILS L
+QS two-term rms at the start 0.0005713 -> tau_qs 0.002046
+B.n normalization frozen at the start: 0.48316; volume band around V0 = 0.60032
+quadrature scales s (expected; compare the s(qw) column): bn 6.283  qs 41.41  iota 1  kappa 0.3622  dcc 9.06e+04
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: FutureWarning: constants is deprecated and will be removed in a future release. Users should not include constants in the arguments of their objective compute methods. Instead declare all the constants in the build method and use as self._constants.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: FutureWarning: constants is deprecated and will be removed in a future release. Users should not include constants in the arguments of their objective compute methods. Instead declare all the constants in the build method and use as self._constants.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: FutureWarning: constants is deprecated and will be removed in a future release. Users should not include constants in the arguments of their objective compute methods. Instead declare all the constants in the build method and use as self._constants.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: FutureWarning: constants is deprecated and will be removed in a future release. Users should not include constants in the arguments of their objective compute methods. Instead declare all the constants in the build method and use as self._constants.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: FutureWarning: constants is deprecated and will be removed in a future release. Users should not include constants in the arguments of their objective compute methods. Instead declare all the constants in the build method and use as self._constants.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: FutureWarning: constants is deprecated and will be removed in a future release. Users should not include constants in the arguments of their objective compute methods. Instead declare all the constants in the build method and use as self._constants.
+  warnings.warn(msg, err)
+
+TERMS AT THE START
+term                             dim_f    weight     norm    s(qw)  target/bounds           raw min    raw max       cost  err/tol  share
+Vacuum B.n error                  1326      31.8   0.4832    6.283  = 0                   -0.008593    0.01142     0.5965     1.09  93.8%
+QS two-term (scale-invariant)     5445      11.8        -    41.41  = 0                   -0.005161   0.005161    0.03898    0.279   6.1%
+aspect ratio                         1      16.7        -        1  [5.5, 6.5]                6.093      6.093          0        0   0.0%
+rotational transform                20       250        -        1  [0.4, inf]               0.4041     0.4059          0        0   0.0%
+volume                               1       333        -        1  [0.5883, 0.6123]         0.5883     0.5883  1.162e-05  0.00482   0.0%
+coil length                          4      24.3        -        2  [0, 4.123]                4.123      4.123  0.0004562   0.0302   0.1%
+coil curvature                    1204      23.8        -   0.7243  [0, 11.58]                    0      8.108          0        0   0.0%
+coil mean squared curvature          4      17.9        -        2  [0, 5.592]                3.737      4.171          0        0   0.0%
+coil-coil distance penalty          54        11        -    7.348  [-inf, 0]                     0   0.001102  7.393e-05   0.0122   0.0%
+plasma-coil minimum distance         8       573        -    2.828  [0.1745, inf]            0.2416     0.2865          0        0   0.0%
+total cost 0.5 sum f^2                                                                                                       0.636
+
+===== step k=3: 48 boundary modes free, maxiter 100 =====
+Building objective: Vacuum B.n error
+Precomputing transforms
+Timer: Precomputing transforms = 21.0 ms
+Building objective: QS two-term (scale-invariant)
+Precomputing transforms
+Timer: Precomputing transforms = 45.2 ms
+Building objective: aspect ratio
+Precomputing transforms
+Timer: Precomputing transforms = 22.3 ms
+Building objective: rotational transform
+Precomputing transforms
+Timer: Precomputing transforms = 22.4 ms
+Building objective: volume
+Precomputing transforms
+Timer: Precomputing transforms = 22.8 ms
+Building objective: coil length
+Precomputing transforms
+Timer: Precomputing transforms = 118 us
+Building objective: coil curvature
+Precomputing transforms
+Timer: Precomputing transforms = 87.0 us
+Building objective: coil mean squared curvature
+Precomputing transforms
+Timer: Precomputing transforms = 63.4 us
+Building objective: coil-coil distance penalty
+Building objective: plasma-coil minimum distance
+ObjectiveFunction deriv_mode : blocked
+Vacuum B.n error jac_chunk_size: None
+QS two-term (scale-invariant) jac_chunk_size: None
+aspect ratio jac_chunk_size: None
+rotational transform jac_chunk_size: None
+volume jac_chunk_size: None
+coil length jac_chunk_size: None
+coil curvature jac_chunk_size: None
+coil mean squared curvature jac_chunk_size: None
+coil-coil distance penalty jac_chunk_size: None
+plasma-coil minimum distance jac_chunk_size: None
+Timer: Objective build = 315 ms
+Building objective: force
+Precomputing transforms
+Timer: Precomputing transforms = 814 ms
+ObjectiveFunction deriv_mode : batched
+ObjectiveFunction jac_chunk_size: 4382
+Timer: Objective build = 861 ms
+ObjectiveFunction deriv_mode : blocked
+lcfs R jac_chunk_size: None
+lcfs Z jac_chunk_size: None
+fixed Psi jac_chunk_size: None
+fixed pressure jac_chunk_size: None
+fixed current jac_chunk_size: None
+fixed sheet current jac_chunk_size: None
+self_consistency R jac_chunk_size: None
+self_consistency Z jac_chunk_size: None
+lambda gauge jac_chunk_size: None
+axis R self consistency jac_chunk_size: None
+axis Z self consistency jac_chunk_size: None
+Timer: Objective build = 1.28 ms
+Timer: Eq Update LinearConstraintProjection build = 3.71 sec
+Timer: Proximal projection build = 16.9 sec
+Building objective: lcfs R
+Building objective: fixed Psi
+Building objective: fixed pressure
+Building objective: fixed current
+Building objective: fixed sheet current
+Building objective: lcfs Z
+Building objective: summed coil current
+Building objective: fixed shift
+Building objective: fixed rotation
+Building objective: fixed arc reference
+ObjectiveFunction deriv_mode : blocked
+lcfs R jac_chunk_size: None
+fixed Psi jac_chunk_size: None
+fixed pressure jac_chunk_size: None
+fixed current jac_chunk_size: None
+fixed sheet current jac_chunk_size: None
+lcfs Z jac_chunk_size: None
+summed coil current jac_chunk_size: None
+fixed shift jac_chunk_size: None
+fixed rotation jac_chunk_size: None
+fixed arc reference jac_chunk_size: None
+Timer: Objective build = 1.49 sec
+Timer: LinearConstraintProjection build = 3.74 sec
+Number of parameters: 107
+Number of objectives: 8067
+Timer: Initializing the optimization = 22.3 sec
+
+Starting optimization
+Using method: proximal-lsq-exact
+E0928 15:50:32.643894 1620448 cuda_timer.cc:87] Delay kernel timed out: measured time has sub-optimal accuracy. There may be a missing warmup execution, please investigate in Nsight Systems.
+  [mem] RSS 5.46 GB  peak 5.46 GB
+Solver options:
+------------------------------------------------------------
+Maximum Function Evaluations       : 501
+Maximum Allowed Total Δx Norm      : inf
+Scaled Termination                 : True
+Trust Region Method                : qr
+Initial Trust Radius               : 1.119e+02
+Maximum Trust Radius               : inf
+Minimum Trust Radius               : 2.220e-16
+Trust Radius Increase Ratio        : 2.000e+00
+Trust Radius Decrease Ratio        : 2.500e-01
+Trust Radius Increase Threshold    : 7.500e-01
+Trust Radius Decrease Threshold    : 2.500e-01
+------------------------------------------------------------ 
+
+   Iteration     Total nfev        Cost      Cost reduction    Step norm     Optimality   
+       0              1          6.360e-01                                    7.133e-02   
+       1              4          5.849e-01      5.111e-02      4.512e-02      7.699e-02   
+       2              9          5.772e-01      7.662e-03      1.833e-03      1.309e-02   
+  [mem] RSS 5.56 GB  peak 5.56 GB
+       3             10          5.762e-01      1.041e-03      4.622e-03      5.766e-03   
+       4             11          5.753e-01      8.705e-04      8.171e-03      8.221e-03   
+       5             12          5.741e-01      1.168e-03      7.642e-03      1.869e-03   
+       6             13          5.722e-01      1.956e-03      5.069e-03      2.164e-03   
+       7             14          5.689e-01      3.282e-03      1.302e-02      1.317e-02   
+       8             17          5.684e-01      5.338e-04      8.210e-03      9.900e-03   
+       9             18          5.679e-01      5.116e-04      3.138e-03      1.546e-03   
+      10             19          5.670e-01      8.347e-04      4.656e-03      3.550e-03   
+      11             20          5.656e-01      1.466e-03      9.641e-03      1.171e-02   
+      12             22          5.653e-01      2.716e-04      1.335e-02      2.536e-02   
+      13             23          5.646e-01      7.182e-04      4.997e-03      4.113e-03   
+      14             24          5.642e-01      4.134e-04      2.777e-03      1.050e-03   
+      15             25          5.634e-01      7.809e-04      2.420e-03      1.460e-03   
+      16             26          5.619e-01      1.436e-03      6.164e-03      4.413e-03   
+      17             27          5.619e-01      3.904e-05      2.145e-02      6.175e-02   
+      18             28          5.613e-01      6.405e-04      2.035e-02      6.327e-02   
+      19             29          5.588e-01      2.448e-03      4.430e-03      4.613e-03   
+      20             30          5.584e-01      3.761e-04      2.253e-03      1.064e-03   
+  [mem] RSS 5.56 GB  peak 5.56 GB
+      21             31          5.578e-01      6.667e-04      4.026e-03      2.044e-03   
+      22             32          5.566e-01      1.135e-03      8.547e-03      1.086e-02   
+      23             35          5.563e-01      2.890e-04      4.673e-03      3.489e-03   
+      24             36          5.562e-01      1.801e-04      1.152e-03      9.165e-04   
+      25             37          5.558e-01      3.351e-04      1.090e-03      1.009e-03   
+      26             38          5.552e-01      6.604e-04      9.500e-04      1.254e-03   
+      27             39          5.539e-01      1.293e-03      1.837e-03      2.064e-03   
+      28             40          5.514e-01      2.478e-03      3.896e-03      4.655e-03   
+      29             41          5.478e-01      3.640e-03      1.675e-02      2.741e-02   
+      30             44          5.468e-01      9.195e-04      1.054e-02      1.644e-02   
+      31             45          5.463e-01      5.056e-04      2.781e-03      8.639e-04   
+      32             46          5.458e-01      5.087e-04      5.409e-03      4.464e-03   
+      33             47          5.455e-01      3.035e-04      1.379e-02      2.605e-02   
+      34             48          5.449e-01      6.484e-04      1.047e-02      1.706e-02   
+      35             49          5.444e-01      4.678e-04      3.594e-03      2.265e-03   
+      36             50          5.441e-01      3.528e-04      8.383e-03      1.057e-02   
+      37             52          5.438e-01      2.412e-04      4.780e-03      3.793e-03   
+      38             53          5.437e-01      1.480e-04      6.402e-04      7.740e-04   
+      39             54          5.434e-01      2.700e-04      1.049e-03      8.286e-04   
+      40             55          5.429e-01      5.368e-04      1.237e-03      9.778e-04   
+  [mem] RSS 5.56 GB  peak 5.56 GB
+      41             56          5.418e-01      1.027e-03      4.203e-03      2.052e-03   
+      42             57          5.413e-01      5.396e-04      1.743e-02      4.042e-02   
+      43             59          5.400e-01      1.283e-03      5.751e-03      5.953e-03   
+      44             60          5.397e-01      2.818e-04      8.676e-03      9.983e-03   
+      45             61          5.394e-01      3.098e-04      4.095e-03      3.561e-03   
+      46             62          5.392e-01      2.428e-04      9.548e-03      1.280e-02   
+      47             64          5.389e-01      2.863e-04      5.046e-03      4.443e-03   
+      48             65          5.387e-01      1.471e-04      7.771e-04      7.319e-04   
+      49             66          5.385e-01      2.545e-04      8.495e-04      7.608e-04   
+      50             67          5.380e-01      5.032e-04      1.108e-03      8.757e-04   
+      51             68          5.370e-01      9.807e-04      2.988e-03      1.738e-03   
+      52             69          5.358e-01      1.236e-03      1.404e-02      2.256e-02   
+      53             72          5.352e-01      6.102e-04      5.485e-03      5.285e-03   
+      54             73          5.349e-01      2.451e-04      6.900e-03      5.381e-03   
+      55             74          5.347e-01      2.246e-04      4.854e-03      3.753e-03   
+      56             75          5.345e-01      1.714e-04      6.384e-03      6.530e-03   
+      57             76          5.343e-01      1.676e-04      6.841e-03      7.491e-03   
+      58             77          5.342e-01      1.569e-04      7.443e-03      8.920e-03   
+      59             78          5.340e-01      1.632e-04      7.681e-03      9.565e-03   
+      60             79          5.339e-01      1.613e-04      7.833e-03      9.878e-03   
+      61             80          5.337e-01      1.662e-04      7.914e-03      1.022e-02   
+      62             81          5.335e-01      1.641e-04      7.924e-03      1.013e-02   
+      63             82          5.334e-01      1.662e-04      7.979e-03      1.037e-02   
+      64             83          5.332e-01      1.626e-04      7.975e-03      1.026e-02   
+      65             84          5.330e-01      1.651e-04      8.027e-03      1.050e-02   
+      66             85          5.329e-01      1.616e-04      8.011e-03      1.034e-02   
+  [mem] RSS 5.56 GB  peak 5.56 GB
+      67             86          5.327e-01      1.638e-04      8.064e-03      1.061e-02   
+      68             87          5.326e-01      1.606e-04      8.042e-03      1.040e-02   
+      69             88          5.324e-01      1.625e-04      8.095e-03      1.070e-02   
+      70             89          5.322e-01      1.595e-04      8.071e-03      1.047e-02   
+      71             90          5.321e-01      1.613e-04      8.124e-03      1.078e-02   
+      72             91          5.319e-01      1.584e-04      8.098e-03      1.053e-02   
+      73             92          5.318e-01      1.602e-04      8.152e-03      1.085e-02   
+      74             93          5.316e-01      1.573e-04      8.125e-03      1.059e-02   
+      75             94          5.314e-01      1.593e-04      8.178e-03      1.092e-02   
+      76             95          5.313e-01      1.558e-04      8.151e-03      1.064e-02   
+      77             96          5.311e-01      1.580e-04      8.204e-03      1.099e-02   
+      78             97          5.310e-01      1.551e-04      8.177e-03      1.070e-02   
+      79             98          5.308e-01      1.572e-04      8.230e-03      1.106e-02   
+      80             99          5.307e-01      1.537e-04      8.201e-03      1.076e-02   
+      81             100         5.305e-01      1.562e-04      8.254e-03      1.112e-02   
+      82             101         5.303e-01      1.526e-04      8.226e-03      1.081e-02   
+      83             102         5.302e-01      1.552e-04      8.278e-03      1.119e-02   
+      84             103         5.300e-01      1.515e-04      8.249e-03      1.086e-02   
+      85             104         5.299e-01      1.542e-04      8.301e-03      1.125e-02   
+      86             105         5.297e-01      1.505e-04      8.272e-03      1.091e-02   
+      87             106         5.296e-01      1.532e-04      8.324e-03      1.131e-02   
+      88             107         5.294e-01      1.495e-04      8.295e-03      1.097e-02   
+      89             108         5.293e-01      1.522e-04      8.346e-03      1.137e-02   
+      90             109         5.291e-01      1.485e-04      8.318e-03      1.101e-02   
+      91             110         5.290e-01      1.513e-04      8.368e-03      1.143e-02   
+      92             111         5.288e-01      1.476e-04      8.340e-03      1.106e-02   
+      93             112         5.287e-01      1.502e-04      8.390e-03      1.149e-02   
+      94             113         5.285e-01      1.466e-04      8.361e-03      1.111e-02   
+      95             114         5.284e-01      1.495e-04      8.411e-03      1.155e-02   
+      96             115         5.282e-01      1.457e-04      8.382e-03      1.116e-02   
+      97             116         5.281e-01      1.483e-04      8.432e-03      1.161e-02   
+      98             117         5.279e-01      1.447e-04      8.402e-03      1.120e-02   
+  [mem] RSS 5.56 GB  peak 5.56 GB
+      99             118         5.278e-01      1.477e-04      8.452e-03      1.166e-02   
+      100            119         5.277e-01      1.438e-04      8.422e-03      1.125e-02   
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 5.277e-01
+         Total delta_x: 8.565e-02
+         Iterations: 100
+         Function evaluations: 119
+         Jacobian evaluations: 101
+Timer: Solution time = 10.8 min
+Timer: Avg time per step = 6.46 sec
+==============================================================================================================
+                                                                 Start  -->   End
+Total (sum of squares):                                      6.360e-01  -->   5.277e-01, 
+Maximum absolute Boundary normal field error:                1.142e-02  -->   9.970e-03 (T*m^2, T^2*m^2)
+Minimum absolute Boundary normal field error:                2.407e-06  -->   8.185e-06 (T*m^2, T^2*m^2)
+Average absolute Boundary normal field error:                2.078e-03  -->   1.879e-03 (T*m^2, T^2*m^2)
+Maximum absolute Boundary normal field error:                2.363e-02  -->   2.064e-02 (normalized)
+Minimum absolute Boundary normal field error:                4.982e-06  -->   1.694e-05 (normalized)
+Average absolute Boundary normal field error:                4.300e-03  -->   3.888e-03 (normalized)
+Maximum absolute Quasi-symmetry (1,0) two-term error:        5.161e-03  -->   5.391e-03 (dimensionless)
+Minimum absolute Quasi-symmetry (1,0) two-term error:        2.759e-17  -->   2.785e-17 (dimensionless)
+Average absolute Quasi-symmetry (1,0) two-term error:        4.384e-04  -->   4.490e-04 (dimensionless)
+Aspect ratio:                                                6.093e+00  -->   6.140e+00 (dimensionless)
+Maximum Rotational transform:                                4.059e-01  -->   4.030e-01 (dimensionless)
+Minimum Rotational transform:                                4.041e-01  -->   3.996e-01 (dimensionless)
+Average Rotational transform:                                4.053e-01  -->   4.021e-01 (dimensionless)
+Plasma volume:                                               5.883e-01  -->   5.883e-01 (m^3)
+Maximum Coil length:                                         4.123e+00  -->   4.124e+00 (m)
+Minimum Coil length:                                         4.123e+00  -->   4.123e+00 (m)
+Average Coil length:                                         4.123e+00  -->   4.123e+00 (m)
+Maximum Coil curvature:                                      8.108e+00  -->   7.701e+00 (m^-1)
+Minimum Coil curvature:                                      0.000e+00  -->   0.000e+00 (m^-1)
+Average Coil curvature:                                      1.535e+00  -->   1.527e+00 (m^-1)
+Maximum Coil mean squared curvature:                         4.171e+00  -->   4.211e+00 (m^-2)
+Minimum Coil mean squared curvature:                         3.737e+00  -->   3.612e+00 (m^-2)
+Average Coil mean squared curvature:                         3.965e+00  -->   3.980e+00 (m^-2)
+Maximum Coil-coil distance penalty:                          1.102e-03  -->   7.829e-04 (dimensionless)
+Minimum Coil-coil distance penalty:                          0.000e+00  -->   0.000e+00 (dimensionless)
+Average Coil-coil distance penalty:                          2.040e-05  -->   1.450e-05 (dimensionless)
+Maximum Minimum plasma-coil distance:                        2.865e-01  -->   2.869e-01 (m)
+Minimum Minimum plasma-coil distance:                        2.416e-01  -->   2.454e-01 (m)
+Average Minimum plasma-coil distance:                        2.678e-01  -->   2.707e-01 (m)
+Maximum absolute Force error:                                2.512e+01  -->   5.145e+01 (N)
+Minimum absolute Force error:                                7.202e-05  -->   3.241e-04 (N)
+Average absolute Force error:                                8.431e-01  -->   1.139e+00 (N)
+Maximum absolute Force error:                                2.129e-05  -->   4.362e-05 (normalized)
+Minimum absolute Force error:                                6.105e-11  -->   2.747e-10 (normalized)
+Average absolute Force error:                                7.147e-07  -->   9.656e-07 (normalized)
+R boundary error:                                            6.170e-20  -->   4.387e-19 (m)
+Fixed Psi error:                                             0.000e+00  -->   0.000e+00 (Wb)
+Fixed pressure profile error:                                0.000e+00  -->   0.000e+00 (Pa)
+Fixed current profile error:                                 0.000e+00  -->   0.000e+00 (A)
+Fixed sheet current error:                                   0.000e+00  -->   0.000e+00 (~)
+Z boundary error:                                            1.351e-19  -->   3.358e-19 (m)
+Summed coil current error:                                   0.000e+00  -->   0.000e+00 (A)
+==============================================================================================================
+
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: FutureWarning: constants is deprecated and will be removed in a future release. Users should not include constants in the arguments of their objective compute methods. Instead declare all the constants in the build method and use as self._constants.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: FutureWarning: constants is deprecated and will be removed in a future release. Users should not include constants in the arguments of their objective compute methods. Instead declare all the constants in the build method and use as self._constants.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: FutureWarning: constants is deprecated and will be removed in a future release. Users should not include constants in the arguments of their objective compute methods. Instead declare all the constants in the build method and use as self._constants.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: FutureWarning: constants is deprecated and will be removed in a future release. Users should not include constants in the arguments of their objective compute methods. Instead declare all the constants in the build method and use as self._constants.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: FutureWarning: constants is deprecated and will be removed in a future release. Users should not include constants in the arguments of their objective compute methods. Instead declare all the constants in the build method and use as self._constants.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: FutureWarning: constants is deprecated and will be removed in a future release. Users should not include constants in the arguments of their objective compute methods. Instead declare all the constants in the build method and use as self._constants.
+  warnings.warn(msg, err)
+
+TERMS AFTER k=3
+term                             dim_f    weight     norm    s(qw)  target/bounds           raw min    raw max       cost  err/tol  share
+Vacuum B.n error                  1326      31.8   0.4832    6.283  = 0                   -0.007398    0.00997     0.4888    0.989  92.6%
+QS two-term (scale-invariant)     5445      11.8        -    41.41  = 0                   -0.005391   0.005391    0.03799    0.276   7.2%
+aspect ratio                         1      16.7        -        1  [5.5, 6.5]                 6.14       6.14          0        0   0.0%
+rotational transform                20       250        -        1  [0.4, inf]               0.3996      0.403  0.0001963   0.0198   0.0%
+volume                               1       333        -        1  [0.5883, 0.6123]         0.5883     0.5883  2.824e-05  0.00751   0.0%
+coil length                          4      24.3        -        2  [0, 4.123]                4.123      4.124  0.0006154   0.0351   0.1%
+coil curvature                    1204      23.8        -   0.7243  [0, 11.58]                    0      7.701          0        0   0.0%
+coil mean squared curvature          4      17.9        -        2  [0, 5.592]                3.612      4.211          0        0   0.0%
+coil-coil distance penalty          54        11        -    7.348  [-inf, 0]                     0  0.0007829  3.734e-05  0.00864   0.0%
+plasma-coil minimum distance         8       573        -    2.828  [0.1745, inf]            0.2454     0.2869          0        0   0.0%
+total cost 0.5 sum f^2                                                                                                      0.5277
+k=3 physics  A 6.140  R0 1.0396  a 0.1693  iota [0.3996, 0.4030]  QS(Boozer, |B_nonsym|/<B>) rho 0.25 1.36e-04  rho 0.5 1.53e-04  rho 0.75 2.82e-04  rho 1 7.69e-04
+k=3 coils    bn 4.2624e-03 (max 2.358e-02)  L 1.000  kappa 0.662  kMS 0.745  d_cc 1.034  d_pc 1.434  linked 0  -> FAILS L
+k=3 solver   Maximum number of iterations has been exceeded.  nit 100  wall 11.5 min
+
+wrote work/ss_qa/ss_v2_qs10_k3: eq_k*.h5, coils_k*.h5, result.json

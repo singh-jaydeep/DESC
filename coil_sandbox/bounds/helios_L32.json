@@ -1,0 +1,10 @@
+{
+  "_source": "Kruger, Elder, Gates et al., Planar coil design for the Helios stellarator fusion power plant, Fusion Eng. Des. 230 (2026) 115893, Table 2 (encircling coils) and Sec. 4.1. L = 36 m is the paper's AVERAGE encircling-coil length, used here as a per-coil cap (user's choice, 2026-09-16). The paper has no kappa_MS bound. convex_excess: allowed total-curvature excess per coil, int |kappa| ds - 2 pi (paper Eq. 5), in radians. || MODIFIED helios_L32 (2026-09-18, user): paper bounds EXCEPT L 36->32. Used for the like-for-like test of the even-current arcB2: warm start from warm_L32_d10 (which reached bn 8.5579e-3 with all four coils at 32 m and min/max 0.91, but only because d_cc had been relaxed to 1.0 m and the coils re-crowded to 1.036 m). This restores d_cc and d_pc to the paper's 1.2 m and asks whether the four-healthy-coil state survives proper clearance enforcement, and whether it still beats the sacrificed baseline's 8.7195e-3 (which uses 36 m coils, 576 m of conductor, and starves one coil to 5.3 MA).",
+  "scale": "absolute",
+  "L": 32.0,
+  "kappa": 1.5,
+  "kappa_MS": null,
+  "d_cc": 1.2,
+  "d_pc": 1.2,
+  "convex_excess": 0.001
+}

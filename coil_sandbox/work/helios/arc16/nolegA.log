@@ -1,0 +1,4 @@
+START  bn 3.3890e-02  L 1.004  kappa 0.335  convex 1302.320  d_cc 1.268  d_pc 1.248  linked 0  coils 16  -> FAILS L,convex
+SOLVER {'wall_s': 1310.52614402771, 'message': 'Maximum number of iterations has been exceeded.', 'nit': 300, 'n_outer': 11, 'constr_violation': 0.0003342657798876088, 'y_absmax_final': 0.034277394257289456}
+START  bn 3.3890e-02  L 1.004  kappa 0.335  convex 1302.320  d_cc 1.268  d_pc 1.248  -> FAILS L,convex
+RESULT bn 8.7897e-03  L 1.000  kappa 0.413  convex 2.765  d_cc 1.035  d_pc 1.156  linked 0  -> FAILS L,convex  active ['L']

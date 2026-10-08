@@ -1,0 +1,7 @@
+cut 90 continue: exit 0
+cut 0: exit 0
+cut 30: exit 0
+cut 60: exit 0
+cut 120: exit 0
+cut 150: exit 0
+SCAN DONE

@@ -1,0 +1,181 @@
+Running as unit: run-p2176494-i2179980.scope; invocation ID: 66b9c34370c34924bf3773d8dcb4987e
+E1008 03:16:45.684815 2176646 cuda_executor.cc:1743] Could not get kernel mode driver version: ( INVALID_ARGUMENT: Version does not match the format X.Y.Z )
+E1008 03:16:45.698119 2176494 cuda_executor.cc:1743] Could not get kernel mode driver version: ( INVALID_ARGUMENT: Version does not match the format X.Y.Z )
+DESC /home/singh/Documents/DESC2/desc
+DEVICE requested=gpu obtained=gpu (1x NVIDIA GeForce RTX 5070 Laptop GPU)
+  [mem] RSS 0.83 GB  peak 0.83 GB
+eq work/ss_qh/matrix/ss/planar_k4b/eq_k4.h5 NFP 4 sym True; start work/ss_qh/matrix/base/xyzN6/result.h5: 4 unique coils (FourierXYZCoil), 4 top-level; VACUUM
+BOUNDS L 2.926  Ltot -  kappa 13.67  kms 18.69  convex -  planar -  dcc 0.05851  dpc 0.1097
+  built coil arclength residual in 1.5 s
+  built coil length in 0.1 s
+  built coil curvature in 0.1 s
+  built coil mean squared curvature in 0.1 s
+  built coil-coil distance rows in 2.5 s
+E1008 03:16:59.436513 2176668 xtile_compiler.cc:399] Fusion: input_reduce_fusion = f64[66177]{0} fusion(a.1, b.1), kind=kCustom, calls=fused_reduce.clone, backend_config={"operation_queue_id":"0","wait_on_operation_queues":[],"fusion_backend_config":{"kind":"__triton","block_level_fusion_config":{"num_warps":"8","output_tiles":[{"sizes":["64"]}],"num_ctas":1,"num_stages":1,"is_tma_allowed":true,"is_warp_specialization_allowed":false}},"force_earliest_schedule":false,"reification_cost":[],"device_type":"DEVICE_TYPE_INVALID"}
+E1008 03:16:59.436567 2176668 xtile_compiler.cc:401] Computation: fused_reduce.clone {
+  param_0.2 = f64[66177,144]{1,0} parameter(0)
+  param_1.2 = f64[144]{0} parameter(1)
+  broadcast.2 = f64[66177,144]{1,0} broadcast(param_1.2), dimensions={1}
+  multiply.2 = f64[66177,144]{1,0} multiply(param_0.2, broadcast.2)
+  constant_2 = f64[] constant(0)
+  ROOT reduce.2 = f64[66177]{0} reduce(multiply.2, constant_2), dimensions={1}, to_apply=scalar_add_computation
+}
+E1008 03:17:03.533550 2176658 xtile_compiler.cc:399] Fusion: input_reduce_fusion = f64[67584]{0} fusion(a.1, b.1), kind=kCustom, calls=fused_reduce.clone, backend_config={"operation_queue_id":"0","wait_on_operation_queues":[],"fusion_backend_config":{"kind":"__triton","block_level_fusion_config":{"num_warps":"8","output_tiles":[{"sizes":["64"]}],"num_ctas":1,"num_stages":1,"is_tma_allowed":true,"is_warp_specialization_allowed":false}},"force_earliest_schedule":false,"reification_cost":[],"device_type":"DEVICE_TYPE_INVALID"}
+E1008 03:17:03.533603 2176658 xtile_compiler.cc:401] Computation: fused_reduce.clone {
+  param_0.4 = f64[67584,144]{1,0} parameter(0)
+  param_1.5 = f64[144]{0} parameter(1)
+  broadcast.4 = f64[67584,144]{1,0} broadcast(param_1.5), dimensions={1}
+  multiply.4 = f64[67584,144]{1,0} multiply(param_0.4, broadcast.4)
+  constant_3 = f64[] constant(0)
+  ROOT reduce.2 = f64[67584]{0} reduce(multiply.4, constant_3), dimensions={1}, to_apply=scalar_add_computation
+}
+  [mem] RSS 2.49 GB  peak 3.29 GB
+E1008 03:17:43.417933 2176670 xtile_compiler.cc:399] Fusion: input_reduce_fusion = f64[50000]{0} fusion(a.1, b.1), kind=kCustom, calls=fused_reduce.clone, backend_config={"operation_queue_id":"0","wait_on_operation_queues":[],"fusion_backend_config":{"kind":"__triton","block_level_fusion_config":{"num_warps":"8","output_tiles":[{"sizes":["64"]}],"num_ctas":1,"num_stages":1,"is_tma_allowed":true,"is_warp_specialization_allowed":false}},"force_earliest_schedule":false,"reification_cost":[],"device_type":"DEVICE_TYPE_INVALID"}
+E1008 03:17:43.417983 2176670 xtile_compiler.cc:401] Computation: fused_reduce.clone {
+  param_0.2 = f64[50000,144]{1,0} parameter(0)
+  param_1.2 = f64[144]{0} parameter(1)
+  broadcast.2 = f64[50000,144]{1,0} broadcast(param_1.2), dimensions={1}
+  multiply.2 = f64[50000,144]{1,0} multiply(param_0.2, broadcast.2)
+  constant_2 = f64[] constant(0)
+  ROOT reduce.2 = f64[50000]{0} reduce(multiply.2, constant_2), dimensions={1}, to_apply=scalar_add_computation
+}
+  [mem] RSS 3.64 GB  peak 3.67 GB
+  [mem] RSS 3.39 GB  peak 3.93 GB
+  [mem] RSS 3.30 GB  peak 4.06 GB
+  [mem] RSS 3.93 GB  peak 4.15 GB
+  [mem] RSS 3.86 GB  peak 4.20 GB
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: The boundary has concave radius 0.00621 m, near the bound 0.11 m: the distance there may have a ridge the spline smooths over.
+  warnings.warn(msg, err)
+  built plasma-coil distance field in 180.8 s
+BUILD 187.6 s; cc gap 1.313 mm on 513 nodes/coil, pc node margin 0.313 mm on 513 nodes/coil; cc active rows at start 9028 of 20000; field {'max_error': 2.624006452039973e-05, 'concave_radius': np.float64(0.006214560669953017), 'node_margin': 0.0003126508111110389}
+INFO {'kind': 'FourierXYZCoil', 'gauge': "phase pinned (['Z_n', 'Z_n', 'Z_n', 'Y_n']), relative speed within +-0.5", 'field_grid': 'uniform N=50 (101 nodes)', 'n_nodes': 513, 'speed_ratio': 1.5, 'cc_gap_mode': 'bounds', 'cc_gap': 0.001313133406666363, 'pc_node_margin': 0.0003126508111110389}
+  coil arclength residual          rows 804
+  coil length                      rows 4
+  coil curvature                   rows 2404
+  coil mean squared curvature      rows 4
+  coil-coil distance rows          rows 18948240
+  plasma-coil distance field       rows 4104
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 4.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 4.
+  warnings.warn(msg, err)
+START  bn 6.3684e-02  L 1.000  kappa 1.000  kMS 1.000  d_cc 1.022  d_pc 1.429  linked 0  -> FAILS L,kappa
+  [mem] RSS 4.41 GB  peak 4.44 GB
+START  true: cc 0.05978 pc 0.15670 max L 2.9255 max |k| 13.673 linked [] gap {'used': 0.001313133406666363, 'needed': 0.0013199468095171085}
+Building objective: summed coil current
+Building objective: fixed parameters
+Building objective: fixed shift
+Building objective: fixed rotation
+Number of parameters: 155
+Number of objectives: 1326
+Number of equality constraints: 0
+Number of inequality constraints: 27392
+
+Starting optimization
+Using method: lsq-auglag-composite
+  [mem] RSS 5.27 GB  peak 5.27 GB
+Outer Inner its  Optimality     gtolk  Violation     ctolk   mu mean   max |y|
+  [mem] RSS 5.53 GB  peak 5.53 GB
+    1        12   9.606e-04  1.00e-03  2.026e-03  1.00e-06  1.00e+01  0.00e+00
+[outer 1] 12 inner its, opt 9.61e-04 (gtolk 1.0e-03, met), violation 2.03e-03 (ctolk 1.0e-06), 54 s
+   coil arclength residual        rows    804 mu 1.0e+01/1.0e+01/1.0e+01 max|y| 0.00e+00 (nonzero 0) max viol 3.39e-04
+   coil length                    rows      4 mu 1.0e+01/1.0e+01/1.0e+01 max|y| 0.00e+00 (nonzero 0) max viol 2.03e-03
+   coil curvature                 rows   2404 mu 1.0e+01/1.0e+01/1.0e+01 max|y| 0.00e+00 (nonzero 0) max viol 0.00e+00
+   coil mean squared curvature    rows      4 mu 1.0e+01/1.0e+01/1.0e+01 max|y| 0.00e+00 (nonzero 0) max viol 0.00e+00
+   coil-coil distance rows        rows   8550 mu 1.0e+01/1.0e+01/1.0e+01 max|y| 0.00e+00 (nonzero 0) max viol 0.00e+00
+   plasma-coil distance field     rows   4104 mu 1.0e+01/1.0e+01/1.0e+01 max|y| 0.00e+00 (nonzero 0) max viol 0.00e+00
+   true: cc 0.05982 m, pc 0.15413 m, max L 2.9265, max |k| 13.663, linked [], gap {'used': 0.001313133406666363, 'needed': 0.001326058631446401}
+    2         1   8.391e-06  1.00e-04  1.315e-04  1.00e-06  1.00e+02  0.00e+00
+[outer 2] 1 inner its, opt 8.39e-06 (gtolk 1.0e-04, met), violation 1.31e-04 (ctolk 1.0e-06), 60 s
+   coil arclength residual        rows    804 mu 1.0e+02/1.0e+02/1.0e+02 max|y| 0.00e+00 (nonzero 0) max viol 1.31e-04
+   coil length                    rows      4 mu 1.0e+02/1.0e+02/1.0e+02 max|y| 0.00e+00 (nonzero 0) max viol 5.95e-05
+   coil curvature                 rows   2404 mu 1.0e+02/1.0e+02/1.0e+02 max|y| 0.00e+00 (nonzero 0) max viol 0.00e+00
+   coil mean squared curvature    rows      4 mu 1.0e+02/1.0e+02/1.0e+02 max|y| 0.00e+00 (nonzero 0) max viol 0.00e+00
+   coil-coil distance rows        rows   8541 mu 1.0e+02/1.0e+02/1.0e+02 max|y| 0.00e+00 (nonzero 0) max viol 1.05e-05
+   plasma-coil distance field     rows   4104 mu 1.0e+02/1.0e+02/1.0e+02 max|y| 0.00e+00 (nonzero 0) max viol 0.00e+00
+   true: cc 0.05981 m, pc 0.15425 m, max L 2.9255, max |k| 13.673, linked [], gap {'used': 0.001313133406666363, 'needed': 0.0013211497191611833}
+    3         1   4.905e-06  1.00e-05  3.623e-05  1.00e-06  1.00e+03  0.00e+00
+[outer 3] 1 inner its, opt 4.90e-06 (gtolk 1.0e-05, met), violation 3.62e-05 (ctolk 1.0e-06), 66 s
+   coil arclength residual        rows    804 mu 1.0e+03/1.0e+03/1.0e+03 max|y| 0.00e+00 (nonzero 0) max viol 3.62e-05
+   coil length                    rows      4 mu 1.0e+03/1.0e+03/1.0e+03 max|y| 0.00e+00 (nonzero 0) max viol 6.75e-06
+   coil curvature                 rows   2404 mu 1.0e+03/1.0e+03/1.0e+03 max|y| 0.00e+00 (nonzero 0) max viol 0.00e+00
+   coil mean squared curvature    rows      4 mu 1.0e+03/1.0e+03/1.0e+03 max|y| 0.00e+00 (nonzero 0) max viol 0.00e+00
+   coil-coil distance rows        rows   8535 mu 1.0e+03/1.0e+03/1.0e+03 max|y| 0.00e+00 (nonzero 0) max viol 1.67e-06
+   plasma-coil distance field     rows   4104 mu 1.0e+03/1.0e+03/1.0e+03 max|y| 0.00e+00 (nonzero 0) max viol 0.00e+00
+   true: cc 0.05981 m, pc 0.15430 m, max L 2.9255, max |k| 13.672, linked [], gap {'used': 0.001313133406666363, 'needed': 0.00131977996807373}
+    4         2   5.308e-07  1.00e-06  1.963e-06  1.00e-06  9.59e+03  6.70e-04
+[outer 4] 2 inner its, opt 5.31e-07 (gtolk 1.0e-06, met), violation 1.96e-06 (ctolk 1.0e-06), 74 s
+   coil arclength residual        rows    804 mu 9.6e+03/9.6e+03/1.0e+04 max|y| 6.70e-04 (nonzero 1) max viol 1.96e-06
+   coil length                    rows      4 mu 1.0e+04/1.0e+04/1.0e+04 max|y| 0.00e+00 (nonzero 0) max viol 5.72e-07
+   coil curvature                 rows   2404 mu 9.6e+03/9.6e+03/9.6e+03 max|y| 0.00e+00 (nonzero 0) max viol 0.00e+00
+   coil mean squared curvature    rows      4 mu 9.6e+03/9.6e+03/9.6e+03 max|y| 0.00e+00 (nonzero 0) max viol 0.00e+00
+   coil-coil distance rows        rows   8535 mu 9.6e+03/9.6e+03/1.0e+04 max|y| 0.00e+00 (nonzero 0) max viol 1.19e-07
+   plasma-coil distance field     rows   4104 mu 9.6e+03/9.6e+03/9.6e+03 max|y| 0.00e+00 (nonzero 0) max viol 0.00e+00
+   true: cc 0.05981 m, pc 0.15432 m, max L 2.9255, max |k| 13.672, linked [], gap {'used': 0.001313133406666363, 'needed': 0.0013196290477971051}
+    5         1   2.862e-07  1.00e-06  2.192e-07  1.00e-06  1.95e+04  9.97e-03
+  [mem] RSS 5.78 GB  peak 6.12 GB
+[outer 5] 1 inner its, opt 2.86e-07 (gtolk 1.0e-06, met), violation 2.19e-07 (ctolk 1.0e-06), 79 s
+   coil arclength residual        rows    804 mu 1.9e+04/1.9e+04/1.0e+05 max|y| 9.97e-03 (nonzero 11) max viol 2.19e-07
+   coil length                    rows      4 mu 1.9e+04/1.9e+04/1.9e+04 max|y| 5.72e-03 (nonzero 4) max viol 0.00e+00
+   coil curvature                 rows   2404 mu 1.9e+04/1.9e+04/1.9e+04 max|y| 0.00e+00 (nonzero 0) max viol 4.53e-09
+   coil mean squared curvature    rows      4 mu 1.9e+04/1.9e+04/1.9e+04 max|y| 0.00e+00 (nonzero 0) max viol 0.00e+00
+   coil-coil distance rows        rows   8535 mu 1.9e+04/1.9e+04/1.9e+04 max|y| 1.19e-03 (nonzero 2) max viol 1.32e-08
+   plasma-coil distance field     rows   4104 mu 1.9e+04/1.9e+04/1.9e+04 max|y| 0.00e+00 (nonzero 0) max viol 0.00e+00
+   true: cc 0.05981 m, pc 0.15432 m, max L 2.9255, max |k| 13.672, linked [], gap {'used': 0.001313133406666363, 'needed': 0.0013196182233458642}
+`gtol` condition satisfied.
+         Max scaled gradient: 2.862e-07
+         Max constraint violation: 2.192e-07
+         Outer iterations: 5
+         Iterations: 17
+         Function evaluations: 28
+         Jacobian evaluations: 18
+==============================================================================================================
+                                                                 Start  -->   End
+Total (sum of squares):                                      8.285e+01  -->   1.632e-02, 
+Maximum absolute Boundary normal field error:                5.513e-02  -->   1.216e-03 (T m^2)
+Minimum absolute Boundary normal field error:                2.143e-06  -->   1.639e-07 (T m^2)
+Average absolute Boundary normal field error:                2.326e-02  -->   3.142e-04 (T m^2)
+Maximum absolute Boundary normal field error:                6.442e-01  -->   1.421e-02 (normalized)
+Minimum absolute Boundary normal field error:                2.504e-05  -->   1.916e-06 (normalized)
+Average absolute Boundary normal field error:                2.718e-01  -->   3.671e-03 (normalized)
+Summed coil current error:                                   0.000e+00  -->   0.000e+00 (A)
+Fixed parameters error:                                      0.000e+00  -->   0.000e+00 (~)
+Maximum Coil arclength residual:                             5.000e-01  -->   5.000e-01 (dimensionless)
+Minimum Coil arclength residual:                            -5.000e-01  -->  -5.000e-01 (dimensionless)
+Average Coil arclength residual:                             5.873e-18  -->   1.762e-17 (dimensionless)
+Maximum Coil length:                                         2.926e+00  -->   2.926e+00 (m)
+Minimum Coil length:                                         2.926e+00  -->   2.926e+00 (m)
+Average Coil length:                                         2.926e+00  -->   2.926e+00 (m)
+Maximum Coil length:                                         6.283e+00  -->   6.283e+00 (normalized)
+Minimum Coil length:                                         6.283e+00  -->   6.283e+00 (normalized)
+Average Coil length:                                         6.283e+00  -->   6.283e+00 (normalized)
+Maximum Coil curvature:                                      1.367e+01  -->   1.367e+01 (m^-1)
+Minimum Coil curvature:                                      1.362e-01  -->   4.695e-01 (m^-1)
+Average Coil curvature:                                      4.008e+00  -->   3.956e+00 (m^-1)
+Maximum Coil curvature:                                      6.366e+00  -->   6.366e+00 (normalized)
+Minimum Coil curvature:                                      6.343e-02  -->   2.186e-01 (normalized)
+Average Coil curvature:                                      1.866e+00  -->   1.842e+00 (normalized)
+Maximum Coil mean squared curvature:                         1.869e+01  -->   1.796e+01 (m^-2)
+Minimum Coil mean squared curvature:                         1.447e+01  -->   1.285e+01 (m^-2)
+Average Coil mean squared curvature:                         1.764e+01  -->   1.522e+01 (m^-2)
+Maximum Coil mean squared curvature:                         4.053e+00  -->   3.894e+00 (normalized)
+Minimum Coil mean squared curvature:                         3.136e+00  -->   2.785e+00 (normalized)
+Average Coil mean squared curvature:                         3.824e+00  -->   3.299e+00 (normalized)
+Maximum Coil-coil distance rows:                             1.938e+00  -->   2.019e+00 (m)
+Minimum Coil-coil distance rows:                             5.851e-02  -->   5.851e-02 (m)
+Average Coil-coil distance rows:                             9.347e-02  -->   9.528e-02 (m)
+Maximum Coil-coil distance rows:                             4.163e+00  -->   4.336e+00 (normalized)
+Minimum Coil-coil distance rows:                             1.257e-01  -->   1.257e-01 (normalized)
+Average Coil-coil distance rows:                             2.008e-01  -->   2.046e-01 (normalized)
+Maximum Plasma-coil distance field:                          2.190e-01  -->   2.190e-01 (m)
+Minimum Plasma-coil distance field:                          1.563e-01  -->   1.540e-01 (m)
+Average Plasma-coil distance field:                          2.129e-01  -->   2.097e-01 (m)
+Maximum Plasma-coil distance field:                          1.178e+00  -->   1.178e+00 (normalized)
+Minimum Plasma-coil distance field:                          8.407e-01  -->   8.279e-01 (normalized)
+Average Plasma-coil distance field:                          1.145e+00  -->   1.127e+00 (normalized)
+==============================================================================================================
+
+SOLVER `gtol` condition satisfied. | 5 outer / 17 inner its, opt 2.86e-07, violation 2.19e-07, 88 s
+START  bn 6.3684e-02  L 1.000  kappa 1.000  kMS 1.000  d_cc 1.022  d_pc 1.429  -> FAILS L,kappa
+RESULT bn 1.0975e-03  L 1.000  kappa 1.000  kMS 0.961  d_cc 1.022  d_pc 1.407  linked 0  -> FAILS kappa  active ['L', 'kappa']
+wrote work/ss_qh/matrix/on_planar/xyzN6/result.h5, result.json, outer.json

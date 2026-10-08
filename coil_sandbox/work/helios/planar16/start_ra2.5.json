@@ -1,0 +1,97 @@
+{
+ "eq": "sample_equilibria/helios_repro.h5",
+ "eq_kind": "h5",
+ "vacuum": false,
+ "nc": 4,
+ "r_over_a": 2.5,
+ "rep": "planar",
+ "N": 7,
+ "B": 5,
+ "M": 3,
+ "knots": 32,
+ "method": "cubic2",
+ "from_coils": null,
+ "phase": "0",
+ "hinges": "phase",
+ "chord_angle": null,
+ "cut_angle": null,
+ "fit_deviation": null,
+ "bounds": {
+  "L": 36.0,
+  "Ltot": null,
+  "kappa": 1.5,
+  "kms": null,
+  "dcc": 1.2,
+  "dpc": 1.2,
+  "convex": 0.001,
+  "planar": null,
+  "f": 1.0422686304491533,
+  "a": 1.7718566717635607,
+  "scale": "absolute"
+ },
+ "metrics": {
+  "per_coil": [
+   {
+    "L": 27.832259516132325,
+    "kappa": 0.22575189425557382,
+    "kms": 0.05096391775997969,
+    "corner": 0.0,
+    "convex": 0.0,
+    "kappa_s_min": 0.2257518942555733,
+    "planar": 0.0
+   },
+   {
+    "L": 27.832259516132325,
+    "kappa": 0.22575189425557382,
+    "kms": 0.050963917759979695,
+    "corner": 0.0,
+    "convex": 0.0,
+    "kappa_s_min": 0.22575189425557343,
+    "planar": 0.0
+   },
+   {
+    "L": 27.832259516132318,
+    "kappa": 0.22575189425557382,
+    "kms": 0.05096391775997971,
+    "corner": 0.0,
+    "convex": 0.0,
+    "kappa_s_min": 0.22575189425557338,
+    "planar": 0.0
+   },
+   {
+    "L": 27.832259516132325,
+    "kappa": 0.22575189425557382,
+    "kms": 0.050963917759979695,
+    "corner": 0.0,
+    "convex": 0.0,
+    "kappa_s_min": 0.22575189425557338,
+    "planar": 0.0
+   }
+  ],
+  "L": 27.832259516132325,
+  "L_total": 111.3290380645293,
+  "kappa": 0.22575189425557382,
+  "kms": 0.05096391775997971,
+  "corner": 0.0,
+  "convex": 0.0,
+  "planar": 0.0,
+  "d_cc": 1.1333032738383344,
+  "d_pc": 1.0821059756099685,
+  "linked": 0,
+  "linked_pairs": [],
+  "bn": 0.07719384069538132,
+  "bn_max": 0.23480377851220008,
+  "bn_local": 0.07438616738396774,
+  "bn_max_T": 1.5246543571465718,
+  "vacuum": false,
+  "n_coils": 16
+ },
+ "margins": {
+  "L": 0.7731183198925646,
+  "kappa": 0.1505012628370492,
+  "convex": 0.0,
+  "d_cc": 0.9444193948652787,
+  "d_pc": 0.9017549796749738
+ },
+ "verdict": "FAILS d_cc,d_pc"
+}

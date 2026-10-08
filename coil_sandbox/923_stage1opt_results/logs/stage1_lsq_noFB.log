@@ -1,0 +1,213 @@
+Running as unit: run-p1319192-i1321251.scope; invocation ID: 9fe79ebee9704b3ea9d7e4971ada83aa
+E0923 15:07:02.343704 1319668 cuda_executor.cc:1743] Could not get kernel mode driver version: ( INVALID_ARGUMENT: Version does not match the format X.Y.Z )
+E0923 15:07:02.356097 1319581 cuda_executor.cc:1743] Could not get kernel mode driver version: ( INVALID_ARGUMENT: Version does not match the format X.Y.Z )
+DEVICE requested=gpu obtained=gpu (1x NVIDIA GeForce RTX 5070 Laptop GPU)
+equilibrium L8 M8 N8 NFP2  dim_x=1462
+eps_1 normal: LIVE (exact, rotation-invariant)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+E0923 15:07:10.003541 1319675 xtile_compiler.cc:399] Fusion: input_reduce_fusion = f64[8,360]{1,0} fusion(a.1, b.1), kind=kCustom, calls=fused_reduce.clone, backend_config={"operation_queue_id":"0","wait_on_operation_queues":[],"fusion_backend_config":{"kind":"__triton","block_level_fusion_config":{"num_warps":"8","output_tiles":[{"sizes":["8","8"]}],"num_ctas":1,"num_stages":1,"is_tma_allowed":true,"is_warp_specialization_allowed":false}},"force_earliest_schedule":false,"reification_cost":[],"device_type":"DEVICE_TYPE_INVALID"}
+E0923 15:07:10.003579 1319675 xtile_compiler.cc:401] Computation: fused_reduce.clone {
+  param_0.4 = f64[8,360,144]{2,1,0} parameter(0)
+  param_1.5 = f64[144]{0} parameter(1)
+  broadcast.1.3 = f64[8,360,144]{2,1,0} broadcast(param_1.5), dimensions={2}
+  multiply.1.3 = f64[8,360,144]{2,1,0} multiply(param_0.4, broadcast.1.3)
+  constant_3 = f64[] constant(0)
+  ROOT reduce.1.1 = f64[8,360]{1,0} reduce(multiply.1.3, constant_3), dimensions={2}, to_apply=scalar_add_computation
+}
+  clamshell: K=8 contours, worst frozen segment lambda_1/lambda_2 = 0.010
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: FutureWarning: constants is deprecated and will be removed in a future release. Users should not include constants in the arguments of their objective compute methods. Instead declare all the constants in the build method and use as self._constants.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: FutureWarning: constants is deprecated and will be removed in a future release. Users should not include constants in the arguments of their objective compute methods. Instead declare all the constants in the build method and use as self._constants.
+  warnings.warn(msg, err)
+diagnostics: monotonic=True  dPhi/dzeta 6.105e+05..1.137e+06  I/G=-5.06e-18  newton_res=1.71e-16  gap_seg=0.0101
+baseline C    mean 1.0077  range 0.8661-1.3723
+baseline eps1 mean 0.0676  range 0.0462-0.0769
+optimizing eps1: target = 0.60 x baseline (mean 0.0676 -> 0.0406)
+objective residual at start = 1.000 (O(1) by construction)
+baseline QS rms 5.1750e-04   iota 0.41970..0.42018
+free boundary DOF: R 24 + Z 24 = 48
+constraint handling: SOFT objective terms (2 bounded terms, residual 10 per bound-width of violation); constraints = force balance + linear fixes only
+proximal re-solve: ftol=1e-06 xtol=1e-08 gtol=1e-10 maxiter=50
+Building objective: clamshell eps1
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+  clamshell eps1: K=8 contours, worst frozen segment lambda_1/lambda_2 = 0.010
+Building objective: aspect ratio
+Precomputing transforms
+Timer: Precomputing transforms = 622 ms
+Building objective: Generic
+ObjectiveFunction deriv_mode : blocked
+clamshell eps1 jac_chunk_size: None
+aspect ratio jac_chunk_size: None
+Generic jac_chunk_size: None
+Timer: Objective build = 8.72 sec
+Building objective: force
+Precomputing transforms
+Timer: Precomputing transforms = 894 ms
+ObjectiveFunction deriv_mode : batched
+ObjectiveFunction jac_chunk_size: 4382
+Timer: Objective build = 1.34 sec
+ObjectiveFunction deriv_mode : blocked
+lcfs R jac_chunk_size: None
+lcfs Z jac_chunk_size: None
+fixed Psi jac_chunk_size: None
+fixed pressure jac_chunk_size: None
+fixed current jac_chunk_size: None
+fixed sheet current jac_chunk_size: None
+self_consistency R jac_chunk_size: None
+self_consistency Z jac_chunk_size: None
+lambda gauge jac_chunk_size: None
+axis R self consistency jac_chunk_size: None
+axis Z self consistency jac_chunk_size: None
+Timer: Objective build = 1.24 ms
+Timer: Eq Update LinearConstraintProjection build = 3.43 sec
+Timer: Proximal projection build = 38.0 sec
+Building objective: lcfs R
+Building objective: lcfs Z
+Building objective: fixed pressure
+Building objective: fixed current
+Building objective: fixed Psi
+ObjectiveFunction deriv_mode : blocked
+lcfs R jac_chunk_size: None
+lcfs Z jac_chunk_size: None
+fixed pressure jac_chunk_size: None
+fixed current jac_chunk_size: None
+fixed Psi jac_chunk_size: None
+Timer: Objective build = 740 ms
+Timer: LinearConstraintProjection build = 1.63 sec
+Number of parameters: 48
+Number of objectives: 14
+Timer: Initializing the optimization = 40.5 sec
+
+Starting optimization
+Using method: proximal-lsq-exact
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: FutureWarning: constants is deprecated and will be removed in a future release. Users should not include constants in the arguments of their objective compute methods. Instead declare all the constants in the build method and use as self._constants.
+  warnings.warn(msg, err)
+Solver options:
+------------------------------------------------------------
+Maximum Function Evaluations       : 1501
+Maximum Allowed Total Δx Norm      : inf
+Scaled Termination                 : True
+Trust Region Method                : qr
+Initial Trust Radius               : 2.173e+00
+Maximum Trust Radius               : inf
+Minimum Trust Radius               : 2.220e-16
+Trust Radius Increase Ratio        : 2.000e+00
+Trust Radius Decrease Ratio        : 2.500e-01
+Trust Radius Increase Threshold    : 7.500e-01
+Trust Radius Decrease Threshold    : 2.500e-01
+------------------------------------------------------------ 
+
+   Iteration     Total nfev        Cost      Cost reduction    Step norm     Optimality   
+       0              1          4.000e+00                                    2.698e+00   
+       1              2          1.572e+00      2.428e+00      7.174e-02      1.635e+00   
+       2              5          1.381e+00      1.915e-01      2.539e-03      1.548e+00   
+       3              6          1.302e+00      7.896e-02      2.492e-03      1.483e+00   
+       4              7          1.249e+00      5.288e-02      5.901e-04      1.443e+00   
+       5              8          1.200e+00      4.875e-02      5.920e-04      1.403e+00   
+       6              9          1.155e+00      4.498e-02      5.931e-04      1.365e+00   
+       7             10          1.113e+00      4.174e-02      5.936e-04      1.327e+00   
+       8             11          1.074e+00      3.907e-02      5.935e-04      1.290e+00   
+       9             12          1.037e+00      3.723e-02      5.928e-04      1.254e+00   
+      10             13          1.001e+00      3.600e-02      5.916e-04      1.219e+00   
+      11             14          9.658e-01      3.523e-02      5.900e-04      1.184e+00   
+      12             15          9.316e-01      3.411e-02      5.879e-04      1.150e+00   
+      13             16          8.987e-01      3.295e-02      5.855e-04      1.116e+00   
+      14             17          8.674e-01      3.126e-02      5.828e-04      1.084e+00   
+      15             18          8.375e-01      2.994e-02      5.799e-04      1.053e+00   
+      16             19          8.092e-01      2.830e-02      5.769e-04      1.023e+00   
+      17             20          7.831e-01      2.613e-02      5.739e-04      9.945e-01   
+      18             21          7.552e-01      2.786e-02      5.715e-04      9.665e-01   
+      19             22          7.253e-01      2.990e-02      5.692e-04      9.395e-01   
+      20             23          6.859e-01      3.938e-02      5.672e-04      9.137e-01   
+      21             24          6.510e-01      3.495e-02      5.683e-04      8.855e-01   
+      22             25          6.176e-01      3.336e-02      5.661e-04      8.692e-01   
+      23             26          5.852e-01      3.237e-02      5.633e-04      8.527e-01   
+      24             27          5.532e-01      3.205e-02      5.598e-04      8.351e-01   
+      25             28          5.214e-01      3.179e-02      5.559e-04      8.165e-01   
+      26             29          4.902e-01      3.118e-02      5.515e-04      7.976e-01   
+      27             30          4.592e-01      3.099e-02      5.467e-04      7.773e-01   
+      28             31          4.284e-01      3.079e-02      5.414e-04      7.555e-01   
+      29             32          3.979e-01      3.053e-02      5.357e-04      7.317e-01   
+      30             33          3.676e-01      3.030e-02      5.297e-04      7.052e-01   
+      31             34          3.378e-01      2.982e-02      5.236e-04      6.759e-01   
+      32             35          3.088e-01      2.905e-02      5.175e-04      6.435e-01   
+      33             36          2.807e-01      2.804e-02      5.117e-04      6.079e-01   
+      34             37          2.543e-01      2.644e-02      5.065e-04      5.332e-01   
+      35             38          2.330e-01      2.124e-02      5.006e-04      4.618e-01   
+      36             39          2.144e-01      1.859e-02      5.140e-04      4.428e-01   
+      37             40          1.973e-01      1.710e-02      5.173e-04      4.332e-01   
+      38             41          1.830e-01      1.435e-02      5.156e-04      4.177e-01   
+      39             42          1.696e-01      1.338e-02      5.131e-04      3.929e-01   
+      40             43          1.544e-01      1.517e-02      5.038e-04      3.622e-01   
+      41             44          1.420e-01      1.248e-02      4.986e-04      3.362e-01   
+      42             45          1.311e-01      1.090e-02      5.000e-04      3.131e-01   
+      43             46          1.227e-01      8.420e-03      5.045e-04      2.955e-01   
+      44             47          1.140e-01      8.620e-03      5.056e-04      2.744e-01   
+      45             48          1.070e-01      7.066e-03      5.066e-04      2.565e-01   
+      46             49          1.003e-01      6.703e-03      5.110e-04      2.465e-01   
+      47             50          9.438e-02      5.885e-03      5.167e-04      2.378e-01   
+      48             51          8.779e-02      6.589e-03      5.181e-04      2.343e-01   
+      49             52          8.275e-02      5.040e-03      5.314e-04      2.294e-01   
+      50             56          8.243e-02      3.132e-04      8.637e-06      2.322e-01   
+Optimization terminated successfully.
+`ftol` condition satisfied. (ftol=1.00e-02)
+         Current function value: 8.243e-02
+         Total delta_x: 7.536e-02
+         Iterations: 50
+         Function evaluations: 56
+         Jacobian evaluations: 51
+Timer: Solution time = 5.02 min
+Timer: Avg time per step = 5.90 sec
+==============================================================================================================
+                                                                 Start  -->   End
+Total (sum of squares):                                      4.000e+00  -->   8.243e-02, 
+Maximum Clamshell                                            7.686e-02  -->   4.826e-02 (dimensionless)
+Minimum Clamshell                                            4.624e-02  -->   2.406e-02 (dimensionless)
+Average Clamshell                                            6.763e-02  -->   4.088e-02 (dimensionless)
+Aspect ratio:                                                6.000e+00  -->   6.250e+00 (dimensionless)
+Maximum Generic objective value:                             4.202e-01  -->   4.617e-01 (~)
+Minimum Generic objective value:                             4.197e-01  -->   3.695e-01 (~)
+Average Generic objective value:                             4.200e-01  -->   4.165e-01 (~)
+Maximum Generic objective value:                             4.202e-01  -->   4.617e-01 (normalized)
+Minimum Generic objective value:                             4.197e-01  -->   3.695e-01 (normalized)
+Average Generic objective value:                             4.200e-01  -->   4.165e-01 (normalized)
+Maximum absolute Force error:                                2.252e+01  -->   1.121e+04 (N)
+Minimum absolute Force error:                                3.916e-04  -->   1.169e-01 (N)
+Average absolute Force error:                                8.294e-01  -->   1.772e+02 (N)
+Maximum absolute Force error:                                2.065e-05  -->   1.028e-02 (normalized)
+Minimum absolute Force error:                                3.591e-10  -->   1.072e-07 (normalized)
+Average absolute Force error:                                7.605e-07  -->   1.625e-04 (normalized)
+R boundary error:                                            1.140e-19  -->   6.081e-20 (m)
+Z boundary error:                                            3.352e-19  -->   2.170e-19 (m)
+Fixed pressure profile error:                                0.000e+00  -->   0.000e+00 (Pa)
+Fixed current profile error:                                 0.000e+00  -->   0.000e+00 (A)
+Fixed Psi error:                                             0.000e+00  -->   0.000e+00 (Wb)
+==============================================================================================================
+
+
+wall clock 345.7 s for 300 iterations -> 1.15 s/it
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: FutureWarning: constants is deprecated and will be removed in a future release. Users should not include constants in the arguments of their objective compute methods. Instead declare all the constants in the build method and use as self._constants.
+  warnings.warn(msg, err)
+C    : mean 1.0077 -> 1.0499  (+4.19%)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: FutureWarning: constants is deprecated and will be removed in a future release. Users should not include constants in the arguments of their objective compute methods. Instead declare all the constants in the build method and use as self._constants.
+  warnings.warn(msg, err)
+eps1 : mean 0.0676 -> 0.0409  (-39.55%)
+saved 922_stage1opt_results/runs/live_eps1_L1_lsq/eq_lo.h5

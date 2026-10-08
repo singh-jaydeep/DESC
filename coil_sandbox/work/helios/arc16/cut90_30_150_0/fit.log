@@ -1,0 +1,14 @@
+DEVICE requested=cpu obtained=cpu (1x cpu)
+equilibrium sample_equilibria/helios_repro.h5 (h5): NFP 2 sym True M 10 N 8
+bounds (absolute, a = 1.77186 m, f = 1.04227): L 36  Ltot -  kappa 1.5  kms -  convex 0.001  planar -  dcc 1.2  dpc 1.2
+  (4 unique coils in work/helios/planar16/stage2/result.h5; bounds for them: L 36  Ltot -  kappa 1.5  kms -  convex 0.001  planar -  dcc 1.2  dpc 1.2)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+polar arcs B=2 M=5 cut line at 90,30,150,0 deg from vertical, fit to work/helios/planar16/stage2/result.h5: 16 coils (expected 16), 4 unique
+  fit max deviation from the source coil: 135.1 mm, 233.1 mm, 147.4 mm, 138.8 mm
+  L 36.0067 m  kappa 0.573  kappa_MS 0.072  d_cc 1235.3 mm  d_pc 1300.6 mm  convexity excess 2.51e+00  corner 40 deg  linked 0
+  B.n (coils + plasma): <|B.n|>/<|B|> 3.354e-02  <|B.n|/|B|> 3.290e-02  max|B.n| 0.832 T
+  value / bound: L 1.000  kappa 0.382  convex 2513.685  d_cc 1.029  d_pc 1.084  -> FAILS L,convex
+wrote work/helios/arc16/cut90_30_150_0/fit.h5

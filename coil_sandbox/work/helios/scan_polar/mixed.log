@@ -1,0 +1,7 @@
+c0x0_c1x120_c2x60: start 12:34
+c0x0_c1x120_c2x60: exit 0 13:01
+c0x0_c1x150_c2x120: start 13:01
+c0x0_c1x150_c2x120: exit 0 13:32
+c0x30_c1x90_c2x0: start 13:32
+c0x30_c1x90_c2x0: exit 0 14:02
+c0x30_c1x120_c2x60: start 14:02

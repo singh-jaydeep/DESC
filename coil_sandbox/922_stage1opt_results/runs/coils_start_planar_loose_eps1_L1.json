@@ -1,0 +1,97 @@
+{
+ "eq": "922_stage1opt_results/runs/loose_eps1_L1/eq_lo.h5",
+ "eq_kind": "h5",
+ "vacuum": false,
+ "nc": 4,
+ "r_over_a": 2.5,
+ "rep": "planar",
+ "N": 7,
+ "B": 5,
+ "M": 3,
+ "knots": 32,
+ "method": "cubic2",
+ "from_coils": null,
+ "phase": "0",
+ "hinges": "phase",
+ "chord_angle": null,
+ "cut_angle": null,
+ "fit_deviation": null,
+ "bounds": {
+  "L": 3.2,
+  "Ltot": null,
+  "kappa": 8.0,
+  "kms": 8.0,
+  "dcc": 0.1,
+  "dpc": 0.05,
+  "convex": null,
+  "planar": null,
+  "f": 0.09798844345653823,
+  "a": 0.166580353876115,
+  "scale": "absolute"
+ },
+ "metrics": {
+  "per_coil": [
+   {
+    "L": 2.616638079847955,
+    "kappa": 2.4012435481886314,
+    "kms": 5.765970577717518,
+    "corner": 0.0,
+    "convex": 0.0,
+    "kappa_s_min": 2.4012435481886274,
+    "planar": 0.0
+   },
+   {
+    "L": 2.616638079847955,
+    "kappa": 2.4012435481886314,
+    "kms": 5.765970577717519,
+    "corner": 0.0,
+    "convex": 0.0,
+    "kappa_s_min": 2.4012435481886283,
+    "planar": 0.0
+   },
+   {
+    "L": 2.616638079847955,
+    "kappa": 2.4012435481886314,
+    "kms": 5.76597057771752,
+    "corner": 0.0,
+    "convex": 0.0,
+    "kappa_s_min": 2.4012435481886283,
+    "planar": 0.0
+   },
+   {
+    "L": 2.616638079847955,
+    "kappa": 2.4012435481886314,
+    "kms": 5.765970577717519,
+    "corner": 0.0,
+    "convex": 0.0,
+    "kappa_s_min": 2.4012435481886287,
+    "planar": 0.0
+   }
+  ],
+  "L": 2.616638079847955,
+  "L_total": 10.46655231939182,
+  "kappa": 2.4012435481886314,
+  "kms": 5.76597057771752,
+  "corner": 0.0,
+  "convex": 0.0,
+  "planar": 0.0,
+  "d_cc": 0.20549705790546688,
+  "d_pc": 0.0686191967904649,
+  "linked": 0,
+  "linked_pairs": [],
+  "bn": 0.12907063805838628,
+  "bn_max": 0.525505859793383,
+  "bn_local": 0.12624113228850256,
+  "bn_max_T": 0.594328900237681,
+  "vacuum": false,
+  "n_coils": 16
+ },
+ "margins": {
+  "L": 0.8176993999524859,
+  "kappa": 0.3001554435235789,
+  "kMS": 0.72074632221469,
+  "d_cc": 2.0549705790546686,
+  "d_pc": 1.3723839358092977
+ },
+ "verdict": "FEASIBLE"
+}

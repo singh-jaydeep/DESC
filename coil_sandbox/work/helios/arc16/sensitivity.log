@@ -1,0 +1,16 @@
+=== [dpc10] bounds/helios_dpc1.0.json  15:48:13 ===
+START  bn 8.7195e-03  L 1.000  kappa 0.467  convex 0.199  d_cc 1.036  d_pc 1.221  linked 0  coils 16  -> FEASIBLE
+START  bn 8.7195e-03  L 1.000  kappa 0.467  convex 0.199  d_cc 1.036  d_pc 1.221  -> FEASIBLE
+RESULT bn 8.7432e-03  L 1.000  kappa 0.486  convex 0.062  d_cc 1.037  d_pc 1.147  linked 0  -> FAILS L  active ['L']
+=== [dcc10] bounds/helios_dcc1.0_16.json  16:09:53 ===
+START  bn 8.7195e-03  L 1.000  kappa 0.467  convex 0.199  d_cc 1.243  d_pc 1.018  linked 0  coils 16  -> FEASIBLE
+START  bn 8.7195e-03  L 1.000  kappa 0.467  convex 0.199  d_cc 1.243  d_pc 1.018  -> FEASIBLE
+RESULT bn 8.4427e-03  L 1.000  kappa 0.505  convex 0.067  d_cc 1.039  d_pc 1.131  linked 0  -> FAILS L  active ['L']
+=== [L30] bounds/helios_L30.json  16:32:06 ===
+START  bn 8.7195e-03  L 1.200  kappa 0.467  convex 0.199  d_cc 1.036  d_pc 1.018  linked 0  coils 16  -> FAILS L
+START  bn 8.7195e-03  L 1.200  kappa 0.467  convex 0.199  d_cc 1.036  d_pc 1.018  -> FAILS L
+RESULT bn 1.1829e-02  L 1.000  kappa 0.445  convex 0.168  d_cc 1.033  d_pc 1.288  linked 0  -> FEASIBLE  active ['L']
+=== SENSITIVITY DONE 16:54:24 ===
+work/helios/arc16/sens_L30   RESULT bn 1.1829e-02  L 1.000  kappa 0.445  convex 0.168  d_cc 1.033  d_pc 1.288  linked 0  -> FEASIBLE  active ['L']
+work/helios/arc16/sens_dcc10 RESULT bn 8.4427e-03  L 1.000  kappa 0.505  convex 0.067  d_cc 1.039  d_pc 1.131  linked 0  -> FAILS L  active ['L']
+work/helios/arc16/sens_dpc10 RESULT bn 8.7432e-03  L 1.000  kappa 0.486  convex 0.062  d_cc 1.037  d_pc 1.147  linked 0  -> FAILS L  active ['L']

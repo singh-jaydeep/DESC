@@ -1,0 +1,22 @@
+=== start on_planar/planarN7 02:50:54
+=== end on_planar/planarN7 exit 0 03:02:16
+=== start on_planar/arcB2 03:02:27
+=== end on_planar/arcB2 exit 0 03:16:31
+=== start on_planar/xyzN6 03:16:41
+=== end on_planar/xyzN6 exit 0 03:22:03
+STEP3 planar DONE
+=== start on_arcB2/planarN7 03:22:13
+=== end on_arcB2/planarN7 exit 0 03:34:17
+=== start on_arcB2/arcB2 03:34:27
+=== end on_arcB2/arcB2 exit 0 03:40:58
+=== start on_arcB2/xyzN6 03:41:08
+=== end on_arcB2/xyzN6 exit 0 03:46:27
+STEP3 arcB2 DONE
+=== start on_xyz/planarN7 03:46:37
+=== end on_xyz/planarN7 exit 0 04:00:56
+=== start on_xyz/arcB2 04:01:06
+=== end on_xyz/arcB2 exit 0 04:12:06
+=== start on_xyz/xyzN6 04:12:16
+=== end on_xyz/xyzN6 exit 0 04:21:31
+STEP3 xyz DONE
+STEP3 ALL DONE 04:21:41

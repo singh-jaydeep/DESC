@@ -1,0 +1,21 @@
+### skip baseline planar (done)
+### stage2 baseline xyz attempt 1 (22:24)
+    attempt 1 failed: CUDA_ERROR_ILLEGAL_ADDRESS
+### stage2 baseline xyz attempt 2 (22:25)
+RESULT bn 1.3311e-02  L 1.000  kappa 0.574  kMS 0.818  d_cc 2.002  d_pc 3.965  linked 0  -> FAILS L  active ['L']
+### skip leg1 planar (done)
+### stage2 leg1 xyz attempt 1 (22:49)
+    attempt 1 failed: CUDA_ERROR_ILLEGAL_ADDRESS
+### stage2 leg1 xyz attempt 2 (22:51)
+    attempt 2 failed: CUDA_ERROR_ILLEGAL_ADDRESS
+### stage2 leg1 xyz attempt 3 (22:52)
+RESULT bn 1.5751e-02  L 1.000  kappa 0.822  kMS 1.000  d_cc 1.929  d_pc 3.795  linked 0  -> FAILS L,kMS  active ['L', 'kMS']
+### start leg2 planar
+  value / bound: L 0.829  kappa 0.296  kMS 0.701  d_cc 1.799  d_pc 1.661  -> FEASIBLE
+### stage2 leg2 planar attempt 1 (23:16)
+RESULT bn 6.4695e-02  L 1.000  kappa 0.830  kMS 1.000  d_cc 2.303  d_pc 2.998  linked 0  -> FAILS L,kMS  active ['L', 'kMS']
+### start leg2 xyz
+  value / bound: L 0.829  kappa 0.296  kMS 0.701  d_cc 1.799  d_pc 1.661  -> FEASIBLE
+### stage2 leg2 xyz attempt 1 (23:30)
+RESULT bn 2.0866e-02  L 1.000  kappa 0.763  kMS 1.000  d_cc 1.955  d_pc 3.435  linked 0  -> FAILS L,kMS  active ['L', 'kMS']
+### ALL DONE 23:54

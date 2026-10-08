@@ -1,0 +1,194 @@
+{
+ "settings": {
+  "eq": "sample_equilibria/helios_repro.h5",
+  "start": "work/helios/arcB3_M5_feas_m0/result.h5",
+  "out": "work/helios/arcB3_M5_feas_m25",
+  "mode": "feasibility",
+  "length_mult": 1.0,
+  "margin": 0.25,
+  "margin_skip": "L",
+  "a": null,
+  "bounds": "bounds/helios_kruger2026.json",
+  "device": null,
+  "vacuum": false,
+  "maxiter": 300,
+  "check_every": 10,
+  "ckpt_every": 50,
+  "diag_log": "diag.jsonl",
+  "dcc_backoff": 0.025,
+  "dpc_backoff": 0.02,
+  "no_arc_backoffs": false,
+  "convex_form": "signed",
+  "convex_kmin": 0.0,
+  "convex_backoff": 0.5,
+  "coil_grid_n": 150,
+  "eval_m": 25,
+  "eval_n": 25,
+  "plasma_m": 64,
+  "plasma_n": 64,
+  "src_gl": 24,
+  "src_n": 400,
+  "vc_m": null,
+  "vc_n": null,
+  "vc_chunk": 64,
+  "dcc_k": 20000,
+  "dpc_k": 20000,
+  "no_signed": false,
+  "dcc_neighbors": null,
+  "dcc_chunk": 4,
+  "dpc_chunk": 1,
+  "qf_chunk": 25,
+  "no_second_order": false,
+  "so_chunk": 16,
+  "so_rtol": 0.05,
+  "max_tr": 0.5,
+  "max_inner_iter": 100,
+  "ctol": 0.0001
+ },
+ "eq_kind": "h5",
+ "device": "gpu",
+ "vacuum": false,
+ "length_multiplier": 1.0,
+ "bounds": {
+  "L": 36.0,
+  "kappa": 1.5,
+  "kms": null,
+  "convex": 0.001,
+  "dcc": 1.2,
+  "dpc": 1.2
+ },
+ "target": {
+  "L": 36.0,
+  "kappa": 1.125,
+  "kms": null,
+  "convex": 0.001,
+  "dcc": 1.5,
+  "dpc": 1.5
+ },
+ "enforced": {
+  "L": 36.0,
+  "kappa": 1.119375,
+  "kms": null,
+  "convex": 0.0005,
+  "dcc": 1.55262,
+  "dpc": 1.53
+ },
+ "solver": {
+  "wall_s": 361.7331759929657,
+  "message": "User supplied callback triggered termination",
+  "nit": 10,
+  "n_outer": 4,
+  "constr_violation": 6.623427502177577e-05,
+  "y_absmax_final": 0.0002758219715370477
+ },
+ "start": {
+  "per_coil": [
+   {
+    "L": 35.99980149423956,
+    "kappa": 1.2478208613985635,
+    "kms": 0.06336444117049216,
+    "corner": 40.4643462113952,
+    "convex": 0.0,
+    "kappa_s_min": 0.0
+   },
+   {
+    "L": 35.6996889353359,
+    "kappa": 1.0361068467828747,
+    "kms": 0.05792355055003941,
+    "corner": 38.989238523341015,
+    "convex": 2.3187935680009462e-05,
+    "kappa_s_min": -0.00020420059658684753
+   },
+   {
+    "L": 35.93670382816394,
+    "kappa": 0.6163957187192045,
+    "kms": 0.052809906179943716,
+    "corner": 29.40587149075018,
+    "convex": 0.0,
+    "kappa_s_min": 0.0
+   }
+  ],
+  "L": 35.99980149423956,
+  "kappa": 1.2478208613985635,
+  "kms": 0.06336444117049216,
+  "corner": 40.4643462113952,
+  "convex": 2.3187935680009462e-05,
+  "d_cc": 1.6071470162503654,
+  "d_pc": 1.66221116235684,
+  "linked": 0,
+  "linked_pairs": [],
+  "bn": 0.045248624716935866,
+  "bn_max": 0.15548040467705201,
+  "bn_local": 0.044613183012398895,
+  "bn_max_T": 1.002145202640822,
+  "vacuum": false,
+  "n_coils": 12
+ },
+ "result": {
+  "per_coil": [
+   {
+    "L": 35.98209782760928,
+    "kappa": 1.113513483502811,
+    "kms": 0.059239763585753856,
+    "corner": 40.72852012966371,
+    "convex": 0.0,
+    "kappa_s_min": 0.0
+   },
+   {
+    "L": 35.69968564708467,
+    "kappa": 1.0361067990644495,
+    "kms": 0.057923523833432654,
+    "corner": 38.98921192934394,
+    "convex": 2.2710760514775732e-05,
+    "kappa_s_min": -0.0002012237349879976
+   },
+   {
+    "L": 35.93670382816393,
+    "kappa": 0.6163957187192063,
+    "kms": 0.05280990617994373,
+    "corner": 29.40587149075035,
+    "convex": 0.0,
+    "kappa_s_min": 0.0
+   }
+  ],
+  "L": 35.98209782760928,
+  "kappa": 1.113513483502811,
+  "kms": 0.059239763585753856,
+  "corner": 40.72852012966371,
+  "convex": 2.2710760514775732e-05,
+  "d_cc": 1.5492354799451824,
+  "d_pc": 1.6681853018359338,
+  "linked": 0,
+  "linked_pairs": [],
+  "bn": 0.047645399496479765,
+  "bn_max": 0.1667728724418473,
+  "bn_local": 0.04723983736868717,
+  "bn_max_T": 1.075346267379108,
+  "vacuum": false,
+  "n_coils": 12
+ },
+ "margins": {
+  "L": 0.9995027174335911,
+  "kappa": 0.7423423223352074,
+  "convex": 0.022710760514775732,
+  "d_cc": 1.2910295666209854,
+  "d_pc": 1.3901544181966117
+ },
+ "failed": [],
+ "active": [
+  "L"
+ ],
+ "history": [
+  {
+   "iter": 10,
+   "bn": 0.047645399496479765,
+   "L": 0.9995027174335911,
+   "kappa": 0.7423423223352074,
+   "convex": 0.022710760514775732,
+   "d_cc": 1.2910295666209854,
+   "d_pc": 1.3901544181966117,
+   "linked": 0,
+   "verdict": "FEASIBLE"
+  }
+ ]
+}

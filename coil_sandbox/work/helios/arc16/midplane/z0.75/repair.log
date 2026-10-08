@@ -1,0 +1,166 @@
+Running as unit: run-p1071790-i1073302.scope; invocation ID: 5358ac999922414895556cf47a81c501
+E0921 23:57:41.213641 1071877 cuda_executor.cc:1743] Could not get kernel mode driver version: ( INVALID_ARGUMENT: Version does not match the format X.Y.Z )
+E0921 23:57:41.225487 1071790 cuda_executor.cc:1743] Could not get kernel mode driver version: ( INVALID_ARGUMENT: Version does not match the format X.Y.Z )
+DEVICE requested=gpu obtained=gpu (1x NVIDIA GeForce RTX 5070 Laptop GPU)
+  [mem] RSS 0.83 GB  peak 0.83 GB
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+JOINT PLANE: every hinge snapped to z = 0.75 m and held there (largest move 0.0000 m; the START line below is AFTER the snap)
+eq sample_equilibria/helios_repro.h5 (h5) NFP 2 sym True; start work/helios/arc16/midplane/z0.75/start.h5: 4 unique coils, arc=True, expect 16 coils; source grid gl (48 nodes/coil), length grid gl (48), constraint grid 301, curvature grid 301; mode feasibility; plasma field included (virtual casing)
+SETTINGS {'eq': 'sample_equilibria/helios_repro.h5', 'start': 'work/helios/arc16/midplane/z0.75/start.h5', 'out': 'work/helios/arc16/midplane/z0.75/repair', 'mode': 'feasibility', 'length_mult': 1.0, 'margin': 0.1, 'fix_hinges': False, 'anchor_weight': 1.0, 'margin_skip': 'L', 'a': None, 'bounds': 'bounds/helios_cold_L28_d10.json', 'device': None, 'vacuum': False, 'maxiter': 300, 'check_every': 25, 'ckpt_every': 50, 'diag_log': None, 'dcc_backoff': 0.025, 'dpc_backoff': 0.02, 'no_arc_backoffs': False, 'convex_form': 'signed', 'convex_kmin': 0.0, 'convex_backoff': 0.5, 'demount_margin': 0.3, 'demount_backoff': 0.02, 'demount_arcs': False, 'demount_delta': 0.5, 'demount_eps': 0.25, 'level_hinges': False, 'fix_hinge_z': 0.75, 'corner_max': None, 'planarity': 'auto', 'planarity_tol': 0.0, 'speed_floor': 0.0, 'arclength_weight': 0.0, 'torsion_weight': 0.0, 'coil_grid_n': 150, 'kappa_grid_n': None, 'eval_m': 25, 'eval_n': 25, 'plasma_m': 64, 'plasma_n': 64, 'src_gl': 24, 'src_n': 400, 'vc_m': None, 'vc_n': None, 'vc_chunk': 64, 'dcc_k': 20000, 'dpc_k': 20000, 'no_signed': False, 'dcc_neighbors': None, 'dcc_chunk': 4, 'dpc_chunk': 1, 'qf_chunk': 25, 'coil_jac_chunk': None, 'no_second_order': False, 'so_chunk': 8, 'so_rtol': 0.05, 'max_tr': 0.5, 'max_inner_iter': 100, 'ctol': 0.0001}
+BOUNDS (judged, absolute, a=1.77186) L 28  Ltot -  kappa 1.5  kms -  convex 0.001  planar -  dcc 1  dpc 1
+TARGET (margin 0.1) L 28  Ltot -  kappa 1.35  kms -  convex 0.001  planar -  dcc 1.1  dpc 1.1
+ENFORCED L 28  Ltot -  kappa 1.343  kms -  convex 0.0005  planar -  dcc 1.137  dpc 1.122  (convexity: signed, kappa_s >= 0.0)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+  [mem] RSS 2.94 GB  peak 2.94 GB
+START  bn 7.7197e-02  L 0.994  kappa 0.164  convex 0.000  d_cc 1.132  d_pc 1.082  linked 0  coils 16  -> FEASIBLE  demount: min hinge clearance +2.299 m, worst arc blocked 0.00%  -> REMOVABLE
+Building objective: fixed parameters
+Timer: Objective build = 630 ms
+Building objective: hinge joint plane
+Building objective: fixed coil current
+Building objective: fixed shift
+Building objective: fixed rotation
+Building objective: fixed arc reference
+Timer: Objective build = 167 ms
+Building objective: coil length
+Precomputing transforms
+Timer: Precomputing transforms = 113 us
+Building objective: coil curvature
+Precomputing transforms
+Timer: Precomputing transforms = 66.1 us
+Building objective: coil signed curvature
+Precomputing transforms
+Timer: Precomputing transforms = 68.5 us
+Building objective: hinge shadow clearance
+  hinge shadow: 8 hinges, 4 outboard, 4 inboard
+Building objective: coil-coil distance penalty
+Building objective: plasma-coil distance penalty
+Timer: Objective build = 5.90 sec
+Timer: LinearConstraintProjection build = 2.47 sec
+Timer: LinearConstraintProjection build = 124 ms
+Number of parameters: 64
+Number of objectives: 148
+Number of equality constraints: 0
+Number of inequality constraints: 2482
+Timer: Initializing the optimization = 10.1 sec
+
+Starting optimization
+Using method: lsq-auglag
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: FutureWarning: constants is deprecated and will be removed in a future release. Users should not include constants in the arguments of their objective compute methods. Instead declare all the constants in the build method and use as self._constants.
+  warnings.warn(msg, err)
+  [mem] RSS 4.11 GB  peak 4.11 GB
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: FutureWarning: constants is deprecated and will be removed in a future release. Users should not include constants in the arguments of their objective compute methods. Instead declare all the constants in the build method and use as self._constants.
+  warnings.warn(msg, err)
+  [mem] RSS 4.65 GB  peak 4.67 GB
+second_order: compiling constraint Hessian for blocks PlasmaCoilSetDistancePenalty
+Solver options:
+------------------------------------------------------------
+Maximum Function Evaluations       : 1501
+Maximum Allowed Total Δx Norm      : inf
+Scaled Termination                 : True
+Trust Region Method                : svd
+Initial Trust Radius               : 2.422e-01
+Maximum Trust Radius               : 5.000e-01
+Minimum Trust Radius               : 2.220e-16
+Trust Radius Increase Ratio        : 4.000e+00
+Trust Radius Decrease Ratio        : 2.500e-01
+Trust Radius Increase Threshold    : 7.500e-01
+Trust Radius Decrease Threshold    : 5.000e-01
+Alpha Omega                        : 1.000e+00
+Beta Omega                         : 1.000e+00
+Alpha Eta                          : 1.000e-01
+Beta Eta                           : 9.000e-01
+Omega                              : 1.000e-02
+Eta                                : 1.000e-02
+Tau                                : 1.000e+01
+------------------------------------------------------------ 
+
+   Iteration     Total nfev        Cost      Cost reduction    Step norm     Optimality    Constr viol.   Penalty param  max(|mltplr|)      gtolk     
+       0              1          0.000e+00                                    3.775e-02      1.373e-02      1.000e+01      0.000e+00      1.000e-03   
+second_order: compiling constraint Hessian for blocks CoilSetDistancePenalty, PlasmaCoilSetDistancePenalty
+  [mem] RSS 5.17 GB  peak 5.17 GB
+       1              2          9.477e-06     -9.477e-06      5.465e-03      1.292e-02      7.555e-03      1.000e+01      0.000e+00      1.000e-03   
+       2              3          2.655e-05     -1.707e-05      4.592e-03      3.790e-03      4.119e-03      1.000e+01      0.000e+00      1.000e-03   
+       3              4          4.370e-05     -1.715e-05      2.962e-03      3.159e-03      2.598e-03      1.000e+01      2.598e-02      3.159e-04   
+       4              5          7.011e-05     -2.641e-05      3.366e-03      6.430e-04      1.340e-03      1.000e+01      2.598e-02      3.159e-04   
+       5              6          7.917e-05     -9.065e-06      1.190e-03      4.716e-03      1.048e-03      1.004e+01      2.598e-02      4.716e-04   
+       6              7          9.897e-05     -1.979e-05      2.031e-03      1.093e-03      6.092e-04      1.004e+01      2.598e-02      4.716e-04   
+       7              8          1.066e-04     -7.664e-06      8.024e-04      1.584e-03      4.849e-04      1.004e+01      7.447e-02      1.584e-04   
+       8              9          1.200e-04     -1.339e-05      1.234e-03      2.405e-04      3.213e-04      1.004e+01      7.447e-02      1.584e-04   
+       9             10          1.226e-04     -2.599e-06      2.570e-04      6.437e-04      2.952e-04      1.004e+01      1.040e-01      6.437e-05   
+      10             11          1.298e-04     -7.181e-06      6.399e-04      4.176e-03      2.321e-04      1.040e+01      1.040e-01      4.176e-04   
+      11             12          1.439e-04     -1.407e-05      1.390e-03      8.192e-04      1.408e-04      1.040e+01      1.040e-01      4.176e-04   
+      12             13          1.485e-04     -4.656e-06      4.445e-04      1.836e-03      1.168e-04      1.040e+01      2.208e-01      1.836e-04   
+      13             14          1.564e-04     -7.836e-06      6.443e-04      3.256e-04      8.430e-05      1.040e+01      2.208e-01      1.836e-04   
+      14             15          1.586e-04     -2.231e-06      2.184e-04      9.742e-04      7.629e-05      1.040e+01      2.971e-01      9.742e-05   
+      15             16          1.638e-04     -5.218e-06      4.045e-04      6.734e-04      5.999e-05      1.040e+01      3.571e-01      6.734e-05   
+  [mem] RSS 5.20 GB  peak 5.20 GB
+      16             17          1.673e-04     -3.498e-06      2.780e-04      4.892e-04      5.073e-05      1.040e+01      4.078e-01      4.892e-05   
+      17             18          1.697e-04     -2.416e-06      1.841e-04      7.817e-05      4.503e-05      1.040e+01      4.078e-01      4.892e-05   
+      18             19          1.701e-04     -4.161e-07      3.201e-05      3.836e-04      4.410e-05      1.040e+01      4.519e-01      3.836e-05   
+      19             20          1.720e-04     -1.818e-06      1.421e-04      7.443e-05      4.020e-05      1.040e+01      4.519e-01      3.836e-05   
+      20             21          1.723e-04     -3.832e-07      3.054e-05      3.167e-04      3.941e-05      1.040e+01      4.913e-01      3.167e-05   
+      21             22          1.741e-04     -1.783e-06      1.400e-04      4.164e-04      3.590e-05      1.040e+01      5.272e-01      4.164e-05   
+      22             23          1.759e-04     -1.813e-06      1.205e-04      2.355e-04      3.255e-05      1.040e+01      5.598e-01      2.355e-05   
+      23             24          1.774e-04     -1.440e-06      1.002e-04      2.068e-04      3.004e-05      1.040e+01      5.898e-01      2.068e-05   
+      24             25          1.786e-04     -1.227e-06      8.531e-05      1.847e-04      2.801e-05      1.040e+01      6.178e-01      1.847e-05   
+  [it   25] bn 7.7130e-02  L 0.996  kappa 0.164  convex 0.000  d_cc 1.141  d_pc 1.115  -> FEASIBLE  target FEASIBLE  demount: min hinge clearance +2.299 m, worst arc blocked 0.00%  -> REMOVABLE
+  feasible against the target set: stopping
+      25             26          1.797e-04     -1.066e-06      7.411e-05      1.670e-04      2.632e-05      1.040e+01      6.442e-01      1.670e-05   
+Warning: User supplied callback triggered termination
+         Current function value: 1.797e-04
+         Constraint violation: 2.632e-05
+         Total delta_x: 1.896e-02
+         Iterations: 25
+         Function evaluations: 26
+         Jacobian evaluations: 25
+Timer: Solution time = 1.94 min
+Timer: Avg time per step = 4.48 sec
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: FutureWarning: constants is deprecated and will be removed in a future release. Users should not include constants in the arguments of their objective compute methods. Instead declare all the constants in the build method and use as self._constants.
+  warnings.warn(msg, err)
+==============================================================================================================
+                                                                 Start  -->   End
+Total (sum of squares):                                      0.000e+00  -->   1.797e-04, 
+Fixed parameters error:                                      0.000e+00  -->   1.896e-02 (~)
+Maximum Coil length:                                         2.783e+01  -->   2.789e+01 (m)
+Minimum Coil length:                                         2.783e+01  -->   2.783e+01 (m)
+Average Coil length:                                         2.783e+01  -->   2.785e+01 (m)
+Maximum Coil length:                                         6.283e+00  -->   6.295e+00 (normalized)
+Minimum Coil length:                                         6.283e+00  -->   6.283e+00 (normalized)
+Average Coil length:                                         6.283e+00  -->   6.286e+00 (normalized)
+Maximum Coil curvature:                                      2.463e-01  -->   2.463e-01 (m^-1)
+Minimum Coil curvature:                                      2.199e-01  -->   2.181e-01 (m^-1)
+Average Coil curvature:                                      2.268e-01  -->   2.267e-01 (m^-1)
+Maximum Coil curvature:                                      1.091e+00  -->   1.091e+00 (normalized)
+Minimum Coil curvature:                                      9.743e-01  -->   9.662e-01 (normalized)
+Average Coil curvature:                                      1.005e+00  -->   1.004e+00 (normalized)
+Maximum Signed in-plane curvature:                           2.463e-01  -->   2.463e-01 (m^-1)
+Minimum Signed in-plane curvature:                           2.199e-01  -->   2.181e-01 (m^-1)
+Average Signed in-plane curvature:                           2.268e-01  -->   2.267e-01 (m^-1)
+Maximum Signed in-plane curvature:                           1.091e+00  -->   1.091e+00 (normalized)
+Minimum Signed in-plane curvature:                           9.743e-01  -->   9.662e-01 (normalized)
+Average Signed in-plane curvature:                           1.005e+00  -->   1.004e+00 (normalized)
+Maximum Hinge shadow clearance:                              3.513e+00  -->   3.517e+00 (m)
+Minimum Hinge shadow clearance:                              2.297e+00  -->   2.297e+00 (m)
+Average Hinge shadow clearance:                              2.807e+00  -->   2.808e+00 (m)
+Maximum Coil-coil distance penalty:                          1.429e-04  -->   0.000e+00 (dimensionless)
+Minimum Coil-coil distance penalty:                          0.000e+00  -->   0.000e+00 (dimensionless)
+Average Coil-coil distance penalty:                          2.647e-06  -->   0.000e+00 (dimensionless)
+Maximum Plasma-coil distance penalty:                        1.373e-02  -->   2.632e-05 (dimensionless)
+Minimum Plasma-coil distance penalty:                        0.000e+00  -->   0.000e+00 (dimensionless)
+Average Plasma-coil distance penalty:                        1.717e-03  -->   3.290e-06 (dimensionless)
+Fixed parameters error:                                      0.000e+00  -->   0.000e+00 (~)
+Fixed coil current error:                                    0.000e+00  -->   0.000e+00 (A)
+==============================================================================================================
+
+  [mem] RSS 5.21 GB  peak 5.21 GB
+
+SOLVER {'wall_s': 139.13824343681335, 'message': 'User supplied callback triggered termination', 'nit': 25, 'n_outer': 16, 'constr_violation': 2.631937789145982e-05, 'y_absmax_final': 0.6441506560311165}
+START  bn 7.7197e-02  L 0.994  kappa 0.164  convex 0.000  d_cc 1.132  d_pc 1.082  -> FEASIBLE
+RESULT bn 7.7130e-02  L 0.996  kappa 0.164  convex 0.000  d_cc 1.141  d_pc 1.115  linked 0  -> FEASIBLE  active ['L']  target FEASIBLE  demount: min hinge clearance +2.299 m, worst arc blocked 0.00%  -> REMOVABLE
+wrote work/helios/arc16/midplane/z0.75/repair/result.h5, result.json, result.png

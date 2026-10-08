@@ -1,0 +1,29 @@
+[repair] done already, skipping
+[free] done already, skipping
+=== dual_L28_c60  19:57:55 ===
+START  bn 2.6724e-02  L 1.000  kappa 0.373  convex 0.065  d_cc 1.306  d_pc 0.993  linked 0  coils 16  -> FAILS d_pc  demount: min hinge clearance +0.912 m, worst arc blocked 0.00%  -> REMOVABLE
+START  bn 2.6724e-02  L 1.000  kappa 0.373  convex 0.065  d_cc 1.306  d_pc 0.993  -> FAILS d_pc
+RESULT bn 2.6778e-02  L 1.000  kappa 0.371  convex 0.036  d_cc 1.303  d_pc 1.018  linked 0  -> FAILS L  active ['L']  demount: min hinge clearance +0.910 m, worst arc blocked 0.00%  -> REMOVABLE
+DEVICE requested=cpu obtained=cpu (1x cpu)
+   corners max 53.3 / limit 60  OK   currents min/max 0.85   max |hinge z| 0.00e+00 m
+=== dual_L30_c70  20:29:59 ===
+work/helios/arc16/midplane/run_midplane_ladder.sh: line 29: 968041 Killed                     "${CAP[@]}" "$PY" run_one.py --eq $EQ "$@" --out "$out" > "$D/$log" 2>&1
+START  bn 2.6778e-02  L 0.933  kappa 0.371  convex 0.036  d_cc 1.303  d_pc 1.018  linked 0  coils 16  -> FEASIBLE  demount: min hinge clearance +0.910 m, worst arc blocked 0.00%  -> REMOVABLE
+DEVICE requested=cpu obtained=cpu (1x cpu)
+Traceback (most recent call last):
+  File "<stdin>", line 6, in <module>
+  File "/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/io/optimizable_io.py", line 58, in load
+    with h5py.File(load_from, "r") as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/singh/miniforge3/envs/desc-env2/lib/python3.12/site-packages/h5py/_hl/files.py", line 555, in __init__
+    fid = make_fid(name, mode, userblock_size, fapl, fcpl, swmr=swmr)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/singh/miniforge3/envs/desc-env2/lib/python3.12/site-packages/h5py/_hl/files.py", line 232, in make_fid
+    fid = h5f.open(name, flags, fapl=fapl)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "h5py/_objects.pyx", line 54, in h5py._objects.with_phil.wrapper
+  File "h5py/_objects.pyx", line 55, in h5py._objects.with_phil.wrapper
+  File "h5py/h5f.pyx", line 106, in h5py.h5f.open
+FileNotFoundError: [Errno 2] Unable to synchronously open file (unable to open file: name = 'work/helios/arc16/midplane/dual_L30_c70/result.h5', errno = 2, error message = 'No such file or directory', flags = 0, o_flags = 0)
+=== dual_L32_c80  20:48:41 ===
+  FAILED -- see work/helios/arc16/midplane/dual_L32_c80.log

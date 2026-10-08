@@ -1,0 +1,43 @@
+E0928 11:21:17.302660 1556036 cuda_executor.cc:1743] Could not get kernel mode driver version: ( INVALID_ARGUMENT: Version does not match the format X.Y.Z )
+E0928 11:21:17.314195 1555949 cuda_executor.cc:1743] Could not get kernel mode driver version: ( INVALID_ARGUMENT: Version does not match the format X.Y.Z )
+DEVICE requested=gpu obtained=gpu (1x NVIDIA GeForce RTX 5070 Laptop GPU)
+  [mem] RSS 0.83 GB  peak 0.83 GB
+eq precise_QA (desc.examples) NFP 2 sym True L,M,N 8,8,8 dim_x 1462; start work/ss_qa/stage2/result.h5: 4 unique coils (PiecewisePlanarArcCoil), 16 total
+SETTINGS {'eq': 'precise_QA', 'start': 'work/ss_qa/stage2/result.h5', 'out': 'work/ss_qa/dry_s2', 'bounds': '/home/singh/Documents/DESC2/coil_sandbox/bounds/precise_qa_sweep910.json', 'a': None, 'device': None, 'dry': True, 'fix_current_sum': False, 'helicity': '1,0', 'qs_rho': '0.2,0.4,0.6,0.8,1.0', 'A_min': 5.5, 'A_max': 6.5, 'iota_min': 0.4, 'kmin': 1, 'kmax': 4, 'maxiter': 50, 'ftol': 0.0001, 'xtol': 1e-06, 'gtol': 1e-08, 'max_tr': None, 'perturb_order': 2, 'tau_bn': 0.005, 'tau_qs': None, 'tau_qs_rel': 2.0, 'tau_A': 0.01, 'tau_iota': 0.01, 'tau_L': 0.01, 'tau_kappa': 0.01, 'tau_kms': 0.01, 'tau_dpc': 0.01, 'tau_dcc': 1e-06, 'dcc_backoff': 0.025, 'dpc_backoff': 0.02, 'no_arc_backoffs': False, 'eval_m': 25, 'eval_n': 25, 'plasma_m': 32, 'plasma_n': 32, 'coil_grid_n': 150, 'src_gl': 24, 'src_n': 400, 'bs_chunk': None, 'jac_chunk': None, 'dcc_k': 20000}
+BOUNDS (judged, absolute) L 5.153  Ltot -  kappa 11.64  kms 5.648  convex -  planar -  dcc 0.08555  dpc 0.1711
+ENFORCED L 5.153  Ltot -  kappa 11.58  kms 5.592  convex -  planar -  dcc 0.09009  dpc 0.1745
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+START physics  A 6.000  R0 1.0307  a 0.1718  iota [0.4197, 0.4202]  QS(Boozer, |B_nonsym|/<B>) rho 0.25 8.14e-05  rho 0.5 4.17e-05  rho 0.75 5.59e-05  rho 1 2.77e-04
+START coils    bn 1.9626e-03 (max 1.088e-02)  L 1.000  kappa 0.719  kMS 0.634  d_cc 1.045  d_pc 1.675  linked 0  -> FAILS L
+QS two-term rms at the start 0.0003543 -> tau_qs 0.0007087
+quadrature scales s (expected; compare the s(qw) column): bn 8.886  qs 41.41  iota 1  kappa 0.3622  dcc 9.06e+04
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: FutureWarning: constants is deprecated and will be removed in a future release. Users should not include constants in the arguments of their objective compute methods. Instead declare all the constants in the build method and use as self._constants.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: FutureWarning: constants is deprecated and will be removed in a future release. Users should not include constants in the arguments of their objective compute methods. Instead declare all the constants in the build method and use as self._constants.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: FutureWarning: constants is deprecated and will be removed in a future release. Users should not include constants in the arguments of their objective compute methods. Instead declare all the constants in the build method and use as self._constants.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: FutureWarning: constants is deprecated and will be removed in a future release. Users should not include constants in the arguments of their objective compute methods. Instead declare all the constants in the build method and use as self._constants.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: FutureWarning: constants is deprecated and will be removed in a future release. Users should not include constants in the arguments of their objective compute methods. Instead declare all the constants in the build method and use as self._constants.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: FutureWarning: constants is deprecated and will be removed in a future release. Users should not include constants in the arguments of their objective compute methods. Instead declare all the constants in the build method and use as self._constants.
+  warnings.warn(msg, err)
+
+TERMS AT THE START
+term                             dim_f    weight     norm    s(qw)  target/bounds           raw min    raw max       cost  err/tol  share
+Vacuum boundary error             2652      22.5   0.1688    8.886  = 0                   -0.002542   0.002496     0.6046      1.1  82.9%
+QS two-term                       5445      34.1   0.5569    41.41  = 0                   -0.001505   0.001505      0.125      0.5  17.1%
+aspect ratio                         1      16.7        -        1  [5.5, 6.5]                    6          6          0        0   0.0%
+rotational transform                20       250        -        1  [0.4, inf]               0.4197     0.4202          0        0   0.0%
+coil length                          4      19.4        -        2  [0, 5.153]                4.989      5.153  4.833e-07 0.000983   0.0%
+coil curvature                    1204      23.8        -   0.7243  [0, 11.58]                    0      8.377          0        0   0.0%
+coil mean squared curvature          4      17.9        -        2  [0, 5.592]                  1.9      3.561          0        0   0.0%
+coil-coil distance penalty          54        11        -    7.348  [-inf, 0]                     0  0.0003044  5.644e-06  0.00336   0.0%
+plasma-coil minimum distance         8       573        -    2.828  [0.1745, inf]            0.2867     0.3591          0        0   0.0%
+total cost 0.5 sum f^2                                                                                                      0.7296
+
+--dry: wrote work/ss_qa/dry_s2/result.json; no optimization run

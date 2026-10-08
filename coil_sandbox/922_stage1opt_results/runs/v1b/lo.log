@@ -1,0 +1,148 @@
+Running as unit: run-p1195493-i1197191.scope; invocation ID: cb7d89d7730e4b2da818c5f8911affd5
+E0922 16:27:23.116316 1195580 cuda_executor.cc:1743] Could not get kernel mode driver version: ( INVALID_ARGUMENT: Version does not match the format X.Y.Z )
+E0922 16:27:23.127858 1195493 cuda_executor.cc:1743] Could not get kernel mode driver version: ( INVALID_ARGUMENT: Version does not match the format X.Y.Z )
+DEVICE requested=gpu obtained=gpu (1x NVIDIA GeForce RTX 5070 Laptop GPU)
+precise_QA  L8 M8 N8 NFP2  dim_x=1462
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+E0922 16:27:30.828268 1195602 xtile_compiler.cc:399] Fusion: input_reduce_fusion = f64[16,480]{1,0} fusion(a.1, b.1), kind=kCustom, calls=fused_reduce.clone, backend_config={"operation_queue_id":"0","wait_on_operation_queues":[],"fusion_backend_config":{"kind":"__triton","block_level_fusion_config":{"num_warps":"8","output_tiles":[{"sizes":["2","32"]}],"num_ctas":1,"num_stages":1,"is_tma_allowed":true,"is_warp_specialization_allowed":false}},"force_earliest_schedule":false,"reification_cost":[],"device_type":"DEVICE_TYPE_INVALID"}
+E0922 16:27:30.828347 1195602 xtile_compiler.cc:401] Computation: fused_reduce.clone {
+  param_0.4 = f64[16,480,144]{2,1,0} parameter(0)
+  param_1.5 = f64[144]{0} parameter(1)
+  broadcast.1.3 = f64[16,480,144]{2,1,0} broadcast(param_1.5), dimensions={2}
+  multiply.1.3 = f64[16,480,144]{2,1,0} multiply(param_0.4, broadcast.1.3)
+  constant_3 = f64[] constant(0)
+  ROOT reduce.1.1 = f64[16,480]{1,0} reduce(multiply.1.3, constant_3), dimensions={2}, to_apply=scalar_add_computation
+}
+  clamshell: K=16 contours, worst frozen segment lambda_1/lambda_2 = 0.010
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: FutureWarning: constants is deprecated and will be removed in a future release. Users should not include constants in the arguments of their objective compute methods. Instead declare all the constants in the build method and use as self._constants.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: FutureWarning: constants is deprecated and will be removed in a future release. Users should not include constants in the arguments of their objective compute methods. Instead declare all the constants in the build method and use as self._constants.
+  warnings.warn(msg, err)
+diagnostics: monotonic=True  dPhi/dzeta 6.105e+05..1.137e+06  I/G=-5.06e-18  newton_res=1.71e-16  gap_seg=0.0103
+baseline C    mean 0.9933  range 0.8657-1.3724
+baseline eps1 mean 0.0676  range 0.0462-0.0769
+baseline QS rms 5.1750e-04   iota 0.41970..0.42018
+free boundary DOF: R 24 + Z 24 = 48
+Building objective: clamshell C
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+  clamshell C: K=16 contours, worst frozen segment lambda_1/lambda_2 = 0.010
+ObjectiveFunction deriv_mode : blocked
+clamshell C jac_chunk_size: None
+Timer: Objective build = 18.9 sec
+Building objective: lcfs R
+Building objective: lcfs Z
+Building objective: fixed pressure
+Building objective: fixed current
+Building objective: fixed Psi
+Building objective: self_consistency R
+Building objective: self_consistency Z
+Building objective: lambda gauge
+Building objective: axis R self consistency
+Building objective: axis Z self consistency
+ObjectiveFunction deriv_mode : blocked
+lcfs R jac_chunk_size: None
+lcfs Z jac_chunk_size: None
+fixed pressure jac_chunk_size: None
+fixed current jac_chunk_size: None
+fixed Psi jac_chunk_size: None
+self_consistency R jac_chunk_size: None
+self_consistency Z jac_chunk_size: None
+lambda gauge jac_chunk_size: None
+axis R self consistency jac_chunk_size: None
+axis Z self consistency jac_chunk_size: None
+Timer: Objective build = 1.11 sec
+Building objective: force
+Precomputing transforms
+Timer: Precomputing transforms = 799 ms
+Building objective: aspect ratio
+Precomputing transforms
+Timer: Precomputing transforms = 628 ms
+Building objective: Generic
+Building objective: QS two-term
+Precomputing transforms
+Timer: Precomputing transforms = 42.3 ms
+Building objective: eps1 hold
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+  eps1 hold: K=16 contours, worst frozen segment lambda_1/lambda_2 = 0.010
+ObjectiveFunction deriv_mode : blocked
+force jac_chunk_size: None
+aspect ratio jac_chunk_size: None
+Generic jac_chunk_size: None
+QS two-term jac_chunk_size: None
+eps1 hold jac_chunk_size: None
+Timer: Objective build = 16.6 sec
+Timer: LinearConstraintProjection build = 3.44 sec
+Timer: LinearConstraintProjection build = 191 ms
+Number of parameters: 904
+Number of objectives: 16
+Number of equality constraints: 5368
+Number of inequality constraints: 765
+Timer: Initializing the optimization = 40.9 sec
+
+Starting optimization
+Using method: lsq-auglag
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: FutureWarning: constants is deprecated and will be removed in a future release. Users should not include constants in the arguments of their objective compute methods. Instead declare all the constants in the build method and use as self._constants.
+  warnings.warn(msg, err)
+Solver options:
+------------------------------------------------------------
+Maximum Function Evaluations       : 2001
+Maximum Allowed Total Δx Norm      : inf
+Scaled Termination                 : True
+Trust Region Method                : qr
+Initial Trust Radius               : 2.025e-01
+Maximum Trust Radius               : inf
+Minimum Trust Radius               : 2.220e-16
+Trust Radius Increase Ratio        : 4.000e+00
+Trust Radius Decrease Ratio        : 2.500e-01
+Trust Radius Increase Threshold    : 7.500e-01
+Trust Radius Decrease Threshold    : 5.000e-01
+Alpha Omega                        : 1.000e+00
+Beta Omega                         : 1.000e+00
+Alpha Eta                          : 1.000e-01
+Beta Eta                           : 9.000e-01
+Omega                              : 1.000e-02
+Eta                                : 1.261e-03
+Tau                                : 1.000e+01
+------------------------------------------------------------ 
+
+   Iteration     Total nfev        Cost      Cost reduction    Step norm     Optimality    Constr viol.   Penalty param  max(|mltplr|)      gtolk     
+       0              1          8.009e+00                                    1.008e+00      1.261e-03      1.000e+01      0.000e+00      1.000e-03   
+       1              2          7.240e+00      7.695e-01      1.553e-03      9.400e-01      2.629e-02      1.000e+01      0.000e+00      1.000e-03   
+       2              4          6.934e+00      3.061e-01      7.220e-04      1.301e+00      5.647e-02      1.000e+01      0.000e+00      1.000e-03   
+       3              5          6.658e+00      2.759e-01      3.758e-04      7.914e-01      5.080e-02      1.000e+01      0.000e+00      1.000e-03   
+       4              6          6.427e+00      2.308e-01      1.063e-03      1.597e+00      4.002e-02      1.000e+01      0.000e+00      1.000e-03   
+       5              7          6.155e+00      2.721e-01      2.355e-04      8.113e-01      4.770e-02      1.000e+01      0.000e+00      1.000e-03   
+       6              9          6.013e+00      1.422e-01      1.954e-04      4.497e-01      5.429e-02      1.000e+01      0.000e+00      1.000e-03   
+       7             10          5.882e+00      1.310e-01      2.747e-04      4.282e-01      5.685e-02      1.000e+01      0.000e+00      1.000e-03   
+       8             11          5.467e+00      4.147e-01      6.050e-04      8.089e-01      5.997e-02      1.000e+01      0.000e+00      1.000e-03   
+       9             14          5.408e+00      5.948e-02      2.906e-04      3.357e-01      6.294e-02      1.000e+01      0.000e+00      1.000e-03   
+      10             15          5.362e+00      4.618e-02      5.088e-05      3.350e-01      6.348e-02      1.000e+01      0.000e+00      1.000e-03   
+      11             16          5.190e+00      1.713e-01      2.714e-04      3.234e-01      6.536e-02      1.000e+01      0.000e+00      1.000e-03   
+      12             17          4.795e+00      3.956e-01      1.195e-03      1.155e+00      6.459e-02      1.000e+01      0.000e+00      1.000e-03   
+      13             20          4.701e+00      9.334e-02      2.600e-04      4.911e-01      6.687e-02      1.000e+01      0.000e+00      1.000e-03   
+      14             21          4.668e+00      3.314e-02      2.015e-04      2.149e-01      6.836e-02      1.000e+01      0.000e+00      1.000e-03   
+      15             22          4.661e+00      7.482e-03      5.961e-05      2.159e-01      6.774e-02      1.000e+01      0.000e+00      1.000e-03   
+      16             23          4.636e+00      2.505e-02      1.387e-04      2.146e-01      6.648e-02      1.000e+01      0.000e+00      1.000e-03   
+      17             24          4.619e+00      1.694e-02      1.818e-04      3.687e-01      6.826e-02      1.000e+01      0.000e+00      1.000e-03   
+      18             25          4.611e+00      7.953e-03      6.431e-05      2.062e-01      6.760e-02      1.000e+01      0.000e+00      1.000e-03   
+      19             26          4.602e+00      9.084e-03      1.892e-04      3.777e-01      6.570e-02      1.000e+01      0.000e+00      1.000e-03   
+      20             27          4.591e+00      1.023e-02      6.807e-05      2.175e-01      6.636e-02      1.000e+01      0.000e+00      1.000e-03   
+      21             28          4.579e+00      1.259e-02      2.255e-04      4.086e-01      6.831e-02      1.000e+01      0.000e+00      1.000e-03   
+      22             29          4.570e+00      8.577e-03      6.547e-05      2.319e-01      6.763e-02      1.000e+01      0.000e+00      1.000e-03   
+      23             30          4.565e+00      4.704e-03      2.107e-04      4.020e-01      6.553e-02      1.000e+01      0.000e+00      1.000e-03   
+      24             31          4.555e+00      1.069e-02      6.941e-05      2.393e-01      6.621e-02      1.000e+01      0.000e+00      1.000e-03   
+      25             32          4.545e+00      9.981e-03      2.426e-04      4.255e-01      6.831e-02      1.000e+01      0.000e+00      1.000e-03   
+      26             33          4.536e+00      8.852e-03      6.627e-05      2.466e-01      6.763e-02      1.000e+01      0.000e+00      1.000e-03   

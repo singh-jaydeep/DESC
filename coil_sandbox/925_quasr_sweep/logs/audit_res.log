@@ -1,0 +1,22 @@
+Running as unit: run-p1493139-i1495380.scope; invocation ID: e74e00f9f6414238b00cfa14670e3161
+DEVICE requested=gpu obtained=gpu (1x NVIDIA GeForce RTX 5070 Laptop GPU)
+Converting VMEC input to DESC input
+Generated DESC input file /tmp/claude-1000/-home-singh-Documents-DESC2-coil-sandbox/91f880f0-34c8-4d34-ba49-8b36d79ca617/scratchpad/quasr_cache/input.q1630198_desc:
+ID 1630198  K=10  QUASR iota edge 1.2045
+
+-- UNSOLVED (interior = DESC's initial guess) --
+  RAISED ValueError: contour Newton did not converge (residual 9.64e-02); raise `newton`.
+
+-- SOLVED at increasing resolution --
+Converting VMEC input to DESC input
+Generated DESC input file /tmp/claude-1000/-home-singh-Documents-DESC2-coil-sandbox/91f880f0-34c8-4d34-ba49-8b36d79ca617/scratchpad/quasr_cache/input.q1630198_desc:
+  L8 M10 N10:   129s  iota_edge 1.20329 (rel 0.10%)  |F|/|grad B^2/2mu0| 1.97e-03  mu0<|J|>/<|B|> nan
+           eps_1 mean 0.035380  monotonic True  newton 8.3e-17
+Converting VMEC input to DESC input
+Generated DESC input file /tmp/claude-1000/-home-singh-Documents-DESC2-coil-sandbox/91f880f0-34c8-4d34-ba49-8b36d79ca617/scratchpad/quasr_cache/input.q1630198_desc:
+  L10 M10 N10:   124s  iota_edge 1.20312 (rel 0.11%)  |F|/|grad B^2/2mu0| 1.97e-03  mu0<|J|>/<|B|> nan
+           eps_1 mean 0.035356  monotonic True  newton 8.3e-17
+Converting VMEC input to DESC input
+Generated DESC input file /tmp/claude-1000/-home-singh-Documents-DESC2-coil-sandbox/91f880f0-34c8-4d34-ba49-8b36d79ca617/scratchpad/quasr_cache/input.q1630198_desc:
+  L12 M12 N12:   597s  iota_edge 1.20462 (rel 0.01%)  |F|/|grad B^2/2mu0| 4.59e-04  mu0<|J|>/<|B|> nan
+           eps_1 mean 0.035517  monotonic True  newton 8.3e-17

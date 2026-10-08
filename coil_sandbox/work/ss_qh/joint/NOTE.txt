@@ -1,0 +1,82 @@
+Joint plane (all arcB2 hinges at z = 0) on precise_QH -- started 2026-10-08.
+
+Constraint: run_al.py --fix-hinge-z 0. Snaps every hinge z to 0, then FixParameters on hinges[:, 2] (linear,
+eliminated exactly, no multiplier); hinge x, y, tilts and shapes stay free. Valid because the leaf arcs carry
+identity rotmat/zero shift (checked at start). Stellarator symmetry maps z -> -z, so z = 0 is the only height
+giving ONE plane. START/RESULT lines add the exact vertical-removal check (sandbox/demount.py), diagnostic only.
+Smoke test (smoke/, 3 its): hinge z stays exactly 0 while hinges move 5-29 cm in x,y and tilts 25-47 deg.
+
+Why a constructed start (z0_hinges.py): every baseline coil (arcB2, XYZ, planar) overhangs its z = 0 chord by
+5-42 cm, and a transverse arc is a graph over its chord. Fitting arcs with hinges at the z = 0 crossings gives
+garbage (starts/z0fit_from_arcB2: B.n 0.17, kappa 10x, d_pc 0.01x; from XYZ also linked).
+Cause: precise_QH's vertical excursion -- at phi 28 deg the whole cross-section is below z = 0 (Z -0.225..-0.043).
+So with a z = 0 joint the coils must be D-shaped there (shallow arch on top, deep bowl below).
+
+Start (make_z0_start.py): per coil a vertical-plane lens of two arches h sin(pi t)^0.7 over a z = 0 chord that spans
+the cross-section +- 2.0 d_pc; heights = smallest with in-plane gap >= 0.75 x that. Currents from base/arcB2.
+Scan (starts/scan): power 1 (pure sine) needs 1.2-1.4 m bowls (L 1.3x); 0.5 (half ellipse) has kappa 2-2.5x at the
+hinges; 0.7/c2.0 is the pick: L 0.994, kappa 1.36, kMS 0.58, d_cc 1.50, d_pc 1.008, unlinked, B.n 0.264, removable.
+Repacked into one CoilSet(NFP 4, sym) (fixed_ss_eq/repack_arcs.py) -- the nested form crashes CoilSetDistanceRows.
+Build check (build/): 5.0 GB peak, cc active 1313/80000, field max err 1.7e-6.
+
+2026-10-08 runs (run_base.sh both; user approved the config):
+* base_z0 (--fix-hinge-z 0): CONVERGED gtol, 13 outer / 756 inner, 941 s, opt 7.6e-7, viol 4.3e-7.
+  bn 1.8009e-2 = 3.3x the free warm arcB2 baseline (matrix/base/arcB2 5.437e-3); planar N7 is 2.205e-2.
+  L 1.000 kappa 1.001 (between-node peak) kMS 0.994 d_cc 1.006 d_pc 1.005, all five active; hinge z exactly 0;
+  REMOVABLE (min hinge clearance +0.112 m, no arc blocked).
+* base_free (same cold start, hinges free): FAILED, not a KKT point (8 outer / 454 inner, 904 s); bn 2.11e-2,
+  d_cc 0.408, coils 0-1 LINKED (all 8 symmetry copies, Lk +1). Kept running at the user's request as a test of the
+  signed coil-coil rows. What happened:
+  - Linked during outer 1 (29 inner its at mu 10): hinges free -> coil 1's chord went near vertical (hinge z -0.27/+0.35)
+    and coils 0, 1 swept ~25 deg to phi ~ -8 deg and passed through each other in one step. The guard did not prevent it.
+  - The violation 0.12 IS the signed row (closest node distance / 0.409 m normalization). Its pull acts on the same
+    node pair the ordinary >= d_cc slot rows push apart: tug of war, 56 -> 49 mm over outers 1-4.
+  - Outer 5: the signed row's mu (1e4-1e5) won, pair pulled to 18.6 mm, which put > 80000 node pairs within
+    select_distance: slot overflow (80235-81589, rows dropped, 119 warnings) -> inner solves stalled; outer 8 took
+    0 inner its; mu reached 1e7. Ended linked at 23.9 mm.
+  - So with these settings the signed row detects linking and pulls the right way but does not recover a linked pair.
+    Ideas (untested): drop a linked pair's slot rows while it is linked; stop crossings in the step (linking check);
+    much larger --cc-k so the pull does not overflow.
+* LINK GUARD (user's minimal fix): solver option initial_penalty_rows (desc/optimize/aug_lagrangian_composite.py,
+  main repo, uncommitted) + run_al.py --link-mu MU = initial mu on the 72 signed per-pair coil-coil rows only.
+  Inactive unless a pair links, so it costs nothing until then; the merit function rejects a linking step.
+  Smoke (smoke_link/) confirmed the ids (cc group max mu 1e8, every other row 10).
+* base_free_link (--link-mu 1e8, otherwise = base_free): attempt 1 SEGFAULTED (exit 139) in outer 6 after 5 clean
+  outers (kept in base_free_link_segv1; identical through outer 2, GPU not bit-reproducible after). Rerun: never linked,
+  every inner solve converged (no stall); outer 6 took 398 inner its to opt 9.2e-7. User called it at outer 8
+  (opt 9.45e-7, violation 1.36e-4, 660 inner, 1008 s); killed, result rebuilt from x_outer08 (from_checkpoint.py):
+  result_outer08.h5/.json: bn 6.4404e-3, L 1.000 kappa 1.001 kMS 1.002 d_cc 1.010 d_pc 1.111, unlinked.
+  => The guard prevented linking without breaking convergence. Clean joint-plane cost from the SAME cold start:
+     z0 1.801e-2 / free 6.440e-3 = 2.80x. (Free warm baseline 5.437e-3: the cold start itself costs 1.18x.)
+* Scaling bug in the guard (found by the unit test): x_scale="jac" took column norms over ALL rows incl. inactive
+  hinge rows, so the 1e4 (=sqrt 1e8) weight shrank the steps of every coil variable (toy: 22 -> 300 its, no convergence).
+  base_free_link_v1 (the run above, 6.44e-3) was affected. Narrow fix, committed with the option and a unit test
+  (31ed99491): seeded rows are left out of the jac scale while inactive (toy: 23 its).
+* base_free_link (rerun with the fix): CONVERGED gtol, 11 outer / 277 inner, 419 s, opt 3.3e-7, viol 1.9e-7, never
+  linked. bn 6.4207e-3; L 1.000 kappa 1.001 kMS 0.991 d_cc 1.007 d_pc 1.155. Same answer as v1 in < half the its.
+  => joint plane cost from the same cold start: 1.8009e-2 / 6.4207e-3 = 2.80x.
+  (Not shown: whether the guard actively rejected a linking step on this path; the unguarded run linked in outer 1.)
+* single_stage.py: --fix-hinge-z added (snap + FixParameters on hinge z, per-step check line). ss_z0.sh = matrix arcB2
+  single stage + --fix-hinge-z 0 from base_z0, anchors passed explicitly, autotune off; then k4b, then refine
+  (run_al --fix-hinge-z 0 --link-mu 1e8). User approved 2026-10-08.
+* Single stage ss_z0 (k1-4, each to maxiter): ss coils bn 1.62e-2 / 1.08e-2 / 8.25e-3 / 6.97e-3; k4b 6.82e-3 (-2%).
+  QS rho 0.5 3.7e-3 (17x precise_QH; B_arcB2 4x), edge 8.0e-3; iota min 1.181 (bound 1.19, weighted); A 8.09.
+  Refined (on_z0/arcB2_z0): CONVERGED, bn 6.3715e-3, removable, hinge clearance 0.144 m.
+  => joint on own ss boundary 6.37e-3 vs free arcB2 on B_arcB2 1.48e-3: 4.3x (3.3x on precise_QH). Gap not closed.
+* Vertical excursion unchanged by single stage (max |z-centre| 144 -> 156 mm). See results/RESULTS.md "Why".
+* k=5 (ss_z0_k5): stopped on xtol after 12 its, cost -0.5%, bn 6.81e-3; optimality 0.04, trust region collapsed
+  (10 nfev/step), no solve failure in the log. Refined (on_z0_k5): bn 6.356e-3 (-0.25%). k=5 gives nothing here.
+* Cold start survey (cold/): WISTELL-A best for z = 0 (z=0 chord covers >= 34% of every section's R extent; precise_QH
+  0%). Prepared eq_wistell.h5 (mirrored zeta -> -zeta, scaled to a = 0.1243; exact) and the lens start; NOT launched.
+  Reduced-helix precise_QH (shrink_helix.py) diverged on re-solve (needs continuation).
+
+2026-10-08 17:28 -- per-coil horizontal hinges (user: "not at z=0 alone, just horizontal; each coil its own z").
+  Measured first: free arcB2 chords tilt 37-80 deg (warm, precise_QH), 39-80 (B_arcB2), 11-38 (cold free_link).
+  run_al.py --horizontal-hinges = sandbox/demount.HingeLevel (existing Helios objective; linear, factorized).
+  base_level (run_base.sh level; start base_z0, link guard): CONVERGED gtol 11 outer / 215 inner, 379 s.
+  B.n 8.768e-3 (base_z0 1.801e-2, base_free_link 6.421e-3 -> 1.37x). Coil z -161,-45,-64,+62 mm; spread 4e-16;
+  REMOVABLE, min hinge clearance +0.019 m. outer-5 checkpoint read 8.766e-3 already.
+  k=5 stall written up for another session: results/K5_STALL.md (user: don't investigate now).
+2026-10-08 17:41 -- single_stage.py --horizontal-hinges added; ss_level.sh (same as ss_z0.sh but the flag and start
+  base_level). Dry: B.n 2.07x tol (67.5%), d_pc 28.8% (single stage's 2% d_pc backoff vs run_al's; ss_z0 had 12.5%).
+  Launched chain -> k4b -> refine (ss_level.out).

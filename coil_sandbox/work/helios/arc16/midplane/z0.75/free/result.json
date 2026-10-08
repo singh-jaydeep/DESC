@@ -1,0 +1,484 @@
+{
+ "settings": {
+  "eq": "sample_equilibria/helios_repro.h5",
+  "start": "work/helios/arc16/midplane/z0.75/repair/result.h5",
+  "out": "work/helios/arc16/midplane/z0.75/free",
+  "mode": "stage2",
+  "length_mult": 1.0,
+  "margin": 0.0,
+  "fix_hinges": false,
+  "anchor_weight": 0.001,
+  "margin_skip": "",
+  "a": null,
+  "bounds": "bounds/helios_cold_L28_d10.json",
+  "device": null,
+  "vacuum": false,
+  "maxiter": 300,
+  "check_every": 25,
+  "ckpt_every": 50,
+  "diag_log": "diag.jsonl",
+  "dcc_backoff": 0.025,
+  "dpc_backoff": 0.02,
+  "no_arc_backoffs": false,
+  "convex_form": "signed",
+  "convex_kmin": 0.0,
+  "convex_backoff": 0.5,
+  "demount_margin": 0.3,
+  "demount_backoff": 0.02,
+  "demount_arcs": false,
+  "demount_delta": 0.5,
+  "demount_eps": 0.25,
+  "level_hinges": false,
+  "fix_hinge_z": 0.75,
+  "corner_max": null,
+  "planarity": "auto",
+  "planarity_tol": 0.0,
+  "speed_floor": 0.0,
+  "arclength_weight": 0.0,
+  "torsion_weight": 0.0,
+  "coil_grid_n": 150,
+  "kappa_grid_n": null,
+  "eval_m": 25,
+  "eval_n": 25,
+  "plasma_m": 64,
+  "plasma_n": 64,
+  "src_gl": 24,
+  "src_n": 400,
+  "vc_m": null,
+  "vc_n": null,
+  "vc_chunk": 64,
+  "dcc_k": 20000,
+  "dpc_k": 20000,
+  "no_signed": false,
+  "dcc_neighbors": null,
+  "dcc_chunk": 4,
+  "dpc_chunk": 1,
+  "qf_chunk": 25,
+  "coil_jac_chunk": null,
+  "no_second_order": false,
+  "so_chunk": 8,
+  "so_rtol": 0.05,
+  "max_tr": 0.5,
+  "max_inner_iter": 100,
+  "ctol": 0.0001
+ },
+ "eq_kind": "h5",
+ "device": "gpu",
+ "vacuum": false,
+ "length_multiplier": 1.0,
+ "bounds": {
+  "L": 28.0,
+  "Ltot": null,
+  "kappa": 1.5,
+  "kms": null,
+  "convex": 0.001,
+  "planar": null,
+  "dcc": 1.0,
+  "dpc": 1.0
+ },
+ "target": {
+  "L": 28.0,
+  "Ltot": null,
+  "kappa": 1.5,
+  "kms": null,
+  "convex": 0.001,
+  "planar": null,
+  "dcc": 1.0,
+  "dpc": 1.0
+ },
+ "enforced": {
+  "L": 28.0,
+  "Ltot": null,
+  "kappa": 1.4925,
+  "kms": null,
+  "convex": 0.0005,
+  "planar": null,
+  "dcc": 1.0341466666666665,
+  "dpc": 1.02
+ },
+ "solver": {
+  "wall_s": 1186.577793121338,
+  "message": "Augmented Lagrangian subproblems stalled at a feasible point: `ctol` is satisfied and no further progress is available at this precision, but `gtol` was not reached.",
+  "nit": 300,
+  "n_outer": 129,
+  "constr_violation": 1.185754254485046e-06,
+  "y_absmax_final": 0.036206416248013025
+ },
+ "start": {
+  "per_coil": [
+   {
+    "L": 27.885311322464517,
+    "kappa": 0.23772782228139938,
+    "kms": 0.05114887058648563,
+    "corner": 1.013077669493092,
+    "convex": 0.0,
+    "kappa_s_min": 0.21809620824750703,
+    "planar": 0.0
+   },
+   {
+    "L": 27.833901327391878,
+    "kappa": 0.24631776676207134,
+    "kms": 0.051618472007007955,
+    "corner": 1.1126986177367753,
+    "convex": 0.0,
+    "kappa_s_min": 0.21992416032901432,
+    "planar": 0.0
+   },
+   {
+    "L": 27.833774172596662,
+    "kappa": 0.2447988381896249,
+    "kms": 0.051568064059815996,
+    "corner": 1.0307733658240923,
+    "convex": 0.0,
+    "kappa_s_min": 0.2204468694185668,
+    "planar": 0.0
+   },
+   {
+    "L": 27.833100048616352,
+    "kappa": 0.23653490086020781,
+    "kms": 0.05130046715114722,
+    "corner": 0.5853931023124248,
+    "convex": 0.0,
+    "kappa_s_min": 0.22303149705891628,
+    "planar": 0.0
+   }
+  ],
+  "L": 27.885311322464517,
+  "L_total": 111.38608687106941,
+  "kappa": 0.24631776676207134,
+  "kms": 0.051618472007007955,
+  "corner": 1.1126986177367753,
+  "convex": 0.0,
+  "planar": 0.0,
+  "d_cc": 1.1405950113297054,
+  "d_pc": 1.1149395384759797,
+  "linked": 0,
+  "linked_pairs": [],
+  "bn": 0.07712972893093126,
+  "bn_max": 0.23304361483552438,
+  "bn_local": 0.07429887020570014,
+  "bn_max_T": 1.5132842296640348,
+  "vacuum": false,
+  "n_coils": 16
+ },
+ "result": {
+  "per_coil": [
+   {
+    "L": 27.999999702812772,
+    "kappa": 0.46167537173309914,
+    "kms": 0.08171959224350586,
+    "corner": 58.76719815387205,
+    "convex": 9.899429694181943e-06,
+    "kappa_s_min": -0.00016508794602635148,
+    "planar": 0.0
+   },
+   {
+    "L": 27.999998442882905,
+    "kappa": 0.4415353717155293,
+    "kms": 0.07652473523301948,
+    "corner": 54.51656667777557,
+    "convex": 0.0,
+    "kappa_s_min": 0.037421572515103176,
+    "planar": 0.0
+   },
+   {
+    "L": 27.999999489028255,
+    "kappa": 0.5915691969053117,
+    "kms": 0.08772799039824722,
+    "corner": 52.43720195059579,
+    "convex": 9.193031382116484e-06,
+    "kappa_s_min": -0.0001394805472117262,
+    "planar": 0.0
+   },
+   {
+    "L": 27.99998870099887,
+    "kappa": 0.5293113192762281,
+    "kms": 0.08337297213981007,
+    "corner": 45.09669208949216,
+    "convex": 1.5053658733339931e-05,
+    "kappa_s_min": -0.00017617105941559937,
+    "planar": 0.0
+   }
+  ],
+  "L": 27.999999702812772,
+  "L_total": 111.99998633572281,
+  "kappa": 0.5915691969053117,
+  "kms": 0.08772799039824722,
+  "corner": 58.76719815387205,
+  "convex": 1.5053658733339931e-05,
+  "planar": 0.0,
+  "d_cc": 1.636940460363799,
+  "d_pc": 1.1204669391760502,
+  "linked": 0,
+  "linked_pairs": [],
+  "bn": 0.025875450251617946,
+  "bn_max": 0.12702703739010193,
+  "bn_local": 0.025935724058024186,
+  "bn_max_T": 0.8186326062069809,
+  "vacuum": false,
+  "n_coils": 16
+ },
+ "margins": {
+  "L": 0.9999999893861704,
+  "kappa": 0.3943794646035412,
+  "convex": 0.015053658733339931,
+  "d_cc": 1.636940460363799,
+  "d_pc": 1.1204669391760502
+ },
+ "failed": [],
+ "active": [
+  "L"
+ ],
+ "history": [
+  {
+   "iter": 25,
+   "bn": 0.029042987827989215,
+   "L": 1.0002476132676779,
+   "kappa": 0.32183258411816057,
+   "convex": 6.315246708512524,
+   "d_cc": 1.0906058589951766,
+   "d_pc": 1.0841678404996455,
+   "linked": 0,
+   "verdict": "FAILS L,convex"
+  },
+  {
+   "iter": 50,
+   "bn": 0.025882279406734664,
+   "L": 0.9999595282404127,
+   "kappa": 0.39181169625363915,
+   "convex": 0.7348241541318551,
+   "d_cc": 1.5882435257335175,
+   "d_pc": 1.1129470287479222,
+   "linked": 0,
+   "verdict": "FEASIBLE"
+  },
+  {
+   "iter": 75,
+   "bn": 0.025879245131159728,
+   "L": 1.0000026683303265,
+   "kappa": 0.3942156516865957,
+   "convex": 0.08887368337223489,
+   "d_cc": 1.6373772326819263,
+   "d_pc": 1.1208424575417013,
+   "linked": 0,
+   "verdict": "FAILS L"
+  },
+  {
+   "iter": 100,
+   "bn": 0.02587548667828496,
+   "L": 1.0000012632570754,
+   "kappa": 0.3942027701491926,
+   "convex": 0.06132730905443253,
+   "d_cc": 1.6372987958239722,
+   "d_pc": 1.1207402703432954,
+   "linked": 0,
+   "verdict": "FAILS L"
+  },
+  {
+   "iter": 125,
+   "bn": 0.025875381019549917,
+   "L": 0.9999998833767041,
+   "kappa": 0.39415989102813304,
+   "convex": 0.02731808788633377,
+   "d_cc": 1.6373166546961813,
+   "d_pc": 1.1206906363280422,
+   "linked": 0,
+   "verdict": "FEASIBLE"
+  },
+  {
+   "iter": 150,
+   "bn": 0.025875226796358498,
+   "L": 1.000001116270334,
+   "kappa": 0.39422841785010115,
+   "convex": 0.02536751323249113,
+   "d_cc": 1.6372489078838974,
+   "d_pc": 1.1209293542679593,
+   "linked": 0,
+   "verdict": "FAILS L"
+  },
+  {
+   "iter": 175,
+   "bn": 0.025875692956946382,
+   "L": 1.0000009307322242,
+   "kappa": 0.3942410994561752,
+   "convex": 0.0312661797471821,
+   "d_cc": 1.6372644167225723,
+   "d_pc": 1.1208038192443532,
+   "linked": 0,
+   "verdict": "FAILS L"
+  },
+  {
+   "iter": 200,
+   "bn": 0.025875371978302867,
+   "L": 0.9999999797591619,
+   "kappa": 0.3942958389596198,
+   "convex": 0.013568667258638057,
+   "d_cc": 1.6371834174962696,
+   "d_pc": 1.120690505108787,
+   "linked": 0,
+   "verdict": "FEASIBLE"
+  },
+  {
+   "iter": 225,
+   "bn": 0.02587574781030953,
+   "L": 1.000000391251604,
+   "kappa": 0.3943272074380486,
+   "convex": 0.022362584864728648,
+   "d_cc": 1.6370966577978037,
+   "d_pc": 1.1205118148876434,
+   "linked": 0,
+   "verdict": "FAILS L"
+  },
+  {
+   "iter": 250,
+   "bn": 0.02587561415048564,
+   "L": 0.9999999996644469,
+   "kappa": 0.39435936297854873,
+   "convex": 0.014438418544769016,
+   "d_cc": 1.6369953817357734,
+   "d_pc": 1.1205052088130583,
+   "linked": 0,
+   "verdict": "FEASIBLE"
+  },
+  {
+   "iter": 275,
+   "bn": 0.025875771525067003,
+   "L": 1.0000000130128,
+   "kappa": 0.39437688192545367,
+   "convex": 0.0228241997992803,
+   "d_cc": 1.636960392480178,
+   "d_pc": 1.120463265167317,
+   "linked": 0,
+   "verdict": "FAILS L"
+  },
+  {
+   "iter": 300,
+   "bn": 0.025875450251617946,
+   "L": 0.9999999893861704,
+   "kappa": 0.3943794646035412,
+   "convex": 0.015053658733339931,
+   "d_cc": 1.636940460363799,
+   "d_pc": 1.1204669391760502,
+   "linked": 0,
+   "verdict": "FEASIBLE"
+  }
+ ],
+ "demount": [
+  {
+   "hinge_clearance": [
+    2.897443303873116,
+    0.8092088338639822
+   ],
+   "hinge_R": [
+    12.69922662954884,
+    6.784230036120569
+   ],
+   "hinge_z": [
+    0.75,
+    0.75
+   ],
+   "arcs": [
+    {
+     "dir": -1.0,
+     "blocked_frac": 0.0,
+     "worst_depth": 1.0430107921270686,
+     "blocked_depth": 0.0
+    },
+    {
+     "dir": 1.0,
+     "blocked_frac": 0.0,
+     "worst_depth": 1.2672912533050997,
+     "blocked_depth": 0.0
+    }
+   ],
+   "ok": true
+  },
+  {
+   "hinge_clearance": [
+    2.9989436146629327,
+    0.47335783408272736
+   ],
+   "hinge_R": [
+    12.668481906217975,
+    6.481187486499965
+   ],
+   "hinge_z": [
+    0.75,
+    0.75
+   ],
+   "arcs": [
+    {
+     "dir": -1.0,
+     "blocked_frac": 0.0,
+     "worst_depth": 1.4671550379120095,
+     "blocked_depth": 0.0
+    },
+    {
+     "dir": 1.0,
+     "blocked_frac": 0.0,
+     "worst_depth": 1.5687185777684531,
+     "blocked_depth": 0.0
+    }
+   ],
+   "ok": true
+  },
+  {
+   "hinge_clearance": [
+    2.7065317261473805,
+    0.45220885559613677
+   ],
+   "hinge_R": [
+    12.122805041473113,
+    5.899057271930517
+   ],
+   "hinge_z": [
+    0.75,
+    0.75
+   ],
+   "arcs": [
+    {
+     "dir": -1.0,
+     "blocked_frac": 0.0,
+     "worst_depth": 1.7175681452926446,
+     "blocked_depth": 0.0
+    },
+    {
+     "dir": 1.0,
+     "blocked_frac": 0.0,
+     "worst_depth": 1.733100796427868,
+     "blocked_depth": 0.0
+    }
+   ],
+   "ok": true
+  },
+  {
+   "hinge_clearance": [
+    2.6745956637940616,
+    1.1368062926035654
+   ],
+   "hinge_R": [
+    11.829395338823492,
+    4.569618663932489
+   ],
+   "hinge_z": [
+    0.75,
+    0.75
+   ],
+   "arcs": [
+    {
+     "dir": -1.0,
+     "blocked_frac": 0.0,
+     "worst_depth": 1.7920415489726178,
+     "blocked_depth": 0.0
+    },
+    {
+     "dir": 1.0,
+     "blocked_frac": 0.0,
+     "worst_depth": 1.7980808732775682,
+     "blocked_depth": 0.0
+    }
+   ],
+   "ok": true
+  }
+ ]
+}

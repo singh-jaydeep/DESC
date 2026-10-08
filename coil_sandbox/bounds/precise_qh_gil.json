@@ -1,0 +1,11 @@
+{
+  "_note": "precise_QH bounds of the sweep_qh bundle (Gil et al. Table III stated set, a-scaled to a=0.1243 m). Absolute.",
+  "scale": "absolute",
+  "L": 2.9255111576633253,
+  "kappa": 13.672824284132604,
+  "kappa_MS": 18.694612390476625,
+  "d_cc": 0.05851022315326651,
+  "d_pc": 0.1097066684123747,
+  "convex_excess": null,
+  "planar_max": null
+}

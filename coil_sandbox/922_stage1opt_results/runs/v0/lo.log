@@ -1,0 +1,210 @@
+Running as unit: run-p1186927-i1188613.scope; invocation ID: 1948d03362d24114875cb9c393c792de
+E0922 15:56:51.107627 1187014 cuda_executor.cc:1743] Could not get kernel mode driver version: ( INVALID_ARGUMENT: Version does not match the format X.Y.Z )
+E0922 15:56:51.119002 1186927 cuda_executor.cc:1743] Could not get kernel mode driver version: ( INVALID_ARGUMENT: Version does not match the format X.Y.Z )
+DEVICE requested=gpu obtained=gpu (1x NVIDIA GeForce RTX 5070 Laptop GPU)
+precise_QA  L8 M8 N8 NFP2 sym=True  dim_x=1462
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+potential: G 5.4418e+06  I -1.270e-10  I/G -2.33e-17  residual 1.89e-05  monotonic True
+baseline C   [1.372  0.9731 0.8649 0.9713]  mean 1.0453
+baseline e1  [0.0462 0.0769 0.0678 0.0769]
+baseline QS rms 5.1750e-04   iota 0.41970..0.42018
+free boundary DOF: R 12 + Z 12 = 24
+Building objective: C0
+Building objective: eps1_0
+Building objective: C1
+Building objective: eps1_1
+Building objective: C2
+Building objective: eps1_2
+Building objective: C3
+Building objective: eps1_3
+ObjectiveFunction deriv_mode : blocked
+C0 jac_chunk_size: 100
+eps1_0 jac_chunk_size: 100
+C1 jac_chunk_size: 100
+eps1_1 jac_chunk_size: 100
+C2 jac_chunk_size: 100
+eps1_2 jac_chunk_size: 100
+C3 jac_chunk_size: 100
+eps1_3 jac_chunk_size: 100
+Timer: Objective build = 143 ms
+Building objective: lcfs R
+Building objective: lcfs Z
+Building objective: fixed pressure
+Building objective: fixed current
+Building objective: fixed Psi
+Building objective: SurfaceCurve consistency
+Building objective: fixed parameters
+Building objective: SurfaceCurve consistency
+Building objective: fixed parameters
+Building objective: SurfaceCurve consistency
+Building objective: fixed parameters
+Building objective: SurfaceCurve consistency
+Building objective: fixed parameters
+Building objective: self_consistency R
+Building objective: self_consistency Z
+Building objective: lambda gauge
+Building objective: axis R self consistency
+Building objective: axis Z self consistency
+Building objective: fixed shift
+Building objective: fixed rotation
+Building objective: fixed shift
+Building objective: fixed rotation
+Building objective: fixed shift
+Building objective: fixed rotation
+Building objective: fixed shift
+Building objective: fixed rotation
+ObjectiveFunction deriv_mode : blocked
+lcfs R jac_chunk_size: None
+lcfs Z jac_chunk_size: None
+fixed pressure jac_chunk_size: None
+fixed current jac_chunk_size: None
+fixed Psi jac_chunk_size: None
+SurfaceCurve consistency jac_chunk_size: None
+fixed parameters jac_chunk_size: None
+SurfaceCurve consistency jac_chunk_size: None
+fixed parameters jac_chunk_size: None
+SurfaceCurve consistency jac_chunk_size: None
+fixed parameters jac_chunk_size: None
+SurfaceCurve consistency jac_chunk_size: None
+fixed parameters jac_chunk_size: None
+self_consistency R jac_chunk_size: None
+self_consistency Z jac_chunk_size: None
+lambda gauge jac_chunk_size: None
+axis R self consistency jac_chunk_size: None
+axis Z self consistency jac_chunk_size: None
+fixed shift jac_chunk_size: None
+fixed rotation jac_chunk_size: None
+fixed shift jac_chunk_size: None
+fixed rotation jac_chunk_size: None
+fixed shift jac_chunk_size: None
+fixed rotation jac_chunk_size: None
+fixed shift jac_chunk_size: None
+fixed rotation jac_chunk_size: None
+Timer: Objective build = 1.37 sec
+Building objective: force
+Precomputing transforms
+Timer: Precomputing transforms = 765 ms
+Building objective: aspect ratio
+Precomputing transforms
+Timer: Precomputing transforms = 605 ms
+Building objective: Generic
+Building objective: QS two-term
+Precomputing transforms
+Timer: Precomputing transforms = 42.3 ms
+ObjectiveFunction deriv_mode : blocked
+force jac_chunk_size: 100
+aspect ratio jac_chunk_size: None
+Generic jac_chunk_size: None
+QS two-term jac_chunk_size: None
+Timer: Objective build = 1.61 sec
+Timer: LinearConstraintProjection build = 5.40 sec
+Timer: LinearConstraintProjection build = 619 ms
+Number of parameters: 880
+Number of objectives: 8
+Number of equality constraints: 5352
+Number of inequality constraints: 765
+Timer: Initializing the optimization = 9.70 sec
+
+Starting optimization
+Using method: lsq-auglag
+second_order: compiling constraint Hessian for blocks ForceBalance, AspectRatio, QuasisymmetryTwoTerm
+Solver options:
+------------------------------------------------------------
+Maximum Function Evaluations       : 76
+Maximum Allowed Total Δx Norm      : inf
+Scaled Termination                 : True
+Trust Region Method                : qr
+Initial Trust Radius               : 2.352e-01
+Maximum Trust Radius               : inf
+Minimum Trust Radius               : 2.220e-16
+Trust Radius Increase Ratio        : 4.000e+00
+Trust Radius Decrease Ratio        : 2.500e-01
+Trust Radius Increase Threshold    : 7.500e-01
+Trust Radius Decrease Threshold    : 5.000e-01
+Alpha Omega                        : 1.000e+00
+Beta Omega                         : 1.000e+00
+Alpha Eta                          : 1.000e-01
+Beta Eta                           : 9.000e-01
+Omega                              : 3.281e-03
+Eta                                : 1.261e-03
+Tau                                : 1.000e+01
+------------------------------------------------------------ 
+
+   Iteration     Total nfev        Cost      Cost reduction    Step norm     Optimality    Constr viol.   Penalty param  max(|mltplr|)      gtolk     
+       0              1          2.260e+00                                    3.281e-03      1.261e-03      1.000e+01      0.000e+00      3.281e-04   
+second_order: compiling constraint Hessian for blocks ForceBalance, AspectRatio, GenericObjective, QuasisymmetryTwoTerm
+       1              2          2.260e+00      1.125e-04      8.448e-04      3.282e-03      1.148e-03      1.000e+01      0.000e+00      3.281e-04   
+       2              3          2.259e+00      1.167e-03      4.461e-04      3.166e-03      4.484e-04      1.000e+01      0.000e+00      3.281e-04   
+       3              4          2.255e+00      4.587e-03      1.766e-03      3.112e-03      1.551e-03      1.000e+01      0.000e+00      3.281e-04   
+       4              5          2.237e+00      1.763e-02      6.460e-03      2.511e-03      3.199e-03      1.000e+01      0.000e+00      3.281e-04   
+       5              6          2.228e+00      8.456e-03      2.649e-03      2.417e-03      3.331e-03      1.000e+01      0.000e+00      3.281e-04   
+       6              7          2.214e+00      1.466e-02      4.658e-03      2.110e-03      3.558e-03      1.000e+01      0.000e+00      3.281e-04   
+       7              8          2.207e+00      7.055e-03      2.220e-03      1.930e-03      3.656e-03      1.000e+01      0.000e+00      3.281e-04   
+       8              9          2.198e+00      8.975e-03      2.816e-03      1.824e-03      3.777e-03      1.000e+01      0.000e+00      3.281e-04   
+       9             10          2.197e+00      6.433e-04      2.026e-04      1.860e-03      3.785e-03      1.000e+01      0.000e+00      3.281e-04   
+      10             11          2.196e+00      8.249e-04      2.580e-04      1.864e-03      3.795e-03      1.000e+01      0.000e+00      3.281e-04   
+      11             12          2.192e+00      4.543e-03      1.412e-03      1.805e-03      3.850e-03      1.000e+01      0.000e+00      3.281e-04   
+      12             13          2.179e+00      1.252e-02      3.888e-03      1.728e-03      3.997e-03      1.000e+01      0.000e+00      3.281e-04   
+      13             14          2.179e+00      7.250e-04      2.244e-04      1.719e-03      4.004e-03      1.000e+01      0.000e+00      3.281e-04   
+      14             15          2.177e+00      1.078e-03      3.325e-04      1.761e-03      4.014e-03      1.000e+01      0.000e+00      3.281e-04   
+      15             16          2.177e+00      6.867e-04      2.151e-04      1.771e-03      4.020e-03      1.000e+01      0.000e+00      3.281e-04   
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 2.177e+00
+         Constraint violation: 4.020e-03
+         Total delta_x: 1.873e-02
+         Iterations: 15
+         Function evaluations: 16
+         Jacobian evaluations: 15
+Timer: Solution time = 1.74 min
+Timer: Avg time per step = 6.55 sec
+==============================================================================================================
+                                                                 Start  -->   End
+Total (sum of squares):                                      2.260e+00  -->   2.177e+00, 
+C0 objective value:                                          1.372e+00  -->   1.314e+00 (Unknown)
+eps1_0 objective value:                                      4.623e-02  -->   4.516e-02 (Unknown)
+C1 objective value:                                          9.731e-01  -->   9.715e-01 (Unknown)
+eps1_1 objective value:                                      7.686e-02  -->   7.687e-02 (Unknown)
+C2 objective value:                                          8.649e-01  -->   8.611e-01 (Unknown)
+eps1_2 objective value:                                      6.785e-02  -->   6.754e-02 (Unknown)
+C3 objective value:                                          9.713e-01  -->   9.701e-01 (Unknown)
+eps1_3 objective value:                                      7.686e-02  -->   7.687e-02 (Unknown)
+Maximum absolute Force error:                                2.252e+01  -->   3.550e+03 (N)
+Minimum absolute Force error:                                3.916e-04  -->   3.608e-02 (N)
+Average absolute Force error:                                8.294e-01  -->   1.424e+02 (N)
+Maximum absolute Force error:                                2.065e-05  -->   3.255e-03 (normalized)
+Minimum absolute Force error:                                3.591e-10  -->   3.308e-08 (normalized)
+Average absolute Force error:                                7.605e-07  -->   1.306e-04 (normalized)
+R boundary error:                                            0.000e+00  -->   1.014e-18 (m)
+Z boundary error:                                            0.000e+00  -->   6.019e-19 (m)
+Fixed pressure profile error:                                0.000e+00  -->   0.000e+00 (Pa)
+Fixed current profile error:                                 0.000e+00  -->   0.000e+00 (A)
+Fixed Psi error:                                             0.000e+00  -->   0.000e+00 (Wb)
+Aspect ratio:                                                6.000e+00  -->   6.000e+00 (dimensionless)
+Maximum Generic objective value:                             4.202e-01  -->   4.201e-01 (~)
+Minimum Generic objective value:                             4.197e-01  -->   4.199e-01 (~)
+Average Generic objective value:                             4.200e-01  -->   4.200e-01 (~)
+Maximum Generic objective value:                             4.202e-01  -->   4.201e-01 (normalized)
+Minimum Generic objective value:                             4.197e-01  -->   4.199e-01 (normalized)
+Average Generic objective value:                             4.200e-01  -->   4.200e-01 (normalized)
+Maximum Quasi-symmetry (1,0) two-term error:                 1.392e-03  -->   6.637e-04 (T^3)
+Minimum Quasi-symmetry (1,0) two-term error:                -7.512e-04  -->  -8.123e-04 (T^3)
+Average Quasi-symmetry (1,0) two-term error:                -2.136e-06  -->  -5.186e-06 (T^3)
+Maximum Quasi-symmetry (1,0) two-term error:                 2.500e-03  -->   1.192e-03 (normalized)
+Minimum Quasi-symmetry (1,0) two-term error:                -1.349e-03  -->  -1.459e-03 (normalized)
+Average Quasi-symmetry (1,0) two-term error:                -3.835e-06  -->  -9.312e-06 (normalized)
+SurfaceCurve consistency error:                              0.000e+00  -->   1.331e-16 (m)
+Fixed parameters error:                                      0.000e+00  -->   0.000e+00 (~)
+SurfaceCurve consistency error:                              0.000e+00  -->   1.714e-16 (m)
+Fixed parameters error:                                      0.000e+00  -->   0.000e+00 (~)
+SurfaceCurve consistency error:                              0.000e+00  -->   2.046e-16 (m)
+Fixed parameters error:                                      0.000e+00  -->   0.000e+00 (~)
+SurfaceCurve consistency error:                              0.000e+00  -->   1.336e-16 (m)
+Fixed parameters error:                                      0.000e+00  -->   0.000e+00 (~)
+==============================================================================================================
+
+
+wall clock 120.2 s for 15 iterations -> 8.02 s/iteration
+saved 922_stage1opt_results/runs/v0/eq_lo.h5

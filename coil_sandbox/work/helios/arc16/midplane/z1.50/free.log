@@ -1,0 +1,484 @@
+Running as unit: run-p1090400-i1091921.scope; invocation ID: bb7a71c7f2ec43a39dc80077f047b655
+E0922 00:25:25.949513 1090492 cuda_executor.cc:1743] Could not get kernel mode driver version: ( INVALID_ARGUMENT: Version does not match the format X.Y.Z )
+E0922 00:25:25.961346 1090400 cuda_executor.cc:1743] Could not get kernel mode driver version: ( INVALID_ARGUMENT: Version does not match the format X.Y.Z )
+DEVICE requested=gpu obtained=gpu (1x NVIDIA GeForce RTX 5070 Laptop GPU)
+  [mem] RSS 0.83 GB  peak 0.83 GB
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+JOINT PLANE: every hinge snapped to z = 1.5 m and held there (largest move 0.0000 m; the START line below is AFTER the snap)
+eq sample_equilibria/helios_repro.h5 (h5) NFP 2 sym True; start work/helios/arc16/midplane/z1.50/repair/result.h5: 4 unique coils, arc=True, expect 16 coils; source grid gl (48 nodes/coil), length grid gl (48), constraint grid 301, curvature grid 301; mode stage2; plasma field included (virtual casing)
+SETTINGS {'eq': 'sample_equilibria/helios_repro.h5', 'start': 'work/helios/arc16/midplane/z1.50/repair/result.h5', 'out': 'work/helios/arc16/midplane/z1.50/free', 'mode': 'stage2', 'length_mult': 1.0, 'margin': 0.0, 'fix_hinges': False, 'anchor_weight': 0.001, 'margin_skip': '', 'a': None, 'bounds': 'bounds/helios_cold_L28_d10.json', 'device': None, 'vacuum': False, 'maxiter': 300, 'check_every': 25, 'ckpt_every': 50, 'diag_log': 'diag.jsonl', 'dcc_backoff': 0.025, 'dpc_backoff': 0.02, 'no_arc_backoffs': False, 'convex_form': 'signed', 'convex_kmin': 0.0, 'convex_backoff': 0.5, 'demount_margin': 0.3, 'demount_backoff': 0.02, 'demount_arcs': False, 'demount_delta': 0.5, 'demount_eps': 0.25, 'level_hinges': False, 'fix_hinge_z': 1.5, 'corner_max': None, 'planarity': 'auto', 'planarity_tol': 0.0, 'speed_floor': 0.0, 'arclength_weight': 0.0, 'torsion_weight': 0.0, 'coil_grid_n': 150, 'kappa_grid_n': None, 'eval_m': 25, 'eval_n': 25, 'plasma_m': 64, 'plasma_n': 64, 'src_gl': 24, 'src_n': 400, 'vc_m': None, 'vc_n': None, 'vc_chunk': 64, 'dcc_k': 20000, 'dpc_k': 20000, 'no_signed': False, 'dcc_neighbors': None, 'dcc_chunk': 4, 'dpc_chunk': 1, 'qf_chunk': 25, 'coil_jac_chunk': None, 'no_second_order': False, 'so_chunk': 8, 'so_rtol': 0.05, 'max_tr': 0.5, 'max_inner_iter': 100, 'ctol': 0.0001}
+BOUNDS (judged, absolute, a=1.77186) L 28  Ltot -  kappa 1.5  kms -  convex 0.001  planar -  dcc 1  dpc 1
+ENFORCED L 28  Ltot -  kappa 1.492  kms -  convex 0.0005  planar -  dcc 1.034  dpc 1.02  (convexity: signed, kappa_s >= 0.0)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+  [mem] RSS 2.93 GB  peak 2.93 GB
+START  bn 7.7155e-02  L 0.996  kappa 0.184  convex 0.000  d_cc 1.151  d_pc 1.114  linked 0  coils 16  -> FEASIBLE  demount: min hinge clearance +2.055 m, worst arc blocked 0.00%  -> REMOVABLE
+Building objective: Quadratic flux
+Precomputing transforms
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Could not build fft interpolator, switching to dft which is slow.
+Reason: Got False for eval_grid.can_fft2.
+  warnings.warn(msg, err)
+  [mem] RSS 7.56 GB  peak 7.56 GB
+  [mem] RSS 7.75 GB  peak 7.75 GB
+  [mem] RSS 7.90 GB  peak 7.90 GB
+Timer: Precomputing transforms = 1.27 min
+Timer: Objective build = 1.29 min
+Building objective: hinge joint plane
+Building objective: summed coil current
+Building objective: fixed shift
+Building objective: fixed rotation
+Building objective: fixed arc reference
+Timer: Objective build = 757 ms
+Timer: Objective build = 2.87 ms
+Timer: LinearConstraintProjection build = 3.19 sec
+Timer: LinearConstraintProjection build = 135 ms
+Number of parameters: 67
+Number of objectives: 1326
+Number of equality constraints: 0
+Number of inequality constraints: 2482
+Timer: Initializing the optimization = 1.37 min
+
+Starting optimization
+Using method: lsq-auglag
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: FutureWarning: constants is deprecated and will be removed in a future release. Users should not include constants in the arguments of their objective compute methods. Instead declare all the constants in the build method and use as self._constants.
+  warnings.warn(msg, err)
+E0922 00:27:56.407895 1090502 cuda_timer.cc:87] Delay kernel timed out: measured time has sub-optimal accuracy. There may be a missing warmup execution, please investigate in Nsight Systems.
+  [mem] RSS 5.23 GB  peak 7.90 GB
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: FutureWarning: constants is deprecated and will be removed in a future release. Users should not include constants in the arguments of their objective compute methods. Instead declare all the constants in the build method and use as self._constants.
+  warnings.warn(msg, err)
+E0922 00:28:13.938942 1090499 cuda_timer.cc:87] Delay kernel timed out: measured time has sub-optimal accuracy. There may be a missing warmup execution, please investigate in Nsight Systems.
+  [mem] RSS 5.72 GB  peak 7.90 GB
+Solver options:
+------------------------------------------------------------
+Maximum Function Evaluations       : 1501
+Maximum Allowed Total Δx Norm      : inf
+Scaled Termination                 : True
+Trust Region Method                : svd
+Initial Trust Radius               : 9.885e-01
+Maximum Trust Radius               : 5.000e-01
+Minimum Trust Radius               : 2.220e-16
+Trust Radius Increase Ratio        : 4.000e+00
+Trust Radius Decrease Ratio        : 2.500e-01
+Trust Radius Increase Threshold    : 7.500e-01
+Trust Radius Decrease Threshold    : 5.000e-01
+Alpha Omega                        : 1.000e+00
+Beta Omega                         : 1.000e+00
+Alpha Eta                          : 1.000e-01
+Beta Eta                           : 9.000e-01
+Omega                              : 1.000e-02
+Eta                                : 1.000e-02
+Tau                                : 1.000e+01
+------------------------------------------------------------ 
+
+   Iteration     Total nfev        Cost      Cost reduction    Step norm     Optimality    Constr viol.   Penalty param  max(|mltplr|)      gtolk     
+       0              1          3.596e-01                                    1.627e-01      0.000e+00      1.000e+01      0.000e+00      1.000e-03   
+second_order: compiling constraint Hessian for blocks CoilLength, CoilCurvature, CoilSignedCurvature, HingeShadowClearance
+  [mem] RSS 6.41 GB  peak 7.90 GB
+E0922 00:29:10.400718 1090514 cuda_timer.cc:87] Delay kernel timed out: measured time has sub-optimal accuracy. There may be a missing warmup execution, please investigate in Nsight Systems.
+  [mem] RSS 7.19 GB  peak 7.90 GB
+       1              3          2.936e-01      6.591e-02      5.674e-01      9.323e-02      0.000e+00      1.000e+01      0.000e+00      1.000e-03   
+       2              4          2.321e-01      6.153e-02      7.711e-01      6.888e-02      0.000e+00      1.000e+01      0.000e+00      1.000e-03   
+       3              5          2.032e-01      2.897e-02      5.025e-01      8.820e-02      0.000e+00      1.000e+01      0.000e+00      1.000e-03   
+       4              6          1.823e-01      2.082e-02      4.225e-01      5.449e-02      0.000e+00      1.000e+01      0.000e+00      1.000e-03   
+       5              7          1.667e-01      1.563e-02      3.537e-01      3.253e-02      0.000e+00      1.000e+01      0.000e+00      1.000e-03   
+  [mem] RSS 7.22 GB  peak 7.90 GB
+       6              8          1.538e-01      1.286e-02      3.200e-01      2.190e-02      0.000e+00      1.000e+01      0.000e+00      1.000e-03   
+second_order: compiling constraint Hessian for blocks CoilLength, CoilCurvature, CoilSignedCurvature, HingeShadowClearance, CoilSetDistancePenalty
+  [mem] RSS 7.34 GB  peak 7.90 GB
+  [mem] RSS 8.23 GB  peak 8.23 GB
+  [mem] RSS 8.25 GB  peak 8.25 GB
+       7              9          1.430e-01      1.081e-02      2.939e-01      2.498e-02      8.490e-03      1.000e+01      0.000e+00      1.000e-03   
+       8             10          1.348e-01      8.287e-03      2.578e-01      9.814e-03      2.748e-03      1.000e+01      0.000e+00      1.000e-03   
+       9             11          1.272e-01      7.576e-03      2.350e-01      7.475e-03      1.591e-03      1.000e+01      0.000e+00      1.000e-03   
+      10             12          1.203e-01      6.851e-03      2.223e-01      5.507e-03      9.915e-04      1.000e+01      0.000e+00      1.000e-03   
+      11             13          1.141e-01      6.240e-03      2.127e-01      4.201e-03      6.844e-04      1.000e+01      0.000e+00      1.000e-03   
+      12             14          1.084e-01      5.690e-03      2.078e-01      3.919e-03      4.795e-04      1.000e+01      0.000e+00      1.000e-03   
+      13             15          1.031e-01      5.268e-03      2.056e-01      3.669e-03      3.496e-04      1.000e+01      0.000e+00      1.000e-03   
+      14             16          9.826e-02      4.868e-03      2.047e-01      3.597e-03      2.795e-04      1.000e+01      0.000e+00      1.000e-03   
+  [mem] RSS 8.31 GB  peak 8.31 GB
+      15             17          9.373e-02      4.532e-03      2.033e-01      3.624e-03      5.182e-04      1.000e+01      0.000e+00      1.000e-03   
+      16             18          8.954e-02      4.190e-03      2.006e-01      3.478e-03      8.349e-04      1.000e+01      0.000e+00      1.000e-03   
+      17             19          8.563e-02      3.907e-03      2.003e-01      3.515e-03      1.057e-03      1.000e+01      0.000e+00      1.000e-03   
+      18             20          8.203e-02      3.595e-03      1.966e-01      3.168e-03      1.218e-03      1.000e+01      0.000e+00      1.000e-03   
+      19             21          7.870e-02      3.335e-03      1.961e-01      3.087e-03      1.326e-03      1.000e+01      0.000e+00      1.000e-03   
+      20             22          7.565e-02      3.053e-03      1.931e-01      2.713e-03      1.399e-03      1.000e+01      0.000e+00      1.000e-03   
+      21             23          7.283e-02      2.813e-03      1.923e-01      2.472e-03      1.444e-03      1.000e+01      0.000e+00      1.000e-03   
+      22             24          7.027e-02      2.567e-03      1.907e-01      2.281e-03      1.472e-03      1.000e+01      0.000e+00      1.000e-03   
+      23             25          6.792e-02      2.351e-03      1.899e-01      2.189e-03      1.481e-03      1.000e+01      0.000e+00      1.000e-03   
+      24             26          6.576e-02      2.158e-03      1.884e-01      2.127e-03      1.490e-03      1.000e+01      0.000e+00      1.000e-03   
+  [mem] RSS 8.31 GB  peak 8.31 GB
+  [it   25] bn 3.1242e-02  L 1.000  kappa 0.334  convex 2.676  d_cc 1.027  d_pc 1.143  -> FAILS L,convex  demount: min hinge clearance +0.929 m, worst arc blocked 0.00%  -> REMOVABLE
+      25             27          6.379e-02      1.969e-03      1.873e-01      2.030e-03      1.545e-03      1.000e+01      0.000e+00      1.000e-03   
+      26             28          6.200e-02      1.787e-03      1.867e-01      1.993e-03      1.626e-03      1.000e+01      0.000e+00      1.000e-03   
+      27             29          6.037e-02      1.633e-03      1.852e-01      1.899e-03      1.680e-03      1.000e+01      0.000e+00      1.000e-03   
+      28             30          5.886e-02      1.505e-03      1.826e-01      1.791e-03      1.681e-03      1.000e+01      0.000e+00      1.000e-03   
+      29             31          5.749e-02      1.376e-03      1.811e-01      1.742e-03      1.687e-03      1.000e+01      0.000e+00      1.000e-03   
+      30             32          5.625e-02      1.240e-03      1.789e-01      1.614e-03      1.665e-03      1.000e+01      0.000e+00      1.000e-03   
+      31             33          5.511e-02      1.140e-03      1.770e-01      1.587e-03      1.657e-03      1.000e+01      0.000e+00      1.000e-03   
+      32             34          5.408e-02      1.031e-03      1.739e-01      1.416e-03      1.645e-03      1.000e+01      0.000e+00      1.000e-03   
+      33             35          5.312e-02      9.543e-04      1.713e-01      1.373e-03      1.636e-03      1.000e+01      0.000e+00      1.000e-03   
+      34             36          5.226e-02      8.652e-04      1.663e-01      1.174e-03      1.622e-03      1.000e+01      0.000e+00      1.000e-03   
+      35             37          5.145e-02      8.066e-04      1.647e-01      1.149e-03      1.618e-03      1.000e+01      0.000e+00      1.000e-03   
+      36             38          5.073e-02      7.225e-04      1.584e-01      5.175e-03      1.624e-03      1.000e+01      1.624e-02      5.175e-04   
+      37             39          5.020e-02      5.323e-04      1.581e-01      1.302e-03      1.007e-03      1.000e+01      1.624e-02      5.175e-04   
+  [mem] RSS 8.31 GB  peak 8.31 GB
+      38             40          4.963e-02      5.622e-04      1.485e-01      8.791e-04      7.386e-04      1.000e+01      1.624e-02      5.175e-04   
+      39             41          4.910e-02      5.299e-04      1.485e-01      1.093e-03      6.106e-04      1.000e+01      1.624e-02      5.175e-04   
+      40             42          4.865e-02      4.529e-04      1.380e-01      9.214e-04      5.604e-04      1.000e+01      1.624e-02      5.175e-04   
+      41             43          4.825e-02      4.017e-04      1.393e-01      1.269e-03      5.287e-04      1.000e+01      1.624e-02      5.175e-04   
+      42             44          4.793e-02      3.161e-04      1.264e-01      1.043e-03      4.942e-04      1.000e+01      1.624e-02      5.175e-04   
+      43             45          4.766e-02      2.729e-04      1.267e-01      1.303e-03      4.611e-04      1.000e+01      1.624e-02      5.175e-04   
+      44             46          4.746e-02      1.991e-04      1.101e-01      1.099e-03      3.946e-04      1.000e+01      1.624e-02      5.175e-04   
+      45             47          4.729e-02      1.689e-04      1.095e-01      1.099e-03      3.988e-04      1.000e+01      1.624e-02      5.175e-04   
+      46             48          4.717e-02      1.206e-04      9.868e-02      1.032e-03      4.100e-04      1.000e+01      1.624e-02      5.175e-04   
+      47             49          4.709e-02      8.287e-05      8.217e-02      8.499e-04      4.168e-04      1.000e+01      1.624e-02      5.175e-04   
+second_order: compiling constraint Hessian for blocks CoilLength, CoilSignedCurvature, HingeShadowClearance
+  [mem] RSS 8.33 GB  peak 8.33 GB
+E0922 00:33:44.744822 1090517 cuda_timer.cc:87] Delay kernel timed out: measured time has sub-optimal accuracy. There may be a missing warmup execution, please investigate in Nsight Systems.
+  [mem] RSS 8.36 GB  peak 8.39 GB
+      48             50          4.704e-02      4.373e-05      5.431e-02      6.725e-04      4.222e-04      1.000e+01      1.624e-02      5.175e-04   
+      49             51          4.701e-02      3.420e-05      5.040e-02      5.948e-04      4.254e-04      1.000e+01      1.624e-02      5.175e-04   
+  [it   50] bn 2.6750e-02  L 1.000  kappa 0.440  convex 3.218  d_cc 1.534  d_pc 1.155  -> FAILS convex  demount: min hinge clearance +0.307 m, worst arc blocked 0.00%  -> REMOVABLE
+      50             52          4.699e-02      2.429e-05      4.479e-02      2.029e-03      4.303e-04      1.000e+01      1.860e-02      2.029e-04   
+      51             53          4.697e-02      1.208e-05      1.240e-03      9.333e-04      4.253e-04      1.000e+01      1.860e-02      2.029e-04   
+      52             54          4.697e-02      2.089e-06      1.981e-02      6.501e-04      3.690e-04      1.000e+01      1.860e-02      2.029e-04   
+      53             55          4.697e-02      3.680e-06      2.993e-02      3.604e-04      3.031e-04      1.000e+01      1.860e-02      2.029e-04   
+  [mem] RSS 8.36 GB  peak 8.39 GB
+      54             56          4.697e-02      6.227e-07      6.507e-03      3.007e-04      2.931e-04      1.000e+01      1.860e-02      2.029e-04   
+      55             57          4.697e-02      1.556e-07      1.347e-03      2.893e-04      2.913e-04      1.000e+01      1.860e-02      2.029e-04   
+      56             58          4.697e-02      1.469e-07      1.237e-03      2.791e-04      2.896e-04      1.000e+01      1.860e-02      2.029e-04   
+      57             59          4.697e-02      2.663e-07      2.211e-03      2.614e-04      2.867e-04      1.000e+01      1.860e-02      2.029e-04   
+      58             60          4.697e-02      9.217e-07      7.555e-03      2.059e-04      2.773e-04      1.000e+01      1.860e-02      2.029e-04   
+      59             61          4.697e-02      1.081e-06      8.130e-03      2.511e-03      2.686e-04      1.040e+01      1.860e-02      2.511e-04   
+      60             62          4.697e-02     -9.243e-06      1.231e-03      1.459e-03      1.840e-04      1.040e+01      1.860e-02      2.511e-04   
+      61             63          4.698e-02     -3.283e-06      1.835e-02      7.644e-04      1.329e-04      1.040e+01      1.860e-02      2.511e-04   
+      62             64          4.698e-02     -3.551e-06      1.368e-02      2.750e-04      1.047e-04      1.040e+01      1.860e-02      2.511e-04   
+      63             65          4.698e-02     -7.328e-07      4.122e-03      9.272e-04      9.857e-05      1.040e+01      2.846e-02      9.272e-05   
+      64             66          4.698e-02     -1.524e-06      4.341e-03      6.071e-04      8.845e-05      1.040e+01      2.846e-02      9.272e-05   
+      65             67          4.699e-02     -2.074e-06      5.025e-03      2.354e-04      7.667e-05      1.040e+01      2.846e-02      9.272e-05   
+      66             68          4.699e-02     -7.707e-07      2.101e-03      1.150e-04      7.283e-05      1.040e+01      2.846e-02      9.272e-05   
+      67             69          4.699e-02     -4.309e-07      1.534e-03      1.310e-03      8.161e-05      1.040e+01      3.552e-02      1.310e-04   
+  [mem] RSS 8.36 GB  peak 8.39 GB
+      68             70          4.699e-02     -1.783e-07      2.968e-03      5.605e-04      8.177e-05      1.040e+01      3.552e-02      1.310e-04   
+      69             71          4.699e-02     -2.068e-07      2.622e-03      1.695e-04      8.141e-05      1.040e+01      3.552e-02      1.310e-04   
+      70             72          4.699e-02     -8.723e-08      1.374e-03      2.644e-04      8.096e-05      1.040e+01      4.181e-02      2.644e-05   
+      71             73          4.699e-02     -1.181e-06      2.194e-03      7.079e-05      5.701e-05      1.040e+01      4.181e-02      2.644e-05   
+      72             74          4.699e-02     -4.204e-07      9.921e-04      4.235e-04      5.097e-05      1.040e+01      4.656e-02      4.235e-05   
+      73             75          4.699e-02      7.312e-07      1.626e-04      8.370e-05      5.488e-05      1.040e+01      4.656e-02      4.235e-05   
+      74             76          4.699e-02      2.396e-08      1.420e-03      7.901e-04      5.806e-05      1.040e+01      5.237e-02      7.901e-05   
+  [it   75] bn 2.6743e-02  L 1.000  kappa 0.450  convex 0.129  d_cc 1.551  d_pc 1.163  -> FAILS L  demount: min hinge clearance +0.325 m, worst arc blocked 0.00%  -> REMOVABLE
+      75             77          4.699e-02     -1.148e-07      2.544e-04      1.111e-04      5.619e-05      1.040e+01      5.237e-02      7.901e-05   
+      76             78          4.699e-02     -9.382e-07      1.476e-03      2.777e-04      4.335e-05      1.040e+01      5.644e-02      2.777e-05   
+      77             79          4.699e-02     -2.522e-06      1.813e-03      8.089e-05      3.837e-05      1.040e+01      5.644e-02      2.777e-05   
+      78             80          4.699e-02     -5.597e-07      6.801e-04      3.704e-05      3.726e-05      1.040e+01      5.644e-02      2.777e-05   
+  [mem] RSS 8.37 GB  peak 8.39 GB
+      79             81          4.699e-02     -4.827e-07      7.754e-04      2.778e-04      3.633e-05      1.040e+01      5.540e-02      2.778e-05   
+      80             82          4.699e-02      9.320e-07      1.254e-03      5.446e-04      4.076e-05      1.040e+01      5.527e-02      5.446e-05   
+      81             83          4.699e-02     -2.479e-07      8.469e-04      8.551e-05      3.553e-05      1.040e+01      5.527e-02      5.446e-05   
+      82             84          4.699e-02     -3.747e-08      4.642e-04      1.912e-05      3.457e-05      1.040e+01      5.536e-02      1.912e-06   
+      83             85          4.699e-02     -1.765e-07      5.470e-04      2.770e-06      3.321e-05      1.040e+01      5.536e-02      1.912e-06   
+      84             86          4.699e-02     -1.349e-10      4.257e-04      4.713e-06      3.317e-05      1.040e+01      5.536e-02      1.912e-06   
+      85             87          4.699e-02      7.376e-10      5.020e-04      1.408e-04      3.329e-05      1.040e+01      5.578e-02      1.408e-05   
+      86             88          4.699e-02     -5.385e-07      1.743e-03      3.031e-05      2.943e-05      1.040e+01      5.578e-02      1.408e-05   
+      87             89          4.699e-02     -1.612e-07      9.831e-04      8.599e-05      2.892e-05      1.040e+01      5.791e-02      8.599e-06   
+      88             90          4.699e-02     -2.567e-07      1.431e-03      3.354e-05      2.372e-05      1.040e+01      5.791e-02      8.599e-06   
+      89             91          4.699e-02     -5.520e-08      2.400e-04      2.310e-05      2.259e-05      1.040e+01      5.791e-02      8.599e-06   
+  [mem] RSS 8.38 GB  peak 8.39 GB
+      90             92          4.699e-02     -1.222e-07      6.099e-04      1.113e-04      2.024e-05      1.040e+01      5.973e-02      1.113e-05   
+      91             93          4.699e-02     -9.490e-08      3.869e-04      9.603e-05      2.019e-05      1.040e+01      5.973e-02      1.113e-05   
+      92             94          4.699e-02      9.350e-09      1.014e-05      5.795e-05      2.024e-05      1.040e+01      6.145e-02      5.795e-06   
+      93             95          4.699e-02      3.594e-08      1.774e-05      1.596e-04      2.022e-05      1.040e+01      6.322e-02      1.596e-05   
+      94             96          4.699e-02     -2.737e-07      9.650e-04      1.364e-04      2.012e-05      1.040e+01      6.322e-02      1.596e-05   
+      95             97          4.699e-02     -7.051e-07      2.604e-03      7.836e-05      1.983e-05      1.040e+01      6.322e-02      1.596e-05   
+      96             98          4.699e-02     -1.936e-07      1.886e-05      2.096e-04      1.985e-05      1.040e+01      6.381e-02      2.096e-05   
+      97             99          4.699e-02     -8.961e-08      4.407e-04      1.881e-04      1.982e-05      1.040e+01      6.381e-02      2.096e-05   
+      98             100         4.700e-02     -1.934e-07      9.891e-04      1.425e-04      1.973e-05      1.040e+01      6.381e-02      2.096e-05   
+      99             101         4.700e-02     -1.659e-07      9.485e-04      1.045e-04      1.965e-05      1.040e+01      6.381e-02      2.096e-05   
+  [it  100] bn 2.6745e-02  L 1.000  kappa 0.451  convex 0.040  d_cc 1.551  d_pc 1.163  -> FAILS L  demount: min hinge clearance +0.325 m, worst arc blocked 0.00%  -> REMOVABLE
+      100            102         4.700e-02     -5.475e-08      3.230e-04      9.329e-05      1.962e-05      1.040e+01      6.381e-02      2.096e-05   
+  [mem] RSS 8.40 GB  peak 8.40 GB
+      101            103         4.700e-02     -3.514e-07      2.140e-03      2.223e-05      1.939e-05      1.040e+01      6.381e-02      2.096e-05   
+      102            104         4.700e-02     -9.281e-08      9.023e-04      4.014e-05      1.927e-05      1.040e+01      6.276e-02      4.014e-06   
+      103            105         4.700e-02      3.591e-08      4.276e-05      7.810e-05      1.931e-05      1.040e+01      6.174e-02      7.810e-06   
+      104            106         4.700e-02     -2.292e-07      2.872e-05      2.691e-04      1.942e-05      1.040e+01      6.081e-02      2.691e-05   
+      105            107         4.700e-02      2.259e-07      2.049e-05      6.290e-05      1.948e-05      1.040e+01      5.990e-02      6.290e-06   
+      106            108         4.700e-02      5.571e-07      5.340e-04      4.694e-05      2.026e-05      1.040e+01      5.990e-02      6.290e-06   
+      107            109         4.700e-02      6.255e-08      6.585e-05      4.523e-05      2.034e-05      1.040e+01      5.990e-02      6.290e-06   
+      108            110         4.699e-02      1.006e-07      2.332e-05      4.455e-04      2.043e-05      1.040e+01      5.960e-02      4.455e-05   
+      109            111         4.699e-02      1.444e-08      2.279e-05      7.631e-04      2.045e-05      1.040e+01      5.932e-02      7.631e-05   
+      110            112         4.699e-02      4.291e-08      8.725e-05      1.031e-03      2.051e-05      1.040e+01      5.908e-02      1.031e-04   
+      111            113         4.699e-02     -7.985e-08      4.099e-05      1.131e-04      2.046e-05      1.040e+01      5.881e-02      1.131e-05   
+      112            114         4.700e-02     -4.510e-07      3.092e-05      1.029e-04      2.039e-05      1.040e+01      5.846e-02      1.029e-05   
+  [mem] RSS 8.42 GB  peak 8.42 GB
+      113            115         4.700e-02      7.804e-08      1.607e-04      9.867e-05      2.044e-05      1.040e+01      5.846e-02      1.029e-05   
+      114            116         4.699e-02      4.830e-07      3.813e-05      5.415e-05      2.048e-05      1.040e+01      5.817e-02      5.415e-06   
+      115            117         4.699e-02      2.380e-07      8.035e-04      4.422e-05      2.068e-05      1.040e+01      5.817e-02      5.415e-06   
+      116            118         4.699e-02      1.947e-08      6.469e-05      5.878e-05      2.070e-05      1.040e+01      5.820e-02      5.878e-06   
+      117            119         4.699e-02      3.114e-07      1.398e-03      4.027e-05      2.078e-05      1.040e+01      5.820e-02      5.878e-06   
+      118            120         4.699e-02     -1.837e-07      1.593e-05      2.539e-04      2.075e-05      1.040e+01      5.874e-02      2.539e-05   
+      119            121         4.699e-02      7.740e-08      4.150e-04      2.292e-04      2.071e-05      1.040e+01      5.874e-02      2.539e-05   
+      120            122         4.699e-02      1.479e-08      8.094e-05      4.792e-04      2.070e-05      1.040e+01      5.938e-02      4.792e-05   
+      121            123         4.699e-02      1.762e-07      2.470e-05      5.925e-05      2.077e-05      1.040e+01      6.002e-02      5.925e-06   
+      122            124         4.699e-02      6.715e-08      3.680e-05      5.645e-04      2.113e-05      1.040e+01      6.066e-02      5.645e-05   
+      123            125         4.699e-02     -1.152e-07      4.684e-04      5.010e-04      2.097e-05      1.040e+01      6.066e-02      5.645e-05   
+      124            126         4.699e-02     -3.498e-08      2.534e-05      7.951e-05      2.086e-05      1.040e+01      6.122e-02      7.951e-06   
+  [mem] RSS 8.44 GB  peak 8.44 GB
+  [it  125] bn 2.6745e-02  L 1.000  kappa 0.451  convex 0.042  d_cc 1.551  d_pc 1.163  -> FAILS L  demount: min hinge clearance +0.325 m, worst arc blocked 0.00%  -> REMOVABLE
+      125            127         4.699e-02     -3.140e-07      8.552e-04      6.187e-05      2.048e-05      1.040e+01      6.122e-02      7.951e-06   
+      126            128         4.699e-02     -1.589e-07      4.840e-04      5.676e-05      2.022e-05      1.040e+01      6.122e-02      7.951e-06   
+      127            129         4.699e-02     -1.456e-07      4.542e-04      4.820e-05      1.998e-05      1.040e+01      6.122e-02      7.951e-06   
+      128            130         4.699e-02     -6.422e-08      2.121e-04      4.443e-05      1.986e-05      1.040e+01      6.122e-02      7.951e-06   
+      129            131         4.700e-02     -3.414e-07      1.158e-03      2.341e-05      1.922e-05      1.040e+01      6.122e-02      7.951e-06   
+      130            132         4.700e-02     -1.344e-07      1.114e-05      2.009e-04      1.912e-05      1.040e+01      6.117e-02      2.009e-05   
+      131            133         4.700e-02      1.527e-07      1.657e-05      4.958e-05      1.922e-05      1.040e+01      6.113e-02      4.958e-06   
+      132            134         4.700e-02      9.025e-08      2.855e-05      4.343e-04      1.967e-05      1.040e+01      6.115e-02      4.343e-05   
+      133            135         4.699e-02      2.981e-07      4.975e-04      3.432e-04      2.011e-05      1.040e+01      6.115e-02      4.343e-05   
+      134            136         4.699e-02      2.491e-07      4.413e-04      2.563e-04      2.052e-05      1.040e+01      6.115e-02      4.343e-05   
+      135            137         4.699e-02      1.640e-07      3.240e-04      1.895e-04      2.083e-05      1.040e+01      6.115e-02      4.343e-05   
+      136            138         4.699e-02      2.524e-08      5.321e-05      2.181e-04      2.087e-05      1.040e+01      6.180e-02      2.181e-05   
+      137            139         4.699e-02      4.132e-08      2.834e-04      1.529e-04      2.101e-05      1.040e+01      6.244e-02      1.529e-05   
+  [mem] RSS 8.46 GB  peak 8.46 GB
+      138            140         4.699e-02     -1.694e-07      1.082e-03      4.182e-05      2.109e-05      1.040e+01      6.244e-02      1.529e-05   
+      139            141         4.699e-02     -9.780e-09      7.884e-05      3.801e-05      2.109e-05      1.040e+01      6.244e-02      1.529e-05   
+      140            142         4.699e-02     -5.083e-09      4.120e-05      3.607e-05      2.109e-05      1.040e+01      6.244e-02      1.529e-05   
+      141            143         4.699e-02     -8.118e-09      2.196e-06      2.366e-05      2.108e-05      1.040e+01      6.273e-02      2.366e-06   
+      142            144         4.699e-02     -2.511e-08      9.683e-06      2.481e-05      2.116e-05      1.040e+01      6.302e-02      2.481e-06   
+      143            145         4.699e-02      1.124e-07      1.230e-05      4.115e-05      2.115e-05      1.040e+01      6.331e-02      4.115e-06   
+      144            146         4.699e-02     -9.310e-08      1.066e-04      3.776e-05      2.104e-05      1.040e+01      6.331e-02      4.115e-06   
+      145            147         4.699e-02     -1.536e-07      1.565e-05      1.561e-04      2.105e-05      1.040e+01      6.351e-02      1.561e-05   
+      146            148         4.699e-02      8.904e-08      1.789e-05      5.608e-05      2.103e-05      1.040e+01      6.370e-02      5.608e-06   
+      147            149         4.699e-02     -1.472e-07      2.676e-05      6.267e-04      2.101e-05      1.040e+01      6.387e-02      6.267e-05   
+      148            150         4.699e-02      1.045e-07      2.756e-05      6.457e-05      2.097e-05      1.040e+01      6.402e-02      6.457e-06   
+      149            151         4.699e-02     -1.207e-07      4.348e-05      7.662e-04      2.080e-05      1.040e+01      6.412e-02      7.662e-05   
+  [mem] RSS 8.48 GB  peak 8.48 GB
+  [it  150] bn 2.6745e-02  L 1.000  kappa 0.451  convex 0.047  d_cc 1.552  d_pc 1.162  -> FAILS L  demount: min hinge clearance +0.326 m, worst arc blocked 0.00%  -> REMOVABLE
+      150            152         4.699e-02     -6.964e-08      9.250e-05      7.311e-04      2.056e-05      1.040e+01      6.412e-02      7.662e-05   
+      151            153         4.700e-02     -1.598e-07      2.149e-04      6.503e-04      1.999e-05      1.040e+01      6.412e-02      7.662e-05   
+      152            154         4.700e-02     -1.287e-07      1.571e-04      5.945e-04      1.959e-05      1.040e+01      6.412e-02      7.662e-05   
+      153            155         4.700e-02     -9.858e-08      1.226e-04      5.519e-04      1.929e-05      1.040e+01      6.412e-02      7.662e-05   
+      154            156         4.700e-02     -8.296e-08      1.062e-04      5.158e-04      1.904e-05      1.040e+01      6.412e-02      7.662e-05   
+      155            157         4.700e-02     -1.721e-07      2.237e-04      4.411e-04      1.851e-05      1.040e+01      6.412e-02      7.662e-05   
+      156            158         4.700e-02     -8.682e-07      1.170e-03      1.171e-04      1.583e-05      1.040e+01      6.282e-02      1.171e-05   
+      157            159         4.700e-02     -1.193e-07      2.501e-05      7.160e-05      1.575e-05      1.040e+01      6.153e-02      7.160e-06   
+      158            160         4.700e-02      3.303e-07      5.688e-05      3.376e-04      1.752e-05      1.040e+01      6.153e-02      7.160e-06   
+      159            161         4.700e-02     -8.076e-08      2.144e-05      4.951e-05      1.576e-05      1.040e+01      6.029e-02      4.951e-06   
+      160            162         4.700e-02      2.474e-08      2.547e-05      7.073e-05      1.574e-05      1.040e+01      5.908e-02      7.073e-06   
+      161            163         4.700e-02     -5.734e-07      4.160e-05      5.091e-04      1.560e-05      1.040e+01      5.783e-02      5.091e-05   
+      162            164         4.700e-02      4.158e-07      4.007e-05      1.375e-04      1.542e-05      1.040e+01      5.659e-02      1.375e-05   
+  [mem] RSS 8.50 GB  peak 8.50 GB
+      163            165         4.700e-02      4.352e-08      4.403e-05      2.418e-04      1.539e-05      1.040e+01      5.539e-02      2.418e-05   
+      164            166         4.700e-02      1.543e-07      1.765e-04      2.121e-04      1.533e-05      1.040e+01      5.539e-02      2.418e-05   
+      165            167         4.700e-02     -2.730e-08      7.580e-05      3.947e-04      1.536e-05      1.040e+01      5.539e-02      2.418e-05   
+      166            168         4.700e-02      1.774e-07      2.590e-05      4.994e-04      1.535e-05      1.040e+01      5.536e-02      4.994e-05   
+      167            169         4.700e-02      1.687e-08      1.915e-05      1.307e-03      1.534e-05      1.040e+01      5.536e-02      1.307e-04   
+      168            170         4.700e-02      1.073e-07      1.218e-04      1.282e-03      1.528e-05      1.040e+01      5.536e-02      1.307e-04   
+      169            171         4.700e-02     -3.363e-08      6.632e-05      3.542e-04      1.525e-05      1.040e+01      5.536e-02      3.542e-05   
+      170            172         4.700e-02     -9.031e-07      8.280e-05      5.463e-04      1.515e-05      1.040e+01      5.536e-02      3.542e-05   
+      171            173         4.700e-02      4.974e-07      5.301e-05      1.231e-04      1.512e-05      1.040e+01      5.536e-02      1.231e-05   
+      172            174         4.700e-02      8.152e-08      7.665e-05      1.215e-04      1.507e-05      1.040e+01      5.536e-02      1.231e-05   
+      173            175         4.699e-02      1.479e-06      1.380e-03      9.085e-05      1.424e-05      1.040e+01      5.536e-02      1.231e-05   
+      174            176         4.699e-02      4.934e-07      5.917e-05      4.205e-05      2.149e-05      1.040e+01      5.536e-02      1.231e-05   
+  [mem] RSS 8.52 GB  peak 8.52 GB
+  [it  175] bn 2.6745e-02  L 1.000  kappa 0.451  convex 0.040  d_cc 1.551  d_pc 1.162  -> FAILS L  demount: min hinge clearance +0.326 m, worst arc blocked 0.00%  -> REMOVABLE
+      175            177         4.699e-02      1.076e-07      1.013e-04      4.095e-05      2.114e-05      1.040e+01      5.536e-02      1.231e-05   
+      176            178         4.699e-02      7.061e-07      6.713e-04      1.188e-04      3.097e-05      1.040e+01      5.536e-02      1.231e-05   
+      177            179         4.699e-02      1.984e-07      2.323e-04      1.098e-04      3.447e-05      1.040e+01      5.536e-02      1.231e-05   
+      178            180         4.699e-02      1.086e-06      1.275e-03      1.776e-05      5.305e-05      1.040e+01      5.536e-02      1.231e-05   
+      179            181         4.699e-02      4.243e-07      5.098e-04      1.332e-05      6.021e-05      1.040e+01      5.536e-02      1.231e-05   
+      180            182         4.699e-02      4.902e-08      6.496e-05      1.284e-05      6.096e-05      1.040e+01      5.536e-02      1.231e-05   
+      181            183         4.699e-02      9.871e-07      1.325e-03      4.393e-05      7.588e-05      1.040e+01      5.536e-02      1.231e-05   
+      182            184         4.699e-02      2.831e-07      6.331e-04      2.656e-05      7.945e-05      1.040e+01      5.536e-02      1.231e-05   
+      183            185         4.699e-02      6.309e-09      1.639e-05      7.402e-04      7.952e-05      1.040e+01      5.656e-02      7.402e-05   
+      184            186         4.699e-02      4.112e-09      1.327e-04      5.876e-04      8.021e-05      1.040e+01      6.152e-02      5.876e-05   
+      185            187         4.699e-02     -2.019e-06      2.841e-04      2.692e-03      7.292e-05      1.040e+01      6.152e-02      5.876e-05   
+      186            188         4.699e-02      8.600e-07      1.566e-04      2.498e-04      7.039e-05      1.040e+01      6.152e-02      5.876e-05   
+      187            189         4.699e-02      3.605e-07      5.670e-04      4.633e-03      1.009e-04      1.040e+01      6.152e-02      5.876e-05   
+      188            190         4.699e-02     -4.428e-07      1.940e-04      3.076e-04      7.041e-05      1.040e+01      6.152e-02      5.876e-05   
+  [mem] RSS 8.55 GB  peak 8.55 GB
+      189            191         4.699e-02     -1.924e-06      1.429e-04      6.923e-04      4.337e-05      1.040e+01      6.152e-02      5.876e-05   
+      190            192         4.699e-02      6.504e-07      9.370e-05      2.023e-04      4.062e-05      1.040e+01      6.152e-02      5.876e-05   
+      191            193         4.699e-02     -1.332e-06      1.783e-04      2.076e-03      3.453e-05      1.040e+01      6.152e-02      5.876e-05   
+      192            194         4.699e-02      4.106e-07      9.097e-05      1.463e-04      3.352e-05      1.040e+01      6.152e-02      5.876e-05   
+      193            195         4.699e-02      9.152e-07      2.800e-04      7.372e-04      9.093e-05      1.040e+01      6.152e-02      5.876e-05   
+      194            196         4.699e-02     -1.457e-06      1.318e-04      1.167e-04      2.391e-05      1.040e+01      6.152e-02      5.876e-05   
+      195            197         4.700e-02     -8.586e-07      1.276e-04      1.403e-03      1.962e-05      1.040e+01      6.152e-02      5.876e-05   
+      196            198         4.700e-02      2.492e-07      6.016e-05      1.894e-03      1.924e-05      1.040e+01      6.207e-02      1.894e-04   
+      197            199         4.699e-02      2.322e-07      7.398e-05      3.227e-04      1.951e-05      1.040e+01      6.252e-02      3.227e-05   
+      198            200         4.699e-02      7.923e-08      9.030e-05      2.536e-04      2.688e-05      1.040e+01      6.252e-02      3.227e-05   
+      199            201         4.700e-02     -4.900e-07      1.256e-04      2.133e-04      2.079e-05      1.040e+01      6.252e-02      3.227e-05   
+  [mem] RSS 8.57 GB  peak 8.57 GB
+  [it  200] bn 2.6747e-02  L 1.000  kappa 0.451  convex 0.040  d_cc 1.551  d_pc 1.163  -> FAILS L  demount: min hinge clearance +0.326 m, worst arc blocked 0.00%  -> REMOVABLE
+      200            202         4.700e-02      6.239e-09      5.147e-04      4.508e-04      2.059e-05      1.040e+01      6.184e-02      4.508e-05   
+      201            203         4.700e-02     -3.463e-07      1.316e-04      2.228e-04      4.372e-05      1.040e+01      6.184e-02      4.508e-05   
+      202            204         4.700e-02      2.503e-08      4.672e-04      1.375e-03      4.214e-05      1.040e+01      6.119e-02      1.375e-04   
+      203            205         4.700e-02      1.192e-07      8.264e-04      1.167e-03      3.245e-05      1.040e+01      6.119e-02      1.375e-04   
+      204            206         4.700e-02      2.853e-07      1.505e-04      2.909e-04      3.526e-05      1.040e+01      6.119e-02      1.375e-04   
+      205            207         4.700e-02     -3.330e-07      1.576e-04      1.483e-03      9.162e-06      1.040e+01      6.119e-02      1.375e-04   
+      206            208         4.700e-02      2.549e-07      7.061e-05      1.095e-03      2.516e-05      1.040e+01      6.080e-02      1.095e-04   
+      207            209         4.700e-02     -7.871e-08      6.263e-05      2.298e-04      1.388e-05      1.040e+01      6.037e-02      2.298e-05   
+      208            210         4.700e-02     -1.038e-06      1.134e-04      6.336e-04      8.733e-06      1.040e+01      6.037e-02      2.298e-05   
+      209            211         4.700e-02      2.552e-08      1.224e-04      1.774e-03      8.740e-06      1.040e+01      5.963e-02      1.774e-04   
+      210            212         4.700e-02      6.553e-07      1.078e-04      1.836e-04      8.670e-06      1.040e+01      5.883e-02      1.836e-05   
+      211            213         4.700e-02      4.159e-07      1.248e-04      3.707e-04      5.204e-05      1.040e+01      5.883e-02      1.836e-05   
+      212            214         4.700e-02     -4.614e-08      3.556e-05      4.706e-04      4.172e-05      1.040e+01      5.773e-02      4.706e-05   
+      213            215         4.700e-02     -6.559e-07      6.807e-05      7.116e-05      8.459e-06      1.040e+01      5.773e-02      4.706e-05   
+  [mem] RSS 8.59 GB  peak 8.59 GB
+      214            216         4.700e-02      1.408e-07      5.820e-04      6.309e-05      8.850e-06      1.040e+01      5.773e-02      4.706e-05   
+      215            217         4.700e-02      6.205e-08      2.198e-04      5.971e-05      9.026e-06      1.040e+01      5.773e-02      4.706e-05   
+      216            218         4.700e-02      2.469e-08      8.266e-05      1.568e-04      9.098e-06      1.040e+01      5.692e-02      1.568e-05   
+      217            219         4.700e-02      2.545e-08      7.173e-05      4.504e-04      9.173e-06      1.040e+01      5.614e-02      4.504e-05   
+      218            220         4.700e-02      3.520e-08      5.927e-05      2.036e-04      1.758e-05      1.040e+01      5.551e-02      2.036e-05   
+      219            221         4.700e-02      4.902e-08      1.011e-04      9.642e-05      1.778e-05      1.040e+01      5.551e-02      2.036e-05   
+      220            222         4.700e-02      2.445e-07      6.813e-05      6.154e-05      1.513e-05      1.040e+01      5.551e-02      2.036e-05   
+      221            223         4.700e-02      5.753e-08      2.050e-04      5.843e-05      1.416e-05      1.040e+01      5.551e-02      2.036e-05   
+      222            224         4.700e-02      8.748e-08      2.973e-04      5.380e-05      1.273e-05      1.040e+01      5.551e-02      2.036e-05   
+      223            225         4.700e-02      1.503e-08      4.731e-05      5.251e-04      1.249e-05      1.040e+01      5.534e-02      5.251e-05   
+      224            226         4.700e-02     -1.125e-07      4.527e-05      9.644e-05      9.847e-06      1.040e+01      5.535e-02      9.644e-06   
+  [it  225] bn 2.6746e-02  L 1.000  kappa 0.451  convex 0.040  d_cc 1.551  d_pc 1.163  -> FEASIBLE  demount: min hinge clearance +0.325 m, worst arc blocked 0.00%  -> REMOVABLE
+      225            227         4.700e-02     -6.148e-07      4.845e-05      3.136e-04      9.726e-06      1.040e+01      5.535e-02      9.644e-06   
+  [mem] RSS 8.62 GB  peak 8.62 GB
+      226            228         4.700e-02      2.534e-07      6.575e-04      2.542e-04      1.062e-05      1.040e+01      5.535e-02      9.644e-06   
+      227            229         4.700e-02      1.883e-08      4.191e-05      9.052e-04      1.069e-05      1.040e+01      5.537e-02      9.052e-05   
+      228            230         4.700e-02      3.794e-07      4.549e-05      1.138e-04      1.071e-05      1.040e+01      5.538e-02      1.138e-05   
+      229            231         4.700e-02      7.076e-08      1.871e-04      1.066e-04      1.078e-05      1.040e+01      5.538e-02      1.138e-05   
+      230            232         4.699e-02      4.362e-07      5.853e-05      2.018e-04      2.134e-05      1.040e+01      5.538e-02      1.138e-05   
+      231            233         4.699e-02     -1.235e-07      2.231e-05      1.511e-04      1.930e-05      1.040e+01      5.538e-02      1.511e-05   
+      232            234         4.699e-02      1.116e-08      8.627e-05      2.439e-04      1.871e-05      1.040e+01      5.538e-02      2.439e-05   
+      233            235         4.700e-02     -6.166e-07      4.607e-05      5.401e-04      1.069e-05      1.040e+01      5.538e-02      5.401e-05   
+      234            236         4.700e-02      1.332e-07      3.509e-05      1.109e-04      1.064e-05      1.040e+01      5.538e-02      1.109e-05   
+      235            237         4.700e-02      1.809e-07      7.504e-05      4.160e-04      1.039e-05      1.040e+01      5.538e-02      1.109e-05   
+      236            238         4.700e-02      3.422e-09      2.632e-05      1.205e-03      1.031e-05      1.040e+01      5.538e-02      1.205e-04   
+      237            239         4.700e-02      2.049e-08      2.410e-04      1.829e-03      9.455e-06      1.040e+01      5.538e-02      1.829e-04   
+      238            240         4.700e-02      1.731e-08      3.273e-04      2.167e-03      8.195e-06      1.040e+01      5.537e-02      2.167e-04   
+  [mem] RSS 8.64 GB  peak 8.64 GB
+      239            241         4.700e-02      5.958e-08      1.053e-04      2.210e-04      9.042e-06      1.040e+01      5.537e-02      2.210e-05   
+      240            242         4.700e-02     -5.646e-08      1.118e-03      4.683e-04      4.395e-06      1.040e+01      5.537e-02      2.210e-05   
+      241            243         4.699e-02      1.069e-06      1.315e-03      3.617e-04      1.840e-05      1.040e+01      5.537e-02      2.210e-05   
+      242            244         4.699e-02      9.856e-08      1.035e-04      4.128e-04      3.165e-05      1.040e+01      5.537e-02      2.210e-05   
+      243            245         4.699e-02      4.367e-07      4.087e-05      5.497e-04      3.310e-05      1.040e+01      5.631e-02      5.497e-05   
+      244            246         4.699e-02     -1.690e-07      5.296e-04      5.099e-04      3.399e-05      1.040e+01      5.631e-02      5.497e-05   
+      245            247         4.699e-02      2.231e-07      2.412e-04      2.510e-04      3.690e-05      1.040e+01      5.631e-02      5.497e-05   
+      246            248         4.699e-02     -9.897e-08      3.428e-04      2.399e-04      3.548e-05      1.040e+01      5.631e-02      5.497e-05   
+      247            249         4.699e-02     -6.944e-08      2.457e-04      2.320e-04      3.447e-05      1.040e+01      5.631e-02      5.497e-05   
+      248            250         4.699e-02     -8.752e-08      3.147e-04      2.220e-04      3.320e-05      1.040e+01      5.631e-02      5.497e-05   
+      249            251         4.700e-02     -1.422e-06      1.104e-04      3.871e-04      2.955e-05      1.040e+01      5.631e-02      5.497e-05   
+  [it  250] bn 2.6746e-02  L 1.000  kappa 0.451  convex 0.055  d_cc 1.551  d_pc 1.163  -> FAILS L  demount: min hinge clearance +0.325 m, worst arc blocked 0.00%  -> REMOVABLE
+      250            252         4.699e-02      8.881e-07      8.479e-05      1.390e-04      3.001e-05      1.040e+01      5.631e-02      5.497e-05   
+      251            253         4.700e-02     -7.353e-07      3.826e-03      6.672e-05      4.026e-05      1.040e+01      5.631e-02      5.497e-05   
+  [mem] RSS 8.67 GB  peak 8.67 GB
+      252            254         4.700e-02     -1.649e-08      1.693e-04      6.425e-05      4.074e-05      1.040e+01      5.631e-02      5.497e-05   
+      253            255         4.700e-02     -5.066e-07      7.190e-05      5.070e-04      4.106e-05      1.040e+01      5.631e-02      5.497e-05   
+      254            256         4.700e-02      2.244e-07      3.269e-05      1.924e-04      4.100e-05      1.040e+01      6.041e-02      1.924e-05   
+      255            257         4.700e-02     -4.727e-08      6.682e-05      1.371e-04      3.320e-05      1.040e+01      6.041e-02      1.924e-05   
+      256            258         4.700e-02     -4.186e-07      1.238e-03      1.013e-04      3.130e-05      1.040e+01      6.041e-02      1.924e-05   
+      257            259         4.700e-02     -4.047e-07      7.707e-05      2.539e-04      3.124e-05      1.040e+01      6.041e-02      1.924e-05   
+      258            260         4.700e-02     -1.431e-07      7.258e-04      2.075e-04      3.043e-05      1.040e+01      6.041e-02      1.924e-05   
+      259            261         4.700e-02     -5.996e-08      3.300e-04      1.874e-04      3.012e-05      1.040e+01      6.041e-02      1.924e-05   
+      260            262         4.700e-02      1.165e-07      2.861e-05      4.531e-04      2.970e-05      1.040e+01      6.338e-02      4.531e-05   
+      261            263         4.700e-02      1.153e-07      1.468e-04      4.076e-04      2.792e-05      1.040e+01      6.338e-02      4.531e-05   
+      262            264         4.700e-02      1.516e-07      1.919e-04      3.669e-04      2.564e-05      1.040e+01      6.338e-02      4.531e-05   
+      263            265         4.700e-02     -5.769e-07      1.032e-04      1.686e-04      1.952e-05      1.040e+01      6.338e-02      4.531e-05   
+      264            266         4.700e-02      6.349e-08      9.071e-05      1.560e-04      1.853e-05      1.040e+01      6.338e-02      4.531e-05   
+      265            267         4.700e-02      9.690e-08      1.345e-04      1.376e-04      1.713e-05      1.040e+01      6.338e-02      4.531e-05   
+  [mem] RSS 8.69 GB  peak 8.69 GB
+      266            268         4.700e-02      4.112e-07      4.649e-05      3.785e-04      1.677e-05      1.040e+01      6.506e-02      3.785e-05   
+      267            269         4.700e-02     -9.231e-07      1.104e-04      5.894e-04      1.733e-05      1.040e+01      6.506e-02      3.785e-05   
+      268            270         4.700e-02      9.360e-08      1.751e-04      5.765e-04      1.733e-05      1.040e+01      6.506e-02      3.785e-05   
+      269            271         4.700e-02      3.855e-07      7.269e-04      5.231e-04      1.732e-05      1.040e+01      6.506e-02      3.785e-05   
+      270            272         4.700e-02      9.078e-08      1.777e-04      5.102e-04      1.730e-05      1.040e+01      6.506e-02      3.785e-05   
+      271            273         4.700e-02      8.602e-08      1.698e-04      4.978e-04      1.727e-05      1.040e+01      6.506e-02      3.785e-05   
+      272            274         4.700e-02      8.036e-08      1.602e-04      4.861e-04      1.724e-05      1.040e+01      6.506e-02      3.785e-05   
+      273            275         4.700e-02      1.293e-07      3.144e-04      4.446e-04      1.673e-05      1.040e+01      6.506e-02      3.785e-05   
+      274            276         4.700e-02      2.073e-08      5.458e-05      1.406e-03      1.662e-05      1.040e+01      6.617e-02      1.406e-04   
+  [it  275] bn 2.6745e-02  L 1.000  kappa 0.451  convex 0.040  d_cc 1.551  d_pc 1.163  -> FAILS L  demount: min hinge clearance +0.325 m, worst arc blocked 0.00%  -> REMOVABLE
+      275            277         4.700e-02      7.289e-07      1.102e-04      2.806e-04      1.660e-05      1.040e+01      6.617e-02      1.406e-04   
+      276            278         4.699e-02      4.077e-07      1.243e-03      1.580e-04      1.827e-05      1.040e+01      6.617e-02      1.406e-04   
+      277            279         4.699e-02      3.341e-07      7.964e-05      2.059e-04      4.034e-05      1.040e+01      6.713e-02      2.059e-05   
+      278            280         4.699e-02      6.222e-08      6.661e-04      1.815e-04      3.482e-05      1.040e+01      6.713e-02      2.059e-05   
+  [mem] RSS 8.72 GB  peak 8.72 GB
+      279            281         4.699e-02      2.410e-08      2.806e-04      3.070e-04      3.264e-05      1.040e+01      6.792e-02      3.070e-05   
+      280            282         4.700e-02     -1.383e-06      1.238e-04      1.988e-04      1.266e-05      1.040e+01      6.792e-02      3.070e-05   
+      281            283         4.700e-02      2.790e-07      4.599e-05      1.090e-04      1.206e-05      1.040e+01      6.792e-02      3.070e-05   
+      282            284         4.700e-02      8.953e-08      6.045e-04      9.750e-05      1.033e-05      1.040e+01      6.792e-02      3.070e-05   
+      283            285         4.700e-02     -3.188e-07      4.041e-05      4.904e-04      1.013e-05      1.040e+01      6.849e-02      4.904e-05   
+      284            286         4.699e-02      8.268e-07      8.897e-05      1.371e-04      9.820e-06      1.040e+01      6.849e-02      4.904e-05   
+      285            287         4.699e-02      2.143e-07      7.338e-05      3.085e-04      1.767e-05      1.040e+01      6.849e-02      4.904e-05   
+      286            288         4.699e-02      1.665e-08      2.777e-04      5.151e-04      1.753e-05      1.040e+01      6.904e-02      5.151e-05   
+      287            289         4.700e-02     -3.398e-07      5.184e-05      1.490e-04      8.606e-06      1.040e+01      6.945e-02      1.490e-05   
+      288            290         4.700e-02     -3.327e-08      1.934e-04      1.427e-04      7.622e-06      1.040e+01      6.945e-02      1.490e-05   
+      289            291         4.700e-02     -5.596e-07      7.693e-05      2.167e-04      7.698e-06      1.040e+01      6.945e-02      1.490e-05   
+      290            292         4.700e-02     -3.678e-09      8.786e-05      2.125e-04      7.272e-06      1.040e+01      6.945e-02      1.490e-05   
+      291            293         4.700e-02     -1.329e-08      3.352e-04      3.653e-04      5.668e-06      1.040e+01      6.945e-02      1.490e-05   
+      292            294         4.700e-02     -5.743e-07      4.204e-04      3.302e-04      3.823e-06      1.040e+01      6.945e-02      1.490e-05   
+  [mem] RSS 8.74 GB  peak 8.74 GB
+      293            295         4.700e-02     -2.205e-07      1.152e-04      4.028e-04      2.150e-05      1.040e+01      6.945e-02      1.490e-05   
+      294            296         4.700e-02     -1.061e-06      1.372e-03      2.755e-04      2.228e-05      1.040e+01      6.945e-02      1.490e-05   
+      295            297         4.700e-02     -1.572e-07      1.902e-04      2.620e-04      2.456e-05      1.040e+01      6.945e-02      1.490e-05   
+      296            298         4.700e-02     -1.585e-07      1.927e-04      2.485e-04      2.685e-05      1.040e+01      6.945e-02      1.490e-05   
+      297            299         4.700e-02     -7.665e-07      8.613e-05      2.266e-04      3.560e-05      1.040e+01      6.945e-02      1.490e-05   
+      298            300         4.700e-02     -1.731e-07      2.709e-04      2.085e-04      3.805e-05      1.040e+01      6.945e-02      1.490e-05   
+      299            301         4.700e-02     -1.220e-06      1.942e-03      8.124e-05      5.544e-05      1.040e+01      6.945e-02      1.490e-05   
+  [it  300] bn 2.6748e-02  L 1.000  kappa 0.451  convex 0.086  d_cc 1.551  d_pc 1.163  -> FEASIBLE  demount: min hinge clearance +0.325 m, worst arc blocked 0.00%  -> REMOVABLE
+      300            302         4.700e-02     -6.458e-08      2.308e-04      7.377e-05      5.701e-05      1.040e+01      6.945e-02      1.490e-05   
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 4.700e-02
+         Constraint violation: 5.701e-05
+         Total delta_x: 6.357e+00
+         Iterations: 300
+         Function evaluations: 302
+         Jacobian evaluations: 300
+Timer: Solution time = 16.7 min
+Timer: Avg time per step = 3.33 sec
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: FutureWarning: constants is deprecated and will be removed in a future release. Users should not include constants in the arguments of their objective compute methods. Instead declare all the constants in the build method and use as self._constants.
+  warnings.warn(msg, err)
+==============================================================================================================
+                                                                 Start  -->   End
+Total (sum of squares):                                      3.596e-01  -->   4.700e-02, 
+Maximum absolute Boundary normal field error:                6.275e+00  -->   3.025e+00 (T m^2)
+Minimum absolute Boundary normal field error:                4.850e-04  -->   2.958e-03 (T m^2)
+Average absolute Boundary normal field error:                1.993e+00  -->   6.930e-01 (T m^2)
+Maximum absolute Boundary normal field error:                5.561e-02  -->   2.681e-02 (normalized)
+Minimum absolute Boundary normal field error:                4.298e-06  -->   2.621e-05 (normalized)
+Average absolute Boundary normal field error:                1.766e-02  -->   6.141e-03 (normalized)
+Maximum Coil length:                                         2.789e+01  -->   2.800e+01 (m)
+Minimum Coil length:                                         2.784e+01  -->   2.800e+01 (m)
+Average Coil length:                                         2.785e+01  -->   2.800e+01 (m)
+Maximum Coil length:                                         6.291e+00  -->   6.317e+00 (normalized)
+Minimum Coil length:                                         6.279e+00  -->   6.317e+00 (normalized)
+Average Coil length:                                         6.283e+00  -->   6.317e+00 (normalized)
+Maximum Coil curvature:                                      2.760e-01  -->   6.759e-01 (m^-1)
+Minimum Coil curvature:                                      1.992e-01  -->   7.130e-08 (m^-1)
+Average Coil curvature:                                      2.285e-01  -->   2.509e-01 (m^-1)
+Maximum Coil curvature:                                      1.224e+00  -->   2.996e+00 (normalized)
+Minimum Coil curvature:                                      8.831e-01  -->   3.161e-07 (normalized)
+Average Coil curvature:                                      1.013e+00  -->   1.112e+00 (normalized)
+Maximum Signed in-plane curvature:                           2.760e-01  -->   6.759e-01 (m^-1)
+Minimum Signed in-plane curvature:                           1.992e-01  -->  -6.161e-04 (m^-1)
+Average Signed in-plane curvature:                           2.285e-01  -->   2.509e-01 (m^-1)
+Maximum Signed in-plane curvature:                           1.224e+00  -->   2.996e+00 (normalized)
+Minimum Signed in-plane curvature:                           8.831e-01  -->  -2.731e-03 (normalized)
+Average Signed in-plane curvature:                           1.013e+00  -->   1.112e+00 (normalized)
+Maximum Hinge shadow clearance:                              3.263e+00  -->   2.973e+00 (m)
+Minimum Hinge shadow clearance:                              2.055e+00  -->   3.200e-01 (m)
+Average Hinge shadow clearance:                              2.519e+00  -->   1.650e+00 (m)
+  [mem] RSS 8.76 GB  peak 8.76 GB
+Maximum Coil-coil distance penalty:                          0.000e+00  -->   0.000e+00 (dimensionless)
+Minimum Coil-coil distance penalty:                          0.000e+00  -->   0.000e+00 (dimensionless)
+Average Coil-coil distance penalty:                          0.000e+00  -->   0.000e+00 (dimensionless)
+Maximum Plasma-coil distance penalty:                        0.000e+00  -->   0.000e+00 (dimensionless)
+Minimum Plasma-coil distance penalty:                        0.000e+00  -->   0.000e+00 (dimensionless)
+Average Plasma-coil distance penalty:                        0.000e+00  -->   0.000e+00 (dimensionless)
+Fixed parameters error:                                      0.000e+00  -->   0.000e+00 (~)
+Summed coil current error:                                   0.000e+00  -->   7.451e-09 (A)
+==============================================================================================================
+
+
+SOLVER {'wall_s': 1101.726209640503, 'message': 'Maximum number of iterations has been exceeded.', 'nit': 300, 'n_outer': 94, 'constr_violation': 5.7006408529755776e-05, 'y_absmax_final': 0.06945478072367581}
+START  bn 7.7155e-02  L 0.996  kappa 0.184  convex 0.000  d_cc 1.151  d_pc 1.114  -> FEASIBLE
+RESULT bn 2.6748e-02  L 1.000  kappa 0.451  convex 0.086  d_cc 1.551  d_pc 1.163  linked 0  -> FEASIBLE  active ['L']  demount: min hinge clearance +0.325 m, worst arc blocked 0.00%  -> REMOVABLE
+wrote work/helios/arc16/midplane/z1.50/free/result.h5, result.json, result.png

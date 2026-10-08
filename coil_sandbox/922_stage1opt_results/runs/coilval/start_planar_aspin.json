@@ -1,0 +1,97 @@
+{
+ "eq": "922_stage1opt_results/runs/live_eps1_L1_aspin/eq_lo.h5",
+ "eq_kind": "h5",
+ "vacuum": false,
+ "nc": 4,
+ "r_over_a": 2.5,
+ "rep": "planar",
+ "N": 7,
+ "B": 5,
+ "M": 3,
+ "knots": 32,
+ "method": "cubic2",
+ "from_coils": null,
+ "phase": "0",
+ "hinges": "phase",
+ "chord_angle": null,
+ "cut_angle": null,
+ "fit_deviation": null,
+ "bounds": {
+  "L": 3.2,
+  "Ltot": null,
+  "kappa": 8.0,
+  "kms": 8.0,
+  "dcc": 0.1,
+  "dpc": 0.05,
+  "convex": null,
+  "planar": null,
+  "f": 0.10094687678018198,
+  "a": 0.17160969052630937,
+  "scale": "absolute"
+ },
+ "metrics": {
+  "per_coil": [
+   {
+    "L": 2.695638715211357,
+    "kappa": 2.3308707030077453,
+    "kms": 5.432958234139812,
+    "corner": 0.0,
+    "convex": 0.0,
+    "kappa_s_min": 2.3308707030077422,
+    "planar": 0.0
+   },
+   {
+    "L": 2.695638715211357,
+    "kappa": 2.3308707030077453,
+    "kms": 5.432958234139812,
+    "corner": 0.0,
+    "convex": 0.0,
+    "kappa_s_min": 2.3308707030077422,
+    "planar": 0.0
+   },
+   {
+    "L": 2.6956387152113566,
+    "kappa": 2.3308707030077453,
+    "kms": 5.432958234139813,
+    "corner": 0.0,
+    "convex": 0.0,
+    "kappa_s_min": 2.330870703007742,
+    "planar": 0.0
+   },
+   {
+    "L": 2.695638715211357,
+    "kappa": 2.3308707030077453,
+    "kms": 5.432958234139812,
+    "corner": 0.0,
+    "convex": 0.0,
+    "kappa_s_min": 2.330870703007742,
+    "planar": 0.0
+   }
+  ],
+  "L": 2.695638715211357,
+  "L_total": 10.782554860845428,
+  "kappa": 2.3308707030077453,
+  "kms": 5.432958234139813,
+  "corner": 0.0,
+  "convex": 0.0,
+  "planar": 0.0,
+  "d_cc": 0.21531811357942227,
+  "d_pc": 0.07074094843950188,
+  "linked": 0,
+  "linked_pairs": [],
+  "bn": 0.11837515646577892,
+  "bn_max": 0.4822069912107887,
+  "bn_local": 0.11663031524564801,
+  "bn_max_T": 0.5133953630565374,
+  "vacuum": false,
+  "n_coils": 16
+ },
+ "margins": {
+  "L": 0.842387098503549,
+  "kappa": 0.29135883787596817,
+  "kMS": 0.6791197792674766,
+  "d_cc": 2.1531811357942225,
+  "d_pc": 1.4148189687900374
+ },
+ "verdict": "FEASIBLE"
+}

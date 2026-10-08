@@ -1,0 +1,97 @@
+{
+ "eq": "922_stage1opt_results/runs/live_eps1_L1_aspin3/eq_lo.h5",
+ "eq_kind": "h5",
+ "vacuum": false,
+ "nc": 4,
+ "r_over_a": 2.5,
+ "rep": "xyz",
+ "N": 7,
+ "B": 5,
+ "M": 3,
+ "knots": 32,
+ "method": "cubic2",
+ "from_coils": null,
+ "phase": "0",
+ "hinges": "phase",
+ "chord_angle": null,
+ "cut_angle": null,
+ "fit_deviation": null,
+ "bounds": {
+  "L": 3.2,
+  "Ltot": null,
+  "kappa": 8.0,
+  "kms": 8.0,
+  "dcc": 0.1,
+  "dpc": 0.05,
+  "convex": null,
+  "planar": null,
+  "f": 0.1013908791070048,
+  "a": 0.17236449448190816,
+  "scale": "absolute"
+ },
+ "metrics": {
+  "per_coil": [
+   {
+    "L": 2.7074951480204046,
+    "kappa": 2.320663551982454,
+    "kms": 5.385479321498609,
+    "corner": 0.0,
+    "convex": NaN,
+    "kappa_s_min": NaN,
+    "planar": 0.0
+   },
+   {
+    "L": 2.7074951480204055,
+    "kappa": 2.320663551982384,
+    "kms": 5.385479321498605,
+    "corner": 0.0,
+    "convex": NaN,
+    "kappa_s_min": NaN,
+    "planar": 0.0
+   },
+   {
+    "L": 2.7074951480204055,
+    "kappa": 2.3206635519823267,
+    "kms": 5.385479321498606,
+    "corner": 0.0,
+    "convex": NaN,
+    "kappa_s_min": NaN,
+    "planar": 0.0
+   },
+   {
+    "L": 2.707495148020406,
+    "kappa": 2.320663551982317,
+    "kms": 5.385479321498604,
+    "corner": 0.0,
+    "convex": NaN,
+    "kappa_s_min": NaN,
+    "planar": 0.0
+   }
+  ],
+  "L": 2.707495148020406,
+  "L_total": 10.829980592081622,
+  "kappa": 2.320663551982454,
+  "kms": 5.385479321498609,
+  "corner": 0.0,
+  "convex": NaN,
+  "planar": 0.0,
+  "d_cc": 0.15628534019042845,
+  "d_pc": 0.1007536441548506,
+  "linked": 0,
+  "linked_pairs": [],
+  "bn": 0.12221012537166537,
+  "bn_max": 0.4326412763095394,
+  "bn_local": 0.11928653760845662,
+  "bn_max_T": 0.49597477161258474,
+  "vacuum": false,
+  "n_coils": 16
+ },
+ "margins": {
+  "L": 0.8460922337563768,
+  "kappa": 0.29008294399780676,
+  "kMS": 0.6731849151873261,
+  "d_cc": 1.5628534019042843,
+  "d_pc": 2.015072883097012
+ },
+ "verdict": "FEASIBLE"
+}

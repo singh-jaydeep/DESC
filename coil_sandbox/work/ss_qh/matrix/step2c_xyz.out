@@ -1,0 +1,5 @@
+=== start ss xyz [XLA_PYTHON_CLIENT_MEM_FRACTION=0.5] 01:33:18
+=== end ss xyz [XLA_PYTHON_CLIENT_MEM_FRACTION=0.5] exit 0 02:24:14
+=== start k4b xyz 02:24:14
+=== end k4b xyz exit 0 02:38:43
+STEP2C DONE ok=1 02:38:43

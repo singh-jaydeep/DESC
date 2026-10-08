@@ -1,0 +1,14 @@
+DEVICE requested=cpu obtained=cpu (1x cpu)
+equilibrium sample_equilibria/helios_repro.h5 (h5): NFP 2 sym True M 10 N 8
+bounds (absolute, a = 1.77186 m, f = 1.04227): L 28  Ltot -  kappa 1.5  kms -  convex 0.001  planar -  dcc 1  dpc 1
+  (4 unique coils in work/helios/arc16/midplane/circles_M5.h5; bounds for them: L 28  Ltot -  kappa 1.5  kms -  convex 0.001  planar -  dcc 1  dpc 1)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+polar arcs B=2 M=5 hinges at given parameters 4.027102,5.955999;0.077011,4.599679;0.465657,4.960872;0.845822,5.170738, fit to work/helios/arc16/midplane/circles_M5.h5: 16 coils (expected 16), 4 unique
+  fit max deviation from the source coil: 11.6 mm, 14.4 mm, 14.0 mm, 10.8 mm
+  L 27.8420 m  kappa 0.334  kappa_MS 0.055  d_cc 1135.8 mm  d_pc 1081.2 mm  convexity excess 0.00e+00  corner 5 deg  linked 0
+  B.n (coils + plasma): <|B.n|>/<|B|> 7.721e-02  <|B.n|/|B|> 7.440e-02  max|B.n| 1.524 T
+  value / bound: L 0.994  kappa 0.223  convex 0.000  d_cc 1.136  d_pc 1.081  -> FEASIBLE
+wrote work/helios/arc16/midplane/z2.25/start.h5

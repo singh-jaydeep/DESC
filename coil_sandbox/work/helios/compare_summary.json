@@ -1,0 +1,88 @@
+{
+ "stopped run (paper-form convexity), it 150": {
+  "file": "work/helios/planarN7_ra2.65/ckpt_it0150.h5",
+  "verdict": "FEASIBLE",
+  "margins": {
+   "L": 0.9894,
+   "kappa": 0.3752,
+   "convex": 0.8295,
+   "d_cc": 1.615,
+   "d_pc": 1.3826
+  },
+  "bn": 0.04102966740478229,
+  "bn_local": 0.040466907228556386,
+  "bn_max_T": 0.9612899289453193,
+  "per_coil": [
+   {
+    "L": 35.619,
+    "kappa": 0.4821,
+    "convex_excess": 0.0008295149173962457,
+    "min_kappa_s": -0.00074,
+    "current_MA": 22.467
+   },
+   {
+    "L": 35.575,
+    "kappa": 0.5152,
+    "convex_excess": 0.0006696528228280485,
+    "min_kappa_s": -0.00059,
+    "current_MA": 21.144
+   },
+   {
+    "L": 34.989,
+    "kappa": 0.5627,
+    "convex_excess": 0.0007252157574217932,
+    "min_kappa_s": -0.00178,
+    "current_MA": 21.35
+   }
+  ],
+  "d_cc": 1.9380257170440365,
+  "d_pc": 1.659179875506147
+ },
+ "signed-convexity restart, it 150 (300 total)": {
+  "file": "work/helios/planarN7_ra2.65_signed_from150/ckpt_it0150.h5",
+  "verdict": "FEASIBLE",
+  "margins": {
+   "L": 1.0,
+   "kappa": 0.3981,
+   "convex": 0.2659,
+   "d_cc": 1.6829,
+   "d_pc": 1.3759
+  },
+  "bn": 0.04023347575629668,
+  "bn_local": 0.03972430072267703,
+  "bn_max_T": 0.9823018906157386,
+  "per_coil": [
+   {
+    "L": 36.0,
+    "kappa": 0.5266,
+    "convex_excess": 0.0002658946747029489,
+    "min_kappa_s": -0.00093,
+    "current_MA": 21.704
+   },
+   {
+    "L": 35.999,
+    "kappa": 0.5532,
+    "convex_excess": 3.106394221674691e-05,
+    "min_kappa_s": -0.00021,
+    "current_MA": 20.964
+   },
+   {
+    "L": 36.0,
+    "kappa": 0.5971,
+    "convex_excess": 0.00012597891116605808,
+    "min_kappa_s": -0.00025,
+    "current_MA": 22.292
+   }
+  ],
+  "d_cc": 2.0194610844271126,
+  "d_pc": 1.6510998723016723
+ },
+ "final_extra": {
+  "B_axis_T": 6.05639486982898,
+  "area_weighted_mean_absBn_T": 0.24449244716220583,
+  "area_weighted_mean_absBn_over_Baxis": 0.040369304250650655,
+  "rms_Bn_over_rms_B": 0.04804645747041997,
+  "max_absBn_T": 0.9823018906157386,
+  "plasma_only_area_weighted_mean_absBn_T": 0.16646680728376084
+ }
+}

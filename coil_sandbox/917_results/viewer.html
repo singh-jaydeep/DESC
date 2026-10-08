@@ -1,0 +1,383 @@
+<title>Helios Coil Field Error</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.27.0/plotly.min.js"></script>
+<script src="data.js"></script>
+<style>
+  :root{
+    --plane:#f7f7f5; --surface:#fcfcfb; --sunk:#eeeeea;
+    --ink:#0b0b0d; --ink-2:#52514e; --muted:#898781;
+    --line:#e1e0d9; --rule:#c9c8c0; --ring:rgba(11,11,13,.10);
+    --accent:#2a78d6; --accent-soft:rgba(42,120,214,.10);
+    --good:#0ca30c; --bad:#d03b3b;
+    --c0:#2a78d6; --c1:#eb6834; --c2:#1baf7a; --c3:#eda100;
+    --scene:#f2f2ef;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --plane:#0d0d0d; --surface:#1a1a19; --sunk:#141413;
+      --ink:#ffffff; --ink-2:#c3c2b7; --muted:#898781;
+      --line:#2c2c2a; --rule:#383835; --ring:rgba(255,255,255,.10);
+      --accent:#3987e5; --accent-soft:rgba(57,135,229,.16);
+      --good:#0ca30c; --bad:#e66767;
+      --c0:#3987e5; --c1:#d95926; --c2:#199e70; --c3:#c98500;
+      --scene:#121211;
+    }
+  }
+  :root[data-theme="dark"]{
+    --plane:#0d0d0d; --surface:#1a1a19; --sunk:#141413;
+    --ink:#ffffff; --ink-2:#c3c2b7; --muted:#898781;
+    --line:#2c2c2a; --rule:#383835; --ring:rgba(255,255,255,.10);
+    --accent:#3987e5; --accent-soft:rgba(57,135,229,.16);
+    --good:#0ca30c; --bad:#e66767;
+    --c0:#3987e5; --c1:#d95926; --c2:#199e70; --c3:#c98500;
+    --scene:#121211;
+  }
+
+  html,body{height:100%}
+  body{
+    margin:0; background:var(--plane); color:var(--ink);
+    font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+    font-size:14px; line-height:1.45;
+  }
+  .wrap{
+    max-width:1500px; margin:0 auto; padding-inline:16px;
+    padding-block:20px 28px; display:flex; flex-direction:column; gap:16px;
+  }
+
+  header h1{
+    margin:0; font-size:19px; font-weight:600; letter-spacing:-.01em; text-wrap:balance;
+  }
+  header p{
+    margin:4px 0 0; color:var(--ink-2); max-width:72ch;
+  }
+  .eyebrow{
+    font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:11px; font-weight:500;
+    letter-spacing:.09em; text-transform:uppercase; color:var(--muted); margin:0 0 6px;
+  }
+
+  .layout{display:grid; grid-template-columns:330px minmax(0,1fr); gap:16px; align-items:start}
+  @media (max-width:900px){ .layout{grid-template-columns:1fr} }
+
+  .panel{background:var(--surface); border:1px solid var(--line); border-radius:8px}
+  .panel-head{
+    padding:11px 13px; border-bottom:1px solid var(--line);
+    font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:11px; font-weight:500;
+    letter-spacing:.09em; text-transform:uppercase; color:var(--muted);
+  }
+
+  /* the selector IS the results table: picking a row is also comparing */
+  .rows{display:flex; flex-direction:column}
+  .row{
+    display:grid; grid-template-columns:1fr auto; gap:2px 10px; align-items:baseline;
+    padding:9px 13px; border:0; border-bottom:1px solid var(--line);
+    background:none; color:inherit; font:inherit; text-align:left; cursor:pointer;
+    border-left:3px solid transparent; width:100%;
+  }
+  .row:last-child{border-bottom:0}
+  .row:hover{background:var(--sunk)}
+  .row[aria-pressed="true"]{background:var(--accent-soft); border-left-color:var(--accent)}
+  .row .nm{font-weight:500}
+  .row .bn{
+    font-family:"IBM Plex Mono",ui-monospace,monospace; font-variant-numeric:tabular-nums;
+    font-size:13px; font-weight:500;
+  }
+  .row .sub{grid-column:1/-1; color:var(--muted); font-size:12px; line-height:1.35}
+  .row:focus-visible{outline:2px solid var(--accent); outline-offset:-2px}
+
+  .ctrls{padding:13px; display:flex; flex-direction:column; gap:13px}
+  .ctrl{display:flex; flex-direction:column; gap:6px}
+  .ctrl>span{
+    font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:11px; font-weight:500;
+    letter-spacing:.06em; text-transform:uppercase; color:var(--muted);
+  }
+  .seg{display:flex; border:1px solid var(--rule); border-radius:6px; overflow:hidden}
+  .seg button{
+    flex:1; padding:7px 8px; border:0; border-right:1px solid var(--rule);
+    background:var(--surface); color:var(--ink-2); font:inherit; font-size:13px; cursor:pointer;
+  }
+  .seg button:last-child{border-right:0}
+  .seg button[aria-pressed="true"]{background:var(--accent); color:#fff; font-weight:500}
+  .seg button:focus-visible{outline:2px solid var(--accent); outline-offset:-2px}
+
+  #plot{width:100%; height:min(72vh,640px); min-height:380px; background:var(--scene); border-radius:8px}
+
+  .metrics{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:1px; background:var(--line)}
+  .metric{background:var(--surface); padding:12px 13px}
+  .metric .k{
+    font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:11px; letter-spacing:.06em;
+    text-transform:uppercase; color:var(--muted);
+  }
+  .metric .v{
+    font-family:"IBM Plex Mono",ui-monospace,monospace; font-variant-numeric:tabular-nums;
+    font-size:21px; font-weight:600; letter-spacing:-.01em; margin-top:3px;
+  }
+  .metric .u{font-size:12px; color:var(--ink-2); font-weight:400}
+  .metric.lead .v{color:var(--accent)}
+
+  .geo{padding:12px 13px; display:grid; grid-template-columns:repeat(auto-fit,minmax(128px,1fr)); gap:10px 16px}
+  .geo div{display:flex; justify-content:space-between; gap:8px; border-bottom:1px dotted var(--line); padding-bottom:3px}
+  .geo dt{color:var(--muted); font-size:12px}
+  .geo dd{
+    margin:0; font-family:"IBM Plex Mono",ui-monospace,monospace;
+    font-variant-numeric:tabular-nums; font-size:12px; font-weight:500;
+  }
+  .ok{color:var(--good)} .no{color:var(--bad)}
+
+  footer{color:var(--muted); font-size:12px; max-width:88ch}
+  footer code{font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:11px; color:var(--ink-2)}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important; transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Helios · NFP 2 · 12–16 encircling coils · finite beta</p>
+    <h1>Where the coils leave field error on the plasma</h1>
+    <p>Normal field error <strong>B·n</strong> on the boundary, from the coils plus the plasma's
+      own field (virtual casing), normalised by &lt;|B|&gt;. Select a coilset to repaint the surface
+      and swap the coils. The colour scale is shared across coilsets by default, so the surfaces
+      compare directly.</p>
+  </header>
+
+  <div class="layout">
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <section class="panel">
+        <div class="panel-head">Coilsets — mean |B·n| / &lt;|B|&gt;</div>
+        <div class="rows" id="rows"></div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">View</div>
+        <div class="ctrls">
+          <label class="ctrl"><span>Coils shown</span>
+            <div class="seg" id="segCoils">
+              <button data-v="all" aria-pressed="true" id="btnAll">All coils</button>
+              <button data-v="uniq" aria-pressed="false" id="btnUniq">Unique</button>
+              <button data-v="none" aria-pressed="false">None</button>
+            </div>
+          </label>
+          <label class="ctrl"><span>Surface colour</span>
+            <div class="seg" id="segField">
+              <button data-v="signed" aria-pressed="true">Signed B·n</button>
+              <button data-v="abs" aria-pressed="false">|B·n|</button>
+              <button data-v="off" aria-pressed="false">Off</button>
+            </div>
+          </label>
+          <label class="ctrl"><span>Colour range</span>
+            <div class="seg" id="segScale">
+              <button data-v="shared" aria-pressed="true">Shared</button>
+              <button data-v="own" aria-pressed="false">Per coilset</button>
+            </div>
+          </label>
+        </div>
+      </section>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:16px;min-width:0">
+      <div id="plot"></div>
+
+      <section class="panel">
+        <div class="panel-head" id="mhead">Metrics</div>
+        <div class="metrics" id="metrics"></div>
+        <dl class="geo" id="geo"></dl>
+      </section>
+    </div>
+  </div>
+
+  <footer>
+    Coilsets in <code>917_results/*.h5</code>; the surface, field and metrics are rebuilt by
+    <code>917_results/build_data.py</code>. Mean and max are taken over the full boundary
+    (192 × 96), unweighted, matching the <code>bn</code> the sandbox run records report.
+    B_axis = 6.056 T. Length, curvature and clearance are the dense-check values against the
+    Kruger et al. bounds: L ≤ 36 m per coil, κ ≤ 1.5 /m, d_cc and d_pc ≥ 1.2 m — except
+    <em>Polar B=2, L ≤ 37 m</em>, which was optimised against a deliberately relaxed length cap
+    and so is not comparable on L, and <em>FourierXYZ, 16 coils</em>, which has 4 unique coils
+    instead of 3 and therefore 576 m of conductor against 432 m — it is not a controlled test of
+    coil count alone.
+  </footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var D = window.HELIOS_DATA, NZ = D.nzeta, NT = D.ntheta, SETS = D.coilsets;
+  var css = function(n){ return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); };
+
+  // ---- geometry: close the mesh in both angles so there is no seam --------------
+  function grid2d(get){
+    var out = [], iz, it, row;
+    for (iz = 0; iz <= NZ; iz++){
+      row = [];
+      for (it = 0; it <= NT; it++) row.push(get((iz % NZ) * NT + (it % NT)));
+      out.push(row);
+    }
+    return out;
+  }
+  var XYZ = D.xyz;
+  var GX = grid2d(function(i){ return XYZ[i*3]; });
+  var GY = grid2d(function(i){ return XYZ[i*3+1]; });
+  var GZ = grid2d(function(i){ return XYZ[i*3+2]; });
+
+  // ---- colour: diverging blue<->red with a neutral midpoint for the signed field,
+  //      one-hue blue for magnitude. Never a rainbow.
+  var DIVERGING = [[0,"#0d366b"],[0.15,"#2a78d6"],[0.35,"#9ec5f4"],[0.5,"#dcdbd3"],
+                   [0.65,"#f0a9a6"],[0.85,"#d03b3b"],[1,"#7d1d1d"]];
+  var SEQUENTIAL = [[0,"#f3f7fe"],[0.2,"#cde2fb"],[0.4,"#86b6ef"],[0.6,"#2a78d6"],
+                    [0.8,"#1c5cab"],[1,"#0d366b"]];
+
+  var sharedMax = 0;
+  SETS.forEach(function(s){ s.bn.forEach(function(v){ var a = Math.abs(v); if (a > sharedMax) sharedMax = a; }); });
+
+  var state = { set:0, coils:"all", field:"signed", scale:"shared" };
+  var plotted = false;
+
+  function colourFor(s){
+    var signed = state.field === "signed";
+    var peak = state.scale === "shared" ? sharedMax : Math.max.apply(null, s.bn.map(Math.abs));
+    var vals = grid2d(function(i){ return signed ? s.bn[i] : Math.abs(s.bn[i]); });
+    return {
+      vals: vals,
+      cmin: signed ? -peak : 0,
+      cmax: peak,
+      scale: signed ? DIVERGING : SEQUENTIAL,
+      title: signed ? "B·n / <|B|>" : "|B·n| / <|B|>"
+    };
+  }
+
+  function traces(){
+    var s = SETS[state.set], out = [], c, i, n, xs, ys, zs, j, p;
+
+    if (state.field === "off"){
+      out.push({ type:"surface", x:GX, y:GY, z:GZ, showscale:false, hoverinfo:"skip",
+                 colorscale:[[0,css("--sunk")],[1,css("--sunk")]], opacity:0.98,
+                 surfacecolor:grid2d(function(){ return 0; }), lighting:{ambient:.72,diffuse:.55,specular:.06} });
+    } else {
+      c = colourFor(s);
+      out.push({
+        type:"surface", x:GX, y:GY, z:GZ, surfacecolor:c.vals,
+        colorscale:c.scale, cmin:c.cmin, cmax:c.cmax,
+        lighting:{ambient:.86,diffuse:.34,specular:.03}, opacity:1,
+        hovertemplate:"B·n / <|B|> = %{surfacecolor:.4f}<extra></extra>",
+        colorbar:{
+          title:{ text:c.title, side:"right", font:{size:11,color:css("--ink-2")} },
+          thickness:12, len:.66, x:1.0, tickfont:{size:10,color:css("--muted")},
+          outlinewidth:0, tickformat:".3f"
+        }
+      });
+    }
+
+    if (state.coils !== "none"){
+      var cols = [css("--c0"), css("--c1"), css("--c2"), css("--c3")];
+      for (i = 0, n = s.coils.length; i < n; i++){
+        if (state.coils === "uniq" && i % (n / s.n_unique) !== 0) continue;
+        p = s.coils[i]; xs = []; ys = []; zs = [];
+        for (j = 0; j < p.length; j += 3){ xs.push(p[j]); ys.push(p[j+1]); zs.push(p[j+2]); }
+        out.push({
+          type:"scatter3d", mode:"lines", x:xs, y:ys, z:zs, hoverinfo:"skip", showlegend:false,
+          line:{ width:5, color:cols[s.owner[i] % cols.length] }
+        });
+      }
+    }
+    return out;
+  }
+
+  function layout(){
+    return {
+      paper_bgcolor:css("--scene"), plot_bgcolor:css("--scene"),
+      margin:{l:0,r:0,t:0,b:0}, showlegend:false,
+      scene:{
+        aspectmode:"data", bgcolor:css("--scene"),
+        xaxis:{visible:false}, yaxis:{visible:false}, zaxis:{visible:false},
+        camera:{ eye:{x:1.25,y:1.25,z:0.92} }
+      },
+      font:{ family:"IBM Plex Sans, system-ui, sans-serif", color:css("--ink-2") }
+    };
+  }
+
+  function draw(keepCamera){
+    var cam = null, gd = document.getElementById("plot");
+    if (keepCamera && gd && gd.layout && gd.layout.scene) cam = gd.layout.scene.camera;
+    var lay = layout();
+    if (cam) lay.scene.camera = cam;
+    Plotly.react(gd, traces(), lay, {displaylogo:false, responsive:true,
+      modeBarButtonsToRemove:["toImage"]});
+    plotted = true;
+  }
+
+  // ---- panels ------------------------------------------------------------------
+  var fmtE = function(v){ return v.toExponential(3).replace("e-0","e-"); };
+
+  function rows(){
+    var host = document.getElementById("rows");
+    host.innerHTML = "";
+    SETS.slice().sort(function(a,b){ return a.bn_mean - b.bn_mean; }).forEach(function(s){
+      var idx = SETS.indexOf(s);
+      var b = document.createElement("button");
+      b.className = "row"; b.type = "button";
+      b.setAttribute("aria-pressed", String(idx === state.set));
+      b.innerHTML = '<span class="nm"></span><span class="bn"></span><span class="sub"></span>';
+      b.querySelector(".nm").textContent = s.label;
+      b.querySelector(".bn").textContent = fmtE(s.bn_mean);
+      b.querySelector(".sub").textContent = s.note;
+      b.addEventListener("click", function(){ state.set = idx; rows(); panels(); draw(true); });
+      host.appendChild(b);
+    });
+  }
+
+  function panels(){
+    var s = SETS[state.set];
+    document.getElementById("mhead").textContent = "Metrics — " + s.label;
+    document.getElementById("btnAll").textContent = "All " + s.n_coils;
+    document.getElementById("btnUniq").textContent = s.n_unique + " unique";
+
+    var cells = [
+      ["Mean |B·n| / &lt;|B|&gt;", fmtE(s.bn_mean), "", true],
+      ["Max |B·n| / &lt;|B|&gt;",  fmtE(s.bn_max),  "", true],
+      ["Mean |B·n|", s.bn_mean_T.toFixed(4), "T", false],
+      ["Max |B·n|",  s.bn_max_T.toFixed(4),  "T", false],
+      ["Mean / B<sub>axis</sub>", (100*s.bn_mean_T/D.B_axis).toFixed(2), "%", false]
+    ];
+    document.getElementById("metrics").innerHTML = cells.map(function(c){
+      return '<div class="metric' + (c[3] ? " lead" : "") + '"><div class="k">' + c[0] +
+             '</div><div class="v">' + c[1] + (c[2] ? ' <span class="u">' + c[2] + "</span>" : "") +
+             "</div></div>";
+    }).join("");
+
+    var pass = function(ok, txt){ return '<dd class="' + (ok ? "ok" : "no") + '">' + txt + "</dd>"; };
+    var relaxedL = s.key === "polarB2_cut30_L37";
+    var geo = [
+      ["Coils", s.n_coils + " (" + s.n_unique + " unique)", null],
+      ["Max length", s.L_max.toFixed(3) + " m", relaxedL ? null : s.L_max <= 36.01],
+      ["Max curvature", s.kappa_max.toFixed(3) + " /m", s.kappa_max <= 1.5],
+      ["Coil–coil gap", s.d_cc.toFixed(3) + " m", s.d_cc >= 1.2],
+      ["Coil–plasma gap", s.d_pc.toFixed(3) + " m", s.d_pc >= 1.2],
+      ["Currents", s.currents.map(function(c){ return c.toFixed(1); }).join(" / ") + " MA", null]
+    ];
+    document.getElementById("geo").innerHTML = geo.map(function(g){
+      return "<div><dt>" + g[0] + "</dt>" +
+             (g[2] === null ? "<dd>" + g[1] + "</dd>" : pass(g[2], g[1])) + "</div>";
+    }).join("");
+  }
+
+  function seg(id, key){
+    document.getElementById(id).addEventListener("click", function(e){
+      var b = e.target.closest("button"); if (!b) return;
+      state[key] = b.dataset.v;
+      Array.prototype.forEach.call(this.querySelectorAll("button"), function(x){
+        x.setAttribute("aria-pressed", String(x === b));
+      });
+      draw(true);
+    });
+  }
+
+  rows(); panels(); draw(false);
+  seg("segCoils", "coils"); seg("segField", "field"); seg("segScale", "scale");
+
+  // repaint on theme change so the scene keeps its token colours
+  if (window.matchMedia){
+    var mq = window.matchMedia("(prefers-color-scheme: dark)");
+    (mq.addEventListener ? mq.addEventListener.bind(mq, "change") : mq.addListener.bind(mq))(function(){
+      if (plotted) draw(true);
+    });
+  }
+})();
+</script>

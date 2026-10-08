@@ -1,0 +1,13 @@
+{
+  "_note": "precise_QA coil validation. ABSOLUTE so all three equilibria get an identical coil problem (a varies 0.1718->0.1689, and a-scaled bounds would move with the thing under test).",
+  "_note2": "convex_excess null so planar and FourierXYZ are judged ALIKE; on Helios the FourierXYZ reference never carried convexity and the comparison was unfair by 17% until that was noticed.",
+  "_keys": "input keys are L, kappa, kappa_MS, d_cc, d_pc, convex_excess, planar_max -- NOT the short names of the returned dict",
+  "scale": "absolute",
+  "L": 3.2,
+  "kappa": 8.0,
+  "kappa_MS": 8.0,
+  "d_cc": 0.10,
+  "d_pc": 0.05,
+  "convex_excess": null,
+  "planar_max": null
+}

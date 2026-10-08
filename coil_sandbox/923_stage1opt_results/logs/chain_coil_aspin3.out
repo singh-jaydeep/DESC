@@ -1,0 +1,13 @@
+### start aspin3 planar (18:47)
+  B.n (coils + plasma): <|B.n|>/<|B|> 1.222e-01  <|B.n|/|B|> 1.193e-01  max|B.n| 0.496 T
+  value / bound: L 0.846  kappa 0.290  kMS 0.673  d_cc 1.563  d_pc 2.015  -> FEASIBLE
+wrote 922_stage1opt_results/runs/coilval/start_planar_aspin3.h5
+### stage2 aspin3 planar attempt 1 (18:48)
+RESULT bn 5.2057e-02  L 1.000  kappa 0.800  kMS 1.000  d_cc 1.008  d_pc 2.872  linked 0  -> FAILS L  active ['L', 'kMS', 'd_cc']
+### start aspin3 xyz (19:03)
+  B.n (coils + plasma): <|B.n|>/<|B|> 1.222e-01  <|B.n|/|B|> 1.193e-01  max|B.n| 0.496 T
+  value / bound: L 0.846  kappa 0.290  kMS 0.673  d_cc 1.563  d_pc 2.015  -> FEASIBLE
+wrote 922_stage1opt_results/runs/coilval/start_xyz_aspin3.h5
+### stage2 aspin3 xyz attempt 1 (19:03)
+RESULT bn 1.6483e-02  L 1.000  kappa 0.606  kMS 1.000  d_cc 1.747  d_pc 3.591  linked 0  -> FAILS L,kMS  active ['L', 'kMS']
+### MATCHED-QUALITY DONE 19:27

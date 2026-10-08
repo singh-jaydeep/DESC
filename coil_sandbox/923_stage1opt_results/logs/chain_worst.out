@@ -1,0 +1,64 @@
+### LEG 1 fresh from precise_QA at 19:42:06
+###   eps1 : mean 0.0676 -> 0.0673  (-0.50%)
+###   bound/floor: optimizing eps1 WORST-OFFENDER: single bound (0, 0.04612) = 0.60 x max(baseline 0.07686); 8/8 contours are above it L_gradB floor 0.54353 m = 3.1641 a  (1 x the ORIGINAL min 0.54353 x backoff 1); this equilibrium starts at min 0.54353 m = 3.1641 a, 0/2401 nodes below it; weight 5 Building objective: L_gradB floor L_gradB floor jac_chunk_size: None Maximum L_gradB floor objective value:                       1.244e+00  -->   1.255e+00 (m) Minimum L_gradB floor objective value:                       5.435e-01  -->   5.446e-01 (m) Average L_gradB floor objective value:                       8.434e-01  -->   8.428e-01 (m) Maximum L_gradB floor objective value:                       1.244e+00  -->   1.255e+00 (normalized) Minimum L_gradB floor objective value:                       5.435e-01  -->   5.446e-01 (normalized) Average L_gradB floor objective value:                       8.434e-01  -->   8.428e-01 (normalized) 
+###   stop: Warning: Maximum number of iterations has been exceeded.  iters 301
+###   Aspect ratio:                                                6.000e+00  -->   6.010e+00 (dimensionless)  Maximum absolute Force error:                                2.151e-05  -->   2.247e-05 (normalized)
+###   iota: Maximum Generic objective value:                             4.202e-01  -->   4.208e-01 (~) Minimum Generic objective value:                             4.197e-01  -->   4.195e-01 (~) 
+### LEG 2 from 922_stage1opt_results/runs/worst1 at 19:57:54
+###   eps1 : mean 0.0673 -> 0.0561  (-16.62%)
+###   bound/floor: optimizing eps1 WORST-OFFENDER: single bound (0, 0.04569) = 0.60 x max(baseline 0.07614); 8/8 contours are above it L_gradB floor 0.54353 m = 3.1689 a  (1 x the ORIGINAL min 0.54353 x backoff 1); this equilibrium starts at min 0.54457 m = 3.1749 a, 0/2401 nodes below it; weight 5 Building objective: L_gradB floor L_gradB floor jac_chunk_size: None Maximum L_gradB floor objective value:                       1.255e+00  -->   2.132e+00 (m) Minimum L_gradB floor objective value:                       5.446e-01  -->   5.362e-01 (m) Average L_gradB floor objective value:                       8.428e-01  -->   7.524e-01 (m) Maximum L_gradB floor objective value:                       1.255e+00  -->   2.132e+00 (normalized) Minimum L_gradB floor objective value:                       5.446e-01  -->   5.362e-01 (normalized) Average L_gradB floor objective value:                       8.428e-01  -->   7.524e-01 (normalized) 
+###   stop: `xtol` condition satisfied. (xtol=1.00e-10)  iters 16
+###   Aspect ratio:                                                6.010e+00  -->   6.010e+00 (dimensionless)  Maximum absolute Force error:                                2.252e-05  -->   1.453e-04 (normalized)
+###   iota: Maximum Generic objective value:                             4.208e-01  -->   4.605e-01 (~) Minimum Generic objective value:                             4.195e-01  -->   4.434e-01 (~) 
+### LEG 3 from 922_stage1opt_results/runs/worst2 at 20:03:09
+###   eps1 : mean 0.0561 -> 0.0556  (-0.84%)
+###   bound/floor: optimizing eps1 WORST-OFFENDER: single bound (0, 0.04108) = 0.60 x max(baseline 0.06847); 7/8 contours are above it L_gradB floor 0.54353 m = 3.1630 a  (1 x the ORIGINAL min 0.54353 x backoff 1); this equilibrium starts at min 0.53620 m = 3.1204 a, 36/2401 nodes below it; weight 5 Building objective: L_gradB floor L_gradB floor jac_chunk_size: None Maximum L_gradB floor objective value:                       2.132e+00  -->   2.184e+00 (m) Minimum L_gradB floor objective value:                       5.362e-01  -->   5.347e-01 (m) Average L_gradB floor objective value:                       7.524e-01  -->   7.498e-01 (m) Maximum L_gradB floor objective value:                       2.132e+00  -->   2.184e+00 (normalized) Minimum L_gradB floor objective value:                       5.362e-01  -->   5.347e-01 (normalized) Average L_gradB floor objective value:                       7.524e-01  -->   7.498e-01 (normalized) 
+###   stop: Warning: A bad approximation caused failure to predict improvement.  iters 10
+###   Aspect ratio:                                                6.010e+00  -->   6.010e+00 (dimensionless)  Maximum absolute Force error:                                2.094e-04  -->   2.188e-04 (normalized)
+###   iota: Maximum Generic objective value:                             4.605e-01  -->   4.618e-01 (~) Minimum Generic objective value:                             4.434e-01  -->   4.439e-01 (~) 
+### resolution + complexity 20:07:14
+Running as unit: run-p1405200-i1407328.scope; invocation ID: 5bd8ca901d6c44f6a76410ff49c52c89
+DEVICE requested=gpu obtained=gpu (1x NVIDIA GeForce RTX 5070 Laptop GPU)
+run                        L=8 eps1        |f|          L=12 eps1        |f|      GAP       A
+worst1           0.067295 (  -0.50%)  3.639e-06 0.067285 (  -0.51%)  1.451e-07    0.01p  6.0100
+worst3           0.055638 ( -17.74%)  3.609e-05 0.055609 ( -17.78%)  1.377e-06    0.04p  6.0100
+Running as unit: run-p1407400-i1409530.scope; invocation ID: 13150122f00e4e4381bd610bc74050d8
+DEVICE requested=cpu obtained=cpu (1x cpu)
+
+=== baseline precise_QA ===  a = 0.17178 m   A = 6.0000
+  L_gradB/a   min   3.1620   5th   3.3790   median   4.9137   area-mean   4.8334
+  pdrot [1/m] max  29.4682   95th   9.5763   median   2.1641   area-mean   2.3321
+  pdrot * a   max   5.0620   95th   1.6450   median   0.3717   area-mean   0.4006
+  smallest |shape-operator director| (umbilic proximity) 4.798e-01
+
+=== worst1 ===  a = 0.17152 m   A = 6.0100
+  L_gradB/a   min   3.1729   5th   3.3870   median   4.9018   area-mean   4.8411
+  pdrot [1/m] max  30.1196   95th   9.7336   median   2.1531   area-mean   2.3263
+  pdrot * a   max   5.1661   95th   1.6695   median   0.3693   area-mean   0.3990
+  smallest |shape-operator director| (umbilic proximity) 4.817e-01
+
+=== worst3 ===  a = 0.17189 m   A = 6.0100
+  L_gradB/a   min   3.1046   5th   3.2071   median   4.1367   area-mean   4.4963
+  pdrot [1/m] max  46.4561   95th  14.8036   median   1.9063   area-mean   2.7671
+  pdrot * a   max   7.9853   95th   2.5446   median   0.3277   area-mean   0.4756
+  smallest |shape-operator director| (umbilic proximity) 3.295e-01
+
+============================================================================================
+RELATIVE TO BASELINE  (L_gradB/a SMALLER = harder; pdrot*a LARGER = less planar)
+run                       Lg min    Lg 5th    Lg med   Lg mean    pd max   pd 95th    pd med   pd mean
+worst1                    +0.35%    +0.23%    -0.24%    +0.16%    +2.06%    +1.49%    -0.66%    -0.40%
+worst3                    -1.81%    -5.09%   -15.81%    -6.97%   +57.75%   +54.68%   -11.85%   +18.73%
+### per-contour spread (the point of worst-mode) 20:09:57
+                min      p25   median      p75      MAX     mean   spread
+baseline    0.04623  0.06462  0.07057  0.07462  0.07686  0.06765     1.66x
+aspin       0.03231  0.04737  0.06985  0.07214  0.07607  0.06068     2.35x
+           change by baseline rank, easiest->hardest quartile means:  -28.8%    -2.4%    -6.0%    -8.9%
+lsqfb       0.03106  0.04201  0.05346  0.05625  0.05736  0.04907     1.85x
+           change by baseline rank, easiest->hardest quartile means:  -34.4%   -20.4%   -26.3%   -30.2%
+aspin3      0.01902  0.03069  0.04610  0.06242  0.06517  0.04589     3.43x
+           change by baseline rank, easiest->hardest quartile means:  -56.0%   -16.4%   -24.9%   -37.1%
+worst1      0.04614  0.06403  0.07023  0.07418  0.07614  0.06731     1.65x
+           change by baseline rank, easiest->hardest quartile means:   -0.5%    +0.0%    -0.5%    -0.9%
+worst3      0.04021  0.04705  0.05302  0.06814  0.06970  0.05553     1.73x
+           change by baseline rank, easiest->hardest quartile means:  -19.9%    -4.2%   -16.9%   -29.6%
+### WORST CHAIN DONE 20:10:10

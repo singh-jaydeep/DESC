@@ -1,0 +1,1 @@
+Final planar N7 result: cold start -> 150 its (cap 0.5, planarN7/) -> 400 its from ckpt_it0150 with --max-tr inf (this folder). Hit maxiter; kappa 1.109 (infeasible), bn 1.858e-2 flat to <1% since restart it 150.

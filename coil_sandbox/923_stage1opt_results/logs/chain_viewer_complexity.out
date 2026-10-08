@@ -1,0 +1,42 @@
+=== VIEWER ===
+  planar ... 16 coils (expected 16), 0 linked
+  xyz ... 16 coils (expected 16), 0 linked
+  start ... 16 coils (expected 16), 0 linked
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+wrote 922_stage1opt_results/view_fb500.html (476 kB)
+=== COIL COMPLEXITY ===
+DEVICE requested=cpu obtained=cpu (1x cpu)
+
+=== baseline precise_QA ===  a = 0.17178 m   A = 6.0000
+  L_gradB/a   min   3.1620   5th   3.3790   median   4.9137   area-mean   4.8334
+  pdrot [1/m] max  29.4682   95th   9.5763   median   2.1641   area-mean   2.3321
+  pdrot * a   max   5.0620   95th   1.6450   median   0.3717   area-mean   0.4006
+  smallest |shape-operator director| (umbilic proximity) 4.798e-01
+
+=== live_eps1_L1_lsqfb ===  a = 0.16720 m   A = 6.2510
+  L_gradB/a   min   2.4173   5th   3.2039   median   4.3005   area-mean   4.8088
+  pdrot [1/m] max 892.9409   95th  34.5826   median   3.6826   area-mean   6.3175
+  pdrot * a   max 149.2983   95th   5.7821   median   0.6157   area-mean   1.0563
+  smallest |shape-operator director| (umbilic proximity) 1.248e-02
+
+=== loose_eps1_L1 ===  a = 0.16658 m   A = 6.2876
+  L_gradB/a   min   1.5690   5th   3.2145   median   4.4809   area-mean   5.0015
+  pdrot [1/m] max 798.0839   95th  77.7699   median   5.9894   area-mean  16.1095
+  pdrot * a   max 132.9451   95th  12.9549   median   0.9977   area-mean   2.6835
+  smallest |shape-operator director| (umbilic proximity) 3.256e-02
+
+=== loose_eps1_L2 ===  a = 0.16890 m   A = 6.2320
+  L_gradB/a   min   0.0068   5th   0.9894   median   3.2804   area-mean   4.2511
+  pdrot [1/m] max 304264.3374   95th 3545.0364   median  31.6955   area-mean 698.2872
+  pdrot * a   max 51390.6103   95th 598.7609   median   5.3534   area-mean 117.9415
+  smallest |shape-operator director| (umbilic proximity) 2.024e-02
+
+============================================================================================
+RELATIVE TO BASELINE  (L_gradB/a SMALLER = harder; pdrot*a LARGER = less planar)
+run                       Lg min    Lg 5th    Lg med   Lg mean    pd max   pd 95th    pd med   pd mean
+live_eps1_L1_lsqfb       -23.55%    -5.18%   -12.48%    -0.51% +2849.40%  +251.50%   +65.63%  +163.67%
+loose_eps1_L1            -50.38%    -4.87%    -8.81%    +3.48% +2526.34%  +687.53%  +168.39%  +569.86%
+loose_eps1_L2            -99.78%   -70.72%   -33.24%   -12.05% +1015124.87% +36298.65% +1340.08% +29340.35%

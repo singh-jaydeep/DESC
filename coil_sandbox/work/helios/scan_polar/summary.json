@@ -1,0 +1,643 @@
+{
+ "B_axis_T": 6.05639486982898,
+ "paper_pct": 0.22999999999999998,
+ "cuts": {
+  "0": {
+   "final": "work/helios/scan_polar/cut0/legB/result.h5",
+   "bn_fit": 0.040419983088467976,
+   "bn_repair": 0.044923,
+   "bn_held": 0.040861,
+   "bn_free": 0.012658,
+   "bn_continued": null,
+   "bn": 0.012657679175538485,
+   "verdict": "FAILS L",
+   "margins": {
+    "L": 1.0,
+    "kappa": 0.4601,
+    "convex": 0.1135,
+    "d_cc": 1.0337,
+    "d_pc": 1.7049
+   },
+   "worst_L_excess_m": 5.3661971051610635e-05,
+   "mean_absBn_T": 0.07885538704415469,
+   "pct_Baxis": 1.3020185892598746,
+   "max_absBn_T": 0.3200352544972439,
+   "coils": [
+    {
+     "current_MA": 21.86,
+     "L": 36.0,
+     "hinges_RZ": [
+      [
+       5.35,
+       -4.26
+      ],
+      [
+       5.72,
+       2.08
+      ]
+     ],
+     "fold_deg": 80.9,
+     "corner_deg": 53.6,
+     "arc_ref_margin": 0.005
+    },
+    {
+     "current_MA": 21.05,
+     "L": 36.0,
+     "hinges_RZ": [
+      [
+       3.98,
+       -5.01
+      ],
+      [
+       7.86,
+       4.58
+      ]
+     ],
+     "fold_deg": 82.8,
+     "corner_deg": 73.0,
+     "arc_ref_margin": 0.28
+    },
+    {
+     "current_MA": 22.06,
+     "L": 36.0,
+     "hinges_RZ": [
+      [
+       12.19,
+       -3.37
+      ],
+      [
+       4.98,
+       2.19
+      ]
+     ],
+     "fold_deg": 65.1,
+     "corner_deg": 68.9,
+     "arc_ref_margin": 0.768
+    }
+   ]
+  },
+  "30": {
+   "final": "work/helios/scan_polar/cut30/legB/result.h5",
+   "bn_fit": 0.03997777591034346,
+   "bn_repair": 0.045371,
+   "bn_held": 0.029161,
+   "bn_free": 0.01045,
+   "bn_continued": null,
+   "bn": 0.010449886974964882,
+   "verdict": "FEASIBLE",
+   "margins": {
+    "L": 1.0,
+    "kappa": 0.3529,
+    "convex": 0.0316,
+    "d_cc": 1.3481,
+    "d_pc": 1.3283
+   },
+   "worst_L_excess_m": -7.81514465586497e-07,
+   "mean_absBn_T": 0.06702910074461825,
+   "pct_Baxis": 1.1067491830583203,
+   "max_absBn_T": 0.2781275601001593,
+   "coils": [
+    {
+     "current_MA": 21.63,
+     "L": 36.0,
+     "hinges_RZ": [
+      [
+       6.37,
+       -0.04
+      ],
+      [
+       13.38,
+       3.87
+      ]
+     ],
+     "fold_deg": 24.9,
+     "corner_deg": 61.8,
+     "arc_ref_margin": 0.458
+    },
+    {
+     "current_MA": 21.21,
+     "L": 36.0,
+     "hinges_RZ": [
+      [
+       4.26,
+       -4.82
+      ],
+      [
+       8.05,
+       4.93
+      ]
+     ],
+     "fold_deg": 83.4,
+     "corner_deg": 78.1,
+     "arc_ref_margin": 0.156
+    },
+    {
+     "current_MA": 22.12,
+     "L": 36.0,
+     "hinges_RZ": [
+      [
+       9.45,
+       3.92
+      ],
+      [
+       4.3,
+       -2.24
+      ]
+     ],
+     "fold_deg": 77.9,
+     "corner_deg": 101.6,
+     "arc_ref_margin": 0.179
+    }
+   ]
+  },
+  "60": {
+   "final": "work/helios/scan_polar/cut60/legB/result.h5",
+   "bn_fit": 0.04014422534139171,
+   "bn_repair": 0.043788,
+   "bn_held": 0.038656,
+   "bn_free": 0.010713,
+   "bn_continued": null,
+   "bn": 0.0107126576951794,
+   "verdict": "FAILS L",
+   "margins": {
+    "L": 1.0,
+    "kappa": 0.357,
+    "convex": 0.0277,
+    "d_cc": 1.3305,
+    "d_pc": 1.2962
+   },
+   "worst_L_excess_m": 2.513064661968656e-05,
+   "mean_absBn_T": 0.0680350802604401,
+   "pct_Baxis": 1.1233593866108216,
+   "max_absBn_T": 0.26024063135871534,
+   "coils": [
+    {
+     "current_MA": 20.91,
+     "L": 36.0,
+     "hinges_RZ": [
+      [
+       6.42,
+       0.06
+      ],
+      [
+       13.45,
+       3.67
+      ]
+     ],
+     "fold_deg": 23.3,
+     "corner_deg": 66.0,
+     "arc_ref_margin": 0.04
+    },
+    {
+     "current_MA": 21.91,
+     "L": 36.0,
+     "hinges_RZ": [
+      [
+       13.66,
+       -2.03
+      ],
+      [
+       5.42,
+       -0.08
+      ]
+     ],
+     "fold_deg": 45.1,
+     "corner_deg": 54.8,
+     "arc_ref_margin": 0.675
+    },
+    {
+     "current_MA": 22.14,
+     "L": 36.0,
+     "hinges_RZ": [
+      [
+       9.47,
+       3.91
+      ],
+      [
+       4.24,
+       -2.25
+      ]
+     ],
+     "fold_deg": 78.5,
+     "corner_deg": 98.0,
+     "arc_ref_margin": 0.324
+    }
+   ]
+  },
+  "90": {
+   "final": "work/helios/scan_polar/cut90/legC/result.h5",
+   "bn_fit": 0.04038947836706771,
+   "bn_repair": 0.042281,
+   "bn_held": 0.032764,
+   "bn_free": 0.012502,
+   "bn_continued": 0.012495,
+   "bn": 0.012495152619890322,
+   "verdict": "FAILS L",
+   "margins": {
+    "L": 1.0,
+    "kappa": 0.3014,
+    "convex": 0.0058,
+    "d_cc": 1.0324,
+    "d_pc": 1.2977
+   },
+   "worst_L_excess_m": 2.8917271777118003e-07,
+   "mean_absBn_T": 0.07717968274709083,
+   "pct_Baxis": 1.2743502431054372,
+   "max_absBn_T": 0.3390698714350615,
+   "coils": [
+    {
+     "current_MA": 21.04,
+     "L": 36.0,
+     "hinges_RZ": [
+      [
+       13.37,
+       3.76
+      ],
+      [
+       6.44,
+       0.04
+      ]
+     ],
+     "fold_deg": 23.8,
+     "corner_deg": 65.9,
+     "arc_ref_margin": 0.468
+    },
+    {
+     "current_MA": 21.68,
+     "L": 36.0,
+     "hinges_RZ": [
+      [
+       13.59,
+       -2.3
+      ],
+      [
+       5.3,
+       -0.28
+      ]
+     ],
+     "fold_deg": 45.0,
+     "corner_deg": 52.3,
+     "arc_ref_margin": 0.229
+    },
+    {
+     "current_MA": 22.24,
+     "L": 36.0,
+     "hinges_RZ": [
+      [
+       12.26,
+       -3.34
+      ],
+      [
+       5.08,
+       2.21
+      ]
+     ],
+     "fold_deg": 66.3,
+     "corner_deg": 69.6,
+     "arc_ref_margin": 0.594
+    }
+   ]
+  },
+  "120": {
+   "final": "work/helios/scan_polar/cut120/legB/result.h5",
+   "bn_fit": 0.04050493579408217,
+   "bn_repair": 0.042326,
+   "bn_held": 0.026961,
+   "bn_free": 0.014494,
+   "bn_continued": null,
+   "bn": 0.014493756066650742,
+   "verdict": "FAILS L",
+   "margins": {
+    "L": 1.0,
+    "kappa": 0.3004,
+    "convex": 0.0545,
+    "d_cc": 1.0357,
+    "d_pc": 1.0185
+   },
+   "worst_L_excess_m": 6.960738192418603e-05,
+   "mean_absBn_T": 0.0905784981192365,
+   "pct_Baxis": 1.4955844205348894,
+   "max_absBn_T": 0.3735101753780649,
+   "coils": [
+    {
+     "current_MA": 16.89,
+     "L": 36.0,
+     "hinges_RZ": [
+      [
+       12.26,
+       -3.07
+      ],
+      [
+       6.82,
+       0.33
+      ]
+     ],
+     "fold_deg": 1.0,
+     "corner_deg": 89.1,
+     "arc_ref_margin": 0.047
+    },
+    {
+     "current_MA": 23.85,
+     "L": 36.0,
+     "hinges_RZ": [
+      [
+       13.92,
+       -1.44
+      ],
+      [
+       5.33,
+       -0.58
+      ]
+     ],
+     "fold_deg": 40.1,
+     "corner_deg": 53.8,
+     "arc_ref_margin": 0.412
+    },
+    {
+     "current_MA": 24.21,
+     "L": 36.0,
+     "hinges_RZ": [
+      [
+       12.25,
+       -3.34
+      ],
+      [
+       4.99,
+       1.95
+      ]
+     ],
+     "fold_deg": 64.7,
+     "corner_deg": 65.8,
+     "arc_ref_margin": 0.085
+    }
+   ]
+  },
+  "150": {
+   "final": "work/helios/scan_polar/cut150/legB/result.h5",
+   "bn_fit": 0.040388713529440304,
+   "bn_repair": 0.042836,
+   "bn_held": 0.037507,
+   "bn_free": 0.014148,
+   "bn_continued": null,
+   "bn": 0.014147557178204165,
+   "verdict": "FEASIBLE",
+   "margins": {
+    "L": 1.0,
+    "kappa": 0.2693,
+    "convex": 0.4165,
+    "d_cc": 1.0322,
+    "d_pc": 1.7602
+   },
+   "worst_L_excess_m": -0.00010920157128424535,
+   "mean_absBn_T": 0.0892827841195384,
+   "pct_Baxis": 1.4741902738924215,
+   "max_absBn_T": 0.34661702440758596,
+   "coils": [
+    {
+     "current_MA": 20.96,
+     "L": 36.0,
+     "hinges_RZ": [
+      [
+       7.0,
+       -6.81
+      ],
+      [
+       6.86,
+       4.44
+      ]
+     ],
+     "fold_deg": 55.7,
+     "corner_deg": 52.3,
+     "arc_ref_margin": 0.472
+    },
+    {
+     "current_MA": 21.83,
+     "L": 36.0,
+     "hinges_RZ": [
+      [
+       13.59,
+       -2.14
+      ],
+      [
+       5.21,
+       -0.28
+      ]
+     ],
+     "fold_deg": 52.0,
+     "corner_deg": 53.5,
+     "arc_ref_margin": 0.741
+    },
+    {
+     "current_MA": 22.17,
+     "L": 36.0,
+     "hinges_RZ": [
+      [
+       11.98,
+       -3.65
+      ],
+      [
+       4.93,
+       1.88
+      ]
+     ],
+     "fold_deg": 66.6,
+     "corner_deg": 69.4,
+     "arc_ref_margin": 0.384
+    }
+   ]
+  }
+ },
+ "refs": {
+  "planar N=7": {
+   "file": "work/helios/planarN7_final_it300.h5",
+   "bn": 0.04023347575629668,
+   "verdict": "FEASIBLE",
+   "mean_absBn_T": 0.24441016545413752,
+   "pct_Baxis": 4.035571832868936,
+   "max_absBn_T": 0.9843927754533708,
+   "coils": [
+    {
+     "current_MA": 21.7,
+     "L": 36.0
+    },
+    {
+     "current_MA": 20.96,
+     "L": 35.999
+    },
+    {
+     "current_MA": 22.29,
+     "L": 36.0
+    }
+   ]
+  },
+  "transverse arcB2 M=5": {
+   "file": "work/helios/arcB2_M5_stage2_w1/result.h5",
+   "bn": 0.0132030693714499,
+   "verdict": "FEASIBLE",
+   "mean_absBn_T": 0.08573669295471369,
+   "pct_Baxis": 1.4156390855858234,
+   "max_absBn_T": 0.36173279838524386,
+   "coils": [
+    {
+     "current_MA": 20.26,
+     "L": 36.0,
+     "hinges_RZ": [
+      [
+       6.69,
+       -7.06
+      ],
+      [
+       6.8,
+       5.6
+      ]
+     ],
+     "fold_deg": 57.9,
+     "corner_deg": 94.8,
+     "arc_ref_margin": 0.089
+    },
+    {
+     "current_MA": 21.34,
+     "L": 36.0,
+     "hinges_RZ": [
+      [
+       4.59,
+       -5.87
+      ],
+      [
+       8.86,
+       5.98
+      ]
+     ],
+     "fold_deg": 74.0,
+     "corner_deg": 96.4,
+     "arc_ref_margin": 0.368
+    },
+    {
+     "current_MA": 23.36,
+     "L": 36.0,
+     "hinges_RZ": [
+      [
+       10.66,
+       4.99
+      ],
+      [
+       3.7,
+       -3.35
+      ]
+     ],
+     "fold_deg": 76.2,
+     "corner_deg": 89.6,
+     "arc_ref_margin": 0.496
+    }
+   ]
+  },
+  "arcB3 M=5": {
+   "file": "work/helios/arcB3_M5_final_it200.h5",
+   "bn": 0.01008281378655446,
+   "verdict": "FAILS L",
+   "mean_absBn_T": 0.06318691530904988,
+   "pct_Baxis": 1.043309042212998,
+   "max_absBn_T": 0.24123701908220663,
+   "coils": [
+    {
+     "current_MA": 20.06,
+     "L": 36.001,
+     "hinges_RZ": [
+      [
+       5.78,
+       -0.54
+      ],
+      [
+       5.13,
+       3.43
+      ],
+      [
+       12.66,
+       -4.14
+      ]
+     ],
+     "fold_deg": 19.2,
+     "corner_deg": 86.7,
+     "arc_ref_margin": 0.377
+    },
+    {
+     "current_MA": 22.3,
+     "L": 36.0,
+     "hinges_RZ": [
+      [
+       5.08,
+       -0.0
+      ],
+      [
+       11.11,
+       5.0
+      ],
+      [
+       12.42,
+       -3.92
+      ]
+     ],
+     "fold_deg": 35.8,
+     "corner_deg": 48.4,
+     "arc_ref_margin": 0.389
+    },
+    {
+     "current_MA": 22.59,
+     "L": 36.0,
+     "hinges_RZ": [
+      [
+       13.16,
+       2.73
+      ],
+      [
+       4.0,
+       -2.64
+      ],
+      [
+       7.13,
+       3.86
+      ]
+     ],
+     "fold_deg": 53.9,
+     "corner_deg": 70.4,
+     "arc_ref_margin": 0.524
+    }
+   ]
+  }
+ },
+ "distance_m": {
+  "0 | 30": 1.47,
+  "0 | 60": 1.43,
+  "0 | 90": 1.04,
+  "0 | 120": 1.7,
+  "0 | 150": 1.3,
+  "0 | planar N=7": 2.46,
+  "0 | transverse arcB2 M=5": 1.32,
+  "0 | arcB3 M=5": 1.21,
+  "30 | 60": 1.06,
+  "30 | 90": 1.44,
+  "30 | 120": 1.69,
+  "30 | 150": 1.31,
+  "30 | planar N=7": 2.53,
+  "30 | transverse arcB2 M=5": 1.11,
+  "30 | arcB3 M=5": 1.02,
+  "60 | 90": 1.4,
+  "60 | 120": 1.57,
+  "60 | 150": 1.28,
+  "60 | planar N=7": 2.53,
+  "60 | transverse arcB2 M=5": 1.06,
+  "60 | arcB3 M=5": 0.64,
+  "90 | 120": 1.32,
+  "90 | 150": 0.94,
+  "90 | planar N=7": 2.53,
+  "90 | transverse arcB2 M=5": 1.15,
+  "90 | arcB3 M=5": 1.18,
+  "120 | 150": 1.76,
+  "120 | planar N=7": 2.7,
+  "120 | transverse arcB2 M=5": 1.51,
+  "120 | arcB3 M=5": 1.42,
+  "150 | planar N=7": 2.53,
+  "150 | transverse arcB2 M=5": 1.13,
+  "150 | arcB3 M=5": 1.2
+ }
+}

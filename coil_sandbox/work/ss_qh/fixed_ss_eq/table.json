@@ -1,0 +1,87 @@
+[
+ {
+  "label": "arcB2 M5, single-stage start",
+  "path": "work/ss_qh/arcB2/ss_k4/coils_k4.h5",
+  "bn": 0.0019187570165353088,
+  "bn_max": 0.008005883369822279,
+  "margins": {
+   "L": 1.0002533633292716,
+   "kappa": 0.997073658076898,
+   "kMS": 0.994104432673593,
+   "d_cc": 1.204803949459063,
+   "d_pc": 1.1332957348215154
+  },
+  "linked": 0,
+  "active": [
+   "L",
+   "kappa"
+  ],
+  "over": [
+   "L"
+  ]
+ },
+ {
+  "label": "arcB2 M5, stage 2",
+  "path": "work/ss_qh/fixed_ss_eq/al_arcB2/result.h5",
+  "bn": 0.0014489086505241535,
+  "bn_max": 0.006345281849465246,
+  "margins": {
+   "L": 1.0000000123003783,
+   "kappa": 1.0006798865193947,
+   "kMS": 0.8160029845691563,
+   "d_cc": 1.1231212183367225,
+   "d_pc": 1.2960401623686855
+  },
+  "linked": 0,
+  "active": [
+   "L",
+   "kappa"
+  ],
+  "over": [
+   "kappa"
+  ]
+ },
+ {
+  "label": "planar N7, stage 2 (cold start)",
+  "path": "work/ss_qh/fixed_ss_eq/al_planarN7/result.h5",
+  "bn": 0.018515960948628164,
+  "bn_max": 0.07772498742419515,
+  "margins": {
+   "L": 1.000000000243728,
+   "kappa": 1.0019363598273225,
+   "kMS": 1.0000000045541995,
+   "d_cc": 1.0379976147385688,
+   "d_pc": 1.0050467268287802
+  },
+  "linked": 0,
+  "active": [
+   "L",
+   "kappa",
+   "kMS"
+  ],
+  "over": [
+   "kappa"
+  ]
+ },
+ {
+  "label": "FourierXYZ N6, stage 2",
+  "path": "work/ss_qh/fixed_ss_eq/al_xyzN6/result.h5",
+  "bn": 0.0005191579054392973,
+  "bn_max": 0.002115150825323958,
+  "margins": {
+   "L": 1.0000000017576363,
+   "kappa": 1.0003201612844554,
+   "kMS": 0.753413831823876,
+   "d_cc": 1.0216450005848385,
+   "d_pc": 1.3329185140573454
+  },
+  "linked": 0,
+  "active": [
+   "L",
+   "kappa"
+  ],
+  "over": [
+   "kappa"
+  ]
+ }
+]

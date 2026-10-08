@@ -1,0 +1,10 @@
+{
+  "_source": "Kruger et al. Table 2, as helios_kruger2026.json, but with convex_excess dropped: convexity is undefined for a non-planar coil (the signed in-plane curvature has no plane to be signed against). For the unrestricted-shape CEILING run, handoff 2(a).",
+  "scale": "absolute",
+  "L": 36.0,
+  "kappa": 1.5,
+  "kappa_MS": null,
+  "d_cc": 1.2,
+  "d_pc": 1.2,
+  "convex_excess": null
+}

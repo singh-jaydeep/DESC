@@ -1,0 +1,205 @@
+{
+ "settings": {
+  "eq": "sample_equilibria/helios_repro.h5",
+  "start": "work/helios/starts/circ_ra2.65.h5",
+  "out": "work/helios/smoke",
+  "mode": "stage2",
+  "length_mult": 1.0,
+  "margin": 0.0,
+  "a": null,
+  "bounds": "bounds/helios_kruger2026.json",
+  "device": null,
+  "vacuum": false,
+  "maxiter": 3,
+  "check_every": 1,
+  "ckpt_every": 0,
+  "diag_log": null,
+  "dcc_backoff": 0.025,
+  "dpc_backoff": 0.02,
+  "no_arc_backoffs": false,
+  "convex_backoff": 0.5,
+  "coil_grid_n": 150,
+  "eval_m": 25,
+  "eval_n": 25,
+  "plasma_m": 64,
+  "plasma_n": 64,
+  "src_gl": 24,
+  "src_n": 400,
+  "vc_m": null,
+  "vc_n": null,
+  "vc_chunk": 64,
+  "dcc_k": 20000,
+  "dpc_k": 20000,
+  "no_signed": false,
+  "dcc_neighbors": null,
+  "dcc_chunk": 4,
+  "dpc_chunk": 1,
+  "qf_chunk": 25,
+  "no_second_order": false,
+  "so_chunk": 16,
+  "so_rtol": 0.05,
+  "max_tr": 0.5,
+  "max_inner_iter": 100,
+  "ctol": 0.0001
+ },
+ "eq_kind": "h5",
+ "device": "gpu",
+ "vacuum": false,
+ "length_multiplier": 1.0,
+ "bounds": {
+  "L": 36.0,
+  "kappa": 1.5,
+  "kms": null,
+  "convex": 0.001,
+  "dcc": 1.2,
+  "dpc": 1.2
+ },
+ "target": {
+  "L": 36.0,
+  "kappa": 1.5,
+  "kms": null,
+  "convex": 0.001,
+  "dcc": 1.2,
+  "dpc": 1.2
+ },
+ "enforced": {
+  "L": 36.0,
+  "kappa": 1.5,
+  "kms": null,
+  "convex": 0.0005,
+  "dcc": 1.2299999999999998,
+  "dpc": 1.224
+ },
+ "solver": {
+  "wall_s": 150.65189838409424,
+  "message": "Maximum number of iterations has been exceeded.",
+  "nit": 3,
+  "n_outer": 0,
+  "constr_violation": 0.0,
+  "y_absmax_final": 0.0
+ },
+ "start": {
+  "per_coil": [
+   {
+    "L": 29.502195087100247,
+    "kappa": 0.21297348514676778,
+    "kms": 0.04535770537556045,
+    "corner": 0.0,
+    "convex": 0.0
+   },
+   {
+    "L": 29.502195087100247,
+    "kappa": 0.21297348514676775,
+    "kms": 0.04535770537556045,
+    "corner": 0.0,
+    "convex": 8.881784197001252e-16
+   },
+   {
+    "L": 29.50219508710024,
+    "kappa": 0.2129734851467678,
+    "kms": 0.04535770537556047,
+    "corner": 0.0,
+    "convex": 0.0
+   }
+  ],
+  "L": 29.502195087100247,
+  "kappa": 0.2129734851467678,
+  "kms": 0.04535770537556047,
+  "corner": 0.0,
+  "convex": 8.881784197001252e-16,
+  "d_cc": 1.3236804037386833,
+  "d_pc": 1.3721929015931627,
+  "linked": 0,
+  "linked_pairs": [],
+  "bn": 0.0796678891370232,
+  "bn_max": 0.24746257825659498,
+  "bn_local": 0.07687026292419515,
+  "bn_max_T": 1.607636932918111,
+  "vacuum": false,
+  "n_coils": 12
+ },
+ "result": {
+  "per_coil": [
+   {
+    "L": 29.924825452181054,
+    "kappa": 0.3076171390576539,
+    "kms": 0.04697920315240856,
+    "corner": 0.0,
+    "convex": 0.0
+   },
+   {
+    "L": 29.84945862311197,
+    "kappa": 0.3157574381225993,
+    "kms": 0.0471896519634718,
+    "corner": 0.0,
+    "convex": 0.0
+   },
+   {
+    "L": 29.68614581518755,
+    "kappa": 0.3087943367210665,
+    "kms": 0.04667999020505592,
+    "corner": 0.0,
+    "convex": 0.0
+   }
+  ],
+  "L": 29.924825452181054,
+  "kappa": 0.3157574381225993,
+  "kms": 0.0471896519634718,
+  "corner": 0.0,
+  "convex": 0.0,
+  "d_cc": 2.06216569471515,
+  "d_pc": 1.482618647772291,
+  "linked": 0,
+  "linked_pairs": [],
+  "bn": 0.061163370218537426,
+  "bn_max": 0.21451432135671122,
+  "bn_local": 0.06010103743013717,
+  "bn_max_T": 1.3874563930356967,
+  "vacuum": false,
+  "n_coils": 12
+ },
+ "margins": {
+  "L": 0.8312451514494738,
+  "kappa": 0.21050495874839956,
+  "convex": 0.0,
+  "d_cc": 1.7184714122626252,
+  "d_pc": 1.2355155398102424
+ },
+ "failed": [],
+ "active": [],
+ "history": [
+  {
+   "iter": 1,
+   "bn": 0.0731893810596437,
+   "L": 0.8213951583796231,
+   "kappa": 0.15962573846944786,
+   "convex": 0.0,
+   "d_cc": 1.282923443156627,
+   "d_pc": 1.2801374795285017,
+   "linked": 0,
+   "verdict": "FEASIBLE"
+  },
+  {
+   "iter": 2,
+   "bn": 0.06490571529867517,
+   "L": 0.8274016853953797,
+   "kappa": 0.18750461691677908,
+   "convex": 0.0,
+   "d_cc": 1.6514277185409463,
+   "d_pc": 1.1852707433246439,
+   "linked": 0,
+   "verdict": "FEASIBLE"
+  },
+  {
+   "iter": 3,
+   "bn": 0.061163370218537426,
+   "L": 0.8312451514494738,
+   "kappa": 0.21050495874839956,
+   "convex": 0.0,
+   "d_cc": 1.7184714122626252,
+   "d_pc": 1.2355155398102424,
+   "linked": 0,
+   "verdict": "FEASIBLE"
+  }
+ ]
+}

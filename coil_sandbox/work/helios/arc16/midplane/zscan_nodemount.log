@@ -1,0 +1,23 @@
+=== z* = 0.75  23:14:56 ===
+  fit max deviation from the source coil: 3.8 mm, 4.5 mm, 4.2 mm, 3.7 mm
+  value / bound: L 0.994  kappa 0.164  convex 0.000  d_cc 1.132  d_pc 1.082  -> FEASIBLE
+RESULT bn 7.7130e-02  L 0.996  kappa 0.164  convex 0.000  d_cc 1.141  d_pc 1.115  linked 0  -> FEASIBLE  active ['L']  target FEASIBLE
+RESULT bn 2.5875e-02  L 1.000  kappa 0.394  convex 0.042  d_cc 1.637  d_pc 1.121  linked 0  -> FAILS L  active ['L']
+DEVICE requested=cpu obtained=cpu (1x cpu)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+   corners max 58.8   currents min/max 0.83   demount clearance +0.452 m, blocked 0.00%  -> REMOVABLE
+=== z* = 1.50  23:38:22 ===
+  fit max deviation from the source coil: 6.0 mm, 7.9 mm, 7.5 mm, 5.9 mm
+  value / bound: L 0.994  kappa 0.184  convex 0.000  d_cc 1.132  d_pc 1.082  -> FEASIBLE
+RESULT bn 7.7155e-02  L 0.996  kappa 0.184  convex 0.000  d_cc 1.150  d_pc 1.114  linked 0  -> FEASIBLE  active ['L']  target FEASIBLE
+RESULT bn 2.6396e-02  L 1.000  kappa 0.451  convex 0.042  d_cc 1.793  d_pc 1.139  linked 0  -> FAILS L  active ['L']
+DEVICE requested=cpu obtained=cpu (1x cpu)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+   corners max 75.0   currents min/max 0.88   demount clearance -0.293 m, blocked 1.12%  -> NOT REMOVABLE
+=== z* = 2.25  23:55:56 ===

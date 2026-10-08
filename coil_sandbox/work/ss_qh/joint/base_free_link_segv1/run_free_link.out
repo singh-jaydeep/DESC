@@ -1,0 +1,3 @@
+=== start base_free_link 11:41:04
+work/ss_qh/joint/run_base.sh: line 12: 2360150 Segmentation fault         $CAP $PY run_al.py $COMMON --start $START --out $J/$name "$@" > $J/$name/run.log 2>&1
+=== end base_free_link exit 139 11:56:47

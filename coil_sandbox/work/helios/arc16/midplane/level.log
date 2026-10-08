@@ -1,0 +1,22 @@
+=== level repair  01:08:31 ===
+START  bn 7.7194e-02  L 0.994  kappa 0.153  convex 0.000  d_cc 1.133  d_pc 1.082  linked 0  coils 16  -> FEASIBLE  demount: min hinge clearance +2.396 m, worst arc blocked 0.00%  -> REMOVABLE
+Building objective: hinge level
+  hinge level: 4 residuals (4 coils, B=2), linear -- factorized out, not an AL constraint
+START  bn 7.7194e-02  L 0.994  kappa 0.153  convex 0.000  d_cc 1.133  d_pc 1.082  -> FEASIBLE
+RESULT bn 7.7117e-02  L 0.996  kappa 0.155  convex 0.000  d_cc 1.134  d_pc 1.116  linked 0  -> FEASIBLE  active ['L']  target FEASIBLE  demount: min hinge clearance +2.396 m, worst arc blocked 0.00%  -> REMOVABLE
+=== level free  01:12:14 ===
+START  bn 7.7117e-02  L 0.996  kappa 0.155  convex 0.000  d_cc 1.134  d_pc 1.116  linked 0  coils 16  -> FEASIBLE  demount: min hinge clearance +2.396 m, worst arc blocked 0.00%  -> REMOVABLE
+START  bn 7.7117e-02  L 0.996  kappa 0.155  convex 0.000  d_cc 1.134  d_pc 1.116  -> FEASIBLE
+RESULT bn 2.2857e-02  L 1.000  kappa 0.420  convex 0.057  d_cc 1.522  d_pc 1.185  linked 0  -> FAILS L  active ['L']  demount: min hinge clearance +0.311 m, worst arc blocked 0.00%  -> REMOVABLE
+DEVICE requested=cpu obtained=cpu (1x cpu)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/coil_sandbox/vendor/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+   corners max 63.5   currents min/max 0.89
+   coil 0: hinge z [-0.2894 -0.2894]  (level to 0.00e+00 m)  clearance [2.93  0.941]
+   coil 1: hinge z [-0.5346 -0.5346]  (level to 3.55e-15 m)  clearance [2.789 1.268]
+   coil 2: hinge z [1.268 1.268]  (level to 4.44e-16 m)  clearance [2.92  0.311]
+   coil 3: hinge z [2.1043 2.1043]  (level to 8.88e-16 m)  clearance [2.931 0.32 ]
+   -> REMOVABLE
+=== LEVEL DONE 01:30:17 ===

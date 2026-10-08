@@ -1,0 +1,123 @@
+Running as unit: run-p1515209-i1517491.scope; invocation ID: 764f49f7bb11443c85b9d912e2b42725
+E0925 15:30:18.230900 1515694 cuda_executor.cc:1743] Could not get kernel mode driver version: ( INVALID_ARGUMENT: Version does not match the format X.Y.Z )
+E0925 15:30:18.242795 1515589 cuda_executor.cc:1743] Could not get kernel mode driver version: ( INVALID_ARGUMENT: Version does not match the format X.Y.Z )
+DEVICE requested=gpu obtained=gpu (1x NVIDIA GeForce RTX 5070 Laptop GPU)
+50978 devices match
+recording 36 devices at L=M=N=10 -> 925_quasr_sweep/eps_A10.jsonl
+Converting VMEC input to DESC input
+Generated DESC input file 925_quasr_sweep/cache/input.q0010510_desc:
+[1/36] 10510 nfp2QA nc2 A5.0 | eps1 0.04588 eps2 0.01200 C 1.052 | coil eps1 0.35475 | iota_err 35.70% | 173s
+Converting VMEC input to DESC input
+Generated DESC input file 925_quasr_sweep/cache/input.q0017977_desc:
+[2/36] 17977 SKIPPED -- ValueError: Phi_mod is not monotone in zeta (dPhi/dzeta spans -3.397e+09 .. 1.711e+09): the contours are not single-valued zeta(theta), so this equilibrium is outside the modular-proxy class.
+Converting VMEC input to DESC input
+Generated DESC input file 925_quasr_sweep/cache/input.q0019934_desc:
+[3/36] 19934 SKIPPED -- ValueError: Phi_mod is not monotone in zeta (dPhi/dzeta spans -6.260e+07 .. 3.708e+07): the contours are not single-valued zeta(theta), so this equilibrium is outside the modular-proxy class.
+Converting VMEC input to DESC input
+Generated DESC input file 925_quasr_sweep/cache/input.q0021725_desc:
+[4/36] 21725 nfp2QA nc3 A4.0 | eps1 0.07582 eps2 0.02164 C 1.144 | coil eps1 0.29630 | iota_err 0.11% | 161s
+Converting VMEC input to DESC input
+Generated DESC input file 925_quasr_sweep/cache/input.q0022999_desc:
+[5/36] 22999 SKIPPED -- ValueError: Phi_mod is not monotone in zeta (dPhi/dzeta spans -5.397e+08 .. 1.796e+09): the contours are not single-valued zeta(theta), so this equilibrium is outside the modular-proxy class.
+Converting VMEC input to DESC input
+Generated DESC input file 925_quasr_sweep/cache/input.q0036192_desc:
+[6/36] 36192 nfp2QA nc5 A6.7 | eps1 0.05223 eps2 0.01320 C 1.019 | coil eps1 0.22684 | iota_err 0.01% | 167s
+Converting VMEC input to DESC input
+Generated DESC input file 925_quasr_sweep/cache/input.q0059669_desc:
+[7/36] 59669 nfp3QA nc3 A10.0 | eps1 0.02767 eps2 0.00789 C 1.146 | coil eps1 0.24866 | iota_err 12.44% | 177s
+Converting VMEC input to DESC input
+Generated DESC input file 925_quasr_sweep/cache/input.q0187975_desc:
+[8/36] 187975 nfp2QA nc3 A4.0 | eps1 0.07898 eps2 0.02464 C 1.267 | coil eps1 0.20288 | iota_err 8.68% | 153s
+Converting VMEC input to DESC input
+Generated DESC input file 925_quasr_sweep/cache/input.q0188003_desc:
+[9/36] 188003 SKIPPED -- ValueError: Phi_mod is not monotone in zeta (dPhi/dzeta spans -1.842e+08 .. 3.526e+09): the contours are not single-valued zeta(theta), so this equilibrium is outside the modular-proxy class.
+Converting VMEC input to DESC input
+Generated DESC input file 925_quasr_sweep/cache/input.q0204752_desc:
+[10/36] 204752 nfp2QA nc5 A6.7 | eps1 0.05643 eps2 0.01367 C 0.974 | coil eps1 0.33469 | iota_err 0.06% | 168s
+Converting VMEC input to DESC input
+Generated DESC input file 925_quasr_sweep/cache/input.q0206905_desc:
+E0925 15:59:52.882614 1515706 xtile_compiler.cc:399] Fusion: input_reduce_fusion = f64[12,240]{1,0} fusion(a.1, b.1), kind=kCustom, calls=fused_reduce.clone, backend_config={"operation_queue_id":"0","wait_on_operation_queues":[],"fusion_backend_config":{"kind":"__triton","block_level_fusion_config":{"num_warps":"8","output_tiles":[{"sizes":["4","16"]}],"num_ctas":1,"num_stages":1,"is_tma_allowed":true,"is_warp_specialization_allowed":false}},"force_earliest_schedule":false,"reification_cost":[],"device_type":"DEVICE_TYPE_INVALID"}
+E0925 15:59:52.882653 1515706 xtile_compiler.cc:401] Computation: fused_reduce.clone {
+  param_0.4 = f64[12,240,220]{2,1,0} parameter(0)
+  param_1.5 = f64[220]{0} parameter(1)
+  broadcast.1.3 = f64[12,240,220]{2,1,0} broadcast(param_1.5), dimensions={2}
+  multiply.1.3 = f64[12,240,220]{2,1,0} multiply(param_0.4, broadcast.1.3)
+  constant_3 = f64[] constant(0)
+  ROOT reduce.1.1 = f64[12,240]{1,0} reduce(multiply.1.3, constant_3), dimensions={2}, to_apply=scalar_add_computation
+}
+[11/36] 206905 SKIPPED -- ValueError: Phi_mod is not monotone in zeta (dPhi/dzeta spans -7.034e+06 .. 2.156e+08): the contours are not single-valued zeta(theta), so this equilibrium is outside the modular-proxy class.
+Converting VMEC input to DESC input
+Generated DESC input file 925_quasr_sweep/cache/input.q0371463_desc:
+[12/36] 371463 nfp2QA nc3 A10.0 | eps1 0.03473 eps2 0.00815 C 0.939 | coil eps1 0.28051 | iota_err 0.00% | 161s
+Converting VMEC input to DESC input
+Generated DESC input file 925_quasr_sweep/cache/input.q0630491_desc:
+[13/36] 630491 nfp2QA nc5 A10.0 | eps1 0.03060 eps2 0.00710 C 0.928 | coil eps1 0.25125 | iota_err 0.02% | 189s
+Converting VMEC input to DESC input
+Generated DESC input file 925_quasr_sweep/cache/input.q0788056_desc:
+[14/36] 788056 nfp2QA nc5 A5.0 | eps1 0.05875 eps2 0.01602 C 1.098 | coil eps1 0.16801 | iota_err 15.44% | 164s
+Converting VMEC input to DESC input
+Generated DESC input file 925_quasr_sweep/cache/input.q0791647_desc:
+[15/36] 791647 nfp2QA nc6 A5.0 | eps1 0.06150 eps2 0.01670 C 1.093 | coil eps1 0.23639 | iota_err 0.11% | 177s
+Converting VMEC input to DESC input
+Generated DESC input file 925_quasr_sweep/cache/input.q0885868_desc:
+[16/36] 885868 nfp2QA nc2 A4.0 | eps1 0.08684 eps2 0.02463 C 1.180 | coil eps1 0.27763 | iota_err 0.03% | 147s
+Converting VMEC input to DESC input
+Generated DESC input file 925_quasr_sweep/cache/input.q0886805_desc:
+[17/36] 886805 nfp2QA nc2 A5.0 | eps1 0.07993 eps2 0.02084 C 1.089 | coil eps1 0.32677 | iota_err 0.13% | 145s
+Converting VMEC input to DESC input
+Generated DESC input file 925_quasr_sweep/cache/input.q0893099_desc:
+[18/36] 893099 SKIPPED -- ValueError: Phi_mod is not monotone in zeta (dPhi/dzeta spans -7.837e+07 .. 5.311e+07): the contours are not single-valued zeta(theta), so this equilibrium is outside the modular-proxy class.
+Converting VMEC input to DESC input
+Generated DESC input file 925_quasr_sweep/cache/input.q0893834_desc:
+[19/36] 893834 nfp2QA nc3 A4.0 | eps1 0.06941 eps2 0.02049 C 1.186 | coil eps1 0.23588 | iota_err 1.62% | 96s
+Converting VMEC input to DESC input
+Generated DESC input file 925_quasr_sweep/cache/input.q0904593_desc:
+[20/36] 904593 SKIPPED -- ValueError: Phi_mod is not monotone in zeta (dPhi/dzeta spans -3.065e+08 .. 5.667e+08): the contours are not single-valued zeta(theta), so this equilibrium is outside the modular-proxy class.
+Converting VMEC input to DESC input
+Generated DESC input file 925_quasr_sweep/cache/input.q0925156_desc:
+[21/36] 925156 nfp3QA nc2 A10.0 | eps1 0.03374 eps2 0.00961 C 1.140 | coil eps1 0.35909 | iota_err 11.37% | 143s
+Converting VMEC input to DESC input
+Generated DESC input file 925_quasr_sweep/cache/input.q0931883_desc:
+[22/36] 931883 SKIPPED -- ValueError: Phi_mod is not monotone in zeta (dPhi/dzeta spans -5.188e+08 .. 1.466e+09): the contours are not single-valued zeta(theta), so this equilibrium is outside the modular-proxy class.
+Converting VMEC input to DESC input
+Generated DESC input file 925_quasr_sweep/cache/input.q1042631_desc:
+[23/36] 1042631 nfp2QA nc2 A6.7 | eps1 0.04069 eps2 0.01004 C 0.990 | coil eps1 0.41939 | iota_err 1.20% | 120s
+Converting VMEC input to DESC input
+Generated DESC input file 925_quasr_sweep/cache/input.q1051619_desc:
+[24/36] 1051619 nfp2QA nc3 A6.7 | eps1 0.03910 eps2 0.00889 C 0.913 | coil eps1 0.33338 | iota_err 0.04% | 173s
+Converting VMEC input to DESC input
+Generated DESC input file 925_quasr_sweep/cache/input.q1066871_desc:
+[25/36] 1066871 nfp2QA nc5 A10.0 | eps1 0.02987 eps2 0.00690 C 0.924 | coil eps1 0.26053 | iota_err 0.01% | 164s
+Converting VMEC input to DESC input
+Generated DESC input file 925_quasr_sweep/cache/input.q1066928_desc:
+[26/36] 1066928 nfp2QA nc5 A6.7 | eps1 0.04932 eps2 0.01266 C 1.037 | coil eps1 0.23203 | iota_err 0.00% | 154s
+Converting VMEC input to DESC input
+Generated DESC input file 925_quasr_sweep/cache/input.q1328095_desc:
+[27/36] 1328095 nfp4QH nc5 A8.0 | eps1 0.03565 eps2 0.00771 C 0.863 | coil eps1 0.23561 | iota_err 0.10% | 123s
+Converting VMEC input to DESC input
+Generated DESC input file 925_quasr_sweep/cache/input.q1619596_desc:
+[28/36] 1619596 SKIPPED -- ValueError: Phi_mod is not monotone in zeta (dPhi/dzeta spans -3.329e+10 .. 2.394e+10): the contours are not single-valued zeta(theta), so this equilibrium is outside the modular-proxy class.
+Converting VMEC input to DESC input
+Generated DESC input file 925_quasr_sweep/cache/input.q1620599_desc:
+[29/36] 1620599 nfp3QH nc5 A8.0 | eps1 0.04395 eps2 0.01018 C 0.928 | coil eps1 0.39446 | iota_err 2.18% | 170s
+Converting VMEC input to DESC input
+Generated DESC input file 925_quasr_sweep/cache/input.q1659129_desc:
+[30/36] 1659129 nfp3QH nc4 A6.0 | eps1 0.04686 eps2 0.01310 C 1.128 | coil eps1 0.42845 | iota_err 4.82% | 103s
+Converting VMEC input to DESC input
+Generated DESC input file 925_quasr_sweep/cache/input.q1670503_desc:
+[31/36] 1670503 nfp4QH nc3 A6.0 | eps1 0.04362 eps2 0.01111 C 1.048 | coil eps1 0.37497 | iota_err 0.66% | 57s
+Converting VMEC input to DESC input
+Generated DESC input file 925_quasr_sweep/cache/input.q1764623_desc:
+[32/36] 1764623 SKIPPED -- ValueError: Phi_mod is not monotone in zeta (dPhi/dzeta spans -6.211e+10 .. 2.232e+10): the contours are not single-valued zeta(theta), so this equilibrium is outside the modular-proxy class.
+Converting VMEC input to DESC input
+Generated DESC input file 925_quasr_sweep/cache/input.q1768431_desc:
+[33/36] 1768431 SKIPPED -- ValueError: Phi_mod is not monotone in zeta (dPhi/dzeta spans -6.792e+09 .. 6.939e+09): the contours are not single-valued zeta(theta), so this equilibrium is outside the modular-proxy class.
+Converting VMEC input to DESC input
+Generated DESC input file 925_quasr_sweep/cache/input.q1915253_desc:
+[34/36] 1915253 nfp4QH nc5 A8.0 | eps1 0.03773 eps2 0.00846 C 0.890 | coil eps1 0.34309 | iota_err 0.34% | 155s
+Converting VMEC input to DESC input
+Generated DESC input file 925_quasr_sweep/cache/input.q1954715_desc:
+[35/36] 1954715 nfp4QH nc3 A6.0 | eps1 0.03517 eps2 0.00906 C 1.124 | coil eps1 0.38105 | iota_err 1.47% | 130s
+Converting VMEC input to DESC input
+Generated DESC input file 925_quasr_sweep/cache/input.q2477990_desc:
+[36/36] 2477990 nfp3QH nc4 A8.0 | eps1 0.05349 eps2 0.01334 C 0.998 | coil eps1 0.44440 | iota_err 3.43% | 146s

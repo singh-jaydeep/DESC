@@ -1,0 +1,1 @@
+Capped (trust radius 0.5) R1, stopped at ~it 105 on 2026-10-02 to restart all runs with --max-tr inf (user's call). Every step sat on the cap with model ratio ~1; no slack-box truncation.
