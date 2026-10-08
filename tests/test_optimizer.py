@@ -2466,6 +2466,42 @@ class TestAugLagComposite:
         np.testing.assert_allclose(out.y, [lam, -0.3 * (1 + 2 * lam)], rtol=1e-6)
 
     @pytest.mark.unit
+    def test_initial_penalty_rows(self):
+        """A large initial penalty on an inactive row changes no result or speed."""
+        a = jnp.array([2.0, 1.0, 0.0])
+
+        @jit
+        def con(x):
+            return jnp.array([x @ x, x[2], x[0]])
+
+        args = (
+            jit(lambda x: x - a),
+            jnp.zeros(3),
+            jit(lambda x: jnp.eye(3)),
+            -np.inf,
+            np.inf,
+            0.0,
+            np.zeros(3, bool),
+            con,
+            jit(Derivative(con, mode="fwd")),
+            [-np.inf, 0.3, -np.inf],
+            [1.0, 0.3, 10.0],  # x_0 <= 10 never binds
+        )
+        kw = dict(gtol=1e-8, ctol=1e-8, verbose=0)
+        ref = lsq_auglag_composite(*args, **kw)
+        out = lsq_auglag_composite(
+            *args, **kw, options={"initial_penalty_rows": {"ids": [2], "mu": 1e8}}
+        )
+        assert out.success
+        np.testing.assert_allclose(out.x, ref.x, atol=1e-8)
+        # inactive, the seeded row is left out of the jac scale: no slower than without
+        # it (with it in the scale, this took 300 iterations without converging)
+        assert out.nit <= ref.nit + 3
+        h = out.outer_history[0]
+        assert h["mu"][list(h["ids"]).index(2)] == 1e8
+        assert h["mu"][list(h["ids"]).index(0)] == 10.0
+
+    @pytest.mark.unit
     def test_coil_distance_rows(self):
         """Coaxial rings pulled together stop at the bound plus the node gap."""
         coils = CoilSet(

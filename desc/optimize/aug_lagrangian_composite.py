@@ -139,6 +139,15 @@ def lsq_auglag_composite(  # noqa: C901
           Default 10.
         - ``"initial_multipliers"`` : (array) Initial ``y`` for the rows of ``con`` at
           ``x0``. Default 0.
+        - ``"initial_penalty_rows"`` : (dict) ``{"ids": array, "mu": float or array}``,
+          initial ``mu`` for the constraint rows with these ids (``con_row_ids``),
+          above ``"initial_penalty_parameter"``. An inactive row costs nothing, so a
+          large value on rows that should never become violated (e.g. the signed
+          per-pair coil-coil rows, violated only when a pair links) makes the merit
+          function reject any step that violates them, without stiffening the rest.
+          These rows are left out of the ``x_scale="jac"`` column norms while they are
+          inactive; otherwise their weight would shrink the steps of every variable
+          they depend on.
         - ``"omega"``, ``"eta"``, ``"alpha_omega"``, ``"beta_omega"``,
           ``"alpha_eta"``, ``"beta_eta"``, ``"tau"`` : Tolerance schedule and penalty
           increase factor of algorithm 14.4.2, as in ``lsq_auglag``. Defaults
@@ -170,6 +179,7 @@ def lsq_auglag_composite(  # noqa: C901
     options = {} if options is None else dict(options)
     mu0 = options.pop("initial_penalty_parameter", 10.0)
     y0 = options.pop("initial_multipliers", None)
+    mu_rows = options.pop("initial_penalty_rows", None)
     omega = options.pop("omega", None)
     eta = options.pop("eta", None)
     alpha_omega = options.pop("alpha_omega", 1.0)
@@ -227,6 +237,12 @@ def lsq_auglag_composite(  # noqa: C901
     Y, MU = _RowValues(0.0), _RowValues(float(mu0), floor=True)
     if y0 is not None:
         Y.set(ids_c(x0, *args), np.broadcast_to(y0, (m_c,)))
+    seeded = np.zeros(0, dtype=np.int64)
+    if mu_rows is not None:
+        seeded = np.asarray(mu_rows["ids"], dtype=np.int64)
+        MU.set(
+            seeded, np.maximum(np.broadcast_to(mu_rows["mu"], seeded.shape), MU.default)
+        )
 
     def rows(ids):
         ic = np.asarray(ids)[m_f:]
@@ -234,12 +250,16 @@ def lsq_auglag_composite(  # noqa: C901
         y, mu = Y.get(ic), MU.get(ic)
         shift = y / mu
         lo_c, hi_c = lb - shift, ub - shift
-        return (
+        out = (
             jnp.asarray(np.concatenate([lo_f, lo_c])),
             jnp.asarray(np.concatenate([hi_f, hi_c])),
             jnp.asarray(np.concatenate([tgt_f, lb - shift])),
             jnp.asarray(np.concatenate([np.ones(m_f), np.sqrt(mu)])),
         )
+        if seeded.size:  # seeded rows stay out of the jac scale while inactive
+            excl = np.concatenate([np.zeros(m_f, bool), np.isin(ic, seeded)])
+            out = (*out, jnp.asarray(excl))
+        return out
 
     def violation(c):
         return np.abs(np.asarray(composite_resid(c, lb, ub, lb, ~eq)))

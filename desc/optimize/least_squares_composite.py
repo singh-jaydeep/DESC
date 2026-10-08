@@ -94,7 +94,10 @@ def lsq_composite(  # noqa: C901
     rows : callable, optional
         Per-row data at each evaluation, ``rows(ids) -> (lo, hi, tgt, w)`` with ``ids``
         from ``row_ids`` (None without it) and positive weights ``w``. For rows whose
-        bounds or weights follow their identity, as in an augmented Lagrangian.
+        bounds or weights follow their identity, as in an augmented Lagrangian. It may
+        return a fifth entry, a boolean array: those rows are left out of the
+        ``x_scale="jac"`` column norms while they are inactive (zero hinge residual),
+        so a heavily weighted guard row does not shrink the steps before it binds.
     args : tuple
         Additional arguments passed to ``fun``, ``jac``, ``hess`` and ``row_ids``.
     x_scale : array_like or ``'jac'``, optional
@@ -242,11 +245,17 @@ def lsq_composite(  # noqa: C901
             if A is None:
                 A = jac(x, *args)
                 njev += 1
-            lo_, hi_, tgt_, w = rd
+            lo_, hi_, tgt_, w = rd[:4]
             A = A * w[:, None]
             g = jnp.dot(r, A)  # r vanishes on inactive hinge rows
             if jac_scale:
-                scale, scale_inv = compute_jac_scale(A, scale_inv)
+                if len(rd) > 4:  # rows excluded from the scale while inactive
+                    out = jnp.asarray(rd[4]) & jnp.asarray(isb) & (r == 0)
+                    scale, scale_inv = compute_jac_scale(
+                        jnp.where(out[:, None], 0.0, A), scale_inv
+                    )
+                else:
+                    scale, scale_inv = compute_jac_scale(A, scale_inv)
             d = scale
             B = scale_columns(A, d)
             A = None
