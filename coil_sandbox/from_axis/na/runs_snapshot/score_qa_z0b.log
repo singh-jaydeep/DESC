@@ -1,0 +1,58 @@
+/home/jay/Documents/desc_dev/DESC/desc/__init__.py:94: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  from pynvml import (
+DESC /home/jay/Documents/desc_dev/DESC/desc
+DEVICE requested=gpu obtained=gpu (1x NVIDIA GeForce RTX 5070 Ti)
+pyQSC: iota 0.4105 helicity 0.0 max elong 5.59 L_gradB min 0.582
+coil conversion: |dB|/|B| = 4.95e-03  hinge |z| max 0.0e+00
+/home/jay/Documents/desc_dev/DESC/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+/home/jay/Documents/desc_dev/DESC/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+unsolved {"helicity": [1, 0], "qs_booz_rho.25,.5,.75,1": [0.011871792348680424, 0.025489809964026656, 0.04239270803439308, 0.06384044446140778], "iota_min_max": [0.33285013872374647, 0.35602585330449615], "A": 5.327804955678654, "a": 0.1726696371685876, "R0": 0.9199501486020362, "bn": 0.03530971164490516, "bn_max": 0.2222288355351502, "d_pc": 0.16568212664820245, "d_cc": 0.07919930185067188, "L": 3.6133579945862464, "kappa": 10.152680016095541, "linked": 0}
+Building objective: force
+Precomputing transforms
+Building objective: lcfs R
+Building objective: lcfs Z
+Building objective: fixed Psi
+Building objective: fixed pressure
+Building objective: fixed current
+Building objective: fixed sheet current
+Building objective: self_consistency R
+Building objective: self_consistency Z
+Building objective: lambda gauge
+Building objective: axis R self consistency
+Building objective: axis Z self consistency
+Number of parameters: 856
+Number of objectives: 5346
+
+Starting optimization
+Using method: lsq-exact
+Optimization terminated successfully.
+`ftol` condition satisfied. (ftol=1.00e-10)
+         Current function value: 1.103e-06
+         Total delta_x: 2.303e-01
+         Iterations: 192
+         Function evaluations: 212
+         Jacobian evaluations: 193
+==============================================================================================================
+                                                                 Start  -->   End
+Total (sum of squares):                                      4.606e-01  -->   1.103e-06, 
+Maximum absolute Force error:                                9.589e+04  -->   4.673e+02 (N)
+Minimum absolute Force error:                                1.879e+00  -->   5.845e-04 (N)
+Average absolute Force error:                                1.090e+04  -->   1.615e+01 (N)
+Maximum absolute Force error:                                1.117e-01  -->   5.441e-04 (normalized)
+Minimum absolute Force error:                                2.188e-06  -->   6.806e-10 (normalized)
+Average absolute Force error:                                1.270e-02  -->   1.881e-05 (normalized)
+R boundary error:                                            0.000e+00  -->   4.225e-18 (m)
+Z boundary error:                                            0.000e+00  -->   2.632e-18 (m)
+Fixed Psi error:                                             0.000e+00  -->   0.000e+00 (Wb)
+Fixed pressure profile error:                                0.000e+00  -->   0.000e+00 (Pa)
+Fixed current profile error:                                 0.000e+00  -->   0.000e+00 (A)
+Fixed sheet current error:                                   0.000e+00  -->   0.000e+00 (~)
+==============================================================================================================
+
+/home/jay/Documents/desc_dev/DESC/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+/home/jay/Documents/desc_dev/DESC/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+solved {"helicity": [1, 0], "qs_booz_rho.25,.5,.75,1": [0.02425068297894345, 0.020329488282386437, 0.03269141252928953, 0.06401835390791603], "iota_min_max": [0.38982890559231415, 0.4198369487688169], "A": 5.327804955678637, "a": 0.1726696371685877, "R0": 0.9199501486020337, "bn": 0.03530971164490516, "bn_max": 0.2222288355351502, "d_pc": 0.16568212664820237, "d_cc": 0.07919930185067188, "L": 3.6133579945862464, "kappa": 10.152680016095541, "linked": 0}

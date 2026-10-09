@@ -72,6 +72,10 @@ the user): WISTELL-A cold start (`work/ss_qh/joint/cold/`). Traps: arc starts wi
 free-hinge cold starts can link coils in one step, so pass `run_al.py --link-mu 1e8` (initial AL penalty on the
 signed per-pair coil-coil rows only; main repo 31ed99491).
 
+**New line (2026-10-09): near-axis search (`from_axis/`).** Giuliani-style joint axis + coil optimization with the
+z = 0 two-face coil class built in; QA nfp 2/3 and QH nfp 5 give the best seeds. Read `from_axis/CLAUDE.md`,
+`from_axis/REPORT.md`, `from_axis/PLAN.md`; results in `from_axis/viewer.html`.
+
 **Done (2026-10-08): the precise_QH boundary × coils matrix.** Results, caveats and deviations are in
 `work/ss_qh/matrix/RESULTS.md` (tables `matrix.md`, timeline `NOTE.txt`). Planar and arcB2 are best on their own
 single-stage boundary (0.31× and 0.27× their precise_QH B·n). XYZ is best on the arcB2 boundary, because its own single
