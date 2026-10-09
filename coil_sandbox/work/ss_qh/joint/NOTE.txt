@@ -123,3 +123,15 @@ Build check (build/): 5.0 GB peak, cc active 1313/80000, field max err 1.7e-6.
   QUASR 804112 (QA nfp3 A10 iota 0.2, ext_med 0.80; scaled to a 0.1243 via prep_quasr.py A_TARGET): free_warm 8.922e-3,
   level 1.350e-2, z0 1.516e-2 (1.70x, lowest), removable. Viewers: results/view.html (13), view_devices.html (15+).
   Report: results/REPORT.md.
+
+2026-10-09 hires/ (user): best performer (cont/) at equilibrium resolution 12. upres.py cont/k4b eq L=M=N 8 -> 12 (grids 24),
+fixed-boundary re-solve 300 its 13 min: |F| rel 1.40e-4 -> 1.72e-6; iota min 1.2075 -> 1.2069; QS rho .5 7.02e-4 -> 6.87e-4,
+rho 1 2.94e-3 -> 3.07e-3 (res-8 discretization error ~2-4%). Then run.sh all: k4b (L12) -> k5 (L12) -> refine. Compare k4b vs
+cont/k4b (stalled on xtol in 5 its) and refine vs 2.2661e-3.
+
+2026-10-09 res-12 k4b (maxiter 100, eq chunk 300; first try OOM'd on GPU at auto chunk 1164 -> --eq-jac-chunk) moved where res 8
+stalled: 10 its, cost 1.719e-1 -> 1.638e-1, ~4.5 min/it. User: stop at 30 its, refine, compare physics/coils to res 8. No mid-step
+checkpoint, so restarted deterministically with MAXITER=30 run.sh short (k4b -> refine from k4b, no k5).
+
+2026-10-09 hires done: k4b 30 its (MAXITER cap) cost 1.719e-1 -> 1.585e-1, 171 min; refine 2.2746e-3 vs res-8 2.2661e-3 (+0.4%).
+QS rho .5 5.76e-4 vs 7.02e-4, iota min 1.2132 vs 1.2075; coils/removability unchanged. Verdict: stick with res 8 (REPORT.md sec 7).

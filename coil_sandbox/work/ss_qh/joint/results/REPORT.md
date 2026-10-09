@@ -168,6 +168,32 @@ do), and a horizontal chord cannot follow the bean's tilt. A better metric would
 3. Single stage + continuation on QUASR 1328095 (needs an equilibrium re-solve).
 4. A cheaper AL stall rule, or `hessian=secant` in the single stage (`K5_STALL.md`).
 
+## 7. Equilibrium resolution 12 on the best performer (2026-10-09, `../hires/`)
+
+Question (user): another session found single-stage stalls can come from the equilibrium discretization. Does the coil
+continuation result (`cont/`, L = M = N = 8, grids 16) change at L = M = N = 12 (grids 24)?
+
+* **Pure discretization** (`upres.py`): cont/k4b's boundary re-solved at res 12. Force error 1.40e-4 → 1.72e-6; QS and ι
+  shift 2–4% (QS ρ 0.5 7.02e-4 → 6.87e-4, ρ 1 2.94e-3 → 3.07e-3; ι min 1.2075 → 1.2069).
+* **k4b at res 12** (same flags as cont/k4b, capped at 30 iterations by the user; needs `single_stage.py --eq-jac-chunk 300`,
+  auto chunk ran out of GPU memory): res 8 stalled on xtol in 5 iterations (cost 1.712e-1 → 1.711e-1); res 12 moved on
+  steadily to 1.585e-1 (−7.8%, 43 evaluations) and was still descending at the cap. 171 min: ≈4 min per function
+  evaluation vs ≈18 s at res 8 (cont/k4b: 27 evaluations in 8 min).
+* **Refine** (run_al, same flags as cont/refine):
+
+| | res 8 (cont) | res 12 (hires) |
+|---|---|---|
+| single-stage B·n before refine | 2.443e-3 | 2.388e-3 |
+| **refined B·n** | **2.2661e-3** | **2.2746e-3** (+0.4%) |
+| QS ρ 0.25 / 0.5 / 0.75 / 1 | 5.21e-4 / 7.02e-4 / 1.01e-3 / 2.94e-3 | 5.12e-4 / **5.76e-4** / 9.26e-4 / 2.92e-3 |
+| ι range | 1.2075–1.2223 | 1.2132–1.2238 |
+| coils (L, κ, κ_MS, d_cc, d_pc ratios) | 1.000, 1.000, 0.707, 1.017, 1.268 | 1.000, 1.000, 0.707, 1.016, 1.288 |
+| hinge clearance, removable | +0.074 m, yes | +0.079 m, yes |
+
+**Verdict: no significant change in coils or B·n; stick with res 8.** The res-12 progress went into QS (ρ 0.5 −18%) and ι,
+not into B·n, which the refine brings to the same value. Resolution did remove the k4b stall, so a res-12 step is the
+first thing to try when a res-8 single-stage step stalls (K5_STALL.md), at ~13× the cost per evaluation.
+
 ## Files
 
 `../cont/` (continuation), `../quasr1328095/` (4-coil runs; `nc5/` own design + feasibility), `../devices/` (batch),

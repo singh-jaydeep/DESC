@@ -164,6 +164,9 @@ def parse():
     g.add_argument("--src-n", type=int, default=400, help="Biot-Savart LinearGrid(N) for smooth coils")
     g.add_argument("--bs-chunk", type=int, default=None, help="Biot-Savart chunk (eval points)")
     g.add_argument("--jac-chunk", type=int, default=None, help="jac_chunk_size of the heavy terms")
+    g.add_argument("--eq-jac-chunk", type=int, default=None,
+                   help="jac_chunk_size of the proximal ForceBalance (the eq re-solve); DESC's auto size ignores what "
+                        "the coil terms already hold on the GPU (res 12: auto 1164 asked for 4 GB and ran out)")
     g.add_argument("--dcc-k", type=int, default=20000, help="two-pass capacity, coil-coil")
     return ap.parse_args()
 
@@ -294,7 +297,7 @@ def max_hinge_dz(cs, z):
     return max(float(np.abs(np.asarray(c.hinges).reshape(-1, 3)[:, 2] - z).max()) for c in S.iter_unique(cs))
 
 
-def proximal_constraints(eq, k, fix_sum, cs, hinge_z=None, level=False):
+def proximal_constraints(eq, k, fix_sum, cs, hinge_z=None, level=False, eq_chunk=None):
     """ForceBalance plus the fixed-boundary set, with only |m|, |n| <= k boundary modes free
     (R_00 always fixed: it sets the machine size)."""
     R = eq.surface.R_basis.modes
@@ -303,7 +306,8 @@ def proximal_constraints(eq, k, fix_sum, cs, hinge_z=None, level=False):
     Zfix = Z[np.max(np.abs(Z), axis=1) > k]
     base = [c for c in O.get_fixed_boundary_constraints(eq)
             if not isinstance(c, (O.FixBoundaryR, O.FixBoundaryZ))]
-    cons = [O.ForceBalance(eq), O.FixBoundaryR(eq, modes=Rfix), *base]
+    fb = O.ForceBalance(eq, jac_chunk_size=eq_chunk) if eq_chunk else O.ForceBalance(eq)
+    cons = [fb, O.FixBoundaryR(eq, modes=Rfix), *base]
     if len(Zfix):
         cons.append(O.FixBoundaryZ(eq, modes=Zfix))
     if fix_sum:
@@ -473,7 +477,8 @@ def main():
         return
 
     for k in range(a.kmin, a.kmax + 1):
-        cons, n_free = proximal_constraints(eq, k, a.fix_current_sum, cs, a.fix_hinge_z, a.horizontal_hinges)
+        cons, n_free = proximal_constraints(eq, k, a.fix_current_sum, cs, a.fix_hinge_z, a.horizontal_hinges,
+                                            a.eq_jac_chunk)
         objective = O.ObjectiveFunction(tuple(build_terms(eq, cs, a, E)[0]))
         print(f"\n===== step k={k}: {n_free} boundary modes free, maxiter {a.maxiter} =====", flush=True)
         solve = {"verbose": 0}

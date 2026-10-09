@@ -1,0 +1,53 @@
+E1009 09:23:50.336794 2940544 cuda_executor.cc:1743] Could not get kernel mode driver version: ( INVALID_ARGUMENT: Version does not match the format X.Y.Z )
+E1009 09:23:50.349442 2940401 cuda_executor.cc:1743] Could not get kernel mode driver version: ( INVALID_ARGUMENT: Version does not match the format X.Y.Z )
+DESC /home/singh/Documents/DESC2/desc
+DEVICE requested=gpu obtained=gpu (1x NVIDIA GeForce RTX 5070 Laptop GPU)
+/home/singh/Documents/DESC2/coil_sandbox/sandbox/boot.py:43: UserWarning: `desc` was imported (from /home/singh/Documents/DESC2/desc/__init__.py) before boot.setup(); the chosen DESC and the device choice may not take effect.
+  warnings.warn(f"`desc` was imported (from {getattr(sys.modules['desc'], '__file__', '?')}) before "
+DESC /home/singh/Documents/DESC2/desc
+DEVICE requested=gpu obtained=gpu (1x NVIDIA GeForce RTX 5070 Laptop GPU)
+in  L,M,N 8,8,8 grid 16,16,16  V 0.29745  A 8.073  R0 0.9940  a 0.1231  iota [1.2075, 1.2223]  QS(Boozer, |B_nonsym|/<B>) rho 0.25 5.21e-04  rho 0.5 7.02e-04  rho 0.75 1.01e-03  rho 1 2.94e-03  |F|/|gradB^2/2mu0| 1.40e-04
+Building objective: force
+Precomputing transforms
+Building objective: lcfs R
+Building objective: lcfs Z
+Building objective: fixed Psi
+Building objective: fixed pressure
+Building objective: fixed current
+Building objective: fixed sheet current
+Building objective: self_consistency R
+Building objective: self_consistency Z
+Building objective: lambda gauge
+Building objective: axis R self consistency
+Building objective: axis Z self consistency
+Number of parameters: 2784
+Number of objectives: 16562
+
+Starting optimization
+Using method: lsq-exact
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 9.813e-12
+         Total delta_x: 9.866e-03
+         Iterations: 300
+         Function evaluations: 334
+         Jacobian evaluations: 301
+==============================================================================================================
+                                                                 Start  -->   End
+Total (sum of squares):                                      4.962e-08  -->   9.813e-12, 
+Maximum absolute Force error:                                6.429e+01  -->   1.412e+00 (N)
+Minimum absolute Force error:                                1.385e-04  -->   7.558e-07 (N)
+Average absolute Force error:                                1.391e+00  -->   1.691e-02 (N)
+Maximum absolute Force error:                                1.956e-04  -->   4.295e-06 (normalized)
+Minimum absolute Force error:                                4.214e-10  -->   2.299e-12 (normalized)
+Average absolute Force error:                                4.231e-06  -->   5.143e-08 (normalized)
+R boundary error:                                            0.000e+00  -->   3.717e-18 (m)
+Z boundary error:                                            0.000e+00  -->   1.490e-17 (m)
+Fixed Psi error:                                             0.000e+00  -->   0.000e+00 (Wb)
+Fixed pressure profile error:                                0.000e+00  -->   0.000e+00 (Pa)
+Fixed current profile error:                                 0.000e+00  -->   0.000e+00 (A)
+Fixed sheet current error:                                   0.000e+00  -->   0.000e+00 (~)
+==============================================================================================================
+
+solve wall 13.1 min
+out L,M,N 12,12,12 grid 24,24,24  V 0.29745  A 8.073  R0 0.9940  a 0.1231  iota [1.2069, 1.2211]  QS(Boozer, |B_nonsym|/<B>) rho 0.25 5.12e-04  rho 0.5 6.87e-04  rho 0.75 9.92e-04  rho 1 3.07e-03  |F|/|gradB^2/2mu0| 1.72e-06
+wrote work/ss_qh/joint/hires/eq_k4b_L12.h5
