@@ -9,6 +9,10 @@ add() { [ -f "$2" ] && H+=(--h5 "$1=$2@$3"); }
 Q=$J/quasr1328095
 add "q1328095 LEVEL"                 $Q/level/result.h5                 $Q/eq_q1328095.h5
 add "q1328095 free (warm)"           $Q/free_warm/result.h5             $Q/eq_q1328095.h5
+add "q1328095 free (cold, collapsed)" $Q/free/result.h5                $Q/eq_q1328095.h5
+add "q1328095 nc5 own bounds LEVEL (stalled)" $Q/nc5/level/result.h5    $Q/eq_q1328095.h5
+add "q1328095 nc5 own bounds free (warm, stalled)" $Q/nc5/free_warm/result.h5 $Q/eq_q1328095.h5
+add "q1328095 nc5 own bounds free feasibility" $Q/nc5/feas_free/result.h5 $Q/eq_q1328095.h5
 add "q1328095 nc5 own bounds LEVEL feasibility" $Q/nc5/feas_level/result.h5 $Q/eq_q1328095.h5
 add "q1328095 nc5 own bounds LEVEL from feasible" $Q/nc5/level_from_feas/result.h5 $Q/eq_q1328095.h5
 for d in q1632037 q1632468 q1775228 wistell; do
