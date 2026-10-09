@@ -87,3 +87,19 @@ Build check (build/): 5.0 GB peak, cc active 1313/80000, field max err 1.7e-6.
   QS rho .5 9.7e-4 (B_arcB2 8.8e-4), iota min 1.187. view.html rebuilt (11 coilsets). RESULTS.md has an Update section.
   User question answered: stage 2 (lsq-auglag-composite) uses hessian=secant by default; single stage
   (proximal-lsq-exact) is plain GN -> noted in results/K5_STALL.md.
+2026-10-08 19:10-19:55 -- QUASR 1328095 (user recalled QUASR devices "unusually well adapted to arcB2": 925_quasr_sweep).
+  quasr1328095/: eq Psi rescaled to precise_QH <|B|> (exact, vacuum); make_z0_start.py --chord-z centre (new option).
+  free (cold): converged in 29 inner its at B.n 0.1005 -- poor basin (hinges up to 0.75 m, one pair 47 deg apart).
+  level: 5.644e-3, converged gtol 233 inner; NOT REMOVABLE (coil 2 hinge -0.095 m clearance, 5.2% arc blocked).
+  free_warm (from level result): 2.693e-3, converged gtol 136 inner. level/free 2.10 (precise_QH 1.61).
+  Sanity: QUASR's own coils give B.n 9.9e-4 on the rescaled eq.
+  User: accept removability failure for now; build out more examples -> devices/ (all.sh): QUASR 1632037 (iota 1.4),
+  1632468 (1.7), 1775228 (2.0) = best-QS nfp4 QH A8 nc4 per iota bin, then WISTELL-A. Unsolved boundaries (vacuum B.n).
+2026-10-08 19:55-21:35 -- device batch (devices/all.sh), all converged gtol, none linked:
+  q1632037 level 7.672e-3 (NOT removable, 2.6%), free_warm 4.510e-3
+  q1632468 level 8.908e-3 (NOT removable, 29.6%), free_warm 6.340e-3
+  q1775228 level 1.117e-2 (NOT removable, 32.8%; coil z up to 0.68 m), free_warm 5.726e-3
+  wistell  level 1.457e-2 (REMOVABLE, +0.245 m), free_warm 1.346e-2
+  Free-control chord tilts mostly < 30 deg (warm-start bias): level/free is a lower bound on horizontality cost.
+  QUASR own designs vs our bounds: L/coil 3.6-3.7 (ours 2.93), d_pc 0.15-0.21 (ours 0.110), d_cc 0.10 (ours 0.059),
+  kappa_MS 21-35 (ours 18.7); 1328095 used 5 coils/hp (we use 4). User: reconvene on good / bad / untested.

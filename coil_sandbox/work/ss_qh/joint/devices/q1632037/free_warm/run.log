@@ -1,0 +1,198 @@
+Running as unit: run-p2599691-i2603533.scope; invocation ID: f5c76988db41401ab87ad2d09e731e4e
+E1008 20:07:40.296784 2599842 cuda_executor.cc:1743] Could not get kernel mode driver version: ( INVALID_ARGUMENT: Version does not match the format X.Y.Z )
+E1008 20:07:40.309291 2599691 cuda_executor.cc:1743] Could not get kernel mode driver version: ( INVALID_ARGUMENT: Version does not match the format X.Y.Z )
+DESC /home/singh/Documents/DESC2/desc
+DEVICE requested=gpu obtained=gpu (1x NVIDIA GeForce RTX 5070 Laptop GPU)
+  [mem] RSS 0.83 GB  peak 0.83 GB
+eq work/ss_qh/joint/devices/q1632037/eq.h5 NFP 4 sym True; start work/ss_qh/joint/devices/q1632037/level/result.h5: 4 unique coils (PiecewisePlanarArcCoil), 4 top-level; VACUUM
+BOUNDS L 2.926  Ltot -  kappa 13.67  kms 18.69  convex -  planar -  dcc 0.05851  dpc 0.1097
+  built coil length in 2.4 s
+  built coil curvature in 0.1 s
+  built coil mean squared curvature in 0.1 s
+  built coil-coil distance rows in 9.8 s
+E1008 20:08:04.652572 2599864 xtile_compiler.cc:399] Fusion: input_reduce_fusion = f64[103201]{0} fusion(a.1, b.1), kind=kCustom, calls=fused_reduce.clone, backend_config={"operation_queue_id":"0","wait_on_operation_queues":[],"fusion_backend_config":{"kind":"__triton","block_level_fusion_config":{"num_warps":"8","output_tiles":[{"sizes":["64"]}],"num_ctas":1,"num_stages":1,"is_tma_allowed":true,"is_warp_specialization_allowed":false}},"force_earliest_schedule":false,"reification_cost":[],"device_type":"DEVICE_TYPE_INVALID"}
+E1008 20:08:04.652638 2599864 xtile_compiler.cc:401] Computation: fused_reduce.clone {
+  param_0.2 = f64[103201,220]{1,0} parameter(0)
+  param_1.2 = f64[220]{0} parameter(1)
+  broadcast.2 = f64[103201,220]{1,0} broadcast(param_1.2), dimensions={1}
+  multiply.2 = f64[103201,220]{1,0} multiply(param_0.2, broadcast.2)
+  constant_2 = f64[] constant(0)
+  ROOT reduce.2 = f64[103201]{0} reduce(multiply.2, constant_2), dimensions={1}, to_apply=scalar_add_computation
+}
+E1008 20:08:09.819728 2599870 xtile_compiler.cc:399] Fusion: input_reduce_fusion = f64[70912]{0} fusion(a.1, b.1), kind=kCustom, calls=fused_reduce.clone, backend_config={"operation_queue_id":"0","wait_on_operation_queues":[],"fusion_backend_config":{"kind":"__triton","block_level_fusion_config":{"num_warps":"8","output_tiles":[{"sizes":["64"]}],"num_ctas":1,"num_stages":1,"is_tma_allowed":true,"is_warp_specialization_allowed":false}},"force_earliest_schedule":false,"reification_cost":[],"device_type":"DEVICE_TYPE_INVALID"}
+E1008 20:08:09.819785 2599870 xtile_compiler.cc:401] Computation: fused_reduce.clone {
+  param_0.2 = f64[70912,220]{1,0} parameter(0)
+  param_1.2 = f64[220]{0} parameter(1)
+  broadcast.2 = f64[70912,220]{1,0} broadcast(param_1.2), dimensions={1}
+  multiply.2 = f64[70912,220]{1,0} multiply(param_0.2, broadcast.2)
+  constant_2 = f64[] constant(0)
+  ROOT reduce.2 = f64[70912]{0} reduce(multiply.2, constant_2), dimensions={1}, to_apply=scalar_add_computation
+}
+  [mem] RSS 3.03 GB  peak 5.01 GB
+  [mem] RSS 3.03 GB  peak 5.01 GB
+E1008 20:09:08.762121 2599849 xtile_compiler.cc:399] Fusion: input_reduce_fusion = f64[50000]{0} fusion(a.1, b.1), kind=kCustom, calls=fused_reduce.clone, backend_config={"operation_queue_id":"0","wait_on_operation_queues":[],"fusion_backend_config":{"kind":"__triton","block_level_fusion_config":{"num_warps":"8","output_tiles":[{"sizes":["64"]}],"num_ctas":1,"num_stages":1,"is_tma_allowed":true,"is_warp_specialization_allowed":false}},"force_earliest_schedule":false,"reification_cost":[],"device_type":"DEVICE_TYPE_INVALID"}
+E1008 20:09:08.762173 2599849 xtile_compiler.cc:401] Computation: fused_reduce.clone {
+  param_0.4 = f64[50000,220]{1,0} parameter(0)
+  param_1.5 = f64[220]{0} parameter(1)
+  broadcast.4 = f64[50000,220]{1,0} broadcast(param_1.5), dimensions={1}
+  multiply.4 = f64[50000,220]{1,0} multiply(param_0.4, broadcast.4)
+  constant_3 = f64[] constant(0)
+  ROOT reduce.2 = f64[50000]{0} reduce(multiply.4, constant_3), dimensions={1}, to_apply=scalar_add_computation
+}
+  [mem] RSS 4.24 GB  peak 5.01 GB
+  [mem] RSS 4.86 GB  peak 5.02 GB
+  [mem] RSS 4.93 GB  peak 5.09 GB
+  [mem] RSS 4.80 GB  peak 5.17 GB
+  [mem] RSS 5.07 GB  peak 5.24 GB
+  [mem] RSS 5.11 GB  peak 5.28 GB
+  [mem] RSS 4.71 GB  peak 5.31 GB
+  [mem] RSS 4.46 GB  peak 5.38 GB
+  built plasma-coil distance field in 294.7 s
+W1008 20:13:10.434660 2599691 bfc_allocator.cc:502] Allocator (GPU_0_bfc) ran out of memory trying to allocate 954.23MiB (rounded to 1000583424)requested by op 
+If the cause is memory fragmentation maybe the environment variable 'TF_GPU_ALLOCATOR=cuda_malloc_async' will improve the situation. 
+Current allocation summary follows.
+Current allocation summary follows.
+W1008 20:13:10.434772 2599691 bfc_allocator.cc:513] **x___*****_______*******************************************************************_______________
+  [mem] RSS 4.60 GB  peak 5.38 GB
+W1008 20:13:20.534886 2599691 bfc_allocator.cc:502] Allocator (GPU_0_bfc) ran out of memory trying to allocate 954.23MiB (rounded to 1000583424)requested by op 
+If the cause is memory fragmentation maybe the environment variable 'TF_GPU_ALLOCATOR=cuda_malloc_async' will improve the situation. 
+Current allocation summary follows.
+Current allocation summary follows.
+W1008 20:13:20.535006 2599691 bfc_allocator.cc:513] **x___*****_______*************************************************__****************_______________
+BUILD 310.9 s; cc gap 1.060 mm on 1318 nodes/coil, pc node margin 1.659 mm on 514 nodes/coil; cc active rows at start 43336 of 80000; field {'max_error': 8.29148425030013e-07, 'concave_radius': np.float64(0.3326550072537754), 'node_margin': 0.0016590416116764608}
+INFO {'kind': 'PiecewisePlanarArcCoil', 'gauge': 'none', 'field_grid': 'gl (48 nodes)', 'n_nodes': 514, 'speed_ratio': 2.0, 'cc_gap_mode': 'coils', 'cc_gap': 'from the coils at build (see BUILD line)', 'pc_node_margin': 'from the coils at build (see field_info)'}
+  coil length                      rows 4
+  coil curvature                   rows 2404
+  coil mean squared curvature      rows 4
+  coil-coil distance rows          rows 125073000
+  plasma-coil distance field       rows 4112
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 4.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 4.
+  warnings.warn(msg, err)
+  [mem] RSS 5.33 GB  peak 5.38 GB
+START  bn 7.6721e-03  L 1.000  kappa 1.000  kMS 1.011  d_cc 1.008  d_pc 1.294  linked 0  -> FAILS L,kappa,kMS
+START  true: cc 0.05896 pc 0.14193 max L 2.9310 max |k| 13.674 linked [] gap {'used': 0.0010595821839971668, 'needed': 0.001059692310984304}
+LINK GUARD: initial mu 1.0e+08 on the 72 signed per-pair rows (ids 125075340..125075411); every other row starts at the solver default
+Building objective: summed coil current
+Building objective: fixed shift
+Building objective: fixed rotation
+Building objective: fixed arc reference
+Number of parameters: 75
+Number of objectives: 1326
+Number of equality constraints: 0
+Number of inequality constraints: 86596
+
+Starting optimization
+Using method: lsq-auglag-composite
+  [mem] RSS 5.65 GB  peak 6.27 GB
+Outer Inner its  Optimality     gtolk  Violation     ctolk   mu mean   max |y|
+    1         1   2.294e-05  5.72e-05  1.252e-04  4.98e-04  8.32e+04  0.00e+00
+  [mem] RSS 5.97 GB  peak 6.27 GB
+[outer 1] 1 inner its, opt 2.29e-05 (gtolk 5.7e-05, met), violation 1.25e-04 (ctolk 5.0e-04), 46 s
+   coil length                    rows      4 mu 1.0e+01/1.0e+01/1.0e+01 max|y| 0.00e+00 (nonzero 0) max viol 9.08e-05
+   coil curvature                 rows   2404 mu 1.0e+01/1.0e+01/1.0e+01 max|y| 0.00e+00 (nonzero 0) max viol 8.09e-06
+   coil mean squared curvature    rows      4 mu 1.0e+01/1.0e+01/1.0e+01 max|y| 0.00e+00 (nonzero 0) max viol 0.00e+00
+   coil-coil distance rows        rows  43413 mu 1.0e+01/1.0e+01/1.0e+08 max|y| 0.00e+00 (nonzero 0) max viol 1.25e-04
+   plasma-coil distance field     rows   4112 mu 1.0e+01/1.0e+01/1.0e+01 max|y| 0.00e+00 (nonzero 0) max viol 0.00e+00
+   true: cc 0.05902 m, pc 0.14192 m, max L 2.9310, max |k| 13.674, linked [], gap {'used': 0.0010595821839971668, 'needed': 0.0010597947002631593}
+  [mem] RSS 6.17 GB  peak 6.93 GB
+    2        37   3.250e-06  5.72e-06  8.903e-05  6.27e-05  8.32e+04  1.25e-03
+  [mem] RSS 6.20 GB  peak 6.93 GB
+[outer 2] 37 inner its, opt 3.25e-06 (gtolk 5.7e-06, met), violation 8.90e-05 (ctolk 6.3e-05), 105 s
+   coil length                    rows      4 mu 1.0e+01/1.0e+01/1.0e+01 max|y| 9.08e-04 (nonzero 4) max viol 1.62e-05
+   coil curvature                 rows   2404 mu 1.0e+01/1.0e+01/1.0e+01 max|y| 8.09e-05 (nonzero 3) max viol 1.24e-05
+   coil mean squared curvature    rows      4 mu 1.0e+01/1.0e+01/1.0e+01 max|y| 0.00e+00 (nonzero 0) max viol 0.00e+00
+   coil-coil distance rows        rows  20368 mu 1.0e+01/1.0e+01/1.0e+08 max|y| 1.25e-03 (nonzero 17) max viol 8.90e-05
+   plasma-coil distance field     rows   4112 mu 1.0e+01/1.0e+01/1.0e+01 max|y| 0.00e+00 (nonzero 0) max viol 0.00e+00
+   true: cc 0.05895 m, pc 0.15447 m, max L 2.9327, max |k| 13.677, linked [], gap {'used': 0.0010595821839971668, 'needed': 0.0009464913519189482}
+    3         1   5.784e-06  1.44e-05  2.413e-05  4.34e-04  8.32e+04  4.16e-04
+[outer 3] 1 inner its, opt 5.78e-06 (gtolk 1.4e-05, met), violation 2.41e-05 (ctolk 4.3e-04), 114 s
+   coil length                    rows      4 mu 2.6e+01/2.6e+01/2.6e+01 max|y| 4.16e-04 (nonzero 4) max viol 1.32e-06
+   coil curvature                 rows   2404 mu 2.6e+01/2.6e+01/2.6e+01 max|y| 1.24e-04 (nonzero 2) max viol 1.76e-06
+   coil mean squared curvature    rows      4 mu 2.6e+01/2.6e+01/2.6e+01 max|y| 0.00e+00 (nonzero 0) max viol 0.00e+00
+   coil-coil distance rows        rows  20353 mu 2.6e+01/2.6e+01/1.0e+08 max|y| 2.87e-04 (nonzero 3) max viol 2.41e-05
+   plasma-coil distance field     rows   4112 mu 2.6e+01/2.6e+01/2.6e+01 max|y| 0.00e+00 (nonzero 0) max viol 0.00e+00
+   true: cc 0.05894 m, pc 0.15447 m, max L 2.9327, max |k| 13.676, linked [], gap {'used': 0.0010595821839971668, 'needed': 0.0009464665433485928}
+  [mem] RSS 6.11 GB  peak 7.07 GB
+  [mem] RSS 6.11 GB  peak 7.07 GB
+  [mem] RSS 6.11 GB  peak 7.07 GB
+    4        68   2.593e-07  1.00e-06  1.586e-05  1.22e-05  8.32e+04  2.41e-03
+  [mem] RSS 6.51 GB  peak 7.07 GB
+[outer 4] 68 inner its, opt 2.59e-07 (gtolk 1.0e-06, met), violation 1.59e-05 (ctolk 1.2e-05), 223 s
+   coil length                    rows      4 mu 4.1e+01/4.1e+01/4.1e+01 max|y| 4.51e-04 (nonzero 4) max viol 5.96e-07
+   coil curvature                 rows   2404 mu 4.1e+01/4.1e+01/4.1e+01 max|y| 1.50e-04 (nonzero 2) max viol 3.88e-06
+   coil mean squared curvature    rows      4 mu 4.1e+01/4.1e+01/4.1e+01 max|y| 0.00e+00 (nonzero 0) max viol 8.91e-07
+   coil-coil distance rows        rows  13917 mu 4.1e+01/4.1e+01/1.0e+08 max|y| 2.41e-03 (nonzero 4) max viol 1.59e-05
+   plasma-coil distance field     rows   4112 mu 4.1e+01/4.1e+01/4.1e+01 max|y| 0.00e+00 (nonzero 0) max viol 0.00e+00
+   true: cc 0.05902 m, pc 0.14824 m, max L 2.9324, max |k| 13.667, linked [], gap {'used': 0.0010595821839971668, 'needed': 0.0008350979758350222}
+    5         1   1.373e-06  5.72e-06  3.187e-06  3.95e-04  8.32e+04  4.46e-04
+[outer 5] 1 inner its, opt 1.37e-06 (gtolk 5.7e-06, met), violation 3.19e-06 (ctolk 4.0e-04), 231 s
+   coil length                    rows      4 mu 7.2e+01/7.2e+01/7.2e+01 max|y| 3.81e-04 (nonzero 4) max viol 3.70e-08
+   coil curvature                 rows   2404 mu 7.2e+01/7.2e+01/7.2e+01 max|y| 1.59e-04 (nonzero 4) max viol 1.02e-06
+   coil mean squared curvature    rows      4 mu 7.2e+01/7.2e+01/7.2e+01 max|y| 3.66e-05 (nonzero 1) max viol 2.38e-08
+   coil-coil distance rows        rows  13916 mu 7.2e+01/7.2e+01/1.0e+08 max|y| 4.46e-04 (nonzero 2) max viol 3.19e-06
+   plasma-coil distance field     rows   4112 mu 7.2e+01/7.2e+01/7.2e+01 max|y| 0.00e+00 (nonzero 0) max viol 0.00e+00
+   true: cc 0.05903 m, pc 0.14824 m, max L 2.9324, max |k| 13.667, linked [], gap {'used': 0.0010595821839971668, 'needed': 0.0008350963581822813}
+    6         1   4.795e-07  1.00e-06  2.637e-08  4.92e-06  8.32e+04  1.31e-03
+[outer 6] 1 inner its, opt 4.80e-07 (gtolk 1.0e-06, met), violation 2.64e-08 (ctolk 4.9e-06), 238 s
+   coil length                    rows      4 mu 1.0e+02/1.0e+02/1.0e+02 max|y| 3.84e-04 (nonzero 4) max viol 2.64e-08
+   coil curvature                 rows   2404 mu 1.0e+02/1.0e+02/1.0e+02 max|y| 2.33e-04 (nonzero 3) max viol 0.00e+00
+   coil mean squared curvature    rows      4 mu 1.0e+02/1.0e+02/1.0e+02 max|y| 3.83e-05 (nonzero 1) max viol 1.07e-08
+   coil-coil distance rows        rows  13916 mu 1.0e+02/1.0e+02/1.0e+08 max|y| 1.31e-03 (nonzero 3) max viol 0.00e+00
+   plasma-coil distance field     rows   4112 mu 1.0e+02/1.0e+02/1.0e+02 max|y| 0.00e+00 (nonzero 0) max viol 0.00e+00
+   true: cc 0.05903 m, pc 0.14824 m, max L 2.9324, max |k| 13.667, linked [], gap {'used': 0.0010595821839971668, 'needed': 0.0008350956298754453}
+`gtol` condition satisfied.
+         Max scaled gradient: 4.795e-07
+         Max constraint violation: 2.637e-08
+         Outer iterations: 6
+         Iterations: 109
+         Function evaluations: 149
+         Jacobian evaluations: 111
+==============================================================================================================
+                                                                 Start  -->   End
+Total (sum of squares):                                      3.502e-03  -->   1.196e-03, 
+Maximum absolute Boundary normal field error:                1.176e-02  -->   7.340e-03 (T m^2)
+Minimum absolute Boundary normal field error:                9.348e-07  -->   4.599e-06 (T m^2)
+Average absolute Boundary normal field error:                2.578e-03  -->   1.538e-03 (T m^2)
+Maximum absolute Boundary normal field error:                7.568e-03  -->   4.724e-03 (normalized)
+Minimum absolute Boundary normal field error:                6.016e-07  -->   2.960e-06 (normalized)
+Average absolute Boundary normal field error:                1.659e-03  -->   9.899e-04 (normalized)
+Summed coil current error:                                   0.000e+00  -->   1.164e-10 (A)
+Maximum Coil length:                                         2.926e+00  -->   2.926e+00 (m)
+Minimum Coil length:                                         2.926e+00  -->   2.926e+00 (m)
+Average Coil length:                                         2.926e+00  -->   2.926e+00 (m)
+Maximum Coil length:                                         6.257e+00  -->   6.257e+00 (normalized)
+Minimum Coil length:                                         6.257e+00  -->   6.257e+00 (normalized)
+Average Coil length:                                         6.257e+00  -->   6.257e+00 (normalized)
+Maximum Coil curvature:                                      1.367e+01  -->   1.367e+01 (m^-1)
+Minimum Coil curvature:                                      0.000e+00  -->   0.000e+00 (m^-1)
+Average Coil curvature:                                      2.847e+00  -->   2.952e+00 (m^-1)
+Maximum Coil curvature:                                      6.393e+00  -->   6.393e+00 (normalized)
+Minimum Coil curvature:                                      0.000e+00  -->   0.000e+00 (normalized)
+Average Coil curvature:                                      1.331e+00  -->   1.381e+00 (normalized)
+Maximum Coil mean squared curvature:                         1.861e+01  -->   1.869e+01 (m^-2)
+Minimum Coil mean squared curvature:                         6.968e+00  -->   9.840e+00 (m^-2)
+Average Coil mean squared curvature:                         1.245e+01  -->   1.275e+01 (m^-2)
+Maximum Coil mean squared curvature:                         4.068e+00  -->   4.087e+00 (normalized)
+Minimum Coil mean squared curvature:                         1.523e+00  -->   2.151e+00 (normalized)
+Average Coil mean squared curvature:                         2.721e+00  -->   2.787e+00 (normalized)
+Maximum Coil-coil distance rows:                             2.029e+00  -->   2.141e+00 (m)
+Minimum Coil-coil distance rows:                             5.822e-02  -->   5.851e-02 (m)
+Average Coil-coil distance rows:                             9.007e-02  -->   9.774e-02 (m)
+Maximum Coil-coil distance rows:                             4.340e+00  -->   4.579e+00 (normalized)
+Minimum Coil-coil distance rows:                             1.245e-01  -->   1.251e-01 (normalized)
+Average Coil-coil distance rows:                             1.926e-01  -->   2.090e-01 (normalized)
+Maximum Plasma-coil distance field:                          2.189e-01  -->   2.189e-01 (m)
+Minimum Plasma-coil distance field:                          1.411e-01  -->   1.466e-01 (m)
+Average Plasma-coil distance field:                          2.098e-01  -->   2.098e-01 (m)
+Maximum Plasma-coil distance field:                          8.550e-01  -->   8.550e-01 (normalized)
+Minimum Plasma-coil distance field:                          5.510e-01  -->   5.725e-01 (normalized)
+Average Plasma-coil distance field:                          8.193e-01  -->   8.193e-01 (normalized)
+==============================================================================================================
+
+  [mem] RSS 6.23 GB  peak 7.08 GB
+SOLVER `gtol` condition satisfied. | 6 outer / 109 inner its, opt 4.80e-07, violation 2.64e-08, 250 s
+START  bn 7.6721e-03  L 1.000  kappa 1.000  kMS 1.011  d_cc 1.008  d_pc 1.294  -> FAILS L,kappa,kMS
+RESULT bn 4.5102e-03  L 1.000  kappa 1.000  kMS 0.988  d_cc 1.010  d_pc 1.351  linked 0  -> FAILS L,kappa  active ['L', 'kappa']
+wrote work/ss_qh/joint/devices/q1632037/free_warm/result.h5, result.json, outer.json

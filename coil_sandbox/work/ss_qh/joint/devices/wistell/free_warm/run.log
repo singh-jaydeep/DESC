@@ -1,0 +1,1046 @@
+Running as unit: run-p2651167-i2655065.scope; invocation ID: 85ac363cc7a14ca09f34427339b8b340
+E1008 21:22:25.229515 2651313 cuda_executor.cc:1743] Could not get kernel mode driver version: ( INVALID_ARGUMENT: Version does not match the format X.Y.Z )
+E1008 21:22:25.242218 2651167 cuda_executor.cc:1743] Could not get kernel mode driver version: ( INVALID_ARGUMENT: Version does not match the format X.Y.Z )
+DESC /home/singh/Documents/DESC2/desc
+DEVICE requested=gpu obtained=gpu (1x NVIDIA GeForce RTX 5070 Laptop GPU)
+  [mem] RSS 0.83 GB  peak 0.83 GB
+eq work/ss_qh/joint/devices/wistell/eq.h5 NFP 4 sym True; start work/ss_qh/joint/devices/wistell/level/result.h5: 4 unique coils (PiecewisePlanarArcCoil), 4 top-level; VACUUM
+BOUNDS L 2.926  Ltot -  kappa 13.67  kms 18.69  convex -  planar -  dcc 0.05851  dpc 0.1097
+  built coil length in 2.2 s
+  built coil curvature in 0.1 s
+  built coil mean squared curvature in 0.1 s
+  built coil-coil distance rows in 8.8 s
+E1008 21:22:46.799288 2651326 xtile_compiler.cc:399] Fusion: input_reduce_fusion = f64[74305]{0} fusion(a.1, b.1), kind=kCustom, calls=fused_reduce.clone, backend_config={"operation_queue_id":"0","wait_on_operation_queues":[],"fusion_backend_config":{"kind":"__triton","block_level_fusion_config":{"num_warps":"8","output_tiles":[{"sizes":["64"]}],"num_ctas":1,"num_stages":1,"is_tma_allowed":true,"is_warp_specialization_allowed":false}},"force_earliest_schedule":false,"reification_cost":[],"device_type":"DEVICE_TYPE_INVALID"}
+E1008 21:22:46.799340 2651326 xtile_compiler.cc:401] Computation: fused_reduce.clone {
+  param_0.2 = f64[74305,162]{1,0} parameter(0)
+  param_1.2 = f64[162]{0} parameter(1)
+  broadcast.2 = f64[74305,162]{1,0} broadcast(param_1.2), dimensions={1}
+  multiply.2 = f64[74305,162]{1,0} multiply(param_0.2, broadcast.2)
+  constant_2 = f64[] constant(0)
+  ROOT reduce.2 = f64[74305]{0} reduce(multiply.2, constant_2), dimensions={1}, to_apply=scalar_add_computation
+}
+E1008 21:22:51.334106 2651333 xtile_compiler.cc:399] Fusion: input_reduce_fusion = f64[57088]{0} fusion(a.1, b.1), kind=kCustom, calls=fused_reduce.clone, backend_config={"operation_queue_id":"0","wait_on_operation_queues":[],"fusion_backend_config":{"kind":"__triton","block_level_fusion_config":{"num_warps":"8","output_tiles":[{"sizes":["64"]}],"num_ctas":1,"num_stages":1,"is_tma_allowed":true,"is_warp_specialization_allowed":false}},"force_earliest_schedule":false,"reification_cost":[],"device_type":"DEVICE_TYPE_INVALID"}
+E1008 21:22:51.334156 2651333 xtile_compiler.cc:401] Computation: fused_reduce.clone {
+  param_0.4 = f64[57088,162]{1,0} parameter(0)
+  param_1.5 = f64[162]{0} parameter(1)
+  broadcast.4 = f64[57088,162]{1,0} broadcast(param_1.5), dimensions={1}
+  multiply.4 = f64[57088,162]{1,0} multiply(param_0.4, broadcast.4)
+  constant_3 = f64[] constant(0)
+  ROOT reduce.2 = f64[57088]{0} reduce(multiply.4, constant_3), dimensions={1}, to_apply=scalar_add_computation
+}
+  [mem] RSS 2.86 GB  peak 3.91 GB
+E1008 21:23:19.241155 2651338 xtile_compiler.cc:399] Fusion: input_reduce_fusion = f64[50000]{0} fusion(a.1, b.1), kind=kCustom, calls=fused_reduce.clone, backend_config={"operation_queue_id":"0","wait_on_operation_queues":[],"fusion_backend_config":{"kind":"__triton","block_level_fusion_config":{"num_warps":"8","output_tiles":[{"sizes":["64"]}],"num_ctas":1,"num_stages":1,"is_tma_allowed":true,"is_warp_specialization_allowed":false}},"force_earliest_schedule":false,"reification_cost":[],"device_type":"DEVICE_TYPE_INVALID"}
+E1008 21:23:19.241206 2651338 xtile_compiler.cc:401] Computation: fused_reduce.clone {
+  param_0.2 = f64[50000,162]{1,0} parameter(0)
+  param_1.2 = f64[162]{0} parameter(1)
+  broadcast.2 = f64[50000,162]{1,0} broadcast(param_1.2), dimensions={1}
+  multiply.2 = f64[50000,162]{1,0} multiply(param_0.2, broadcast.2)
+  constant_2 = f64[] constant(0)
+  ROOT reduce.2 = f64[50000]{0} reduce(multiply.2, constant_2), dimensions={1}, to_apply=scalar_add_computation
+}
+  [mem] RSS 3.73 GB  peak 4.34 GB
+  [mem] RSS 3.95 GB  peak 4.62 GB
+  [mem] RSS 3.86 GB  peak 4.77 GB
+  [mem] RSS 4.26 GB  peak 4.85 GB
+  built plasma-coil distance field in 159.5 s
+  [mem] RSS 4.42 GB  peak 4.93 GB
+BUILD 173.9 s; cc gap 1.061 mm on 966 nodes/coil, pc node margin 0.892 mm on 514 nodes/coil; cc active rows at start 66776 of 80000; field {'max_error': 1.6840737709911124e-06, 'concave_radius': np.float64(0.22169426378293042), 'node_margin': 0.0008923988914061854}
+INFO {'kind': 'PiecewisePlanarArcCoil', 'gauge': 'none', 'field_grid': 'gl (48 nodes)', 'n_nodes': 514, 'speed_ratio': 2.0, 'cc_gap_mode': 'coils', 'cc_gap': 'from the coils at build (see BUILD line)', 'pc_node_margin': 'from the coils at build (see field_info)'}
+  coil length                      rows 4
+  coil curvature                   rows 2404
+  coil mean squared curvature      rows 4
+  coil-coil distance rows          rows 67187304
+  plasma-coil distance field       rows 4112
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 4.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 4.
+  warnings.warn(msg, err)
+E1008 21:25:48.569534 2651334 xtile_compiler.cc:399] Fusion: input_reduce_fusion = f64[13824,3]{1,0} fusion(loop_divide_fusion, get-tuple-element.341), kind=kCustom, calls=fused_reduce.clone, backend_config={"operation_queue_id":"0","wait_on_operation_queues":[],"fusion_backend_config":{"kind":"__triton","block_level_fusion_config":{"num_warps":"8","output_tiles":[{"sizes":["256","1"]}],"num_ctas":1,"num_stages":1,"is_tma_allowed":true,"is_warp_specialization_allowed":false}},"force_earliest_schedule":false,"reification_cost":[],"device_type":"DEVICE_TYPE_INVALID"}
+E1008 21:25:48.569585 2651334 xtile_compiler.cc:401] Computation: fused_reduce.clone {
+  param_0.375 = f64[13824,48]{1,0} parameter(0)
+  broadcast.120.4 = f64[13824,3,48]{2,1,0} broadcast(param_0.375), dimensions={0,2}
+  param_1.429 = f64[3,48]{1,0} parameter(1)
+  broadcast.128.1 = f64[13824,3,48]{2,1,0} broadcast(param_1.429), dimensions={1,2}
+  multiply.56.3 = f64[13824,3,48]{2,1,0} multiply(broadcast.120.4, broadcast.128.1)
+  constant_162_7 = f64[] constant(0)
+  ROOT reduce_sum.78.1 = f64[13824,3]{1,0} reduce(multiply.56.3, constant_162_7), dimensions={2}, to_apply=region_2.4.clone.9
+}
+START  bn 1.4570e-02  L 1.000  kappa 1.001  kMS 1.011  d_cc 1.009  d_pc 1.402  linked 0  -> FAILS L,kappa,kMS
+  [mem] RSS 5.46 GB  peak 5.85 GB
+START  true: cc 0.05899 pc 0.15379 max L 2.9318 max |k| 13.685 linked [] gap {'used': 0.0010610534777901076, 'needed': 0.0010612437487666428}
+LINK GUARD: initial mu 1.0e+08 on the 72 signed per-pair rows (ids 67189644..67189715); every other row starts at the solver default
+Building objective: summed coil current
+Building objective: fixed shift
+Building objective: fixed rotation
+Building objective: fixed arc reference
+Number of parameters: 75
+Number of objectives: 1326
+Number of equality constraints: 0
+Number of inequality constraints: 86596
+
+Starting optimization
+Using method: lsq-auglag-composite
+  [mem] RSS 5.82 GB  peak 5.85 GB
+Outer Inner its  Optimality     gtolk  Violation     ctolk   mu mean   max |y|
+    1         4   4.817e-04  1.00e-03  3.106e-02  8.74e-04  8.32e+04  0.00e+00
+[outer 1] 4 inner its, opt 4.82e-04 (gtolk 1.0e-03, met), violation 3.11e-02 (ctolk 8.7e-04), 44 s
+   coil length                    rows      4 mu 1.0e+01/1.0e+01/1.0e+01 max|y| 0.00e+00 (nonzero 0) max viol 3.11e-02
+   coil curvature                 rows   2404 mu 1.0e+01/1.0e+01/1.0e+01 max|y| 0.00e+00 (nonzero 0) max viol 5.01e-03
+   coil mean squared curvature    rows      4 mu 1.0e+01/1.0e+01/1.0e+01 max|y| 0.00e+00 (nonzero 0) max viol 1.30e-03
+   coil-coil distance rows        rows  67516 mu 1.0e+01/1.0e+01/1.0e+08 max|y| 0.00e+00 (nonzero 0) max viol 4.26e-03
+   plasma-coil distance field     rows   4112 mu 1.0e+01/1.0e+01/1.0e+01 max|y| 0.00e+00 (nonzero 0) max viol 0.00e+00
+   true: cc 0.05755 m, pc 0.15454 m, max L 2.9400, max |k| 13.767, linked [], gap {'used': 0.0010610534777901076, 'needed': 0.0011294240470672433}
+  [mem] RSS 6.14 GB  peak 6.58 GB
+    2         7   1.256e-04  1.44e-04  4.319e-03  7.21e-04  8.32e+04  8.71e-03
+[outer 2] 7 inner its, opt 1.26e-04 (gtolk 1.4e-04, met), violation 4.32e-03 (ctolk 7.2e-04), 57 s
+   coil length                    rows      4 mu 4.7e+01/1.0e+02/1.0e+02 max|y| 0.00e+00 (nonzero 0) max viol 4.32e-03
+   coil curvature                 rows   2404 mu 4.7e+01/4.7e+01/1.0e+02 max|y| 8.48e-03 (nonzero 4) max viol 1.39e-03
+   coil mean squared curvature    rows      4 mu 4.7e+01/4.7e+01/1.0e+02 max|y| 0.00e+00 (nonzero 0) max viol 7.36e-05
+   coil-coil distance rows        rows  67280 mu 4.7e+01/4.7e+01/1.0e+08 max|y| 8.71e-03 (nonzero 337) max viol 1.50e-03
+   plasma-coil distance field     rows   4112 mu 4.7e+01/4.7e+01/4.7e+01 max|y| 0.00e+00 (nonzero 0) max viol 0.00e+00
+   true: cc 0.05865 m, pc 0.15386 m, max L 2.9323, max |k| 13.697, linked [], gap {'used': 0.0010610534777901076, 'needed': 0.0011190400997715014}
+  [mem] RSS 6.17 GB  peak 6.60 GB
+  [mem] RSS 6.17 GB  peak 6.60 GB
+  [mem] RSS 6.17 GB  peak 6.60 GB
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 80343 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 82896 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 82132 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 81031 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 80527 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 80719 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 80572 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 80733 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 80872 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 81038 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 80941 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 81075 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 81218 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 81489 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 81410 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 81479 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 81514 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 81518 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 81530 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+  [mem] RSS 6.17 GB  peak 6.60 GB
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 81549 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 81537 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 81535 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 81531 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 81545 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 81557 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 81660 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 81941 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 82642 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83305 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 82988 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 82707 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 82673 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 82719 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 82794 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 82973 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83312 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83942 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83601 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83390 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83559 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 84222 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83898 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83632 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83767 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 84253 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 84390 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 85695 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 86359 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 86171 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 86004 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 85904 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+  [mem] RSS 6.17 GB  peak 6.60 GB
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 85779 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 85856 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 85893 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 86023 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 86214 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 86259 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 84386 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 86198 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 86217 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 86270 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 86353 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 86661 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 86732 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 87044 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 87469 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 87375 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 87212 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 87145 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 87156 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 87169 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 87407 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 87201 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 87160 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 87150 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 87194 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 87214 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 87195 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 87215 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 87256 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 87432 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 87270 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 87373 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 87456 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 87450 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 87467 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+  [mem] RSS 6.17 GB  peak 6.60 GB
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 87487 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+    3       143   2.964e-05  3.65e-05  1.084e-03  6.28e-04  8.33e+04  6.96e-02
+[outer 3] 143 inner its, opt 2.96e-05 (gtolk 3.6e-05, met), violation 1.08e-03 (ctolk 6.3e-04), 235 s
+   coil length                    rows      4 mu 1.8e+02/1.0e+03/1.0e+03 max|y| 0.00e+00 (nonzero 0) max viol 3.66e-04
+   coil curvature                 rows   2404 mu 1.8e+02/1.8e+02/1.0e+03 max|y| 2.95e-02 (nonzero 7) max viol 3.39e-04
+   coil mean squared curvature    rows      4 mu 1.8e+02/1.8e+02/1.8e+02 max|y| 7.36e-03 (nonzero 1) max viol 7.96e-05
+   coil-coil distance rows        rows  80072 mu 1.8e+02/1.8e+02/1.0e+08 max|y| 6.96e-02 (nonzero 183) max viol 1.08e-03
+   plasma-coil distance field     rows   4112 mu 1.8e+02/1.8e+02/1.8e+02 max|y| 0.00e+00 (nonzero 0) max viol 0.00e+00
+   true: cc 0.02188 m, pc 0.15257 m, max L 2.9309, max |k| 13.678, linked [], gap {'used': 0.0010610534777901076, 'needed': 0.0011335583391233535}
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 87453 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 87313 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 87257 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 87206 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+    4         3   2.210e-05  2.71e-05  2.400e-04  6.10e-04  8.34e+04  3.66e-01
+[outer 4] 3 inner its, opt 2.21e-05 (gtolk 2.7e-05, met), violation 2.40e-04 (ctolk 6.1e-04), 243 s
+   coil length                    rows      4 mu 2.8e+02/1.0e+03/1.0e+03 max|y| 3.66e-01 (nonzero 3) max viol 1.39e-05
+   coil curvature                 rows   2404 mu 2.8e+02/2.8e+02/1.0e+03 max|y| 6.16e-02 (nonzero 5) max viol 1.01e-04
+   coil mean squared curvature    rows      4 mu 2.8e+02/2.8e+02/2.8e+02 max|y| 2.18e-02 (nonzero 1) max viol 1.52e-05
+   coil-coil distance rows        rows  80072 mu 2.8e+02/2.8e+02/1.0e+08 max|y| 1.13e-01 (nonzero 199) max viol 2.40e-04
+   plasma-coil distance field     rows   4112 mu 2.8e+02/2.8e+02/2.8e+02 max|y| 0.00e+00 (nonzero 0) max viol 0.00e+00
+   true: cc 0.02222 m, pc 0.15254 m, max L 2.9308, max |k| 13.675, linked [], gap {'used': 0.0010610534777901076, 'needed': 0.0011317408858561966}
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 87206 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 87172 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 87143 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 87128 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 87125 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 87129 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 87192 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 87190 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 87181 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 86990 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 87141 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 86940 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 87033 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 87097 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 87116 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 87087 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 87030 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 87028 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 86819 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 86915 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 87154 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 87168 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+  [mem] RSS 6.16 GB  peak 6.63 GB
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 87024 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 86933 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 86977 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 86957 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 86969 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 86904 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 86922 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 86907 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 86895 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 86927 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 86916 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 86828 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 86856 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 86845 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 86855 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 86808 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 86767 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 86476 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 86588 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 86677 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 86751 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 86718 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 86685 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 86625 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 86739 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 86698 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 86628 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 86626 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 86645 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 86643 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 86631 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 86501 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 86289 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 86381 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 86488 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 86525 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 86499 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 86504 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 86430 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 86309 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 86392 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+  [mem] RSS 6.16 GB  peak 6.63 GB
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 86142 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 86224 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 86359 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 86293 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 86259 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 86085 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 85784 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 85832 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 85597 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 85691 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 85681 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 85692 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 85695 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 85668 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 85636 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 85584 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 85518 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 85457 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 85381 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 85081 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 84939 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 84990 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 85072 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 85038 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 85014 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 84984 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 84928 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 84849 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 84883 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 84884 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 84850 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 84843 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 84842 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 84821 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 84779 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 84440 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 84613 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+  [mem] RSS 6.16 GB  peak 6.63 GB
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 84534 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 84251 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 84122 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 84151 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83914 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83929 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 84024 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 84101 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 84100 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 84088 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 84070 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 84042 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83967 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 84016 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 84000 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83966 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83964 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83976 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83879 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83759 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83755 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83609 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83622 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83697 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83745 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83716 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83652 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83584 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83602 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83582 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83567 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83578 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83565 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83546 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83535 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83503 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83104 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83447 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+  [mem] RSS 6.16 GB  peak 6.63 GB
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83389 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 82969 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83269 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83159 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83198 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83282 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83273 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83274 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83265 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83250 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83233 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83187 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83102 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83047 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 82785 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 82836 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 82947 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83025 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83001 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 82980 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 82952 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 82918 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 82910 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 82934 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 82962 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83100 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83087 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83020 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 82963 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 82972 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 82968 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 82985 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 82999 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 82998 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83002 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83031 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83050 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+  [mem] RSS 6.16 GB  peak 6.63 GB
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83051 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83046 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83038 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83045 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83033 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83034 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 82987 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 82982 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83008 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83005 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83004 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 82981 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+    5       134   8.428e-07  1.00e-06  5.054e-04  2.17e-06  8.36e+04  4.35e-01
+[outer 5] 134 inner its, opt 8.43e-07 (gtolk 1.0e-06, met), violation 5.05e-04 (ctolk 2.2e-06), 394 s
+   coil length                    rows      4 mu 4.1e+02/1.0e+03/1.0e+03 max|y| 3.80e-01 (nonzero 3) max viol 2.78e-05
+   coil curvature                 rows   2404 mu 4.1e+02/4.1e+02/1.0e+03 max|y| 8.98e-02 (nonzero 3) max viol 2.01e-04
+   coil mean squared curvature    rows      4 mu 4.1e+02/4.1e+02/4.1e+02 max|y| 2.61e-02 (nonzero 1) max viol 0.00e+00
+   coil-coil distance rows        rows  80072 mu 4.1e+02/4.1e+02/1.0e+08 max|y| 4.35e-01 (nonzero 128) max viol 5.05e-04
+   plasma-coil distance field     rows   4112 mu 4.1e+02/4.1e+02/4.1e+02 max|y| 0.00e+00 (nonzero 0) max viol 0.00e+00
+   true: cc 0.05898 m, pc 0.15307 m, max L 2.9303, max |k| 13.686, linked [], gap {'used': 0.0010610534777901076, 'needed': 0.0011326680861341448}
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 82980 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 82921 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 82899 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 82865 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 82840 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 82817 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 82789 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 82788 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 82830 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 82896 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 82872 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 82841 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 82849 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 82892 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 82934 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 82939 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83004 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83002 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83010 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83014 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83003 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+  [mem] RSS 6.18 GB  peak 6.64 GB
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83008 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83022 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83017 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83012 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83015 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83016 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+    6        20   1.396e-06  2.40e-06  1.528e-04  4.78e-04  8.72e+04  3.18e-01
+[outer 6] 20 inner its, opt 1.40e-06 (gtolk 2.4e-06, met), violation 1.53e-04 (ctolk 4.8e-04), 418 s
+   coil length                    rows      4 mu 4.0e+03/7.0e+03/1.0e+04 max|y| 3.18e-01 (nonzero 3) max viol 3.13e-06
+   coil curvature                 rows   2404 mu 4.0e+03/4.0e+03/4.1e+03 max|y| 2.31e-02 (nonzero 1) max viol 1.86e-05
+   coil mean squared curvature    rows      4 mu 4.0e+03/4.0e+03/4.0e+03 max|y| 1.61e-02 (nonzero 1) max viol 0.00e+00
+   coil-coil distance rows        rows  80072 mu 4.0e+03/4.0e+03/1.0e+08 max|y| 7.71e-04 (nonzero 2) max viol 1.53e-04
+   plasma-coil distance field     rows   4112 mu 4.0e+03/4.0e+03/4.0e+03 max|y| 0.00e+00 (nonzero 0) max viol 0.00e+00
+   true: cc 0.05909 m, pc 0.15312 m, max L 2.9303, max |k| 13.685, linked [], gap {'used': 0.0010610534777901076, 'needed': 0.001132381087036372}
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83016 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83006 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83001 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 82994 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 82991 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 82989 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83039 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83040 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83037 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83048 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83060 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83066 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83062 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83057 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83063 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83070 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83068 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83079 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83077 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83100 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83102 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83089 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83082 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83088 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83084 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83095 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83093 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+  [mem] RSS 6.11 GB  peak 6.66 GB
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83085 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83133 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83186 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83250 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83239 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83193 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83178 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83179 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83187 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83168 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83175 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83167 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83189 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83176 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83172 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83169 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83150 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83162 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83155 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83152 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83154 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83156 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83157 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83159 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83191 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83195 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83198 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83202 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83203 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83244 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83219 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+  [mem] RSS 6.11 GB  peak 6.66 GB
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83214 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83208 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83204 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+    7        54   3.105e-07  1.00e-06  9.096e-05  1.00e-06  8.74e+04  6.24e-01
+[outer 7] 54 inner its, opt 3.11e-07 (gtolk 1.0e-06, met), violation 9.10e-05 (ctolk 1.0e-06), 476 s
+   coil length                    rows      4 mu 4.3e+03/7.1e+03/1.0e+04 max|y| 3.16e-01 (nonzero 3) max viol 3.00e-07
+   coil curvature                 rows   2404 mu 4.3e+03/4.3e+03/4.3e+03 max|y| 7.60e-02 (nonzero 6) max viol 1.29e-05
+   coil mean squared curvature    rows      4 mu 4.3e+03/4.3e+03/4.3e+03 max|y| 1.53e-02 (nonzero 1) max viol 0.00e+00
+   coil-coil distance rows        rows  80072 mu 4.3e+03/4.3e+03/1.0e+08 max|y| 6.24e-01 (nonzero 51) max viol 9.10e-05
+   plasma-coil distance field     rows   4112 mu 4.3e+03/4.3e+03/4.3e+03 max|y| 0.00e+00 (nonzero 0) max viol 0.00e+00
+   true: cc 0.05910 m, pc 0.15288 m, max L 2.9303, max |k| 13.685, linked [], gap {'used': 0.0010610534777901076, 'needed': 0.001135607289716674}
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83204 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83195 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83193 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83191 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83194 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83183 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83167 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83168 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83161 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83157 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83166 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83190 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83224 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83216 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83206 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83192 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83197 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83207 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83228 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83222 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83221 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83219 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83230 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83223 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+  [mem] RSS 6.24 GB  peak 6.66 GB
+    8        23   7.024e-07  1.00e-06  1.422e-05  3.83e-04  1.13e+05  6.24e-01
+[outer 8] 23 inner its, opt 7.02e-07 (gtolk 1.0e-06, met), violation 1.42e-05 (ctolk 3.8e-04), 505 s
+   coil length                    rows      4 mu 3.0e+04/3.0e+04/3.0e+04 max|y| 3.17e-01 (nonzero 3) max viol 9.43e-08
+   coil curvature                 rows   2404 mu 3.0e+04/3.0e+04/4.3e+04 max|y| 4.44e-02 (nonzero 6) max viol 8.69e-07
+   coil mean squared curvature    rows      4 mu 3.0e+04/3.0e+04/3.0e+04 max|y| 1.53e-02 (nonzero 1) max viol 0.00e+00
+   coil-coil distance rows        rows  80072 mu 3.0e+04/3.0e+04/1.0e+08 max|y| 6.24e-01 (nonzero 23) max viol 1.42e-05
+   plasma-coil distance field     rows   4112 mu 3.0e+04/3.0e+04/3.0e+04 max|y| 0.00e+00 (nonzero 0) max viol 0.00e+00
+   true: cc 0.05910 m, pc 0.15296 m, max L 2.9303, max |k| 13.685, linked [], gap {'used': 0.0010610534777901076, 'needed': 0.0011338385500698587}
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83219 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83218 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83217 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+    9         4   6.749e-07  1.00e-06  3.198e-06  1.00e-06  1.21e+05  9.90e-01
+[outer 9] 4 inner its, opt 6.75e-07 (gtolk 1.0e-06, met), violation 3.20e-06 (ctolk 1.0e-06), 513 s
+   coil length                    rows      4 mu 3.8e+04/3.8e+04/3.8e+04 max|y| 3.15e-01 (nonzero 3) max viol 1.66e-08
+   coil curvature                 rows   2404 mu 3.8e+04/3.8e+04/4.3e+04 max|y| 4.39e-02 (nonzero 6) max viol 1.86e-07
+   coil mean squared curvature    rows      4 mu 3.8e+04/3.8e+04/3.8e+04 max|y| 1.49e-02 (nonzero 1) max viol 0.00e+00
+   coil-coil distance rows        rows  80072 mu 3.8e+04/3.8e+04/1.0e+08 max|y| 9.90e-01 (nonzero 25) max viol 3.20e-06
+   plasma-coil distance field     rows   4112 mu 3.8e+04/3.8e+04/3.8e+04 max|y| 0.00e+00 (nonzero 0) max viol 0.00e+00
+   true: cc 0.05910 m, pc 0.15296 m, max L 2.9303, max |k| 13.685, linked [], gap {'used': 0.0010610534777901076, 'needed': 0.0011338354774143057}
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83217 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+   10         4   5.111e-07  1.00e-06  1.370e-06  3.34e-04  1.84e+05  9.90e-01
+[outer 10] 4 inner its, opt 5.11e-07 (gtolk 1.0e-06, met), violation 1.37e-06 (ctolk 3.3e-04), 522 s
+   coil length                    rows      4 mu 1.0e+05/1.0e+05/1.0e+05 max|y| 3.11e-01 (nonzero 3) max viol 2.03e-09
+   coil curvature                 rows   2404 mu 1.0e+05/1.0e+05/1.0e+05 max|y| 4.52e-02 (nonzero 6) max viol 1.48e-08
+   coil mean squared curvature    rows      4 mu 1.0e+05/1.0e+05/1.0e+05 max|y| 1.43e-02 (nonzero 1) max viol 7.81e-10
+   coil-coil distance rows        rows  80072 mu 1.0e+05/1.0e+05/1.0e+08 max|y| 9.90e-01 (nonzero 22) max viol 1.37e-06
+   plasma-coil distance field     rows   4112 mu 1.0e+05/1.0e+05/1.0e+05 max|y| 0.00e+00 (nonzero 0) max viol 0.00e+00
+   true: cc 0.05910 m, pc 0.15296 m, max L 2.9303, max |k| 13.685, linked [], gap {'used': 0.0010610534777901076, 'needed': 0.001133834927345866}
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83217 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+   11         3   6.471e-07  1.00e-06  1.071e-06  1.00e-06  2.44e+05  1.21e+00
+  [mem] RSS 6.24 GB  peak 6.72 GB
+[outer 11] 3 inner its, opt 6.47e-07 (gtolk 1.0e-06, met), violation 1.07e-06 (ctolk 1.0e-06), 530 s
+   coil length                    rows      4 mu 1.6e+05/1.6e+05/1.6e+05 max|y| 3.10e-01 (nonzero 3) max viol 2.26e-11
+   coil curvature                 rows   2404 mu 1.6e+05/1.6e+05/1.6e+05 max|y| 4.64e-02 (nonzero 6) max viol 2.06e-08
+   coil mean squared curvature    rows      4 mu 1.6e+05/1.6e+05/1.6e+05 max|y| 1.44e-02 (nonzero 1) max viol 8.98e-10
+   coil-coil distance rows        rows  80072 mu 1.6e+05/1.6e+05/1.0e+08 max|y| 1.21e+00 (nonzero 17) max viol 1.07e-06
+   plasma-coil distance field     rows   4112 mu 1.6e+05/1.6e+05/1.6e+05 max|y| 0.00e+00 (nonzero 0) max viol 0.00e+00
+   true: cc 0.05910 m, pc 0.15296 m, max L 2.9303, max |k| 13.685, linked [], gap {'used': 0.0010610534777901076, 'needed': 0.0011338348619077479}
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83217 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+   12         3   8.449e-07  1.00e-06  3.230e-07  2.94e-04  4.60e+05  1.29e+00
+[outer 12] 3 inner its, opt 8.45e-07 (gtolk 1.0e-06, met), violation 3.23e-07 (ctolk 2.9e-04), 537 s
+   coil length                    rows      4 mu 3.8e+05/3.8e+05/3.8e+05 max|y| 3.08e-01 (nonzero 3) max viol 7.17e-11
+   coil curvature                 rows   2404 mu 3.8e+05/3.8e+05/3.8e+05 max|y| 4.45e-02 (nonzero 6) max viol 2.25e-08
+   coil mean squared curvature    rows      4 mu 3.8e+05/3.8e+05/3.8e+05 max|y| 1.45e-02 (nonzero 1) max viol 4.46e-10
+   coil-coil distance rows        rows  80072 mu 3.8e+05/3.8e+05/1.0e+08 max|y| 1.29e+00 (nonzero 14) max viol 3.23e-07
+   plasma-coil distance field     rows   4112 mu 3.8e+05/3.8e+05/3.8e+05 max|y| 0.00e+00 (nonzero 0) max viol 0.00e+00
+   true: cc 0.05910 m, pc 0.15296 m, max L 2.9303, max |k| 13.685, linked [], gap {'used': 0.0010610534777901076, 'needed': 0.0011338347920832187}
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83217 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+`gtol` condition satisfied.
+         Max scaled gradient: 8.449e-07
+         Max constraint violation: 3.230e-07
+         Outer iterations: 12
+         Iterations: 402
+         Function evaluations: 605
+         Jacobian evaluations: 404
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 83217 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)
+==============================================================================================================
+                                                                 Start  -->   End
+Total (sum of squares):                                      7.982e-01  -->   6.782e-01, 
+Maximum absolute Boundary normal field error:                1.815e-02  -->   2.105e-02 (T m^2)
+Minimum absolute Boundary normal field error:                3.422e-06  -->   2.005e-07 (T m^2)
+Average absolute Boundary normal field error:                6.406e-03  -->   5.844e-03 (T m^2)
+Maximum absolute Boundary normal field error:                7.502e-02  -->   8.700e-02 (normalized)
+Minimum absolute Boundary normal field error:                1.414e-05  -->   8.284e-07 (normalized)
+Average absolute Boundary normal field error:                2.647e-02  -->   2.415e-02 (normalized)
+Summed coil current error:                                   0.000e+00  -->   4.191e-09 (A)
+Maximum Coil length:                                         2.926e+00  -->   2.926e+00 (m)
+Minimum Coil length:                                         2.744e+00  -->   2.779e+00 (m)
+Average Coil length:                                         2.880e+00  -->   2.889e+00 (m)
+Maximum Coil length:                                         6.392e+00  -->   6.392e+00 (normalized)
+Minimum Coil length:                                         5.995e+00  -->   6.072e+00 (normalized)
+Average Coil length:                                         6.293e+00  -->   6.312e+00 (normalized)
+Maximum Coil curvature:                                      1.367e+01  -->   1.367e+01 (m^-1)
+Minimum Coil curvature:                                      0.000e+00  -->   0.000e+00 (m^-1)
+Average Coil curvature:                                      2.861e+00  -->   2.929e+00 (m^-1)
+Maximum Coil curvature:                                      6.258e+00  -->   6.258e+00 (normalized)
+Minimum Coil curvature:                                      0.000e+00  -->   0.000e+00 (normalized)
+Average Coil curvature:                                      1.310e+00  -->   1.341e+00 (normalized)
+Maximum Coil mean squared curvature:                         1.869e+01  -->   1.869e+01 (m^-2)
+Minimum Coil mean squared curvature:                         6.123e+00  -->   8.833e+00 (m^-2)
+Average Coil mean squared curvature:                         1.275e+01  -->   1.284e+01 (m^-2)
+Maximum Coil mean squared curvature:                         3.916e+00  -->   3.916e+00 (normalized)
+Minimum Coil mean squared curvature:                         1.283e+00  -->   1.850e+00 (normalized)
+Average Coil mean squared curvature:                         2.671e+00  -->   2.689e+00 (normalized)
+Maximum Coil-coil distance rows:                             1.321e+00  -->   1.326e+00 (m)
+Minimum Coil-coil distance rows:                             5.801e-02  -->   5.851e-02 (m)
+Average Coil-coil distance rows:                             8.549e-02  -->   8.293e-02 (m)
+Maximum Coil-coil distance rows:                             2.886e+00  -->   2.897e+00 (normalized)
+Minimum Coil-coil distance rows:                             1.267e-01  -->   1.278e-01 (normalized)
+Average Coil-coil distance rows:                             1.868e-01  -->   1.812e-01 (normalized)
+Maximum Plasma-coil distance field:                          2.191e-01  -->   2.191e-01 (m)
+Minimum Plasma-coil distance field:                          1.531e-01  -->   1.523e-01 (m)
+Average Plasma-coil distance field:                          2.124e-01  -->   2.131e-01 (m)
+Maximum Plasma-coil distance field:                          1.561e+00  -->   1.561e+00 (normalized)
+Minimum Plasma-coil distance field:                          1.091e+00  -->   1.085e+00 (normalized)
+Average Plasma-coil distance field:                          1.514e+00  -->   1.519e+00 (normalized)
+==============================================================================================================
+
+SOLVER `gtol` condition satisfied. | 12 outer / 402 inner its, opt 8.45e-07, violation 3.23e-07, 546 s
+START  bn 1.4570e-02  L 1.000  kappa 1.001  kMS 1.011  d_cc 1.009  d_pc 1.402  -> FAILS L,kappa,kMS
+RESULT bn 1.3460e-02  L 1.000  kappa 1.001  kMS 0.994  d_cc 1.012  d_pc 1.394  linked 0  -> FAILS L,kappa  active ['L', 'kappa', 'kMS']
+wrote work/ss_qh/joint/devices/wistell/free_warm/result.h5, result.json, outer.json

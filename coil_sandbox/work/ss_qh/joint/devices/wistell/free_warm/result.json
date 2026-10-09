@@ -1,0 +1,182 @@
+{
+ "settings": {
+  "eq": "work/ss_qh/joint/devices/wistell/eq.h5",
+  "start": "work/ss_qh/joint/devices/wistell/level/result.h5",
+  "bounds": "bounds/precise_qh_gil.json",
+  "out": "work/ss_qh/joint/devices/wistell/free_warm",
+  "vacuum": true,
+  "a": null,
+  "maxiter": 800,
+  "gtol": 1e-06,
+  "ctol": 1e-06,
+  "field_n": 50,
+  "curv_n": 300,
+  "row_n": 256,
+  "cc_k": 80000,
+  "cc_gap": "coils",
+  "options": "{}",
+  "link_mu": 100000000.0,
+  "fix_hinge_z": null,
+  "horizontal_hinges": false,
+  "device": null
+ },
+ "bounds": {
+  "L": 2.9255111576633253,
+  "Ltot": null,
+  "kappa": 13.672824284132604,
+  "kms": 18.694612390476625,
+  "dcc": 0.05851022315326651,
+  "dpc": 0.1097066684123747,
+  "convex": null,
+  "planar": null,
+  "f": 0.07313777894158312,
+  "a": 0.1243342242006913,
+  "scale": "absolute"
+ },
+ "info": {
+  "kind": "PiecewisePlanarArcCoil",
+  "gauge": "none",
+  "field_grid": "gl (48 nodes)",
+  "n_nodes": 514,
+  "speed_ratio": 2.0,
+  "cc_gap_mode": "coils",
+  "cc_gap": "from the coils at build (see BUILD line)",
+  "pc_node_margin": "from the coils at build (see field_info)"
+ },
+ "solver": {
+  "message": "`gtol` condition satisfied.",
+  "nit": 402,
+  "n_outer": 12,
+  "optimality": 8.449207315469967e-07,
+  "constr_violation": 3.229898856982327e-07,
+  "wall_s": 545.6352589130402
+ },
+ "start": {
+  "per_coil": [
+   {
+    "L": 2.9255111575400967,
+    "kappa": 13.685663194626283,
+    "kms": 10.164386406505008,
+    "corner": 80.1763221818878,
+    "convex": 1.699732550837853,
+    "kappa_s_min": -5.955475638913874,
+    "planar": 0.0
+   },
+   {
+    "L": 2.7438271920956385,
+    "kappa": 13.6728581128178,
+    "kms": 15.955173417405398,
+    "corner": 65.18580726706121,
+    "convex": 2.644683499776282,
+    "kappa_s_min": -8.649425496986364,
+    "planar": 0.0
+   },
+   {
+    "L": 2.9255111674814245,
+    "kappa": 6.112209224236317,
+    "kms": 6.12321561805537,
+    "corner": 63.378823166783775,
+    "convex": 0.8770618974717479,
+    "kappa_s_min": -2.1269887044289892,
+    "planar": 0.0
+   },
+   {
+    "L": 2.9255111432200085,
+    "kappa": 13.685306766192284,
+    "kms": 18.90680926528445,
+    "corner": 84.94019706115228,
+    "convex": 4.551881700206075,
+    "kappa_s_min": -7.775512124553036,
+    "planar": 0.0
+   }
+  ],
+  "L": 2.9255111674814245,
+  "L_total": 11.520360660337168,
+  "kappa": 13.685663194626283,
+  "kms": 18.90680926528445,
+  "corner": 84.94019706115228,
+  "convex": 4.551881700206075,
+  "planar": 0.0,
+  "d_cc": 0.05901637697006665,
+  "d_pc": 0.1538396892135873,
+  "linked": 0,
+  "linked_pairs": [],
+  "bn": 0.014570394760268023,
+  "bn_max": 0.06962001272439465,
+  "bn_local": 0.015037018881561417,
+  "bn_max_T": 0.0888692011854384,
+  "vacuum": true,
+  "n_coils": 32
+ },
+ "result": {
+  "per_coil": [
+   {
+    "L": 2.9255111576961275,
+    "kappa": 13.668841017557472,
+    "kms": 12.642127213041706,
+    "corner": 92.94688499996789,
+    "convex": 2.548080660388844,
+    "kappa_s_min": -9.208692349692063,
+    "planar": 0.0
+   },
+   {
+    "L": 2.779350406927242,
+    "kappa": 13.685087914176373,
+    "kms": 11.091615025735024,
+    "corner": 61.17399406149464,
+    "convex": 1.673474020493391,
+    "kappa_s_min": -3.5945814740852646,
+    "planar": 0.0
+   },
+   {
+    "L": 2.925511154922761,
+    "kappa": 8.747134557584163,
+    "kms": 8.81318761291197,
+    "corner": 61.71724367722737,
+    "convex": 1.573273893786448,
+    "kappa_s_min": -4.277920091449853,
+    "planar": 0.0
+   },
+   {
+    "L": 2.9255111563614657,
+    "kappa": 13.684629692458158,
+    "kms": 18.583528248787474,
+    "corner": 103.42854986029543,
+    "convex": 4.369225740431602,
+    "kappa_s_min": -8.240605749695337,
+    "planar": 0.0
+   }
+  ],
+  "L": 2.9255111576961275,
+  "L_total": 11.555883875907597,
+  "kappa": 13.685087914176373,
+  "kms": 18.583528248787474,
+  "corner": 103.42854986029543,
+  "convex": 4.369225740431602,
+  "planar": 0.0,
+  "d_cc": 0.059198110308756206,
+  "d_pc": 0.15296525621755303,
+  "linked": 0,
+  "linked_pairs": [],
+  "bn": 0.01345951216339917,
+  "bn_max": 0.08020116320547019,
+  "bn_local": 0.014001989186034566,
+  "bn_max_T": 0.10237430930313107,
+  "vacuum": true,
+  "n_coils": 32
+ },
+ "margins": {
+  "L": 1.0000000000112124,
+  "kappa": 1.0008969346631624,
+  "kMS": 0.9940579596212575,
+  "d_cc": 1.011756700255403,
+  "d_pc": 1.3943113798932831
+ },
+ "active": [
+  "L",
+  "kappa",
+  "kMS"
+ ],
+ "joint_start": {},
+ "joint_result": {}
+}

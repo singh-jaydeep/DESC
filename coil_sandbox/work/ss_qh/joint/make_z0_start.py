@@ -13,6 +13,8 @@ above and below. power 1 is the arcs' first transverse mode (exact fit, curvatur
 bowls); power 0.5 is a half ellipse (short, but kappa 2-2.5x the bound at the hinges); in between trades the two. Currents
 are copied from --currents (same sum as the free arcB2 baseline). Stellarator symmetry maps
 z = 0 to itself, so z = 0 is the only height that gives ONE joint plane.
+--chord-z centre puts each coil's chord at its own cross-section's vertical centre instead (hinges level per coil, at
+different heights: the start for run_al.py --horizontal-hinges, and a fair common start for a free-hinge control).
 """
 import sys; sys.path.insert(0, "sandbox")
 import boot; boot.setup(default="cpu")
@@ -37,6 +39,8 @@ ap.add_argument("--gap-frac", type=float, default=0.75,
 ap.add_argument("--power", type=float, default=1.0,
                 help="arch shape h sin(pi t)^power: 1 = pure sine (exact in the arc basis, kappa 0 at the hinges, "
                      "but deep bowls), 0.5 = half ellipse (short, but a vertical tangent at the hinges)")
+ap.add_argument("--chord-z", choices=["zero", "centre"], default="zero",
+                help="zero: every chord at z = 0 (one joint plane); centre: each chord at its cross-section's z centre")
 ap.add_argument("--M", type=int, default=5)
 ap.add_argument("--n", type=int, default=720, help="samples per coil for the fit")
 ap.add_argument("--out", required=True)
@@ -53,13 +57,14 @@ for i in range(a.nc):
     d = eq.surface.compute(["R", "Z"], grid=g)
     R, Z = np.asarray(d["R"]), np.asarray(d["Z"])
     Rc = (R.max() + R.min()) / 2
+    zc = (Z.max() + Z.min()) / 2 if a.chord_z == "centre" else 0.0
     A = (R.max() - R.min()) / 2 + c_in
     tt = np.linspace(0, 1, 2001)
     sec = np.stack([R, Z], 1)
     tree = cKDTree(sec)
 
     def arch(h):  # in-plane (R, z) polyline of an arch of signed height h, inboard to outboard
-        return np.stack([Rc - A + 2 * A * tt, h * np.sin(np.pi * tt) ** a.power], 1)
+        return np.stack([Rc - A + 2 * A * tt, zc + h * np.sin(np.pi * tt) ** a.power], 1)
 
     def height(sign):  # smallest |h| (1 mm scan) with in-plane gap >= gap_frac x c_in
         for h in np.arange(0.0, 2.0, 1e-3):
@@ -71,7 +76,7 @@ for i in range(a.nc):
     n2 = a.n // 2
     t = np.arange(n2) / n2
     Rs = np.concatenate([Rc - A + 2 * A * t, Rc + A - 2 * A * t])          # upper inboard->outboard, lower back
-    Zs = np.concatenate([Bu * np.sin(np.pi * t) ** a.power, -Bl * np.sin(np.pi * t) ** a.power])
+    Zs = zc + np.concatenate([Bu * np.sin(np.pi * t) ** a.power, -Bl * np.sin(np.pi * t) ** a.power])
     pts = np.stack([Rs * np.cos(ph), Rs * np.sin(ph), Zs], 1)
     arc = PiecewisePlanarArcCoil.from_values(cur[i], pts, B=2, M=a.M, basis="xyz", fit_method="chord")
     H = np.asarray(arc.hinges).reshape(-1, 3)
@@ -80,10 +85,10 @@ for i in range(a.nc):
     # in-plane clearance actually achieved (dense polygon vs the cross-section)
     dense = np.stack([np.hypot(fit[:, 0], fit[:, 1]), fit[:, 2]], 1)
     gap = float(cKDTree(dense).query(np.stack([R, Z], 1))[0].min())
-    info.append(dict(phi_deg=float(np.degrees(ph)), Rc=Rc, A=A, Bu=Bu, Bl=Bl, hinge_z=H[:, 2].tolist(),
+    info.append(dict(phi_deg=float(np.degrees(ph)), Rc=Rc, zc=zc, A=A, Bu=Bu, Bl=Bl, hinge_z=H[:, 2].tolist(),
                      fit_dev_mm=dev * 1e3, inplane_gap_m=gap, current=cur[i]))
     print(f"coil {i}: phi {np.degrees(ph):5.1f}  chord R [{Rc - A:.3f}, {Rc + A:.3f}]  up {Bu:.3f} m  down {Bl:.3f} m  "
-          f"hinge z {np.abs(H[:, 2]).max():.1e}  fit dev {dev * 1e3:.2f} mm  in-plane gap {gap:.3f} m", flush=True)
+          f"chord z {zc:+.3f} m  hinge z spread {np.ptp(H[:, 2]):.1e}  fit dev {dev * 1e3:.2f} mm  in-plane gap {gap:.3f} m", flush=True)
     coils.append(arc)
 
 cs = MixedCoilSet(*[CoilSet(c, NFP=eq.NFP, sym=eq.sym) for c in coils])

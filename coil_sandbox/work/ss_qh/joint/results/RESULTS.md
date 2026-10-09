@@ -36,6 +36,34 @@ Single stage with the level constraint (`../ss_level.sh`, same weights/anchors a
 * Every k step ran to maxiter; k4b gained 2% (as for z = 0).
 * Remaining gap 1.93×: horizontality of the chords (free arcB2 chords tilt 37–80° from horizontal).
 
+### Other equilibria (fixed equilibrium, level vs free hinges)
+
+QUASR devices (`../../../../925_quasr_sweep/`, the 2026-09-25 geometric two-plane screen) and WISTELL-A. Recipe per device
+(`../quasr1328095/run.sh`, `../devices/run.sh`): lens start with each chord at its cross-section's centre height
+(`make_z0_start.py --chord-z centre`), `run_al.py --horizontal-hinges --link-mu 1e8`, then a free-hinge control warm-started
+from the level result (a COLD free start on 1328095 fell into a poor basin in outer 1: B·n 0.1005, hinges 0.5-0.75 m up).
+Removability is checked, not constrained (user, 2026-10-08: accept for now, build out more examples).
+
+| equilibrium | ι | free (warm from level) | level per coil | level ÷ free | level removable? | free chord tilts (deg) |
+|---|---|---|---|---|---|---|
+| precise_QH (free: matrix warm start, NOT from level) | 1.25 | 5.437e-3 | 8.768e-3 | 1.61 | yes | 42, 74, 58, 37 |
+| QUASR 1328095 | 1.31 | **2.693e-3** | **5.644e-3** | 2.10 | no (1 coil, 5% of an arc) | 15, 4, 18, 40 |
+| QUASR 1632037 | 1.40 | 4.510e-3 | 7.672e-3 | 1.70 | no (1 coil, 3% of an arc) | 7, 23, 30, 6 |
+| QUASR 1632468 | 1.70 | 6.340e-3 | 8.908e-3 | 1.41 | no (30% of an arc) | 2, 5, 49, 7 |
+| QUASR 1775228 | 2.00 | 5.726e-3 | 1.117e-2 | 1.95 | no (33% of an arc) | 2, 32, 51, 2 |
+| WISTELL-A (mirrored, scaled; A 6.67, R0 0.83) | 1.06 | 1.346e-2 | 1.457e-2 | 1.08 | yes (+0.245 m) | 4, 1, 10, 14 |
+
+Every run converged (gtol), no linked pair. **The free controls were warm-started from the level result and stayed near
+level** (tilts mostly < 30°, vs 37-74° for precise_QH's independently started free run), so level ÷ free is a LOWER
+bound on the cost of horizontality for the five new equilibria. Configs are untested for these devices: every run
+uses precise_QH's bounds (Gil Table III, a-scaled: L 2.93 m/coil, d_pc 0.110, d_cc 0.059, κ 13.7, κ_MS 18.7) and 4
+coils/half-period; QUASR's own designs used 3.6-3.7 m/coil (2.5 m at 5/hp for 1328095), d_pc 0.15-0.21, d_cc 0.10. L is
+active in every run. See NOTE.txt for the full list of caveats.
+
+1328095 is ~2× better for free arcB2 than precise_QH at fixed equilibrium, consistent with the geometric screen; its level
+hinges cost more (2.1×). Its equilibrium (Psi rescaled to precise_QH's <|B|>, exact in vacuum) has a force residual
+2.5e-3, so it needs a re-solve before any single stage.
+
 The sections below are the z = 0 study (afternoon), unchanged.
 
 
