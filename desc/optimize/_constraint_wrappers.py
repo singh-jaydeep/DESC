@@ -561,6 +561,10 @@ class LinearConstraintProjection(ObjectiveFunction):
         """
         return self._objective.row_ids(self.recover(x_reduced), constants)
 
+    def scaled_bounds(self):
+        """Per-row bounds and targets, see ``ObjectiveFunction.scaled_bounds``."""
+        return self._objective.scaled_bounds()
+
     def __getattr__(self, name):
         """For other attributes we defer to the base objective."""
         return getattr(self._objective, name)
@@ -954,6 +958,33 @@ class ProximalProjection(ObjectiveFunction):
             self._eq_solve_objective.update_constraint_target(self._eq)
 
         return xopt, xeq
+
+    def scaled_bounds(self):
+        """Per-row bounds and targets of the objective (not the equilibrium constraint).
+
+        See ``ObjectiveFunction.scaled_bounds``.
+        """
+        return self._objective.scaled_bounds()
+
+    def row_ids(self, x, constants=None):
+        """Identity of each row of the objective, see ``ObjectiveFunction.row_ids``.
+
+        Parameters
+        ----------
+        x : ndarray
+            State vector.
+        constants : list
+            Constant parameters passed to sub-objectives. (Deprecated)
+
+        Returns
+        -------
+        ids : ndarray of int
+            One id per row.
+
+        """
+        constants = setdefault(constants, [None, None])
+        xopt, _ = self._update_equilibrium(x, store=False)
+        return self._objective.row_ids(xopt, constants[0])
 
     def compute_scaled(self, x, constants=None):
         """Compute the objective function and apply weights/normalization.
