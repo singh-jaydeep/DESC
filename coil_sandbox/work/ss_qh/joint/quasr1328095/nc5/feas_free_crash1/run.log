@@ -1,0 +1,21 @@
+Running as unit: run-p2759241-i2763239.scope; invocation ID: 6dd722db40eb40e79035c09af88473b6
+E1009 00:25:56.524342 2759390 cuda_executor.cc:1743] Could not get kernel mode driver version: ( INVALID_ARGUMENT: Version does not match the format X.Y.Z )
+E1009 00:25:56.536653 2759241 cuda_executor.cc:1743] Could not get kernel mode driver version: ( INVALID_ARGUMENT: Version does not match the format X.Y.Z )
+DESC /home/singh/Documents/DESC2/desc
+DEVICE requested=gpu obtained=gpu (1x NVIDIA GeForce RTX 5070 Laptop GPU)
+  [mem] RSS 0.83 GB  peak 0.83 GB
+eq work/ss_qh/joint/quasr1328095/eq_q1328095.h5 NFP 4 sym True; start work/ss_qh/joint/quasr1328095/nc5/starts/level_start_packed.h5: 5 unique coils (PiecewisePlanarArcCoil), 5 top-level; VACUUM
+BOUNDS L 2.5  Ltot -  kappa 13.67  kms 35  convex -  planar -  dcc 0.1  dpc 0.15
+Traceback (most recent call last):
+  File "/home/singh/Documents/DESC2/coil_sandbox/run_al.py", line 148, in <module>
+    o._weight = np.asarray(o._weight) * a.obj_weight  # the setter checks dim_f, which exists only after build
+    ^^^^^^^^
+  File "/home/singh/Documents/DESC2/desc/objectives/objective_funs.py", line 1998, in weight
+    self._check_dimensions()
+  File "/home/singh/Documents/DESC2/desc/objectives/objective_funs.py", line 1459, in _check_dimensions
+    if not is_broadcastable((self.dim_f,), self.target.shape) or (
+                             ^^^^^^^^^^
+  File "/home/singh/Documents/DESC2/desc/objectives/objective_funs.py", line 2015, in dim_f
+    return self._dim_f
+           ^^^^^^^^^^^
+AttributeError: 'QuadraticFlux' object has no attribute '_dim_f'. Did you mean: 'dim_f'?

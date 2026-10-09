@@ -103,3 +103,23 @@ Build check (build/): 5.0 GB peak, cc active 1313/80000, field max err 1.7e-6.
   Free-control chord tilts mostly < 30 deg (warm-start bias): level/free is a lower bound on horizontality cost.
   QUASR own designs vs our bounds: L/coil 3.6-3.7 (ours 2.93), d_pc 0.15-0.21 (ours 0.110), d_cc 0.10 (ours 0.059),
   kappa_MS 21-35 (ours 18.7); 1328095 used 5 coils/hp (we use 4). User: reconvene on good / bad / untested.
+2026-10-08 22:21 -> 2026-10-09 00:25 -- (a) and (b), user-approved configs.
+  (a) QUASR 1328095 at its OWN design: nc 5/hp, bounds/quasr1328095_own.json (L 2.5/coil from L_total 12.5/hp, d_pc 0.15,
+      d_cc 0.10, kappa_MS 35, kappa 13.67 kept). Start infeasible (L 1.19, d_cc 0.59, d_pc 0.90).
+      level: STALLED (not KKT), 4 outer, B.n 8.58e-3, ~1% infeasible (cc 98.9 mm, pc 149.9, L 2.503, k 13.72), NOT removable.
+      free_warm: STALLED, B.n 7.22e-3, L 1.001 k 1.002. Node-gap check used 1.8 mm < needed 2.8 mm (cc grid too coarse?).
+  (b) coil continuation, precise_QH level hinges (cont/cont.sh; user chose the wider ramp):
+      s2 L x0.80 M3: 1.854e-2 removable | k1 x0.80 M3: 1.634e-2 (QS rho.5 5.3e-3) | k2 x0.867 M4: 7.42e-3 |
+      k3 x0.933 M5: 3.50e-3 (QS 8.6e-4) | k4 x1.0: 2.444e-3 (QS 7.0e-4, edge 2.9e-3, iota min 1.208; ftol stop at 69 its) |
+      k4b: 2.443e-3 (xtol after 5) | refine: 2.2661e-3 CONVERGED gtol, REMOVABLE (+0.074 m).
+      vs baseline ss_level: refined 2.859e-3 (-21%), ss coils 3.22e-3 (-24%); 1.53x free arcB2 on B_arcB2 (was 1.93x).
+  Feasibility test: run_al.py --obj-weight added; first version crashed (weight setter checks dim_f before build) ->
+  fixed (sets _weight); both feas runs re-queued after the precise_QA z0 test.
+  z0 screen (z0screen/, 613 QUASR boundaries): every QH device has cut_min 0; QA friendly only at low iota (0.1: >=0.8,
+  0.3: 0.44, >=0.4-0.6: 0). precise_QA: cut_min 0.36 med 0.51 (iota 0.42) -> qa_z0/ (z0, level, free_warm, free_base).
+2026-10-09 00:40-02:25 -- precise_QA z0 test (qa_z0/): free_base 4.542e-3 (repacked old result; KKT already), free_warm
+  8.736e-3, level 1.733e-2, z0 2.432e-2 (5.4x), all removable. Feasibility (nc5/feas_*, after fixing --obj-weight): FEASIBLE
+  level (7 its) and free (5 its). nc5/level_from_feas (row-n 512): STALLED again, B.n 1.14e-2 -> the solver, not geometry.
+  QUASR 804112 (QA nfp3 A10 iota 0.2, ext_med 0.80; scaled to a 0.1243 via prep_quasr.py A_TARGET): free_warm 8.922e-3,
+  level 1.350e-2, z0 1.516e-2 (1.70x, lowest), removable. Viewers: results/view.html (13), view_devices.html (15+).
+  Report: results/REPORT.md.

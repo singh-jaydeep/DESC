@@ -1,0 +1,13 @@
+=== start nc5/feas_level 00:25:31
+=== end nc5/feas_level exit 1 00:25:42
+=== start nc5/feas_free 00:25:52
+=== end nc5/feas_free exit 1 00:26:02
+FEAS DONE
+=== start nc5/feas_level 01:10:24
+=== end nc5/feas_level exit 0 01:18:52
+=== start nc5/feas_free 01:19:02
+=== end nc5/feas_free exit 0 01:27:47
+RETRY DONE
+=== start nc5/level_from_feas 01:41:33
+=== end nc5/level_from_feas exit 0 01:58:23
+FROMFEAS DONE

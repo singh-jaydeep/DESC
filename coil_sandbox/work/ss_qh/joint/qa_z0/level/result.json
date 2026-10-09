@@ -1,0 +1,429 @@
+{
+ "settings": {
+  "eq": "precise_QA",
+  "start": "work/ss_qh/joint/qa_z0/starts/z0_start_packed.h5",
+  "bounds": "bounds/precise_qa_sweep910_L0p8.json",
+  "out": "work/ss_qh/joint/qa_z0/level",
+  "vacuum": true,
+  "a": null,
+  "maxiter": 800,
+  "gtol": 1e-06,
+  "ctol": 1e-06,
+  "field_n": 50,
+  "curv_n": 300,
+  "row_n": 256,
+  "cc_k": 80000,
+  "cc_gap": "coils",
+  "options": "{}",
+  "link_mu": 100000000.0,
+  "fix_hinge_z": null,
+  "obj_weight": 1.0,
+  "horizontal_hinges": true,
+  "device": null
+ },
+ "bounds": {
+  "L": 4.122680045959868,
+  "Ltot": null,
+  "kappa": 11.642911762468422,
+  "kms": 5.648224762859397,
+  "dcc": 0.08554561095366726,
+  "dpc": 0.17109122190733453,
+  "convex": null,
+  "planar": null,
+  "f": 0.10104608496416138,
+  "a": 0.17177834443907436,
+  "scale": "absolute"
+ },
+ "info": {
+  "kind": "PiecewisePlanarArcCoil",
+  "gauge": "none",
+  "field_grid": "gl (48 nodes)",
+  "n_nodes": 514,
+  "speed_ratio": 2.0,
+  "cc_gap_mode": "coils",
+  "cc_gap": "from the coils at build (see BUILD line)",
+  "pc_node_margin": "from the coils at build (see field_info)",
+  "joint_plane": "hinges level per coil (HingeLevel), heights free"
+ },
+ "solver": {
+  "message": "`gtol` condition satisfied.",
+  "nit": 115,
+  "n_outer": 11,
+  "optimality": 7.237541805051256e-07,
+  "constr_violation": 2.41586073257416e-07,
+  "wall_s": 162.90107917785645
+ },
+ "start": {
+  "per_coil": [
+   {
+    "L": 4.151418652606127,
+    "kappa": 12.826510728984646,
+    "kms": 5.4457191988051425,
+    "corner": 29.27615927253561,
+    "convex": 0.0,
+    "kappa_s_min": 0.0,
+    "planar": 0.0
+   },
+   {
+    "L": 4.183094738206395,
+    "kappa": 9.532020318171048,
+    "kms": 3.8380987906199593,
+    "corner": 36.55856708290449,
+    "convex": 0.0,
+    "kappa_s_min": 0.0,
+    "planar": 0.0
+   },
+   {
+    "L": 3.561224023348995,
+    "kappa": 6.72997665387022,
+    "kms": 3.2140808311421063,
+    "corner": 48.29677884322419,
+    "convex": 0.0,
+    "kappa_s_min": 0.0,
+    "planar": 0.0
+   },
+   {
+    "L": 3.0811804923512636,
+    "kappa": 4.394225878025255,
+    "kms": 2.959768925338065,
+    "corner": 56.67050136255753,
+    "convex": 0.0,
+    "kappa_s_min": 0.0,
+    "planar": 0.0
+   }
+  ],
+  "L": 4.183094738206395,
+  "L_total": 14.976917906512782,
+  "kappa": 12.826510728984646,
+  "kms": 5.4457191988051425,
+  "corner": 56.67050136255753,
+  "convex": 0.0,
+  "planar": 0.0,
+  "d_cc": 0.11482203630174043,
+  "d_pc": 0.21794397193338033,
+  "linked": 0,
+  "linked_pairs": [],
+  "bn": 0.1762395933552668,
+  "bn_max": 0.5345461730028245,
+  "bn_local": 0.16361168251855804,
+  "bn_max_T": 0.5883829656819226,
+  "vacuum": true,
+  "n_coils": 16
+ },
+ "result": {
+  "per_coil": [
+   {
+    "L": 4.122680045800799,
+    "kappa": 11.13844712149324,
+    "kms": 5.742222580608415,
+    "corner": 88.6719490691637,
+    "convex": 2.7992948261767405,
+    "kappa_s_min": -3.1766560395576997,
+    "planar": 0.0
+   },
+   {
+    "L": 4.122680045973556,
+    "kappa": 7.916841397159399,
+    "kms": 4.859880215985087,
+    "corner": 87.76768186048393,
+    "convex": 1.8637143437380177,
+    "kappa_s_min": -4.024532581336289,
+    "planar": 0.0
+   },
+   {
+    "L": 4.122680047125145,
+    "kappa": 10.475890708911267,
+    "kms": 5.694228856989723,
+    "corner": 102.53574588206345,
+    "convex": 2.0102014808032145,
+    "kappa_s_min": -2.0954666212449595,
+    "planar": 0.0
+   },
+   {
+    "L": 4.122680045883593,
+    "kappa": 7.82934950011674,
+    "kms": 5.641594607102991,
+    "corner": 119.75522860332778,
+    "convex": 4.081524222285409,
+    "kappa_s_min": -7.830207170730739,
+    "planar": 0.0
+   }
+  ],
+  "L": 4.122680047125145,
+  "L_total": 16.490720184783093,
+  "kappa": 11.13844712149324,
+  "kms": 5.742222580608415,
+  "corner": 119.75522860332778,
+  "convex": 4.081524222285409,
+  "planar": 0.0,
+  "d_cc": 0.08614694110278648,
+  "d_pc": 0.18518150610954479,
+  "linked": 0,
+  "linked_pairs": [],
+  "bn": 0.017329878221229278,
+  "bn_max": 0.07622188600226626,
+  "bn_local": 0.01738775531322003,
+  "bn_max_T": 0.07755910403859238,
+  "vacuum": true,
+  "n_coils": 16
+ },
+ "margins": {
+  "L": 1.0000000002826503,
+  "kappa": 0.9566719518908189,
+  "kMS": 1.0166420108433205,
+  "d_cc": 1.0070293512713926,
+  "d_pc": 1.0823553893947975
+ },
+ "active": [
+  "L",
+  "d_cc"
+ ],
+ "joint_start": {
+  "max_hinge_dz": 0.0,
+  "min_hinge_clearance": 0.34218235496519256,
+  "worst_arc_blocked": 0.0,
+  "removable": true,
+  "report": [
+   {
+    "hinge_clearance": [
+     0.3421862708105745,
+     0.34218324289414914
+    ],
+    "hinge_R": [
+     0.6907347256413827,
+     1.6658476114277279
+    ],
+    "hinge_z": [
+     0.0,
+     0.0
+    ],
+    "arcs": [
+     {
+      "dir": 1.0,
+      "blocked_frac": 0.0,
+      "worst_depth": 0.1453701720825984,
+      "blocked_depth": 0.0
+     },
+     {
+      "dir": -1.0,
+      "blocked_frac": 0.0,
+      "worst_depth": 0.14537017208259817,
+      "blocked_depth": 0.0
+     }
+    ],
+    "ok": true
+   },
+   {
+    "hinge_clearance": [
+     0.34218350275225795,
+     0.34218235496519256
+    ],
+    "hinge_R": [
+     0.48939312665084633,
+     1.6147073294026129
+    ],
+    "hinge_z": [
+     0.0,
+     0.0
+    ],
+    "arcs": [
+     {
+      "dir": 1.0,
+      "blocked_frac": 0.0,
+      "worst_depth": 0.2204735986236256,
+      "blocked_depth": 0.0
+     },
+     {
+      "dir": -1.0,
+      "blocked_frac": 0.0,
+      "worst_depth": 0.22047359862362537,
+      "blocked_depth": 0.0
+     }
+    ],
+    "ok": true
+   },
+   {
+    "hinge_clearance": [
+     0.3421845341027452,
+     0.34218543246147437
+    ],
+    "hinge_R": [
+     0.3556599435370327,
+     1.5105488713341884
+    ],
+    "hinge_z": [
+     0.0,
+     0.0
+    ],
+    "arcs": [
+     {
+      "dir": 1.0,
+      "blocked_frac": 0.0,
+      "worst_depth": 0.23525903143710336,
+      "blocked_depth": 0.0
+     },
+     {
+      "dir": -1.0,
+      "blocked_frac": 0.0,
+      "worst_depth": 0.23525903143710347,
+      "blocked_depth": 0.0
+     }
+    ],
+    "ok": true
+   },
+   {
+    "hinge_clearance": [
+     0.3421828668493183,
+     0.3421824514529872
+    ],
+    "hinge_R": [
+     0.29427917057886654,
+     1.434224490659597
+    ],
+    "hinge_z": [
+     0.0,
+     0.0
+    ],
+    "arcs": [
+     {
+      "dir": 1.0,
+      "blocked_frac": 0.0,
+      "worst_depth": 0.22778979319104697,
+      "blocked_depth": 0.0
+     },
+     {
+      "dir": -1.0,
+      "blocked_frac": 0.0,
+      "worst_depth": 0.22778979319104697,
+      "blocked_depth": 0.0
+     }
+    ],
+    "ok": true
+   }
+  ]
+ },
+ "joint_result": {
+  "max_hinge_dz": 6.661338147750939e-16,
+  "min_hinge_clearance": 0.33465945604416203,
+  "worst_arc_blocked": 0.0,
+  "removable": true,
+  "report": [
+   {
+    "hinge_clearance": [
+     0.33465945604416203,
+     0.6272071210853138
+    ],
+    "hinge_R": [
+     0.7443625163959164,
+     1.9537278635112312
+    ],
+    "hinge_z": [
+     -0.28448693157765015,
+     -0.2844869315776504
+    ],
+    "arcs": [
+     {
+      "dir": 1.0,
+      "blocked_frac": 0.0,
+      "worst_depth": 0.1845604527403406,
+      "blocked_depth": 0.0
+     },
+     {
+      "dir": -1.0,
+      "blocked_frac": 0.0,
+      "worst_depth": 0.1302111108967825,
+      "blocked_depth": 0.0
+     }
+    ],
+    "ok": true
+   },
+   {
+    "hinge_clearance": [
+     0.4452824996241369,
+     0.5609884858622498
+    ],
+    "hinge_R": [
+     0.640134009334544,
+     1.843634437988809
+    ],
+    "hinge_z": [
+     -0.1543788687671581,
+     -0.15437886876715806
+    ],
+    "arcs": [
+     {
+      "dir": 1.0,
+      "blocked_frac": 0.0,
+      "worst_depth": 0.21872021788411644,
+      "blocked_depth": 0.0
+     },
+     {
+      "dir": -1.0,
+      "blocked_frac": 0.0,
+      "worst_depth": 0.2188243933776246,
+      "blocked_depth": 0.0
+     }
+    ],
+    "ok": true
+   },
+   {
+    "hinge_clearance": [
+     0.4803113485086097,
+     0.5530107955063295
+    ],
+    "hinge_R": [
+     0.5659587569915763,
+     1.755218248419203
+    ],
+    "hinge_z": [
+     -0.0751053818194399,
+     -0.07510538181943999
+    ],
+    "arcs": [
+     {
+      "dir": 1.0,
+      "blocked_frac": 0.0,
+      "worst_depth": 0.2350422925987553,
+      "blocked_depth": 0.0
+     },
+     {
+      "dir": -1.0,
+      "blocked_frac": 0.0,
+      "worst_depth": 0.23401545595916695,
+      "blocked_depth": 0.0
+     }
+    ],
+    "ok": true
+   },
+   {
+    "hinge_clearance": [
+     0.45240233712277145,
+     0.4336851610692045
+    ],
+    "hinge_R": [
+     0.21912483688823547,
+     1.542340078247649
+    ],
+    "hinge_z": [
+     0.25230924414611855,
+     0.2523092441461179
+    ],
+    "arcs": [
+     {
+      "dir": 1.0,
+      "blocked_frac": 0.0,
+      "worst_depth": 0.2283389595300549,
+      "blocked_depth": 0.0
+     },
+     {
+      "dir": -1.0,
+      "blocked_frac": 0.0,
+      "worst_depth": 0.2260933943734662,
+      "blocked_depth": 0.0
+     }
+    ],
+    "ok": true
+   }
+  ]
+ }
+}

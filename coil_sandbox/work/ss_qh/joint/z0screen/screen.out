@@ -1,0 +1,37 @@
+=== helicity 1 nfp 2 A 6.67 23:22:25
+0 devices match; screening 0 (best QS first), 0 already done
+=== helicity 1 nfp 2 A 8 23:22:29
+778 devices match; screening 60 (best QS first), 0 already done
+=== helicity 1 nfp 2 A 10 23:28:05
+0 devices match; screening 0 (best QS first), 42 already done
+=== helicity 1 nfp 3 A 6.67 23:28:09
+16 devices match; screening 16 (best QS first), 42 already done
+=== helicity 1 nfp 3 A 8 23:30:55
+4309 devices match; screening 60 (best QS first), 58 already done
+=== helicity 1 nfp 3 A 10 23:38:42
+116 devices match; screening 60 (best QS first), 118 already done
+=== helicity 1 nfp 4 A 6.67 23:45:00
+9 devices match; screening 9 (best QS first), 178 already done
+=== helicity 1 nfp 4 A 8 23:46:08
+4206 devices match; screening 60 (best QS first), 187 already done
+=== helicity 1 nfp 4 A 10 23:47:19
+166 devices match; screening 60 (best QS first), 247 already done
+=== helicity 1 nfp 5 A 6.67 23:50:21
+0 devices match; screening 0 (best QS first), 307 already done
+=== helicity 1 nfp 5 A 8 23:50:25
+202 devices match; screening 60 (best QS first), 307 already done
+=== helicity 1 nfp 5 A 10 23:54:14
+6 devices match; screening 6 (best QS first), 367 already done
+=== helicity 0 nfp 2 A 6.67 23:54:47
+8917 devices match; screening 60 (best QS first), 373 already done
+=== helicity 0 nfp 2 A 8 23:55:45
+0 devices match; screening 0 (best QS first), 433 already done
+=== helicity 0 nfp 2 A 10 23:55:49
+10267 devices match; screening 60 (best QS first), 433 already done
+=== helicity 0 nfp 3 A 6.67 23:56:50
+2577 devices match; screening 60 (best QS first), 493 already done
+=== helicity 0 nfp 3 A 8 23:58:16
+0 devices match; screening 0 (best QS first), 553 already done
+=== helicity 0 nfp 3 A 10 23:58:20
+7467 devices match; screening 60 (best QS first), 553 already done
+SCREEN DONE

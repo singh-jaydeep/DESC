@@ -1,0 +1,21 @@
+=== start nc5/level 22:14:20
+=== end nc5/level exit 0 22:30:29
+=== start nc5/free_warm 22:30:39
+=== end nc5/free_warm exit 0 22:46:46
+=== start work/ss_qh/joint/cont/s2 22:46:56
+=== end work/ss_qh/joint/cont/s2 exit 0 22:54:29
+=== start work/ss_qh/joint/cont/k1 22:54:39
+=== end work/ss_qh/joint/cont/k1 exit 0 23:08:17
+max curve change 0.000e+00 m; max boundary-field change 0.000e+00 T (|B| ~ 1.012 T)
+=== start work/ss_qh/joint/cont/k2 23:08:34
+=== end work/ss_qh/joint/cont/k2 exit 0 23:27:36
+max curve change 0.000e+00 m; max boundary-field change 0.000e+00 T (|B| ~ 0.992 T)
+=== start work/ss_qh/joint/cont/k3 23:27:58
+=== end work/ss_qh/joint/cont/k3 exit 0 23:52:09
+=== start work/ss_qh/joint/cont/k4 23:52:19
+=== end work/ss_qh/joint/cont/k4 exit 0 00:07:57
+=== start work/ss_qh/joint/cont/k4b 00:08:07
+=== end work/ss_qh/joint/cont/k4b exit 0 00:17:17
+=== start work/ss_qh/joint/cont/refine 00:17:27
+=== end work/ss_qh/joint/cont/refine exit 0 00:24:50
+AB DONE

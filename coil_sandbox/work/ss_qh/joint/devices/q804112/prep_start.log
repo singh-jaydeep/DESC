@@ -1,0 +1,32 @@
+DESC /home/singh/Documents/DESC2/desc
+DEVICE requested=cpu obtained=cpu (1x cpu)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 3.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 3.
+  warnings.warn(msg, err)
+coil 0: phi   7.5  chord R [0.840, 1.552]  up 0.322 m  down 0.321 m  chord z +0.000 m  hinge z spread 0.0e+00  fit dev 7.39 mm  in-plane gap 0.168 m
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 3.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 3.
+  warnings.warn(msg, err)
+coil 1: phi  22.5  chord R [0.867, 1.564]  up 0.394 m  down 0.330 m  chord z +0.000 m  hinge z spread 0.0e+00  fit dev 7.78 mm  in-plane gap 0.166 m
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 3.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 3.
+  warnings.warn(msg, err)
+coil 2: phi  37.5  chord R [0.914, 1.579]  up 0.463 m  down 0.342 m  chord z +0.000 m  hinge z spread 0.0e+00  fit dev 8.52 mm  in-plane gap 0.165 m
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 3.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 3.
+  warnings.warn(msg, err)
+coil 3: phi  52.5  chord R [0.967, 1.587]  up 0.465 m  down 0.349 m  chord z +0.000 m  hinge z spread 0.0e+00  fit dev 8.51 mm  in-plane gap 0.162 m
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 3.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 3.
+  warnings.warn(msg, err)
+  L 2.2228 m  kappa 13.797  kappa_MS 12.171  d_cc 219.4 mm  d_pc 160.6 mm  linked 0
+  B.n: <|B.n|>/<|B|> 5.206e-02   value / bound: L 0.760  kappa 1.009  kMS 0.651  d_cc 3.750  d_pc 1.464  -> FAILS kappa
+wrote work/ss_qh/joint/devices/q804112/starts/z0_start.h5
+DESC /home/singh/Documents/DESC2/desc
+DEVICE requested=cpu obtained=cpu (1x cpu)
+MixedCoilSet -> CoilSet(NFP=3, sym=True, 4 coils); worst matched curve difference 0.0e+00 m (order differs); bn 5.2061769155e-02 -> 5.2061769155e-02

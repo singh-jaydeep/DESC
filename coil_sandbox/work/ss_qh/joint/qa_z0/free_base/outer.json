@@ -1,0 +1,442 @@
+[
+ {
+  "outer": 1,
+  "inner_iterations": 1,
+  "optimality": 0.00014825646129285825,
+  "gtolk": 0.0008106685491366609,
+  "inner_converged": true,
+  "constr_violation": 0.008576489731344061,
+  "ctolk": 1e-06,
+  "groups": {
+   "coil length": {
+    "rows": 4,
+    "mu": [
+     10.0,
+     10.0,
+     10.0
+    ],
+    "max_y": 0.0,
+    "nonzero_y": 0,
+    "max_violation": 0.008576489731344061
+   },
+   "coil curvature": {
+    "rows": 2404,
+    "mu": [
+     10.0,
+     10.0,
+     10.0
+    ],
+    "max_y": 0.0,
+    "nonzero_y": 0,
+    "max_violation": 0.0
+   },
+   "coil mean squared curvature": {
+    "rows": 4,
+    "mu": [
+     10.0,
+     10.0,
+     10.0
+    ],
+    "max_y": 0.0,
+    "nonzero_y": 0,
+    "max_violation": 0.0
+   },
+   "coil-coil distance rows": {
+    "rows": 36,
+    "mu": [
+     100000000.0,
+     100000000.0,
+     100000000.0
+    ],
+    "max_y": 0.0,
+    "nonzero_y": 0,
+    "max_violation": 0.0
+   },
+   "plasma-coil distance field": {
+    "rows": 4112,
+    "mu": [
+     10.0,
+     10.0,
+     10.0
+    ],
+    "max_y": 0.0,
+    "nonzero_y": 0,
+    "max_violation": 0.0
+   }
+  },
+  "true": {
+   "cc": 0.1497146980169217,
+   "pc": 0.22009870758725597,
+   "linked": [],
+   "length": [
+    4.1302667043511185,
+    4.139145817443316,
+    4.139155910957447,
+    4.1378651891134055
+   ],
+   "curvature": [
+    7.505265860050747,
+    6.389606402348263,
+    7.889844659603699,
+    6.97872588706197
+   ],
+   "gap": {
+    "used": 0.0015481765112201342,
+    "needed": 0.0015562502233216736
+   }
+  },
+  "t": 37.50606393814087
+ },
+ {
+  "outer": 2,
+  "inner_iterations": 2,
+  "optimality": 1.580784211842132e-05,
+  "gtolk": 8.106685491366609e-05,
+  "inner_converged": true,
+  "constr_violation": 0.0008915039781465239,
+  "ctolk": 1e-06,
+  "groups": {
+   "coil length": {
+    "rows": 4,
+    "mu": [
+     100.0,
+     100.0,
+     100.0
+    ],
+    "max_y": 0.0,
+    "nonzero_y": 0,
+    "max_violation": 0.0008915039781465239
+   },
+   "coil curvature": {
+    "rows": 2404,
+    "mu": [
+     100.0,
+     100.0,
+     100.0
+    ],
+    "max_y": 0.0,
+    "nonzero_y": 0,
+    "max_violation": 0.0
+   },
+   "coil mean squared curvature": {
+    "rows": 4,
+    "mu": [
+     100.0,
+     100.0,
+     100.0
+    ],
+    "max_y": 0.0,
+    "nonzero_y": 0,
+    "max_violation": 0.0
+   },
+   "coil-coil distance rows": {
+    "rows": 36,
+    "mu": [
+     100000000.0,
+     100000000.0,
+     100000000.0
+    ],
+    "max_y": 0.0,
+    "nonzero_y": 0,
+    "max_violation": 0.0
+   },
+   "plasma-coil distance field": {
+    "rows": 4112,
+    "mu": [
+     100.0,
+     100.0,
+     100.0
+    ],
+    "max_y": 0.0,
+    "nonzero_y": 0,
+    "max_violation": 0.0
+   }
+  },
+  "true": {
+   "cc": 0.14965990396771084,
+   "pc": 0.21998568595663123,
+   "linked": [],
+   "length": [
+    4.125239879977114,
+    4.134010152871593,
+    4.1343975452812005,
+    4.13332016789345
+   ],
+   "curvature": [
+    7.514873582062742,
+    6.4095784036608485,
+    7.902268678829391,
+    6.995617389771447
+   ],
+   "gap": {
+    "used": 0.0015481765112201342,
+    "needed": 0.0015491345303608284
+   }
+  },
+  "t": 42.2409770488739
+ },
+ {
+  "outer": 3,
+  "inner_iterations": 2,
+  "optimality": 6.501759463115528e-06,
+  "gtolk": 8.10668549136661e-06,
+  "inner_converged": true,
+  "constr_violation": 8.972802325590834e-05,
+  "ctolk": 1e-06,
+  "groups": {
+   "coil length": {
+    "rows": 4,
+    "mu": [
+     1000.0,
+     1000.0,
+     1000.0
+    ],
+    "max_y": 0.0,
+    "nonzero_y": 0,
+    "max_violation": 8.972802325590834e-05
+   },
+   "coil curvature": {
+    "rows": 2404,
+    "mu": [
+     1000.0,
+     1000.0,
+     1000.0
+    ],
+    "max_y": 0.0,
+    "nonzero_y": 0,
+    "max_violation": 0.0
+   },
+   "coil mean squared curvature": {
+    "rows": 4,
+    "mu": [
+     1000.0,
+     1000.0,
+     1000.0
+    ],
+    "max_y": 0.0,
+    "nonzero_y": 0,
+    "max_violation": 0.0
+   },
+   "coil-coil distance rows": {
+    "rows": 36,
+    "mu": [
+     100000000.0,
+     100000000.0,
+     100000000.0
+    ],
+    "max_y": 0.0,
+    "nonzero_y": 0,
+    "max_violation": 0.0
+   },
+   "plasma-coil distance field": {
+    "rows": 4112,
+    "mu": [
+     1000.0,
+     1000.0,
+     1000.0
+    ],
+    "max_y": 0.0,
+    "nonzero_y": 0,
+    "max_violation": 0.0
+   }
+  },
+  "true": {
+   "cc": 0.14966064163678347,
+   "pc": 0.21997736201170084,
+   "linked": [],
+   "length": [
+    4.124705248674168,
+    4.13347446771488,
+    4.1339052099304325,
+    4.132849241938171
+   ],
+   "curvature": [
+    7.515953179672739,
+    6.41152804116871,
+    7.903732661760936,
+    6.997618465847599
+   ],
+   "gap": {
+    "used": 0.0015481765112201342,
+    "needed": 0.0015484819211146967
+   }
+  },
+  "t": 46.870046615600586
+ },
+ {
+  "outer": 4,
+  "inner_iterations": 9,
+  "optimality": 3.3148976307820713e-07,
+  "gtolk": 1e-06,
+  "inner_converged": true,
+  "constr_violation": 8.84781201992979e-06,
+  "ctolk": 1e-06,
+  "groups": {
+   "coil length": {
+    "rows": 4,
+    "mu": [
+     10000.0,
+     10000.0,
+     10000.0
+    ],
+    "max_y": 0.0,
+    "nonzero_y": 0,
+    "max_violation": 8.84781201992979e-06
+   },
+   "coil curvature": {
+    "rows": 2404,
+    "mu": [
+     10000.0,
+     10000.0,
+     10000.0
+    ],
+    "max_y": 0.0,
+    "nonzero_y": 0,
+    "max_violation": 0.0
+   },
+   "coil mean squared curvature": {
+    "rows": 4,
+    "mu": [
+     10000.0,
+     10000.0,
+     10000.0
+    ],
+    "max_y": 0.0,
+    "nonzero_y": 0,
+    "max_violation": 0.0
+   },
+   "coil-coil distance rows": {
+    "rows": 36,
+    "mu": [
+     100000000.0,
+     100000000.0,
+     100000000.0
+    ],
+    "max_y": 0.0,
+    "nonzero_y": 0,
+    "max_violation": 0.0
+   },
+   "plasma-coil distance field": {
+    "rows": 4112,
+    "mu": [
+     10000.0,
+     10000.0,
+     10000.0
+    ],
+    "max_y": 0.0,
+    "nonzero_y": 0,
+    "max_violation": 0.0
+   }
+  },
+  "true": {
+   "cc": 0.1498161290008418,
+   "pc": 0.2198930907908196,
+   "linked": [],
+   "length": [
+    4.12465111874977,
+    4.133421199509451,
+    4.133856446820719,
+    4.132804220449696
+   ],
+   "curvature": [
+    7.505949596751216,
+    6.400501116431151,
+    7.895132583078263,
+    6.994404776130718
+   ],
+   "gap": {
+    "used": 0.0015481765112201342,
+    "needed": 0.001548163758066203
+   }
+  },
+  "t": 55.49639678001404
+ },
+ {
+  "outer": 5,
+  "inner_iterations": 2,
+  "optimality": 9.038369415484168e-08,
+  "gtolk": 1e-06,
+  "inner_converged": true,
+  "constr_violation": 8.840389504882751e-07,
+  "ctolk": 1e-06,
+  "groups": {
+   "coil length": {
+    "rows": 4,
+    "mu": [
+     100000.0,
+     100000.0,
+     100000.0
+    ],
+    "max_y": 0.0,
+    "nonzero_y": 0,
+    "max_violation": 8.840389504882751e-07
+   },
+   "coil curvature": {
+    "rows": 2404,
+    "mu": [
+     100000.0,
+     100000.0,
+     100000.0
+    ],
+    "max_y": 0.0,
+    "nonzero_y": 0,
+    "max_violation": 0.0
+   },
+   "coil mean squared curvature": {
+    "rows": 4,
+    "mu": [
+     100000.0,
+     100000.0,
+     100000.0
+    ],
+    "max_y": 0.0,
+    "nonzero_y": 0,
+    "max_violation": 0.0
+   },
+   "coil-coil distance rows": {
+    "rows": 36,
+    "mu": [
+     100000000.0,
+     100000000.0,
+     100000000.0
+    ],
+    "max_y": 0.0,
+    "nonzero_y": 0,
+    "max_violation": 0.0
+   },
+   "plasma-coil distance field": {
+    "rows": 4112,
+    "mu": [
+     100000.0,
+     100000.0,
+     100000.0
+    ],
+    "max_y": 0.0,
+    "nonzero_y": 0,
+    "max_violation": 0.0
+   }
+  },
+  "true": {
+   "cc": 0.14981628300839972,
+   "pc": 0.21989319646365743,
+   "linked": [],
+   "length": [
+    4.124645849470882,
+    4.1334158783707835,
+    4.133851550047983,
+    4.132799546133159
+   ],
+   "curvature": [
+    7.50597078850421,
+    6.400529858201385,
+    7.895161013357382,
+    6.994436351457753
+   ],
+   "gap": {
+    "used": 0.0015481765112201342,
+    "needed": 0.0015481591976523607
+   }
+  },
+  "t": 60.15942859649658
+ }
+]

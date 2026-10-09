@@ -1,0 +1,11 @@
+{
+  "_note": "QUASR 1328095's own design thresholds where pinned (L_total 12.5 m per half period -> 2.5 m per coil at 5 coils/hp, since al_problem has no total-length row; kappa_MS 35; d_cc 0.10) and its as-built d_pc 0.15. kappa is NOT pinned in QUASR (as-built 10.83), so precise_QH's 13.67 is kept (arcs need it at the hinges). Absolute.",
+  "scale": "absolute",
+  "L": 2.5,
+  "kappa": 13.672824284132604,
+  "kappa_MS": 35.0,
+  "d_cc": 0.10,
+  "d_pc": 0.15,
+  "convex_excess": null,
+  "planar_max": null
+}

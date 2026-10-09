@@ -15,6 +15,8 @@ check of sandbox/demount.py (diagnostic only, not a constraint).
 --horizontal-hinges (arc coils): one horizontal joint plane PER COIL. Each coil's hinges are snapped to their
 mean height and held level by sandbox/demount.HingeLevel (z_b - z_0 = 0; linear, eliminated exactly); each coil's height
 stays free. Same diagnostics as --fix-hinge-z. Exclusive with it.
+--obj-weight W: multiply the objective (B.n) weight by W; W ~ 1e-6 turns the run into a constraint-only feasibility
+solve with B.n as a weak tie-breaker.
 --link-mu MU: initial AL penalty MU on the signed per-pair coil-coil rows only (default: the solver's 10, like every
 row). They are inactive unless a pair links, so a large MU costs nothing until then and makes the merit function
 reject a step that links a pair (a crossing within one step, which no distance row can see).
@@ -64,6 +66,8 @@ ap.add_argument("--link-mu", type=float, default=None,
                 help="initial AL penalty on the signed per-pair coil-coil rows (linking guard); e.g. 1e8")
 ap.add_argument("--fix-hinge-z", type=float, default=None,
                 help="arc coils: snap every hinge to this height and hold its z there (one joint plane at 0)")
+ap.add_argument("--obj-weight", type=float, default=1.0,
+                help="scale the objective weight (1e-6: feasibility solve, B.n only breaks ties)")
 ap.add_argument("--horizontal-hinges", action="store_true",
                 help="arc coils: each coil's hinges level (own height, free); sandbox/demount.HingeLevel")
 ap.add_argument("--device", default=None)  # read by boot
@@ -139,6 +143,10 @@ if a.fix_hinge_z is not None:
 if a.horizontal_hinges:
     cons = (*cons, D.HingeLevel(cs0))
     info["joint_plane"] = "hinges level per coil (HingeLevel), heights free"
+if a.obj_weight != 1.0:
+    for o in obj.objectives:
+        o._weight = np.asarray(o._weight) * a.obj_weight  # the setter checks dim_f, which exists only after build
+    info["obj_weight"] = a.obj_weight
 obj.build(verbose=0)
 nonlinear = [c for c in cons if not c.linear]
 for c in nonlinear:

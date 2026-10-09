@@ -68,7 +68,9 @@ form `total` (∫|κ|ds ≤ 2π + ε) stalls the solver on nearly straight legs.
 stellarator symmetry). On precise_QH the joint plane costs 2.8× (fixed eq); single stage from near-converged states
 leaves 4.3× vs free arcB2 on its own boundary, because precise_QH's helical-axis excursion is untouched. The user's
 relaxation, each coil's hinges level at its own height (`--horizontal-hinges` in both drivers, sandbox/demount.HingeLevel),
-gets 1.93× after the same single stage (`ss_level.sh`; RESULTS.md "Update"). Single-stage convergence issue (k = 5
+gets 1.93× after the same single stage (`ss_level.sh`; RESULTS.md "Update"). Coil continuation (length ×0.80→1.0 and arc M 3→5 alongside k)
+improved it to 1.53× (`work/ss_qh/joint/cont/cont.sh`). Overnight report covering every run: `work/ss_qh/joint/results/REPORT.md`.
+`run_al.py --obj-weight 1e-6` = constraint-only feasibility solve. Single-stage convergence issue (k = 5
 stall; single stage is plain GN, stage 2 uses the secant Hessian): `work/ss_qh/joint/results/K5_STALL.md`. Next if still
 unsatisfying: WISTELL-A cold start (`work/ss_qh/joint/cold/`). Traps: arc starts with z = 0 hinges must be built
 (`work/ss_qh/joint/make_z0_start.py`), not fitted, then repacked (`work/ss_qh/fixed_ss_eq/repack_arcs.py`);

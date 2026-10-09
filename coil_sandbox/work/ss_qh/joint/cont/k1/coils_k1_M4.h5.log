@@ -1,0 +1,5 @@
+DESC /home/singh/Documents/DESC2/desc
+DEVICE requested=cpu obtained=cpu (1x cpu)
+4 unique coils, 32 total; B=2, M 3 -> 4; free shape params per coil 8
+max curve change 0.000e+00 m; max boundary-field change 0.000e+00 T (|B| ~ 1.012 T)
+wrote work/ss_qh/joint/cont/k1/coils_k1_M4.h5
