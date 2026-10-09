@@ -1,0 +1,26 @@
+Running as unit: run-r08e8b2ca290d4325b9f22a4b8669ddd2.scope; invocation ID: 325921aa42e64e85a5e0d36e8e1209dd
+/home/jay/Documents/desc_dev/DESC/desc/__init__.py:94: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  from pynvml import (
+DESC /home/jay/Documents/desc_dev/DESC/desc
+DEVICE requested=gpu obtained=gpu (1x NVIDIA GeForce RTX 5070 Ti)
+PROX_REG=shift: proximal (dF/dx)^-1 patched
+probe k=5: 120 boundary modes free; terms [('Vacuum B.n error', 1326), ('QS two-term (scale-invariant)', 12005), ('aspect ratio', 1), ('rotational transform', 20), ('volume', 1), ('coil length', 4), ('coil curvature', 1204), ('coil mean squared curvature', 4), ('coil-coil distance penalty', 72), ('plasma-coil minimum distance', 8)]
+device peak so far 2.09 GB
+
+PROBE  f eval 7.2 s, jac 32.0 s; x dim 187, rows 14645; cost 0.818227; |g|_inf 0.1032; |h_gn| 583.8; tr_scipy |x/scale| 1124
+singular values of scaled J: max 4.11 min 0.000189  cond 2.17e+04; count < 1e-8 max: 0
+terms: Vacuum B.n error c 0.646 |g| 0.365 act 1326/1326; QS two-term (scale c 0.164 |g| 0.295 act 12005/12005; aspect ratio c 0 |g| 0 act 0/1; rotational transfo c 0.00378 |g| 0.0298 act 4/20; volume c 4.95e-05 |g| 0.0194 act 1/1; coil length c 0.00127 |g| 0.128 act 2/4; coil curvature c 2.06e-06 |g| 0.00524 act 3/1204; coil mean squared  c 0 |g| 0 act 0/4; coil-coil distance c 0.00268 |g| 0.0603 act 5/72; plasma-coil minimu c 0 |g| 0 act 0/8
+gn t=0.0001 |h| 5.838e-02  pred +1.4352e-04  actual +1.3503e-04  paired +1.3503e-04  ratio +0.9408  (35 s)
+    dc_act/dc_pred per term: Vacuum B.n +1.17e-04/+1.18e-04 e2.4e-02  QS two-ter +2.47e-05/+2.45e-05 e1.9e+01  aspect rat +0.00e+00/+0.00e+00 e0.0e+00  rotational +1.30e-06/+5.98e-07 e2.3e+00  volume +8.61e-09/+8.52e-09 e1.1e-02  coil lengt -8.10e-06/+2.50e-07 e3.4e+01  coil curva +2.94e-08/+2.99e-10 e2.3e+02  coil mean  +0.00e+00/+0.00e+00 e0.0e+00  coil-coil  +2.80e-07/+4.73e-07 e1.1e+00  plasma-coi +0.00e+00/+0.00e+00 e0.0e+00
+gn t=1e-05 |h| 5.838e-03  pred +1.4353e-05  actual +1.4342e-05  paired +1.4342e-05  ratio +0.9992  (12 s)
+    dc_act/dc_pred per term: Vacuum B.n +1.18e-05/+1.18e-05 e2.4e-03  QS two-ter +2.40e-06/+2.45e-06 e6.4e+01  aspect rat +0.00e+00/+0.00e+00 e0.0e+00  rotational +1.88e-07/+5.98e-08 e7.7e+00  volume +8.53e-10/+8.52e-10 e1.1e-03  coil lengt -5.85e-08/+2.50e-08 e3.4e+00  coil curva +3.26e-10/+2.99e-11 e2.3e+01  coil mean  +0.00e+00/+0.00e+00 e0.0e+00  coil-coil  +4.54e-08/+4.73e-08 e1.1e-01  plasma-coi +0.00e+00/+0.00e+00 e0.0e+00
+sd |h| 1.000e-03  pred +1.3501e-04  actual +1.3481e-04  paired +1.3481e-04  ratio +0.9985  (10 s)
+    dc_act/dc_pred per term: Vacuum B.n +1.52e-04/+1.52e-04 e6.7e-04  QS two-ter -2.69e-06/-2.70e-06 e7.2e-01  aspect rat +0.00e+00/+0.00e+00 e0.0e+00  rotational +1.08e-07/+1.00e-07 e9.4e-01  volume -3.69e-08/-3.69e-08 e2.2e-07  coil lengt -1.62e-05/-1.61e-05 e6.7e-03  coil curva +1.62e-08/+1.62e-08 e2.5e-04  coil mean  +0.00e+00/+0.00e+00 e0.0e+00  coil-coil  +1.79e-06/+1.79e-06 e1.0e-03  plasma-coi +0.00e+00/+0.00e+00 e0.0e+00
+sd |h| 1.000e-04  pred +1.3548e-05  actual +1.3543e-05  paired +1.3543e-05  ratio +0.9997  (8 s)
+    dc_act/dc_pred per term: Vacuum B.n +1.52e-05/+1.52e-05 e6.7e-05  QS two-ter -2.73e-07/-2.69e-07 e7.9e-02  aspect rat +0.00e+00/+0.00e+00 e0.0e+00  rotational +1.09e-08/+1.00e-08 e1.5e+00  volume -3.69e-09/-3.69e-09 e3.0e-07  coil lengt -1.60e-06/-1.60e-06 e6.7e-04  coil curva +1.70e-09/+1.70e-09 e2.5e-05  coil mean  +0.00e+00/+0.00e+00 e0.0e+00  coil-coil  +1.80e-07/+1.80e-07 e1.0e-04  plasma-coi +0.00e+00/+0.00e+00 e0.0e+00
+sd |h| 1.000e-05  pred +1.3552e-06  actual +1.3550e-06  paired +1.3550e-06  ratio +0.9998  (8 s)
+    dc_act/dc_pred per term: Vacuum B.n +1.52e-06/+1.52e-06 e6.7e-06  QS two-ter -2.72e-08/-2.69e-08 e7.9e-02  aspect rat +0.00e+00/+0.00e+00 e0.0e+00  rotational +1.09e-09/+1.00e-09 e1.5e+00  volume -3.69e-10/-3.69e-10 e9.9e-07  coil lengt -1.60e-07/-1.60e-07 e6.7e-05  coil curva +1.70e-10/+1.70e-10 e2.5e-06  coil mean  +0.00e+00/+0.00e+00 e0.0e+00  coil-coil  +1.80e-08/+1.80e-08 e1.0e-05  plasma-coi +0.00e+00/+0.00e+00 e0.0e+00
+sd |h| 1.000e-06  pred +1.3553e-07  actual +1.3551e-07  paired +1.3551e-07  ratio +0.9998  (8 s)
+    dc_act/dc_pred per term: Vacuum B.n +1.52e-07/+1.52e-07 e6.9e-07  QS two-ter -2.72e-09/-2.69e-09 e7.9e-02  aspect rat +0.00e+00/+0.00e+00 e0.0e+00  rotational +1.09e-10/+1.00e-10 e1.5e+00  volume -3.69e-11/-3.69e-11 e3.9e-05  coil lengt -1.60e-08/-1.60e-08 e6.7e-06  coil curva +1.70e-11/+1.70e-11 e9.4e-07  coil mean  +0.00e+00/+0.00e+00 e0.0e+00  coil-coil  +1.80e-09/+1.80e-09 e9.8e-07  plasma-coi +0.00e+00/+0.00e+00 e0.0e+00
+sd |h| 1.000e-07  pred +1.3553e-08  actual +1.3550e-08  paired +1.3550e-08  ratio +0.9998  (8 s)
+    dc_act/dc_pred per term: Vacuum B.n +1.52e-08/+1.52e-08 e1.9e-06  QS two-ter -2.72e-10/-2.69e-10 e7.9e-02  aspect rat +0.00e+00/+0.00e+00 e0.0e+00  rotational +1.05e-11/+1.00e-11 e1.5e+00  volume -3.69e-12/-3.69e-12 e9.9e-05  coil lengt -1.60e-09/-1.60e-09 e5.9e-07  coil curva +1.70e-12/+1.70e-12 e8.1e-06  coil mean  +0.00e+00/+0.00e+00 e0.0e+00  coil-coil  +1.80e-10/+1.80e-10 e1.5e-06  plasma-coi +0.00e+00/+0.00e+00 e0.0e+00

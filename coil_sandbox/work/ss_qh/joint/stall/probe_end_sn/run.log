@@ -1,0 +1,318 @@
+Running as unit: run-r5171892021564756867509a1fd064078.scope; invocation ID: 1826d044d1694db8b41e5c0ce437e483
+/home/jay/Documents/desc_dev/DESC/desc/__init__.py:94: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  from pynvml import (
+DESC /home/jay/Documents/desc_dev/DESC/desc
+DEVICE requested=gpu obtained=gpu (1x NVIDIA GeForce RTX 5070 Ti)
+PROX_REG=shift: proximal (dF/dx)^-1 patched
+probe k=5: 120 boundary modes free; terms [('Vacuum B.n error', 1326), ('QS two-term (scale-invariant)', 5445), ('aspect ratio', 1), ('rotational transform', 20), ('volume', 1), ('coil length', 4), ('coil curvature', 1204), ('coil mean squared curvature', 4), ('coil-coil distance penalty', 72), ('plasma-coil minimum distance', 8)]
+  it   0 cost 1.1537180761e-07 |g|inf 3.27e-07 step 1.00e-04 rho +0.833 radius 2.0e-04 shift 1.2e-06 | B_min +7.08e-06 lam_min 8.90e-06 lam_k 9.90e-01 S_sub_min -3.23e-02
+  it   1 cost 1.1537175208e-07 |g|inf 1.65e-04 step 2.36e-05 rho +1.223 radius 2.0e-04 shift 0.0e+00 | B_min +9.32e-06 lam_min 8.91e-06 lam_k 9.90e-01 S_sub_min -3.22e-02
+  it   2 cost 1.1537173163e-07 |g|inf 7.96e-06 step 7.95e-05 rho +0.892 radius 2.0e-04 shift 0.0e+00 | B_min +6.29e-06 lam_min 8.91e-06 lam_k 9.90e-01 S_sub_min -3.23e-02
+  it   3 cost 1.1537169722e-07 |g|inf 1.25e-04 step 2.46e-05 rho +1.298 radius 2.0e-04 shift 0.0e+00 | B_min +7.60e-06 lam_min 8.92e-06 lam_k 9.90e-01 S_sub_min -3.22e-02
+  it   4 cost 1.1537168038e-07 |g|inf 8.62e-06 step 3.36e-05 rho +1.217 radius 6.7e-05 shift 9.4e-06 | B_min +3.13e-06 lam_min 8.92e-06 lam_k 9.90e-01 S_sub_min -3.23e-02
+  it   5 cost 1.1537164641e-07 |g|inf 2.10e-05 step 6.73e-05 rho +1.317 radius 1.3e-04 shift 3.8e-06 | B_min +2.70e-06 lam_min 8.93e-06 lam_k 9.91e-01 S_sub_min -3.23e-02
+  it   6 cost 1.1537156230e-07 |g|inf 7.78e-05 step 1.35e-04 rho +1.368 radius 2.7e-04 shift 1.3e-06 | B_min +2.66e-06 lam_min 8.93e-06 lam_k 9.91e-01 S_sub_min -3.23e-02
+  it   7 cost 1.1537122137e-07 |g|inf 2.86e-04 step 2.18e-04 rho +1.484 radius 2.7e-04 shift 0.0e+00 | B_min +5.17e-06 lam_min 8.95e-06 lam_k 9.91e-01 S_sub_min -3.22e-02
+  it   8 cost 1.1536979427e-07 |g|inf 6.87e-04 step 2.69e-04 rho +1.439 radius 5.4e-04 shift 3.6e-07 | B_min +1.38e-05 lam_min 8.98e-06 lam_k 9.92e-01 S_sub_min -3.20e-02
+  it   9 cost 1.1536695795e-07 |g|inf 1.15e-03 step 1.35e-04 rho +1.246 radius 2.7e-04 shift 5.0e-05 | B_min +1.12e-05 lam_min 9.02e-06 lam_k 9.92e-01 S_sub_min -3.18e-02
+  it  10 cost 1.1536267294e-07 |g|inf 2.77e-04 step 2.69e-04 rho +0.902 radius 5.4e-04 shift 7.1e-05 | B_min -1.52e-05 lam_min 9.04e-06 lam_k 9.93e-01 S_sub_min -3.23e-02
+  it  11 cost 1.1535979415e-07 |g|inf 1.20e-03 step 5.38e-04 rho +0.247 radius 1.3e-04 shift 2.8e-05 | B_min +9.26e-06 lam_min 9.09e-06 lam_k 9.93e-01 S_sub_min -3.19e-02
+  it  12 cost 1.1533605634e-07 |g|inf 3.97e-03 step 1.35e-04 rho +1.083 radius 2.7e-04 shift 2.0e-04 | B_min +3.34e-05 lam_min 9.19e-06 lam_k 9.95e-01 S_sub_min -3.07e-02
+  it  13 cost 1.1532086050e-07 |g|inf 4.57e-04 step 2.69e-04 rho +0.937 radius 5.4e-04 shift 2.3e-04 | B_min -2.64e-05 lam_min 9.21e-06 lam_k 9.95e-01 S_sub_min -3.26e-02
+  it  14 cost 1.1530395864e-07 |g|inf 1.40e-03 step 5.38e-04 rho +0.558 radius 5.4e-04 shift 6.6e-05 | B_min +1.75e-05 lam_min 9.26e-06 lam_k 9.95e-01 S_sub_min -3.23e-02
+  it  15 cost 1.1525989344e-07 |g|inf 4.71e-03 step 2.39e-04 rho +1.227 radius 5.4e-04 shift 0.0e+00 | B_min +3.36e-05 lam_min 9.37e-06 lam_k 9.97e-01 S_sub_min -3.12e-02
+  it  16 cost 1.1524566645e-07 |g|inf 1.33e-03 step 1.35e-04 rho +1.083 radius 2.7e-04 shift 5.4e-04 | B_min +1.31e-05 lam_min 9.39e-06 lam_k 9.97e-01 S_sub_min -3.29e-02
+  it  17 cost 1.1522608370e-07 |g|inf 5.33e-04 step 2.69e-04 rho +0.886 radius 5.4e-04 shift 2.6e-04 | B_min +1.01e-05 lam_min 9.41e-06 lam_k 9.97e-01 S_sub_min -3.34e-02
+  it  18 cost 1.1521029096e-07 |g|inf 2.34e-03 step 5.38e-04 rho +0.683 radius 5.4e-04 shift 2.2e-05 | B_min +1.06e-05 lam_min 9.44e-06 lam_k 9.97e-01 S_sub_min -3.29e-02
+  it  19 cost 1.1518984282e-07 |g|inf 6.79e-03 step 3.83e-04 rho +0.681 radius 5.4e-04 shift 0.0e+00 | B_min +2.23e-05 lam_min 9.44e-06 lam_k 9.97e-01 S_sub_min -3.17e-02
+  it  20 cost 1.1517472902e-07 |g|inf 5.36e-03 step 5.38e-04 rho +0.395 radius 5.4e-04 shift 4.7e-05 | B_min -5.62e-06 lam_min 9.46e-06 lam_k 9.97e-01 S_sub_min -3.21e-02
+  it  21 cost 1.1514218504e-07 |g|inf 1.02e-02 step 1.35e-04 rho +0.991 radius 2.7e-04 shift 3.9e-04 | B_min +6.08e-06 lam_min 9.42e-06 lam_k 9.97e-01 S_sub_min -3.14e-02
+  it  22 cost 1.1512978826e-07 |g|inf 9.81e-04 step 2.69e-04 rho +0.948 radius 5.4e-04 shift 1.3e-04 | B_min +6.50e-06 lam_min 9.44e-06 lam_k 9.97e-01 S_sub_min -3.39e-02
+  it  23 cost 1.1512384539e-07 |g|inf 1.79e-03 step 5.38e-04 rho +0.431 radius 5.4e-04 shift 7.5e-06 | B_min +1.89e-05 lam_min 9.43e-06 lam_k 9.97e-01 S_sub_min -3.37e-02
+  it  24 cost 1.1509958966e-07 |g|inf 5.60e-03 step 2.84e-04 rho +1.095 radius 5.4e-04 shift 0.0e+00 | B_min +2.19e-05 lam_min 9.40e-06 lam_k 9.97e-01 S_sub_min -3.25e-02
+  it  25 cost 1.1508883853e-07 |g|inf 2.46e-03 step 1.35e-04 rho +1.166 radius 2.7e-04 shift 1.6e-04 | B_min +6.85e-06 lam_min 9.39e-06 lam_k 9.97e-01 S_sub_min -3.36e-02
+  it  26 cost 1.1508004069e-07 |g|inf 4.76e-04 step 2.69e-04 rho +0.804 radius 5.4e-04 shift 1.2e-04 | B_min +1.41e-05 lam_min 9.39e-06 lam_k 9.97e-01 S_sub_min -3.43e-02
+  it  27 cost 1.1507043647e-07 |g|inf 2.41e-03 step 1.35e-04 rho +1.153 radius 2.7e-04 shift 1.5e-04 | B_min +1.60e-05 lam_min 9.39e-06 lam_k 9.97e-01 S_sub_min -3.35e-02
+  it  28 cost 1.1506262772e-07 |g|inf 3.46e-04 step 2.69e-04 rho +0.753 radius 5.4e-04 shift 1.2e-04 | B_min +1.30e-05 lam_min 9.38e-06 lam_k 9.97e-01 S_sub_min -3.46e-02
+  it  29 cost 1.1505358451e-07 |g|inf 2.36e-03 step 1.35e-04 rho +1.136 radius 2.7e-04 shift 1.5e-04 | B_min +1.67e-05 lam_min 9.38e-06 lam_k 9.97e-01 S_sub_min -3.35e-02
+  it  30 cost 1.1504638613e-07 |g|inf 3.01e-04 step 2.69e-04 rho +0.739 radius 2.7e-04 shift 1.1e-04 | B_min +1.30e-05 lam_min 9.37e-06 lam_k 9.97e-01 S_sub_min -3.47e-02
+  it  31 cost 1.1503549275e-07 |g|inf 2.26e-03 step 2.69e-04 rho +1.158 radius 5.4e-04 shift 3.8e-05 | B_min +1.71e-05 lam_min 9.36e-06 lam_k 9.97e-01 S_sub_min -3.35e-02
+  it  32 cost 1.1502949608e-07 |g|inf 1.27e-03 step 1.35e-04 rho +1.050 radius 2.7e-04 shift 2.1e-04 | B_min +2.22e-05 lam_min 9.34e-06 lam_k 9.98e-01 S_sub_min -3.44e-02
+  it  33 cost 1.1502179031e-07 |g|inf 7.55e-04 step 2.69e-04 rho +0.957 radius 5.4e-04 shift 7.9e-05 | B_min +9.48e-06 lam_min 9.34e-06 lam_k 9.97e-01 S_sub_min -3.44e-02
+  it  34 cost 1.1501330735e-07 |g|inf 1.50e-03 step 3.70e-04 rho +1.154 radius 5.4e-04 shift 0.0e+00 | B_min +2.03e-05 lam_min 9.32e-06 lam_k 9.98e-01 S_sub_min -3.39e-02
+  it  35 cost 1.1500439351e-07 |g|inf 2.70e-03 step 2.69e-04 rho +1.118 radius 5.4e-04 shift 0.0e+00 | B_min +2.28e-05 lam_min 9.29e-06 lam_k 9.98e-01 S_sub_min -3.37e-02
+  it  36 cost 1.1499702839e-07 |g|inf 2.10e-03 step 1.35e-04 rho +1.150 radius 2.7e-04 shift 1.1e-04 | B_min +1.19e-05 lam_min 9.29e-06 lam_k 9.98e-01 S_sub_min -3.37e-02
+  it  37 cost 1.1499165269e-07 |g|inf 4.34e-04 step 2.69e-04 rho +0.739 radius 2.7e-04 shift 7.4e-05 | B_min +1.35e-05 lam_min 9.28e-06 lam_k 9.98e-01 S_sub_min -3.46e-02
+  it  38 cost 1.1498321072e-07 |g|inf 2.09e-03 step 2.69e-04 rho +1.159 radius 5.4e-04 shift 1.9e-05 | B_min +1.62e-05 lam_min 9.27e-06 lam_k 9.98e-01 S_sub_min -3.36e-02
+  it  39 cost 1.1497804811e-07 |g|inf 1.49e-03 step 1.35e-04 rho +1.053 radius 2.7e-04 shift 1.6e-04 | B_min +1.84e-05 lam_min 9.25e-06 lam_k 9.98e-01 S_sub_min -3.42e-02
+  it  40 cost 1.1497200687e-07 |g|inf 7.26e-04 step 2.69e-04 rho +0.962 radius 5.4e-04 shift 5.7e-05 | B_min +8.73e-06 lam_min 9.25e-06 lam_k 9.97e-01 S_sub_min -3.44e-02
+  it  41 cost 1.1496440807e-07 |g|inf 1.32e-03 step 2.90e-04 rho +1.369 radius 5.4e-04 shift 0.0e+00 | B_min +1.77e-05 lam_min 9.23e-06 lam_k 9.97e-01 S_sub_min -3.38e-02
+  it  42 cost 1.1495740422e-07 |g|inf 1.34e-03 step 2.82e-04 rho +1.286 radius 5.4e-04 shift 0.0e+00 | B_min +1.77e-05 lam_min 9.21e-06 lam_k 9.97e-01 S_sub_min -3.39e-02
+  it  43 cost 1.1494946372e-07 |g|inf 1.43e-03 step 2.71e-04 rho +1.373 radius 5.4e-04 shift 0.0e+00 | B_min +1.52e-05 lam_min 9.20e-06 lam_k 9.97e-01 S_sub_min -3.34e-02
+  it  44 cost 1.1494718134e-07 |g|inf 1.42e-03 step 3.95e-04 rho +0.341 radius 5.4e-04 shift 0.0e+00 | B_min +1.58e-05 lam_min 9.19e-06 lam_k 9.97e-01 S_sub_min -3.37e-02
+  it  45 cost 1.1493429663e-07 |g|inf 3.19e-03 step 3.37e-04 rho +0.984 radius 5.4e-04 shift 0.0e+00 | B_min +1.15e-05 lam_min 9.18e-06 lam_k 9.97e-01 S_sub_min -3.23e-02
+  it  46 cost 1.1492615468e-07 |g|inf 3.35e-03 step 1.35e-04 rho +1.039 radius 2.7e-04 shift 1.9e-04 | B_min +1.32e-05 lam_min 9.15e-06 lam_k 9.96e-01 S_sub_min -3.34e-02
+  it  47 cost 1.1491859396e-07 |g|inf 6.24e-04 step 2.69e-04 rho +0.962 radius 5.4e-04 shift 8.4e-05 | B_min +8.12e-06 lam_min 9.16e-06 lam_k 9.96e-01 S_sub_min -3.41e-02
+  it  48 cost 1.1490877876e-07 |g|inf 1.38e-03 step 4.94e-04 rho +1.073 radius 5.4e-04 shift 0.0e+00 | B_min +1.16e-05 lam_min 9.15e-06 lam_k 9.95e-01 S_sub_min -3.33e-02
+  it  49 cost 1.1489539042e-07 |g|inf 2.26e-03 step 1.35e-04 rho +1.186 radius 2.7e-04 shift 1.1e-04 | B_min +3.94e-06 lam_min 9.14e-06 lam_k 9.95e-01 S_sub_min -3.21e-02
+  it  50 cost 1.1488504062e-07 |g|inf 4.46e-04 step 2.69e-04 rho +0.922 radius 5.4e-04 shift 1.3e-04 | B_min +8.03e-06 lam_min 9.14e-06 lam_k 9.94e-01 S_sub_min -3.42e-02
+  it  51 cost 1.1487040926e-07 |g|inf 1.44e-03 step 5.38e-04 rho +1.004 radius 1.1e-03 shift 8.6e-06 | B_min +9.71e-06 lam_min 9.14e-06 lam_k 9.94e-01 S_sub_min -3.28e-02
+  it  52 cost 1.1485025149e-07 |g|inf 3.36e-03 step 4.01e-04 rho +1.078 radius 1.1e-03 shift 0.0e+00 | B_min +5.73e-06 lam_min 9.12e-06 lam_k 9.93e-01 S_sub_min -3.17e-02
+  it  53 cost 1.1482795202e-07 |g|inf 3.90e-03 step 2.69e-04 rho +1.078 radius 5.4e-04 shift 1.4e-04 | B_min +9.27e-06 lam_min 9.10e-06 lam_k 9.92e-01 S_sub_min -3.22e-02
+  it  54 cost 1.1480826348e-07 |g|inf 1.52e-03 step 5.38e-04 rho +0.803 radius 1.1e-03 shift 3.5e-05 | B_min +9.22e-06 lam_min 9.11e-06 lam_k 9.92e-01 S_sub_min -3.30e-02
+  it  55 cost 1.1476984994e-07 |g|inf 4.08e-03 step 2.69e-04 rho +1.233 radius 5.4e-04 shift 6.2e-05 | B_min -3.97e-07 lam_min 9.12e-06 lam_k 9.91e-01 S_sub_min -3.06e-02
+  it  56 cost 1.1475252800e-07 |g|inf 1.11e-03 step 5.38e-04 rho +0.426 radius 5.4e-04 shift 1.1e-04 | B_min +1.11e-05 lam_min 9.12e-06 lam_k 9.91e-01 S_sub_min -3.35e-02
+  it  57 cost 1.1468698273e-07 |g|inf 5.64e-03 step 5.38e-04 rho +1.120 radius 1.1e-03 shift 3.6e-05 | B_min -9.50e-07 lam_min 9.15e-06 lam_k 9.91e-01 S_sub_min -2.99e-02
+  it  58 cost 1.1465036841e-07 |g|inf 3.09e-03 step 2.69e-04 rho +0.972 radius 5.4e-04 shift 3.9e-04 | B_min +1.65e-05 lam_min 9.15e-06 lam_k 9.92e-01 S_sub_min -3.28e-02
+  it  59 cost 1.1459513804e-07 |g|inf 2.12e-03 step 5.38e-04 rho +1.004 radius 1.1e-03 shift 1.3e-04 | B_min +8.29e-06 lam_min 9.18e-06 lam_k 9.92e-01 S_sub_min -3.22e-02
+  it  60 cost 1.1453947440e-07 |g|inf 4.21e-03 step 1.08e-03 rho +0.807 radius 2.2e-03 shift 7.9e-06 | B_min +1.32e-05 lam_min 9.22e-06 lam_k 9.92e-01 S_sub_min -3.12e-02
+  it  61 cost 1.1443056712e-07 |g|inf 8.75e-03 step 5.38e-04 rho +0.993 radius 1.1e-03 shift 1.1e-04 | B_min -8.64e-05 lam_min 9.23e-06 lam_k 9.95e-01 S_sub_min -2.94e-02
+  it  62 cost 1.1436278677e-07 |g|inf 6.15e-03 step 2.69e-04 rho +1.118 radius 5.4e-04 shift 4.0e-04 | B_min -3.08e-06 lam_min 9.32e-06 lam_k 9.97e-01 S_sub_min -3.13e-02
+  it  63 cost 1.1429134032e-07 |g|inf 1.94e-03 step 5.38e-04 rho +0.917 radius 1.1e-03 shift 2.0e-04 | B_min +9.09e-06 lam_min 9.35e-06 lam_k 9.98e-01 S_sub_min -3.21e-02
+  it  64 cost 1.1421169004e-07 |g|inf 5.05e-03 step 1.08e-03 rho +0.810 radius 2.2e-03 shift 2.9e-05 | B_min +9.80e-06 lam_min 9.39e-06 lam_k 1.00e+00 S_sub_min -3.09e-02
+  it  65 cost 1.1409961416e-07 |g|inf 1.10e-02 step 5.38e-04 rho +0.959 radius 1.1e-03 shift 9.7e-05 | B_min -7.51e-05 lam_min 9.41e-06 lam_k 1.00e+00 S_sub_min -2.94e-02
+  it  66 cost 1.1402820022e-07 |g|inf 7.00e-03 step 2.69e-04 rho +1.088 radius 5.4e-04 shift 3.5e-04 | B_min -5.76e-06 lam_min 9.43e-06 lam_k 1.01e+00 S_sub_min -3.14e-02
+  it  67 cost 1.1396493557e-07 |g|inf 1.63e-03 step 5.38e-04 rho +0.888 radius 1.1e-03 shift 1.9e-04 | B_min +9.87e-06 lam_min 9.45e-06 lam_k 1.01e+00 S_sub_min -3.14e-02
+  it  68 cost 1.1389366228e-07 |g|inf 5.38e-03 step 1.08e-03 rho +0.768 radius 2.2e-03 shift 3.4e-05 | B_min +9.05e-06 lam_min 9.49e-06 lam_k 1.01e+00 S_sub_min -3.06e-02
+  it  69 cost 1.1380102577e-07 |g|inf 9.10e-03 step 5.38e-04 rho +0.935 radius 1.1e-03 shift 8.2e-05 | B_min -3.70e-05 lam_min 9.51e-06 lam_k 1.02e+00 S_sub_min -2.90e-02
+  it  70 cost 1.1374532451e-07 |g|inf 6.95e-03 step 2.69e-04 rho +1.008 radius 5.4e-04 shift 3.5e-04 | B_min +6.47e-06 lam_min 9.52e-06 lam_k 1.02e+00 S_sub_min -3.15e-02
+  it  71 cost 1.1368943887e-07 |g|inf 2.59e-03 step 5.38e-04 rho +0.977 radius 1.1e-03 shift 1.5e-04 | B_min +7.18e-06 lam_min 9.53e-06 lam_k 1.02e+00 S_sub_min -3.06e-02
+  it  72 cost 1.1363923508e-07 |g|inf 4.59e-03 step 1.08e-03 rho +0.665 radius 1.1e-03 shift 2.8e-05 | B_min +1.22e-05 lam_min 9.55e-06 lam_k 1.02e+00 S_sub_min -3.05e-02
+  it  73 cost 1.1355925536e-07 |g|inf 9.71e-03 step 2.69e-04 rho +1.063 radius 5.4e-04 shift 2.1e-04 | B_min -3.37e-05 lam_min 9.60e-06 lam_k 1.03e+00 S_sub_min -2.82e-02
+  it  74 cost 1.1352950290e-07 |g|inf 1.75e-03 step 5.38e-04 rho +0.549 radius 5.4e-04 shift 1.4e-04 | B_min +1.42e-05 lam_min 9.59e-06 lam_k 1.03e+00 S_sub_min -3.24e-02
+  it  75 cost 1.1345972830e-07 |g|inf 9.63e-03 step 5.38e-04 rho +1.080 radius 1.1e-03 shift 6.6e-05 | B_min -3.61e-06 lam_min 9.62e-06 lam_k 1.03e+00 S_sub_min -2.83e-02
+  it  76 cost 1.1343093418e-07 |g|inf 2.73e-03 step 2.69e-04 rho +0.893 radius 5.4e-04 shift 3.1e-04 | B_min +2.09e-05 lam_min 9.63e-06 lam_k 1.03e+00 S_sub_min -3.25e-02
+  it  77 cost 1.1338717391e-07 |g|inf 4.32e-03 step 5.38e-04 rho +1.000 radius 1.1e-03 shift 9.4e-05 | B_min +6.05e-06 lam_min 9.64e-06 lam_k 1.03e+00 S_sub_min -3.00e-02
+  it  78 cost 1.1335557141e-07 |g|inf 4.85e-03 step 2.69e-04 rho +1.093 radius 5.4e-04 shift 2.0e-04 | B_min +7.76e-06 lam_min 9.67e-06 lam_k 1.03e+00 S_sub_min -3.16e-02
+  it  79 cost 1.1332036136e-07 |g|inf 2.95e-03 step 5.38e-04 rho +0.896 radius 1.1e-03 shift 9.2e-05 | B_min +9.33e-06 lam_min 9.68e-06 lam_k 1.03e+00 S_sub_min -3.09e-02
+  it  80 cost 1.1328663648e-07 |g|inf 6.71e-03 step 2.69e-04 rho +1.159 radius 5.4e-04 shift 1.4e-04 | B_min +5.66e-06 lam_min 9.71e-06 lam_k 1.03e+00 S_sub_min -3.08e-02
+  it  81 cost 1.1326256018e-07 |g|inf 1.97e-03 step 5.38e-04 rho +0.643 radius 5.4e-04 shift 9.4e-05 | B_min +1.28e-05 lam_min 9.73e-06 lam_k 1.03e+00 S_sub_min -3.16e-02
+  it  82 cost 1.1321748789e-07 |g|inf 8.90e-03 step 5.38e-04 rho +1.106 radius 1.1e-03 shift 3.3e-05 | B_min +9.35e-06 lam_min 9.76e-06 lam_k 1.03e+00 S_sub_min -2.97e-02
+  it  83 cost 1.1319502818e-07 |g|inf 2.55e-03 step 2.69e-04 rho +0.969 radius 5.4e-04 shift 2.3e-04 | B_min +2.16e-05 lam_min 9.79e-06 lam_k 1.03e+00 S_sub_min -3.14e-02
+  it  84 cost 1.1316721796e-07 |g|inf 3.71e-03 step 5.38e-04 rho +0.982 radius 1.1e-03 shift 4.7e-05 | B_min +8.82e-06 lam_min 9.81e-06 lam_k 1.03e+00 S_sub_min -3.13e-02
+  it  85 cost 1.1313831567e-07 |g|inf 5.89e-03 step 5.76e-04 rho +1.168 radius 1.1e-03 shift 0.0e+00 | B_min +1.15e-05 lam_min 9.84e-06 lam_k 1.03e+00 S_sub_min -3.11e-02
+  it  86 cost 1.1311396004e-07 |g|inf 3.96e-03 step 2.69e-04 rho +1.096 radius 5.4e-04 shift 1.5e-04 | B_min -4.43e-06 lam_min 9.88e-06 lam_k 1.03e+00 S_sub_min -3.08e-02
+  it  87 cost 1.1310248467e-07 |g|inf 2.20e-03 step 5.38e-04 rho +0.446 radius 5.4e-04 shift 3.5e-05 | B_min +1.43e-05 lam_min 9.90e-06 lam_k 1.03e+00 S_sub_min -3.23e-02
+  it  88 cost 1.1306671174e-07 |g|inf 9.96e-03 step 4.36e-04 rho +1.021 radius 5.4e-04 shift 0.0e+00 | B_min +1.63e-05 lam_min 9.95e-06 lam_k 1.03e+00 S_sub_min -2.93e-02
+  it  89 cost 1.1305097819e-07 |g|inf 1.49e-03 step 1.35e-04 rho +0.953 radius 2.7e-04 shift 5.0e-04 | B_min +1.79e-05 lam_min 9.96e-06 lam_k 1.03e+00 S_sub_min -3.25e-02
+  it  90 cost 1.1303448507e-07 |g|inf 1.50e-03 step 2.69e-04 rho +0.960 radius 5.4e-04 shift 1.9e-04 | B_min +8.32e-06 lam_min 9.98e-06 lam_k 1.03e+00 S_sub_min -3.21e-02
+  it  91 cost 1.1301761880e-07 |g|inf 2.14e-03 step 5.38e-04 rho +0.790 radius 1.1e-03 shift 2.4e-05 | B_min +1.03e-05 lam_min 1.00e-05 lam_k 1.03e+00 S_sub_min -3.19e-02
+  it  92 cost 1.1300473089e-07 |g|inf 7.23e-03 step 5.03e-04 rho +0.552 radius 1.1e-03 shift 0.0e+00 | B_min +1.09e-05 lam_min 1.01e-05 lam_k 1.03e+00 S_sub_min -3.05e-02
+  it  93 cost 1.1297687048e-07 |g|inf 2.52e-03 step 2.69e-04 rho +0.828 radius 5.4e-04 shift 1.9e-04 | B_min +5.83e-06 lam_min 1.01e-05 lam_k 1.03e+00 S_sub_min -3.13e-02
+  it  94 cost 1.1297401179e-07 |g|inf 4.33e-03 step 5.38e-04 rho +0.105 radius 1.3e-04 shift 3.5e-05 | B_min +7.34e-06 lam_min 1.01e-05 lam_k 1.03e+00 S_sub_min -3.08e-02
+  it  95 cost 1.1293658042e-07 |g|inf 3.77e-03 step 1.35e-04 rho +0.909 radius 2.7e-04 shift 4.5e-04 | B_min +5.56e-06 lam_min 1.01e-05 lam_k 1.03e+00 S_sub_min -3.14e-02
+  it  96 cost 1.1292058641e-07 |g|inf 2.08e-03 step 2.69e-04 rho +0.880 radius 5.4e-04 shift 1.9e-04 | B_min +8.24e-06 lam_min 1.02e-05 lam_k 1.03e+00 S_sub_min -3.18e-02
+  it  97 cost 1.1291824728e-07 |g|inf 1.52e-03 step 5.38e-04 rho +0.116 radius 1.3e-04 shift 1.9e-05 | B_min +8.48e-06 lam_min 1.02e-05 lam_k 1.03e+00 S_sub_min -3.24e-02
+  it  98 cost 1.1288408494e-07 |g|inf 9.61e-03 step 1.35e-04 rho +1.027 radius 2.7e-04 shift 2.3e-04 | B_min +5.84e-06 lam_min 1.02e-05 lam_k 1.02e+00 S_sub_min -2.98e-02
+  it  99 cost 1.1287281396e-07 |g|inf 2.52e-04 step 2.69e-04 rho +0.708 radius 2.7e-04 shift 1.9e-04 | B_min +8.14e-06 lam_min 1.03e-05 lam_k 1.02e+00 S_sub_min -3.33e-02
+  it 100 cost 1.1285524522e-07 |g|inf 4.03e-03 step 2.69e-04 rho +1.131 radius 5.4e-04 shift 6.8e-05 | B_min +6.95e-06 lam_min 1.03e-05 lam_k 1.02e+00 S_sub_min -3.09e-02
+  it 101 cost 1.1284553042e-07 |g|inf 1.33e-03 step 1.35e-04 rho +1.020 radius 2.7e-04 shift 3.4e-04 | B_min +1.27e-05 lam_min 1.03e-05 lam_k 1.02e+00 S_sub_min -3.32e-02
+  it 102 cost 1.1283258179e-07 |g|inf 1.29e-03 step 2.69e-04 rho +0.934 radius 5.4e-04 shift 1.5e-04 | B_min +8.30e-06 lam_min 1.03e-05 lam_k 1.02e+00 S_sub_min -3.24e-02
+  it 103 cost 1.1282104675e-07 |g|inf 2.11e-03 step 4.90e-04 rho +0.821 radius 5.4e-04 shift 0.0e+00 | B_min +8.92e-06 lam_min 1.04e-05 lam_k 1.02e+00 S_sub_min -3.20e-02
+  it 104 cost 1.1280956658e-07 |g|inf 6.16e-03 step 4.71e-04 rho +0.588 radius 5.4e-04 shift 0.0e+00 | B_min +1.62e-05 lam_min 1.04e-05 lam_k 1.02e+00 S_sub_min -3.08e-02
+  it 105 cost 1.1278908965e-07 |g|inf 2.44e-03 step 1.35e-04 rho +0.978 radius 2.7e-04 shift 3.6e-04 | B_min -4.48e-06 lam_min 1.04e-05 lam_k 1.02e+00 S_sub_min -3.15e-02
+  it 106 cost 1.1277662225e-07 |g|inf 1.34e-03 step 2.69e-04 rho +0.895 radius 5.4e-04 shift 1.5e-04 | B_min +8.27e-06 lam_min 1.04e-05 lam_k 1.02e+00 S_sub_min -3.24e-02
+  it 107 cost 1.1277354874e-07 |g|inf 1.91e-03 step 5.15e-04 rho +0.214 radius 1.3e-04 shift 0.0e+00 | B_min +7.65e-06 lam_min 1.05e-05 lam_k 1.02e+00 S_sub_min -3.18e-02
+  it 108 cost 1.1274618923e-07 |g|inf 8.32e-03 step 1.29e-04 rho +1.048 radius 2.6e-04 shift 2.0e-04 | B_min +4.74e-06 lam_min 1.05e-05 lam_k 1.02e+00 S_sub_min -3.01e-02
+  it 109 cost 1.1273585569e-07 |g|inf 4.57e-04 step 2.58e-04 rho +0.773 radius 5.2e-04 shift 1.6e-04 | B_min +7.66e-06 lam_min 1.05e-05 lam_k 1.02e+00 S_sub_min -3.30e-02
+  it 110 cost 1.1272516120e-07 |g|inf 3.49e-03 step 4.63e-04 rho +0.758 radius 5.2e-04 shift 0.0e+00 | B_min +7.47e-06 lam_min 1.06e-05 lam_k 1.02e+00 S_sub_min -3.11e-02
+  it 111 cost 1.1270780241e-07 |g|inf 2.20e-03 step 1.29e-04 rho +0.948 radius 2.6e-04 shift 3.2e-04 | B_min +2.00e-05 lam_min 1.06e-05 lam_k 1.02e+00 S_sub_min -3.29e-02
+  it 112 cost 1.1269603988e-07 |g|inf 1.57e-03 step 2.58e-04 rho +0.880 radius 5.2e-04 shift 1.6e-04 | B_min +7.96e-06 lam_min 1.07e-05 lam_k 1.02e+00 S_sub_min -3.20e-02
+  it 113 cost 1.1268671457e-07 |g|inf 1.45e-03 step 1.29e-04 rho +1.107 radius 2.6e-04 shift 2.5e-04 | B_min +7.58e-06 lam_min 1.07e-05 lam_k 1.02e+00 S_sub_min -3.21e-02
+  it 114 cost 1.1267600699e-07 |g|inf 9.67e-04 step 2.58e-04 rho +0.905 radius 5.2e-04 shift 1.5e-04 | B_min +8.68e-06 lam_min 1.07e-05 lam_k 1.02e+00 S_sub_min -3.26e-02
+  it 115 cost 1.1266722430e-07 |g|inf 1.99e-03 step 4.31e-04 rho +0.747 radius 5.2e-04 shift 0.0e+00 | B_min +8.23e-06 lam_min 1.07e-05 lam_k 1.02e+00 S_sub_min -3.17e-02
+  it 116 cost 1.1265362159e-07 |g|inf 5.10e-03 step 3.75e-04 rho +0.774 radius 5.2e-04 shift 0.0e+00 | B_min +1.80e-05 lam_min 1.08e-05 lam_k 1.02e+00 S_sub_min -3.09e-02
+  it 117 cost 1.1263773894e-07 |g|inf 2.35e-03 step 1.29e-04 rho +1.023 radius 2.6e-04 shift 2.7e-04 | B_min +1.42e-05 lam_min 1.08e-05 lam_k 1.02e+00 S_sub_min -3.08e-02
+  it 118 cost 1.1262768450e-07 |g|inf 1.15e-03 step 2.58e-04 rho +0.871 radius 5.2e-04 shift 1.4e-04 | B_min +7.99e-06 lam_min 1.08e-05 lam_k 1.02e+00 S_sub_min -3.25e-02
+  it 119 cost 1.1261891714e-07 |g|inf 1.92e-03 step 1.23e-04 rho +1.139 radius 2.5e-04 shift 2.3e-04 | B_min +7.43e-06 lam_min 1.09e-05 lam_k 1.02e+00 S_sub_min -3.16e-02
+  it 120 cost 1.1260949085e-07 |g|inf 7.03e-04 step 2.46e-04 rho +0.889 radius 4.9e-04 shift 1.5e-04 | B_min +8.72e-06 lam_min 1.09e-05 lam_k 1.02e+00 S_sub_min -3.28e-02
+  it 121 cost 1.1260046964e-07 |g|inf 2.16e-03 step 4.35e-04 rho +0.820 radius 4.9e-04 shift 0.0e+00 | B_min +8.56e-06 lam_min 1.09e-05 lam_k 1.02e+00 S_sub_min -3.15e-02
+  it 122 cost 1.1258387690e-07 |g|inf 4.64e-03 step 2.44e-04 rho +1.121 radius 4.9e-04 shift 0.0e+00 | B_min +1.92e-05 lam_min 1.10e-05 lam_k 1.02e+00 S_sub_min -3.17e-02
+  it 123 cost 1.1257537930e-07 |g|inf 2.16e-03 step 1.23e-04 rho +1.100 radius 2.5e-04 shift 2.4e-04 | B_min +1.29e-05 lam_min 1.10e-05 lam_k 1.02e+00 S_sub_min -3.08e-02
+  it 124 cost 1.1256703821e-07 |g|inf 6.50e-04 step 2.46e-04 rho +0.835 radius 4.9e-04 shift 1.4e-04 | B_min +8.54e-06 lam_min 1.11e-05 lam_k 1.02e+00 S_sub_min -3.30e-02
+  it 125 cost 1.1255923871e-07 |g|inf 2.43e-03 step 4.31e-04 rho +0.759 radius 4.9e-04 shift 0.0e+00 | B_min +8.31e-06 lam_min 1.11e-05 lam_k 1.02e+00 S_sub_min -3.11e-02
+  it 126 cost 1.1255707633e-07 |g|inf 3.37e-03 step 4.24e-04 rho +0.134 radius 1.1e-04 shift 0.0e+00 | B_min +2.02e-05 lam_min 1.11e-05 lam_k 1.02e+00 S_sub_min -3.25e-02
+  it 127 cost 1.1253467115e-07 |g|inf 5.38e-03 step 1.06e-04 rho +0.993 radius 2.1e-04 shift 3.3e-04 | B_min +3.25e-06 lam_min 1.12e-05 lam_k 1.02e+00 S_sub_min -3.01e-02
+  it 128 cost 1.1252767871e-07 |g|inf 1.74e-04 step 2.12e-04 rho +0.827 radius 4.2e-04 shift 1.7e-04 | B_min +7.98e-06 lam_min 1.12e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it 129 cost 1.1252034769e-07 |g|inf 2.19e-03 step 4.24e-04 rho +0.720 radius 4.2e-04 shift 1.3e-05 | B_min +9.39e-06 lam_min 1.13e-05 lam_k 1.02e+00 S_sub_min -3.14e-02
+  it 130 cost 1.1250913993e-07 |g|inf 2.80e-03 step 1.06e-04 rho +1.001 radius 2.1e-04 shift 2.3e-04 | B_min +1.91e-05 lam_min 1.13e-05 lam_k 1.02e+00 S_sub_min -3.29e-02
+  it 131 cost 1.1250220579e-07 |g|inf 9.67e-04 step 2.12e-04 rho +0.940 radius 4.2e-04 shift 1.3e-04 | B_min +8.35e-06 lam_min 1.14e-05 lam_k 1.02e+00 S_sub_min -3.20e-02
+  it 132 cost 1.1249747864e-07 |g|inf 1.15e-03 step 1.06e-04 rho +1.103 radius 2.1e-04 shift 2.3e-04 | B_min +1.01e-05 lam_min 1.14e-05 lam_k 1.02e+00 S_sub_min -3.24e-02
+  it 133 cost 1.1249134300e-07 |g|inf 5.66e-04 step 2.12e-04 rho +0.941 radius 4.2e-04 shift 1.2e-04 | B_min +9.22e-06 lam_min 1.14e-05 lam_k 1.02e+00 S_sub_min -3.27e-02
+  it 134 cost 1.1248691544e-07 |g|inf 1.49e-03 step 4.13e-04 rho +0.624 radius 4.2e-04 shift 0.0e+00 | B_min +1.11e-05 lam_min 1.14e-05 lam_k 1.02e+00 S_sub_min -3.20e-02
+  it 135 cost 1.1247513275e-07 |g|inf 4.20e-03 step 1.50e-04 rho +1.170 radius 4.2e-04 shift 0.0e+00 | B_min +2.21e-05 lam_min 1.15e-05 lam_k 1.02e+00 S_sub_min -3.15e-02
+  it 136 cost 1.1247154174e-07 |g|inf 7.36e-04 step 1.06e-04 rho +1.082 radius 2.1e-04 shift 2.2e-04 | B_min +1.00e-05 lam_min 1.15e-05 lam_k 1.02e+00 S_sub_min -3.22e-02
+  it 137 cost 1.1246662844e-07 |g|inf 5.68e-04 step 2.12e-04 rho +0.924 radius 4.2e-04 shift 9.5e-05 | B_min +9.43e-06 lam_min 1.16e-05 lam_k 1.02e+00 S_sub_min -3.28e-02
+  it 138 cost 1.1246139885e-07 |g|inf 1.70e-03 step 3.31e-04 rho +1.029 radius 4.2e-04 shift 0.0e+00 | B_min +1.14e-05 lam_min 1.16e-05 lam_k 1.02e+00 S_sub_min -3.18e-02
+  it 139 cost 1.1245483335e-07 |g|inf 2.46e-03 step 2.06e-04 rho +1.161 radius 4.2e-04 shift 0.0e+00 | B_min +2.04e-05 lam_min 1.17e-05 lam_k 1.02e+00 S_sub_min -3.23e-02
+  it 140 cost 1.1245118853e-07 |g|inf 1.59e-03 step 1.06e-04 rho +1.101 radius 2.1e-04 shift 1.4e-04 | B_min +1.22e-05 lam_min 1.17e-05 lam_k 1.02e+00 S_sub_min -3.15e-02
+  it 141 cost 1.1244774045e-07 |g|inf 3.79e-04 step 2.12e-04 rho +0.800 radius 4.2e-04 shift 7.5e-05 | B_min +1.02e-05 lam_min 1.18e-05 lam_k 1.02e+00 S_sub_min -3.31e-02
+  it 142 cost 1.1244331464e-07 |g|inf 2.02e-03 step 2.87e-04 rho +1.090 radius 4.2e-04 shift 0.0e+00 | B_min +1.22e-05 lam_min 1.18e-05 lam_k 1.02e+00 S_sub_min -3.15e-02
+  it 143 cost 1.1243971192e-07 |g|inf 1.25e-03 step 1.05e-04 rho +0.976 radius 2.1e-04 shift 1.3e-04 | B_min +1.89e-05 lam_min 1.18e-05 lam_k 1.02e+00 S_sub_min -3.32e-02
+  it 144 cost 1.1243638827e-07 |g|inf 9.47e-04 step 2.09e-04 rho +0.953 radius 4.2e-04 shift 5.2e-05 | B_min +1.01e-05 lam_min 1.19e-05 lam_k 1.02e+00 S_sub_min -3.22e-02
+  it 145 cost 1.1243389654e-07 |g|inf 1.17e-03 step 2.74e-04 rho +0.839 radius 4.2e-04 shift 0.0e+00 | B_min +1.29e-05 lam_min 1.19e-05 lam_k 1.02e+00 S_sub_min -3.28e-02
+  it 146 cost 1.1243201700e-07 |g|inf 2.98e-03 step 3.33e-04 rho +0.441 radius 4.2e-04 shift 0.0e+00 | B_min +1.31e-05 lam_min 1.20e-05 lam_k 1.02e+00 S_sub_min -3.12e-02
+  it 147 cost 1.1242752956e-07 |g|inf 1.23e-03 step 1.05e-04 rho +0.837 radius 2.1e-04 shift 1.6e-04 | B_min +1.20e-05 lam_min 1.20e-05 lam_k 1.02e+00 S_sub_min -3.23e-02
+  it 148 cost 1.1242484816e-07 |g|inf 1.12e-03 step 2.09e-04 rho +0.939 radius 4.2e-04 shift 3.3e-05 | B_min +1.10e-05 lam_min 1.21e-05 lam_k 1.02e+00 S_sub_min -3.19e-02
+  it 149 cost 1.1242478124e-07 |g|inf 9.07e-04 step 3.34e-04 rho +0.026 radius 8.4e-05 shift 0.0e+00 | B_min +1.30e-05 lam_min 1.21e-05 lam_k 1.02e+00 S_sub_min -3.32e-02
+  it 150 cost 1.1241996903e-07 |g|inf 3.51e-03 step 8.36e-05 rho +1.009 radius 1.7e-04 shift 8.3e-05 | B_min +1.36e-05 lam_min 1.22e-05 lam_k 1.02e+00 S_sub_min -3.07e-02
+  it 151 cost 1.1241879405e-07 |g|inf 1.30e-04 step 1.67e-04 rho +0.578 radius 1.7e-04 shift 5.6e-05 | B_min +9.90e-06 lam_min 1.22e-05 lam_k 1.02e+00 S_sub_min -3.35e-02
+  it 152 cost 1.1241658826e-07 |g|inf 1.75e-03 step 1.67e-04 rho +1.105 radius 3.3e-04 shift 1.1e-05 | B_min +1.28e-05 lam_min 1.23e-05 lam_k 1.02e+00 S_sub_min -3.20e-02
+  it 153 cost 1.1241550295e-07 |g|inf 4.38e-04 step 8.36e-05 rho +0.962 radius 1.7e-04 shift 9.5e-05 | B_min +1.37e-05 lam_min 1.23e-05 lam_k 1.02e+00 S_sub_min -3.35e-02
+  it 154 cost 1.1241417423e-07 |g|inf 5.79e-04 step 1.67e-04 rho +1.024 radius 3.3e-04 shift 2.7e-05 | B_min +1.10e-05 lam_min 1.23e-05 lam_k 1.02e+00 S_sub_min -3.28e-02
+  it 155 cost 1.1241290153e-07 |g|inf 8.65e-04 step 1.92e-04 rho +1.225 radius 3.3e-04 shift 0.0e+00 | B_min +1.32e-05 lam_min 1.24e-05 lam_k 1.02e+00 S_sub_min -3.31e-02
+  it 156 cost 1.1241171495e-07 |g|inf 1.31e-03 step 1.52e-04 rho +1.232 radius 3.3e-04 shift 0.0e+00 | B_min +1.52e-05 lam_min 1.24e-05 lam_k 1.02e+00 S_sub_min -3.26e-02
+  it 157 cost 1.1241112981e-07 |g|inf 5.93e-04 step 2.03e-04 rho +0.629 radius 3.3e-04 shift 0.0e+00 | B_min +1.27e-05 lam_min 1.24e-05 lam_k 1.02e+00 S_sub_min -3.33e-02
+  it 158 cost 1.1240993137e-07 |g|inf 1.69e-03 step 1.54e-04 rho +0.965 radius 3.3e-04 shift 0.0e+00 | B_min +1.44e-05 lam_min 1.25e-05 lam_k 1.02e+00 S_sub_min -3.21e-02
+  it 159 cost 1.1240934118e-07 |g|inf 3.68e-04 step 7.02e-05 rho +0.906 radius 1.4e-04 shift 6.3e-05 | B_min +1.21e-05 lam_min 1.25e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it 160 cost 1.1240880875e-07 |g|inf 3.84e-04 step 1.40e-04 rho +1.084 radius 2.8e-04 shift 8.7e-06 | B_min +1.08e-05 lam_min 1.25e-05 lam_k 1.02e+00 S_sub_min -3.30e-02
+  it 161 cost 1.1240835501e-07 |g|inf 6.19e-04 step 1.03e-04 rho +1.358 radius 2.8e-04 shift 0.0e+00 | B_min +1.26e-05 lam_min 1.26e-05 lam_k 1.02e+00 S_sub_min -3.32e-02
+  it 162 cost 1.1240806088e-07 |g|inf 3.87e-04 step 1.21e-04 rho +1.200 radius 2.8e-04 shift 0.0e+00 | B_min +1.13e-05 lam_min 1.26e-05 lam_k 1.02e+00 S_sub_min -3.31e-02
+  it 163 cost 1.1240780553e-07 |g|inf 5.35e-04 step 6.58e-05 rho +1.328 radius 2.8e-04 shift 0.0e+00 | B_min +1.25e-05 lam_min 1.26e-05 lam_k 1.02e+00 S_sub_min -3.32e-02
+  it 164 cost 1.1240767914e-07 |g|inf 1.67e-04 step 1.05e-04 rho +1.060 radius 2.8e-04 shift 0.0e+00 | B_min +1.04e-05 lam_min 1.26e-05 lam_k 1.02e+00 S_sub_min -3.33e-02
+  it 165 cost 1.1240756117e-07 |g|inf 4.36e-04 step 3.44e-05 rho +1.252 radius 2.8e-04 shift 0.0e+00 | B_min +1.20e-05 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.32e-02
+  it 166 cost 1.1240751826e-07 |g|inf 4.38e-05 step 7.29e-05 rho +1.052 radius 2.8e-04 shift 0.0e+00 | B_min +9.56e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it 167 cost 1.1240748597e-07 |g|inf 2.23e-04 step 1.38e-05 rho +1.205 radius 2.8e-04 shift 0.0e+00 | B_min +1.10e-05 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.33e-02
+  it 168 cost 1.1240747650e-07 |g|inf 7.00e-06 step 3.19e-05 rho +1.259 radius 2.8e-04 shift 0.0e+00 | B_min +9.17e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it 169 cost 1.1240747250e-07 |g|inf 4.30e-05 step 5.17e-06 rho +1.286 radius 2.8e-04 shift 0.0e+00 | B_min +9.75e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it 170 cost 1.1240747116e-07 |g|inf 1.03e-06 step 1.11e-05 rho +1.328 radius 2.8e-04 shift 0.0e+00 | B_min +9.11e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it 171 cost 1.1240747066e-07 |g|inf 4.98e-06 step 1.93e-06 rho +1.334 radius 2.8e-04 shift 0.0e+00 | B_min +9.19e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it 172 cost 1.1240747049e-07 |g|inf 1.54e-07 step 3.88e-06 rho +1.342 radius 2.8e-04 shift 0.0e+00 | B_min +9.11e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it 173 cost 1.1240747042e-07 |g|inf 6.09e-07 step 7.17e-07 rho +1.347 radius 2.8e-04 shift 0.0e+00 | B_min +9.13e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it 174 cost 1.1240747040e-07 |g|inf 2.44e-08 step 1.39e-06 rho +1.349 radius 2.8e-04 shift 0.0e+00 | B_min +9.12e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it 175 cost 1.1240747039e-07 |g|inf 8.31e-08 step 2.66e-07 rho +1.344 radius 2.8e-04 shift 0.0e+00 | B_min +9.12e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it 176 cost 1.1240747039e-07 |g|inf 8.70e-09 step 4.98e-07 rho +1.382 radius 2.8e-04 shift 0.0e+00 | B_min +9.12e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it 177 cost 1.1240747039e-07 |g|inf 1.59e-08 step 9.88e-08 rho +1.318 radius 2.8e-04 shift 0.0e+00 | B_min +9.12e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it 178 cost 1.1240747038e-07 |g|inf 3.10e-09 step 1.79e-07 rho +1.872 radius 2.8e-04 shift 0.0e+00 | B_min +9.12e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it 179 cost 1.1240747038e-07 |g|inf 5.63e-09 step 3.66e-08 rho +1.873 radius 2.8e-04 shift 0.0e+00 | B_min +9.12e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it 180 cost 1.1240747038e-07 |g|inf 1.23e-09 step 1.54e-14 rho +16.963 radius 3.1e-14 shift 8.3e+04 | B_min +9.12e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+    [subspace-newton] call 1: 181 its, 53.0 s (ftol+xtol); totals 181 its, 53 s
+  it   0 cost 1.1240747038e-07 |g|inf 2.09e-09 step 6.45e-08 rho +1.983 radius 1.0e-04 shift 0.0e+00 | B_min +9.12e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it   1 cost 1.1240747038e-07 |g|inf 2.44e-09 step 1.35e-08 rho +14.149 radius 1.0e-04 shift 0.0e+00 | B_min +9.12e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it   2 cost 1.1240747038e-07 |g|inf 3.22e-09 step 1.35e-18 rho +1421766.836 radius 2.7e-18 shift 8.8e+09 | B_min +9.12e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it   3 cost 1.1240747038e-07 |g|inf 3.22e-09 step 2.70e-18 rho +811069.679 radius 5.4e-18 shift 4.3e+09 | B_min +9.12e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it   4 cost 1.1240747038e-07 |g|inf 3.16e-09 step 8.44e-20 rho +5212313.410 radius 1.7e-19 shift 1.4e+11 | B_min +9.12e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+    [subspace-newton] call 2: 5 its, 11.3 s (ftol+xtol); totals 186 its, 64 s
+
+PROBE  f eval 32.5 s, jac 22.8 s; x dim 187, rows 8085; cost 1.63626; |g|_inf 0.1503; |h_gn| 1150; tr_scipy |x/scale| 1249
+singular values of scaled J: max 3.53 min 0.000265  cond 1.33e+04; count < 1e-8 max: 0
+terms: Vacuum B.n error c 1.23 |g| 0.581 act 1326/1326; QS two-term (scale c 0.366 |g| 0.49 act 5445/5445; aspect ratio c 0 |g| 0 act 0/1; rotational transfo c 0.024 |g| 0.0971 act 6/20; volume c 0.000127 |g| 0.0281 act 1/1; coil length c 0.00359 |g| 0.188 act 3/4; coil curvature c 0.000106 |g| 0.0374 act 5/1204; coil mean squared  c 0 |g| 0 act 0/4; coil-coil distance c 0.00779 |g| 0.1 act 7/72; plasma-coil minimu c 0 |g| 0 act 0/8
+  it   0 cost 1.1288416742e-07 |g|inf 1.78e+00 step 1.00e-04 rho +0.989 radius 2.0e-04 shift 3.2e-01 | B_min -3.22e-01 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -4.66e-01
+  it   1 cost 1.1240396820e-07 |g|inf 8.39e-03 step 2.00e-04 rho +1.009 radius 4.0e-04 shift 1.9e-04 | B_min +8.13e-06 lam_min 1.29e-05 lam_k 1.02e+00 S_sub_min -3.53e-02
+  it   2 cost 1.1238998126e-07 |g|inf 3.80e-03 step 1.97e-04 rho +0.995 radius 4.0e-04 shift 0.0e+00 | B_min +1.01e-05 lam_min 1.28e-05 lam_k 1.02e+00 S_sub_min -3.07e-02
+  it   3 cost 1.1238898108e-07 |g|inf 4.98e-04 step 1.16e-04 rho +0.933 radius 4.0e-04 shift 0.0e+00 | B_min +1.11e-05 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it   4 cost 1.1238883502e-07 |g|inf 2.41e-04 step 1.08e-04 rho +0.660 radius 4.0e-04 shift 0.0e+00 | B_min +1.13e-05 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.30e-02
+  it   5 cost 1.1238872567e-07 |g|inf 5.01e-04 step 2.17e-05 rho +1.009 radius 4.0e-04 shift 0.0e+00 | B_min +1.08e-05 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.31e-02
+  it   6 cost 1.1238871335e-07 |g|inf 6.17e-06 step 4.80e-05 rho +0.764 radius 4.0e-04 shift 0.0e+00 | B_min +9.10e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it   7 cost 1.1238870554e-07 |g|inf 9.59e-05 step 3.21e-06 rho +0.952 radius 4.0e-04 shift 0.0e+00 | B_min +1.01e-05 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.33e-02
+  it   8 cost 1.1238870400e-07 |g|inf 1.62e-07 step 1.50e-05 rho +0.891 radius 4.0e-04 shift 0.0e+00 | B_min +9.06e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it   9 cost 1.1238870341e-07 |g|inf 9.03e-06 step 7.75e-07 rho +0.912 radius 4.0e-04 shift 0.0e+00 | B_min +9.23e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it  10 cost 1.1238870322e-07 |g|inf 2.58e-08 step 5.24e-06 rho +0.909 radius 4.0e-04 shift 0.0e+00 | B_min +9.07e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it  11 cost 1.1238870314e-07 |g|inf 1.10e-06 step 2.45e-07 rho +0.915 radius 4.0e-04 shift 0.0e+00 | B_min +9.10e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it  12 cost 1.1238870312e-07 |g|inf 7.28e-09 step 1.88e-06 rho +0.918 radius 4.0e-04 shift 0.0e+00 | B_min +9.08e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it  13 cost 1.1238870311e-07 |g|inf 1.47e-07 step 7.75e-08 rho +0.936 radius 4.0e-04 shift 0.0e+00 | B_min +9.08e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it  14 cost 1.1238870310e-07 |g|inf 2.29e-09 step 6.75e-07 rho +0.910 radius 4.0e-04 shift 0.0e+00 | B_min +9.08e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it  15 cost 1.1238870310e-07 |g|inf 2.19e-08 step 2.37e-08 rho +1.075 radius 4.0e-04 shift 0.0e+00 | B_min +9.08e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it  16 cost 1.1238870310e-07 |g|inf 1.63e-09 step 2.43e-07 rho +0.812 radius 4.0e-04 shift 0.0e+00 | B_min +9.08e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it  17 cost 1.1238870310e-07 |g|inf 7.67e-09 step 6.96e-09 rho +1.268 radius 4.0e-04 shift 0.0e+00 | B_min +9.08e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it  18 cost 1.1238870310e-07 |g|inf 1.60e-09 step 8.75e-08 rho +0.604 radius 4.0e-04 shift 0.0e+00 | B_min +9.08e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it  19 cost 1.1238870310e-07 |g|inf 2.74e-09 step 1.21e-10 rho +0.671 radius 1.2e-10 shift 8.4e-04 | B_min +9.08e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it  20 cost 1.1238870310e-07 |g|inf 2.71e-09 step 7.37e-15 rho +64784.617 radius 1.5e-14 shift 3.4e+03 | B_min +9.08e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it  21 cost 1.1238870310e-07 |g|inf 6.06e-10 step 2.30e-16 rho +702179.904 radius 4.6e-16 shift 1.2e+05 | B_min +9.08e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it  22 cost 1.1238870310e-07 |g|inf 1.84e-09 step 4.61e-16 rho +365571.208 radius 9.2e-16 shift 5.5e+04 | B_min +9.08e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it  23 cost 1.1238870310e-07 |g|inf 2.01e-09 step 5.76e-17 rho +134586.815 radius 1.2e-16 shift 3.9e+06 | B_min +9.08e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it  24 cost 1.1238870310e-07 |g|inf 8.56e-10 step 2.88e-17 rho +169498.647 radius 5.8e-17 shift 5.9e+06 | B_min +9.08e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+    [subspace-newton] call 3: 25 its, 15.1 s (ftol+xtol); totals 211 its, 79 s
+gn t=0.0001 |h| 1.150e-01  pred +2.5285e-04  actual +2.6499e-04  paired +2.6499e-04  ratio +1.0480  (17 s)
+    dc_act/dc_pred per term: Vacuum B.n +1.91e-04/+1.91e-04 e4.1e-03  QS two-ter +8.98e-05/+5.61e-05 e2.1e+00  aspect rat +0.00e+00/+0.00e+00 e0.0e+00  rotational -5.34e-07/+3.81e-06 e1.2e+00  volume +1.92e-08/+1.87e-08 e2.7e-02  coil lengt -1.46e-06/+6.14e-07 e3.4e+00  coil curva -1.48e-05/+2.05e-08 e3.8e+03 act5->6  coil mean  +0.00e+00/+0.00e+00 e0.0e+00  coil-coil  +1.25e-06/+1.27e-06 e2.8e-02  plasma-coi +0.00e+00/+0.00e+00 e0.0e+00
+  it   0 cost 1.1243518536e-07 |g|inf 1.78e-01 step 1.00e-04 rho +0.961 radius 2.0e-04 shift 9.4e-03 | B_min -9.34e-03 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -5.51e-02
+  it   1 cost 1.1240699152e-07 |g|inf 3.36e-03 step 2.00e-04 rho +0.983 radius 4.0e-04 shift 2.3e-05 | B_min +8.04e-06 lam_min 1.26e-05 lam_k 1.02e+00 S_sub_min -3.26e-02
+  it   2 cost 1.1240578363e-07 |g|inf 5.89e-04 step 7.32e-05 rho +1.065 radius 4.0e-04 shift 0.0e+00 | B_min +1.24e-05 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.38e-02
+  it   3 cost 1.1240566344e-07 |g|inf 2.97e-04 step 9.21e-05 rho +1.076 radius 4.0e-04 shift 0.0e+00 | B_min +9.57e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it   4 cost 1.1240560990e-07 |g|inf 2.80e-04 step 2.44e-05 rho +1.177 radius 4.0e-04 shift 0.0e+00 | B_min +1.09e-05 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.33e-02
+  it   5 cost 1.1240559811e-07 |g|inf 2.08e-05 step 3.70e-05 rho +1.182 radius 4.0e-04 shift 0.0e+00 | B_min +9.37e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it   6 cost 1.1240559416e-07 |g|inf 5.10e-05 step 5.83e-06 rho +1.230 radius 4.0e-04 shift 0.0e+00 | B_min +9.87e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it   7 cost 1.1240559311e-07 |g|inf 1.37e-06 step 1.03e-05 rho +1.292 radius 4.0e-04 shift 0.0e+00 | B_min +9.15e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it   8 cost 1.1240559275e-07 |g|inf 4.28e-06 step 1.62e-06 rho +1.303 radius 4.0e-04 shift 0.0e+00 | B_min +9.20e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it   9 cost 1.1240559263e-07 |g|inf 9.93e-08 step 3.34e-06 rho +1.313 radius 4.0e-04 shift 0.0e+00 | B_min +9.12e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it  10 cost 1.1240559259e-07 |g|inf 4.17e-07 step 5.59e-07 rho +1.325 radius 4.0e-04 shift 0.0e+00 | B_min +9.12e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it  11 cost 1.1240559257e-07 |g|inf 1.65e-08 step 1.17e-06 rho +1.312 radius 4.0e-04 shift 0.0e+00 | B_min +9.12e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it  12 cost 1.1240559256e-07 |g|inf 4.44e-08 step 2.05e-07 rho +1.318 radius 4.0e-04 shift 0.0e+00 | B_min +9.12e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it  13 cost 1.1240559256e-07 |g|inf 6.43e-09 step 4.19e-07 rho +1.475 radius 4.0e-04 shift 0.0e+00 | B_min +9.12e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it  14 cost 1.1240559256e-07 |g|inf 1.26e-08 step 7.60e-08 rho +1.332 radius 4.0e-04 shift 0.0e+00 | B_min +9.11e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it  15 cost 1.1240559256e-07 |g|inf 2.43e-09 step 1.51e-07 rho +1.348 radius 4.0e-04 shift 0.0e+00 | B_min +9.11e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it  16 cost 1.1240559256e-07 |g|inf 4.70e-09 step 2.82e-08 rho +0.973 radius 4.0e-04 shift 0.0e+00 | B_min +9.11e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it  17 cost 1.1240559256e-07 |g|inf 9.06e-10 step 5.42e-08 rho +0.463 radius 4.0e-04 shift 0.0e+00 | B_min +9.11e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it  18 cost 1.1240559256e-07 |g|inf 1.74e-09 step 1.05e-08 rho +6.740 radius 4.0e-04 shift 0.0e+00 | B_min +9.11e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it  19 cost 1.1240559256e-07 |g|inf 8.58e-10 step 1.22e-09 rho +6.411 radius 2.4e-09 shift 2.9e-04 | B_min +9.11e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it  20 cost 1.1240559256e-07 |g|inf 4.85e-10 step 1.52e-10 rho +618.403 radius 3.0e-10 shift 2.9e-03 | B_min +9.11e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it  21 cost 1.1240559256e-07 |g|inf 1.98e-09 step 1.91e-11 rho +2631.184 radius 3.8e-11 shift 2.6e-02 | B_min +9.11e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it  22 cost 1.1240559256e-07 |g|inf 1.17e-09 step 2.38e-12 rho +45698.106 radius 4.8e-12 shift 2.1e-01 | B_min +9.11e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it  23 cost 1.1240559256e-07 |g|inf 1.45e-09 step 1.14e-18 rho +5874406.232 radius 2.3e-18 shift 5.6e+09 | B_min +9.11e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it  24 cost 1.1240559256e-07 |g|inf 1.44e-09 step 1.42e-19 rho +5536362.087 radius 2.8e-19 shift 4.5e+10 | B_min +9.11e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+    [subspace-newton] call 4: 25 its, 14.5 s (ftol+xtol); totals 236 its, 94 s
+gn t=1e-05 |h| 1.150e-02  pred +2.5286e-05  actual +2.8106e-05  paired +2.8106e-05  ratio +1.1115  (16 s)
+    dc_act/dc_pred per term: Vacuum B.n +1.91e-05/+1.91e-05 e4.1e-04  QS two-ter +8.90e-06/+5.61e-06 e2.0e+00  aspect rat +0.00e+00/+0.00e+00 e0.0e+00  rotational -4.78e-08/+3.81e-07 e1.2e+00  volume +1.88e-09/+1.87e-09 e2.7e-03  coil lengt +4.06e-08/+6.14e-08 e3.4e-01  coil curva -1.21e-08/+2.05e-09 e2.2e+03 act5->6  coil mean  +0.00e+00/+0.00e+00 e0.0e+00  coil-coil  +1.27e-07/+1.27e-07 e2.8e-03  plasma-coi +0.00e+00/+0.00e+00 e0.0e+00
+  it   0 cost 1.1240020755e-07 |g|inf 4.03e-02 step 1.00e-04 rho +0.940 radius 2.0e-04 shift 5.0e-04 | B_min -4.94e-04 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.42e-02
+  it   1 cost 1.1239753838e-07 |g|inf 1.32e-03 step 1.14e-04 rho +0.967 radius 2.0e-04 shift 0.0e+00 | B_min +9.05e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.32e-02
+  it   2 cost 1.1239737484e-07 |g|inf 1.91e-04 step 5.20e-05 rho +1.073 radius 2.0e-04 shift 0.0e+00 | B_min +1.13e-05 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it   3 cost 1.1239735548e-07 |g|inf 9.47e-05 step 3.16e-05 rho +1.295 radius 2.0e-04 shift 0.0e+00 | B_min +9.75e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it   4 cost 1.1239735036e-07 |g|inf 3.99e-05 step 1.46e-05 rho +1.406 radius 2.0e-04 shift 0.0e+00 | B_min +9.67e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it   5 cost 1.1239734888e-07 |g|inf 8.10e-06 step 9.94e-06 rho +1.475 radius 2.0e-04 shift 0.0e+00 | B_min +9.22e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it   6 cost 1.1239734839e-07 |g|inf 4.10e-06 step 3.62e-06 rho +1.510 radius 2.0e-04 shift 0.0e+00 | B_min +9.17e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it   7 cost 1.1239734822e-07 |g|inf 5.51e-07 step 3.23e-06 rho +1.525 radius 2.0e-04 shift 0.0e+00 | B_min +9.10e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it   8 cost 1.1239734816e-07 |g|inf 4.37e-07 step 1.16e-06 rho +1.529 radius 2.0e-04 shift 0.0e+00 | B_min +9.10e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it   9 cost 1.1239734814e-07 |g|inf 6.20e-08 step 1.14e-06 rho +1.531 radius 2.0e-04 shift 0.0e+00 | B_min +9.10e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it  10 cost 1.1239734813e-07 |g|inf 5.78e-08 step 4.12e-07 rho +1.526 radius 2.0e-04 shift 0.0e+00 | B_min +9.10e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it  11 cost 1.1239734813e-07 |g|inf 1.30e-08 step 4.08e-07 rho +1.597 radius 2.0e-04 shift 0.0e+00 | B_min +9.10e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it  12 cost 1.1239734813e-07 |g|inf 1.28e-08 step 1.50e-07 rho +1.629 radius 2.0e-04 shift 0.0e+00 | B_min +9.10e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it  13 cost 1.1239734813e-07 |g|inf 4.84e-09 step 1.48e-07 rho +1.122 radius 2.0e-04 shift 0.0e+00 | B_min +9.10e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it  14 cost 1.1239734813e-07 |g|inf 4.58e-09 step 5.49e-08 rho +1.528 radius 2.0e-04 shift 0.0e+00 | B_min +9.10e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it  15 cost 1.1239734813e-07 |g|inf 2.10e-09 step 2.09e-10 rho +3.609 radius 4.2e-10 shift 1.4e-02 | B_min +9.10e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it  16 cost 1.1239734813e-07 |g|inf 9.96e-10 step 4.17e-10 rho +15.622 radius 8.3e-10 shift 6.7e-03 | B_min +9.10e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it  17 cost 1.1239734813e-07 |g|inf 2.25e-09 step 8.35e-10 rho +70.152 radius 1.7e-09 shift 2.6e-03 | B_min +9.10e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it  18 cost 1.1239734813e-07 |g|inf 1.38e-09 step 1.55e-18 rho +2165424.487 radius 3.1e-18 shift 3.5e+09 | B_min +9.10e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it  19 cost 1.1239734813e-07 |g|inf 1.35e-09 step 1.94e-19 rho +4971246.841 radius 3.9e-19 shift 2.9e+10 | B_min +9.10e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+    [subspace-newton] call 5: 20 its, 14.0 s (ftol+xtol); totals 256 its, 108 s
+sd |h| 1.000e-03  pred +2.2481e-04  actual -9.6152e-04  paired -9.6152e-04  ratio -4.2770  (15 s)
+    dc_act/dc_pred per term: Vacuum B.n +2.19e-04/+2.19e-04 e2.1e-04  QS two-ter +3.75e-06/+1.06e-06 e6.6e-02  aspect rat +0.00e+00/+0.00e+00 e0.0e+00  rotational -2.44e-06/-2.78e-06 e4.5e-01  volume -1.73e-07/-1.73e-07 e1.2e-05  coil lengt +3.78e-06/+3.79e-06 e1.6e-03  coil curva -1.18e-03/+5.29e-06 e1.2e+02 act5->7  coil mean  +0.00e+00/+0.00e+00 e0.0e+00  coil-coil  -1.07e-06/-1.07e-06 e3.0e-04  plasma-coi +0.00e+00/+0.00e+00 e0.0e+00
+  it   0 cost 1.1240640288e-07 |g|inf 4.03e-03 step 4.05e-06 rho +1.000 radius 1.0e-04 shift 0.0e+00 | B_min +7.86e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it   1 cost 1.1240640283e-07 |g|inf 4.78e-07 step 5.23e-07 rho +0.993 radius 1.0e-04 shift 0.0e+00 | B_min +9.12e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it   2 cost 1.1240640282e-07 |g|inf 2.71e-08 step 4.56e-07 rho +0.948 radius 1.0e-04 shift 0.0e+00 | B_min +9.12e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it   3 cost 1.1240640282e-07 |g|inf 1.25e-08 step 2.12e-07 rho +0.940 radius 1.0e-04 shift 0.0e+00 | B_min +9.12e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it   4 cost 1.1240640282e-07 |g|inf 5.79e-09 step 7.12e-08 rho +0.655 radius 1.0e-04 shift 0.0e+00 | B_min +9.12e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it   5 cost 1.1240640282e-07 |g|inf 1.84e-09 step 7.96e-08 rho +1.076 radius 1.0e-04 shift 0.0e+00 | B_min +9.12e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it   6 cost 1.1240640282e-07 |g|inf 2.50e-09 step 5.47e-11 rho +0.864 radius 1.1e-10 shift 1.9e+00 | B_min +9.12e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it   7 cost 1.1240640282e-07 |g|inf 4.03e-10 step 6.84e-12 rho +42.017 radius 1.4e-11 shift 1.2e+01 | B_min +9.12e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it   8 cost 1.1240640282e-07 |g|inf 1.09e-09 step 1.37e-11 rho +202.448 radius 2.7e-11 shift 3.9e+00 | B_min +9.12e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it   9 cost 1.1240640282e-07 |g|inf 6.31e-10 step 6.52e-18 rho +219804.389 radius 1.3e-17 shift 2.9e+08 | B_min +9.12e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+    [subspace-newton] call 6: 10 its, 11.1 s (ftol+xtol); totals 266 its, 119 s
+sd |h| 1.000e-04  pred +2.2621e-05  actual +1.3135e-05  paired +1.3135e-05  ratio +0.5807  (12 s)
+    dc_act/dc_pred per term: Vacuum B.n +2.20e-05/+2.20e-05 e2.1e-05  QS two-ter +3.65e-07/+1.25e-07 e6.4e-02  aspect rat +0.00e+00/+0.00e+00 e0.0e+00  rotational -2.43e-07/-2.78e-07 e4.4e-01  volume -1.73e-08/-1.73e-08 e1.3e-06  coil lengt +3.79e-07/+3.79e-07 e1.6e-04  coil curva -9.22e-06/+5.37e-07 e1.1e+02 act5->6  coil mean  +0.00e+00/+0.00e+00 e0.0e+00  coil-coil  -1.07e-07/-1.07e-07 e3.0e-05  plasma-coi +0.00e+00/+0.00e+00 e0.0e+00
+  it   0 cost 1.1240736307e-07 |g|inf 4.03e-04 step 3.43e-07 rho +1.000 radius 1.0e-04 shift 0.0e+00 | B_min +9.34e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it   1 cost 1.1240736307e-07 |g|inf 9.09e-09 step 8.19e-08 rho +1.366 radius 1.0e-04 shift 0.0e+00 | B_min +9.12e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it   2 cost 1.1240736307e-07 |g|inf 1.58e-09 step 1.06e-08 rho +1.677 radius 2.1e-08 shift 7.8e-05 | B_min +9.12e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it   3 cost 1.1240736307e-07 |g|inf 5.24e-10 step 1.32e-09 rho +0.940 radius 2.6e-09 shift 6.2e-04 | B_min +9.12e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it   4 cost 1.1240736307e-07 |g|inf 7.35e-10 step 2.64e-09 rho +4.261 radius 5.3e-09 shift 2.8e-04 | B_min +9.12e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it   5 cost 1.1240736307e-07 |g|inf 7.75e-10 step 1.23e-18 rho +3267369.842 radius 2.5e-18 shift 2.7e+09 | B_min +9.12e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it   6 cost 1.1240736307e-07 |g|inf 7.67e-10 step 6.15e-19 rho +907735.022 radius 1.2e-18 shift 5.4e+09 | B_min +9.12e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+    [subspace-newton] call 7: 7 its, 11.0 s (ftol+xtol); totals 273 its, 130 s
+sd |h| 1.000e-05  pred +2.2635e-06  actual +2.2637e-06  paired +2.2637e-06  ratio +1.0001  (12 s)
+    dc_act/dc_pred per term: Vacuum B.n +2.20e-06/+2.20e-06 e2.1e-06  QS two-ter +2.41e-08/+1.27e-08 e5.8e-02  aspect rat +0.00e+00/+0.00e+00 e0.0e+00  rotational -2.35e-08/-2.78e-08 e4.4e-01  volume -1.73e-09/-1.73e-09 e1.2e-06  coil lengt +3.79e-08/+3.79e-08 e1.6e-05  coil curva +3.82e-08/+5.37e-08 e4.3e+01 act5->6  coil mean  +0.00e+00/+0.00e+00 e0.0e+00  coil-coil  -1.07e-08/-1.07e-08 e2.9e-06  plasma-coi +0.00e+00/+0.00e+00 e0.0e+00
+  it   0 cost 1.1240745965e-07 |g|inf 4.03e-05 step 3.70e-08 rho +1.000 radius 1.0e-04 shift 0.0e+00 | B_min +9.14e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it   1 cost 1.1240745965e-07 |g|inf 1.30e-09 step 2.83e-11 rho +1.860 radius 5.7e-11 shift 1.7e+00 | B_min +9.12e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it   2 cost 1.1240745965e-07 |g|inf 1.57e-09 step 5.54e-14 rho +12471.675 radius 1.1e-13 shift 9.2e+02 | B_min +9.12e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it   3 cost 1.1240745965e-07 |g|inf 1.28e-09 step 6.76e-18 rho +1758810.578 radius 1.4e-17 shift 4.5e+08 | B_min +9.12e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it   4 cost 1.1240745965e-07 |g|inf 1.15e-09 step 3.38e-18 rho +2489887.561 radius 6.8e-18 shift 9.1e+08 | B_min +9.12e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it   5 cost 1.1240745965e-07 |g|inf 1.09e-09 step 6.76e-18 rho +1033897.871 radius 1.4e-17 shift 3.5e+08 | B_min +9.12e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it   6 cost 1.1240745965e-07 |g|inf 1.01e-09 step 2.11e-19 rho +8901076.683 radius 4.2e-19 shift 1.5e+10 | B_min +9.12e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+    [subspace-newton] call 8: 7 its, 10.9 s (ftol+xtol); totals 280 its, 141 s
+sd |h| 1.000e-06  pred +2.2636e-07  actual +2.0688e-07  paired +2.0688e-07  ratio +0.9139  (12 s)
+    dc_act/dc_pred per term: Vacuum B.n +2.20e-07/+2.20e-07 e2.5e-07  QS two-ter -2.00e-08/+1.27e-09 e1.5e-01  aspect rat +0.00e+00/+0.00e+00 e0.0e+00  rotational -9.53e-10/-2.78e-09 e9.4e-01  volume -1.73e-10/-1.73e-10 e1.1e-05  coil lengt +3.79e-09/+3.79e-09 e2.1e-06  coil curva +5.37e-09/+5.37e-09 e7.7e-08  coil mean  +0.00e+00/+0.00e+00 e0.0e+00  coil-coil  -1.07e-09/-1.07e-09 e2.1e-06  plasma-coi +0.00e+00/+0.00e+00 e0.0e+00
+  it   0 cost 1.1240746931e-07 |g|inf 4.03e-06 step 2.26e-08 rho +0.912 radius 1.0e-04 shift 0.0e+00 | B_min +9.12e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it   1 cost 1.1240746931e-07 |g|inf 1.18e-09 step 1.80e-11 rho +9.730 radius 3.6e-11 shift 1.5e+00 | B_min +9.12e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it   2 cost 1.1240746931e-07 |g|inf 1.47e-09 step 1.41e-13 rho +27412.332 radius 2.8e-13 shift 1.9e+02 | B_min +9.12e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+  it   3 cost 1.1240746931e-07 |g|inf 2.46e-09 step 6.70e-20 rho +1126773.140 radius 1.3e-19 shift 1.3e+11 | B_min +9.12e-06 lam_min 1.27e-05 lam_k 1.02e+00 S_sub_min -3.34e-02
+    [subspace-newton] call 9: 4 its, 10.7 s (ftol+xtol); totals 284 its, 151 s
+sd |h| 1.000e-07  pred +2.2636e-08  actual +3.2035e-09  paired +3.2035e-09  ratio +0.1415  (12 s)
+    dc_act/dc_pred per term: Vacuum B.n +2.20e-08/+2.20e-08 e1.2e-06  QS two-ter -2.09e-08/+1.27e-10 e1.5e+00  aspect rat +0.00e+00/+0.00e+00 e0.0e+00  rotational +1.28e-09/-2.78e-10 e7.3e+00  volume -1.73e-11/-1.73e-11 e1.6e-05  coil lengt +3.79e-10/+3.79e-10 e2.8e-06  coil curva +5.37e-10/+5.37e-10 e9.2e-07  coil mean  +0.00e+00/+0.00e+00 e0.0e+00  coil-coil  -1.07e-10/-1.07e-10 e1.9e-05  plasma-coi +0.00e+00/+0.00e+00 e0.0e+00

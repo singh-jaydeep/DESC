@@ -126,11 +126,36 @@ def parse():
     g.add_argument("--xtol", type=float, default=1e-6)
     g.add_argument("--gtol", type=float, default=1e-8)
     g.add_argument("--max-tr", type=float, default=None, help="max_trust_radius (default: solver's)")
+    g.add_argument("--method", choices=["lsq-exact", "lsq-composite"], default="lsq-exact",
+                   help="outer solver under proximal-: lsq-exact (Gauss-Newton trust region) or lsq-composite "
+                        "(Levenberg-Marquardt with the bounded terms kept exact as hinges in the model)")
+    g.add_argument("--hessian", choices=["gn", "secant", "exact"], default=None,
+                   help="lsq-composite second-order term (default: the solver's, gn)")
+    g.add_argument("--finish-steps", type=int, default=None, help="lsq-composite finish_steps")
+    g.add_argument("--init-tr", default=None,
+                   help="lsq-exact initial_trust_radius: scipy (solver default), conngould, mix, or a number")
+    g.add_argument("--track-steps", action="store_true",
+                   help="record every attempted step (predicted/actual reduction, ratio) in result.json")
     g.add_argument("--perturb-order", type=int, default=2)
     g.add_argument("--solve-tol", type=float, default=None,
                    help="ftol = xtol = gtol of the proximal equilibrium re-solve (default: the solver's). MEASURED "
                         "at the default: ~6e-4 of noise on a cost of 1.16 (precise_QA, k=1), which stalls the "
                         "outer solver once the available decrease is smaller; 1e-13 cut it ~20x at 8x the time")
+    g.add_argument("--lambda-pin", type=float, default=0.0,
+                   help="weight of an anchored lambda penalty w (L_lmn - L_lmn at the step's start) added to "
+                        "ForceBalance in the proximal equilibrium sub-problem (sandbox/gauge_fix.py): pins the "
+                        "theta gauge so the re-solve stops drifting. 0 = off. DO NOT USE: it admits "
+                        "non-equilibria (lambda is not pure gauge; work/ss_qh/joint/stall/DIAGNOSIS.md)")
+    g.add_argument("--force-chunk", type=int, default=None,
+                   help="jac_chunk_size of the proximal ForceBalance (default: DESC's 'auto', which OOMs at basis 12 on "
+                        "a 16 GB GPU; 100-400 measured at 1.6-2.5 GB peak for the equilibrium solve)")
+    g.add_argument("--inner-sn", type=int, default=0,
+                   help="replace the proximal's inner Gauss-Newton equilibrium re-solve by subspace Newton with "
+                        "this many soft modes (sandbox/subspace_newton.py; 128 tested). GN does not converge along "
+                        "the soft (relabeling) modes, which makes QS/iota noisy (work/ss_qh/joint/stall/DIAGNOSIS.md)")
+    g.add_argument("--solve-options", default=None,
+                   help="JSON dict passed as options= to the proximal equilibrium re-solve, e.g. "
+                        "'{\"initial_trust_radius\": 1e-3}' (default: the solver's)")
     g = ap.add_argument_group("tolerances: a term whose residual equals its tolerance everywhere costs 1/2")
     g.add_argument("--tau-bn", type=float, default=5e-3,
                    help="rms of the boundary error rows, ~B.n/B and ~2 dB/B (VacuumBoundaryError normalized "
@@ -294,7 +319,7 @@ def max_hinge_dz(cs, z):
     return max(float(np.abs(np.asarray(c.hinges).reshape(-1, 3)[:, 2] - z).max()) for c in S.iter_unique(cs))
 
 
-def proximal_constraints(eq, k, fix_sum, cs, hinge_z=None, level=False):
+def proximal_constraints(eq, k, fix_sum, cs, hinge_z=None, level=False, lambda_pin=0.0, force_chunk=None):
     """ForceBalance plus the fixed-boundary set, with only |m|, |n| <= k boundary modes free
     (R_00 always fixed: it sets the machine size)."""
     R = eq.surface.R_basis.modes
@@ -303,7 +328,11 @@ def proximal_constraints(eq, k, fix_sum, cs, hinge_z=None, level=False):
     Zfix = Z[np.max(np.abs(Z), axis=1) > k]
     base = [c for c in O.get_fixed_boundary_constraints(eq)
             if not isinstance(c, (O.FixBoundaryR, O.FixBoundaryZ))]
-    cons = [O.ForceBalance(eq), O.FixBoundaryR(eq, modes=Rfix), *base]
+    cons = [O.ForceBalance(eq, jac_chunk_size=force_chunk), O.FixBoundaryR(eq, modes=Rfix), *base]
+    if lambda_pin > 0:
+        from gauge_fix import LambdaCondensation
+
+        cons.insert(1, LambdaCondensation(eq, weight=lambda_pin, power=0.0, ref=True, name="lambda pin"))
     if len(Zfix):
         cons.append(O.FixBoundaryZ(eq, modes=Zfix))
     if fix_sum:
@@ -396,6 +425,12 @@ def coil_check(cs, eq, P):
 
 def main():
     a = parse()
+    if a.inner_sn:
+        from subspace_newton import install_proximal_hook
+
+        install_proximal_hook(k=a.inner_sn, verbose=0)
+        import subspace_newton as _sn  # noqa: F401
+        print(f"inner solve: subspace Newton, k = {a.inner_sn}", flush=True)
     if a.fix_coils:
         a.fix_current_sum = False
         print("--fix-coils: coils frozen; only the equilibrium is optimized", flush=True)
@@ -473,18 +508,34 @@ def main():
         return
 
     for k in range(a.kmin, a.kmax + 1):
-        cons, n_free = proximal_constraints(eq, k, a.fix_current_sum, cs, a.fix_hinge_z, a.horizontal_hinges)
+        cons, n_free = proximal_constraints(eq, k, a.fix_current_sum, cs, a.fix_hinge_z, a.horizontal_hinges,
+                                            a.lambda_pin, a.force_chunk)
         objective = O.ObjectiveFunction(tuple(build_terms(eq, cs, a, E)[0]))
         print(f"\n===== step k={k}: {n_free} boundary modes free, maxiter {a.maxiter} =====", flush=True)
         solve = {"verbose": 0}
         if a.solve_tol is not None:
             solve.update(ftol=a.solve_tol, xtol=a.solve_tol, gtol=a.solve_tol)
+        if a.solve_options:
+            solve["options"] = json.loads(a.solve_options)
         opts = {"perturb_options": {"order": a.perturb_order, "verbose": 0}, "solve_options": solve}
-        if a.max_tr is not None:
-            opts["max_trust_radius"] = a.max_tr
+        if a.method == "lsq-exact":
+            if a.max_tr is not None:
+                opts["max_trust_radius"] = a.max_tr
+            if a.init_tr is not None:
+                try:
+                    opts["initial_trust_radius"] = float(a.init_tr)
+                except ValueError:
+                    opts["initial_trust_radius"] = a.init_tr
+        else:
+            if a.hessian is not None:
+                opts["hessian"] = a.hessian
+            if a.finish_steps is not None:
+                opts["finish_steps"] = a.finish_steps
+        if a.track_steps:
+            opts["track_steps"] = True
         t0 = time.time()
         things = [eq] if a.fix_coils else [eq, cs]
-        out, res = Optimizer("proximal-lsq-exact").optimize(
+        out, res = Optimizer(f"proximal-{a.method}").optimize(
             things, objective=objective, constraints=cons, maxiter=a.maxiter, ftol=a.ftol, xtol=a.xtol,
             gtol=a.gtol, verbose=3, copy=False, options=opts)
         wall = time.time() - t0
@@ -505,7 +556,9 @@ def main():
         eq.save(os.path.join(a.out, f"eq_k{k}.h5"))
         cs.save(os.path.join(a.out, f"coils_k{k}.h5"))
         rec["steps"].append(dict(k=k, n_free=n_free, wall_s=wall, nit=int(res["nit"]), message=str(res["message"]),
-                                 physics=p, coils=m, terms=table))
+                                 physics=p, coils=m, terms=table,
+                                 step_log=[{q: np.asarray(v).tolist() for q, v in r.items()}
+                                           for r in res.get("step_log", [])]))
         json.dump(rec, open(os.path.join(a.out, "result.json"), "w"), indent=1, default=float)
     print(f"\nwrote {a.out}: eq_k*.h5, coils_k*.h5, result.json")
 

@@ -1,0 +1,6 @@
+Running as unit: run-r62acca28c0ea43398d2c7d1be4a3cc4a.scope; invocation ID: 22c36bb7f2b04f2d83264be20fc14138
+/home/jay/Documents/desc_dev/DESC/desc/__init__.py:94: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  from pynvml import (
+DESC /home/jay/Documents/desc_dev/DESC/desc
+DEVICE requested=gpu obtained=gpu (1x NVIDIA GeForce RTX 5070 Ti)
+RESCORE work/ss_qh/joint/stall/k5_tol6/eq_k5_resolved.h5 -> basis 12: 300 its 476 s, force 2.4094e-10; saved work/ss_qh/joint/stall/rescore12/k5_tol6/eq12.h5

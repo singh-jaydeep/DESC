@@ -1,0 +1,49 @@
+Running as unit: run-raf12665bc465413485d4e2d6e3f49fbd.scope; invocation ID: 7943f5cb6a1e4532b4949475c2162ff2
+/home/jay/Documents/desc_dev/DESC/desc/__init__.py:94: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  from pynvml import (
+DESC /home/jay/Documents/desc_dev/DESC/desc
+DEVICE requested=gpu obtained=gpu (1x NVIDIA GeForce RTX 5070 Ti)
+--field-term bn is blind to the current scale: holding the coil current SUM fixed
+  [mem] RSS 0.76 GB  peak 0.76 GB
+JOINT PLANE: every hinge snapped to z = 0.0 m and its z held there (largest move 0.00e+00 m)
+eq work/ss_qh/joint/stall/rescore12/k5_pincomp/eq12.h5 (h5) NFP 4 sym True L,M,N 12,12,12 dim_x 4074; start work/ss_qh/joint/stall/k5_pin_comp/coils_k5.h5: 4 unique coils (PiecewisePlanarArcCoil), 32 total
+SETTINGS {'eq': 'work/ss_qh/joint/stall/rescore12/k5_pincomp/eq12.h5', 'start': 'work/ss_qh/joint/stall/k5_pin_comp/coils_k5.h5', 'out': 'work/ss_qh/joint/stall/rescore12/k5_pincomp', 'bounds': 'bounds/precise_qh_gil.json', 'a': None, 'device': None, 'length_mult': 1.0, 'fix_coils': False, 'fix_hinge_z': 0.0, 'horizontal_hinges': False, 'dry': True, 'field_term': 'bn', 'fix_current_sum': True, 'helicity': '1,4', 'qs_rho': '0.2,0.4,0.6,0.8,1.0', 'A_min': 7.5, 'A_max': 8.5, 'vol_band': 0.02, 'V0': 0.30352, 'bn_norm': 0.42526, 'qs_form': 'scale-invariant', 'iota_min': 1.19, 'kmin': 5, 'kmax': 5, 'maxiter': 50, 'ftol': 1e-06, 'xtol': 1e-06, 'gtol': 1e-08, 'max_tr': None, 'method': 'lsq-exact', 'hessian': None, 'finish_steps': None, 'init_tr': None, 'track_steps': False, 'perturb_order': 2, 'solve_tol': None, 'lambda_pin': 0.0, 'force_chunk': None, 'inner_sn': 0, 'solve_options': None, 'tau_bn': 0.005, 'tau_qs': 0.01695, 'tau_qs_rel': 2.0, 'tau_A': 0.01, 'tau_V': 0.005, 'tau_iota': 0.01, 'tau_L': 0.01, 'tau_kappa': 0.01, 'tau_kms': 0.01, 'tau_dpc': 0.01, 'tau_dcc': 1e-06, 'dcc_backoff': 0.025, 'dpc_backoff': 0.02, 'no_arc_backoffs': False, 'eval_m': 25, 'eval_n': 25, 'plasma_m': 32, 'plasma_n': 32, 'coil_grid_n': 150, 'src_gl': 24, 'src_n': 400, 'bs_chunk': None, 'jac_chunk': None, 'dcc_k': 20000}
+BOUNDS (judged, absolute) L 2.926  Ltot -  kappa 13.67  kms 18.69  convex -  planar -  dcc 0.05851  dpc 0.1097
+ENFORCED L 2.926  Ltot -  kappa 13.6  kms 18.51  convex -  planar -  dcc 0.06088  dpc 0.1119
+/home/jay/Documents/desc_dev/DESC/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 4.
+  warnings.warn(msg, err)
+/home/jay/Documents/desc_dev/DESC/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 4.
+  warnings.warn(msg, err)
+START physics  A 8.175  R0 1.0023  a 0.1226  iota [1.1788, 1.2088]  QS(Boozer, |B_nonsym|/<B>) rho 0.25 2.12e-03  rho 0.5 2.21e-03  rho 0.75 3.30e-03  rho 1 7.51e-03
+START coils    bn 5.4950e-03 (max 2.162e-02)  L 1.001  kappa 0.997  kMS 0.906  d_cc 1.007  d_pc 1.107  linked 0  -> FAILS L
+QS two-term rms at the start 0.01149 -> tau_qs 0.01695
+B.n normalization frozen at the start: 0.42526; volume band around V0 = 0.30352
+quadrature scales s (expected; compare the s(qw) column): bn 6.283  qs 41.41  iota 1  kappa 0.3622  dcc 9.06e+04
+/home/jay/Documents/desc_dev/DESC/desc/utils.py:590: FutureWarning: constants is deprecated and will be removed in a future release. Users should not include constants in the arguments of their objective compute methods. Instead declare all the constants in the build method and use as self._constants.
+  warnings.warn(msg, err)
+/home/jay/Documents/desc_dev/DESC/desc/utils.py:590: FutureWarning: constants is deprecated and will be removed in a future release. Users should not include constants in the arguments of their objective compute methods. Instead declare all the constants in the build method and use as self._constants.
+  warnings.warn(msg, err)
+/home/jay/Documents/desc_dev/DESC/desc/utils.py:590: FutureWarning: constants is deprecated and will be removed in a future release. Users should not include constants in the arguments of their objective compute methods. Instead declare all the constants in the build method and use as self._constants.
+  warnings.warn(msg, err)
+/home/jay/Documents/desc_dev/DESC/desc/utils.py:590: FutureWarning: constants is deprecated and will be removed in a future release. Users should not include constants in the arguments of their objective compute methods. Instead declare all the constants in the build method and use as self._constants.
+  warnings.warn(msg, err)
+/home/jay/Documents/desc_dev/DESC/desc/utils.py:590: FutureWarning: constants is deprecated and will be removed in a future release. Users should not include constants in the arguments of their objective compute methods. Instead declare all the constants in the build method and use as self._constants.
+  warnings.warn(msg, err)
+/home/jay/Documents/desc_dev/DESC/desc/utils.py:590: FutureWarning: constants is deprecated and will be removed in a future release. Users should not include constants in the arguments of their objective compute methods. Instead declare all the constants in the build method and use as self._constants.
+  warnings.warn(msg, err)
+
+TERMS AT THE START
+term                             dim_f    weight     norm    s(qw)  target/bounds           raw min    raw max       cost  err/tol  share
+Vacuum B.n error                  1326      31.8   0.4253    6.283  = 0                   -0.008093   0.007433     0.7291     1.21  73.2%
+QS two-term (scale-invariant)    12005      1.42        -    41.41  = 0                     -0.1049     0.1049     0.2298    0.678  23.1%
+aspect ratio                         1      12.5        -        1  [7.5, 8.5]                8.175      8.175          0        0   0.0%
+rotational transform                20        84        -        1  [1.19, inf]               1.179      1.209    0.03173    0.252   3.2%
+volume                               1       659        -        1  [0.2974, 0.3096]         0.2974     0.2974  6.257e-05   0.0112   0.0%
+coil length                          4      34.2        -        2  [0, 2.926]                2.767      2.927    0.00187   0.0612   0.2%
+coil curvature                    1204      20.3        -    5.013  [0, 13.6]                     0      13.61  3.018e-06  0.00246   0.0%
+coil mean squared curvature          4       5.4        -        2  [0, 18.51]                8.795      17.05          0        0   0.0%
+coil-coil distance penalty          72        11        -    8.485  [-inf, 0]                     0   0.004068   0.002999   0.0775   0.3%
+plasma-coil minimum distance         8       894        -    2.828  [0.1119, inf]            0.1216     0.1684          0        0   0.0%
+total cost 0.5 sum f^2                                                                                                      0.9955
+
+--dry: wrote work/ss_qh/joint/stall/rescore12/k5_pincomp/result.json; no optimization run
