@@ -138,7 +138,8 @@ class NearAxis:
         B = B0 * t
         resid = jnp.max(jnp.abs(res(x)))
         return dict(g, B=B, G=G, iota=iota, sigma=sigma, X1c=X1c, Y1s=Y1s, Y1c=Y1c, resid=resid,
-                    elong_terms=(X1c, Y1s, Y1c))
+                    elong_terms=(X1c, Y1s, Y1c), Dv=Dv, abs_G0=abs_G0, iotaN=iotaN, etabar=etabar,
+                    dX1c=dX1c, dY1s=dY1s, dY1c=dY1c, B0=B0)
 
 
 def elongation(X1c, Y1s, Y1c):

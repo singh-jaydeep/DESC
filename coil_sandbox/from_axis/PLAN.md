@@ -183,6 +183,26 @@ B/gradB Jacobian was vmapped over axis points -> `lax.map` (peak 1.4 GB).
   pairs within `select_distance`, gap, stable ids passed as `row_ids` to `lsq_composite`) before the sweep-1 QH
   reruns. The regularizer ladder (`reg1.sh`) runs to completion on the soft-min version.
 
+## Plan for the next hours (agreed with the user, 2026-10-09 evening)
+
+* **Stage A, second-order axis search (CPU):** `na/sweepA.sh` runs `na/chainA.sh CASE SEED` for QA nfp2/3 and QH nfp4/5,
+  2 seeds each: first order (smooth distances) -> regularizer -> second-order ladder (wgg, w2) = (1e-3,1e-4) ..
+  (1, 1e-1). Selection: B20 residual near the published references, coil grad grad B within ~20-30%, first order
+  within ~2%, iota within 3%, bounds met, small axis abs(Z).
+* **Stage B, extension (GPU, one at a time):** `score_fb.py` (free boundary at a radius inside the confined region,
+  Poincare), then for survivors `single_stage.py --fix-hinge-z 0` from the free-boundary eq and converted coils with
+  the k5 settings (basis 12, --solve-tol 1e-6, --method lsq-composite --hessian secant). Note: single_stage couples
+  a fixed-boundary eq to the coils by B.n (not free-boundary-in-the-loop).
+* Re-solve final free-boundary states at higher resolution before quoting QS; Poincare is the arbiter.
+
+## Status, end of 2026-10-09 night
+
+* Best: `na/runs2/o2w1_qa2s2_gg1e-1_w1e-2_w1x10` (+ `_fb_a0.12_L10`): QA nfp2, QS 3.2e-3 / 6.6e-3 / 1.3e-2 / 2.3e-2 on
+  its own surface, nested surfaces, axis abs(Z) 0.10. Same state from seed s0 (`s2_qa2_s0_gg1e-1_w1e-2`).
+* Near-planar: trade-off mapped (REPORT 11.2-11.3); QH near-planar fails at first order.
+* Not done yet: single stage (Stage B) on the best candidate; port the branch's distance rows; free-boundary
+  solver diagnostic (verbose=3, basis 12).
+
 ## Decision gates
 * After Phase 2: do the best z0 seeds have nested surfaces and QS meaningfully better than the perturbed-precise_QH
   route's starting point? If not, check whether the gap is first-order truncation (try r2 guess) or coil ripple.

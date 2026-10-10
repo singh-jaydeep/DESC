@@ -27,7 +27,8 @@ import jax.numpy as jnp
 from desc.optimize.least_squares_composite import lsq_composite
 
 from nae import NearAxis, helicity, elongation
-from folded import Layout, coil_arcs, full_coilset, B_and_gradB, arc_curvature, coil_length, NPT
+from nae2 import second_order
+from folded import Layout, coil_arcs, full_coilset, B_and_gradB, arc_curvature, coil_length, NPT, biot_savart
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--nfp", type=int, default=4)
@@ -46,8 +47,14 @@ ap.add_argument("--Lmax", type=float, default=2.93)
 ap.add_argument("--kmax", type=float, default=13.7)
 ap.add_argument("--imax", type=float, default=2.0, help="each current in [0, imax x uniform]; <= 0 disables")
 ap.add_argument("--emax", type=float, default=0.0, help="max NAE elongation; <= 0 disables")
+ap.add_argument("--zmax", type=float, default=0.0, help="max |Z| of the expansion axis (bound rows); <= 0 disables")
 ap.add_argument("--wlen", type=float, default=0.0, help="regularizer: weight of sum_i (L_i / L_max)^2 (target 0)")
 ap.add_argument("--wbend", type=float, default=0.0, help="regularizer: weight of sum_i int (kappa / kappa_max)^2 ds / L_i")
+ap.add_argument("--order", type=int, default=1, choices=[1, 2], help="2: add second-order QS (B20 rows, free B2c) and coil grad grad B matching")
+ap.add_argument("--w1", type=float, default=1.0, help="weight of the first-order B and gradB rows (keep first order stiff at second order)")
+ap.add_argument("--w2", type=float, default=1e-3, help="order 2: weight of the B20 - <B20> rows (second-order QS breaking)")
+ap.add_argument("--wgg", type=float, default=1.0, help="order 2: weight of the grad grad B rows (times a/2, so they measure field error at r = a)")
+ap.add_argument("--B2c0", type=float, default=0.0, help="order 2: initial B2c when starting from a first-order run")
 ap.add_argument("--wpen", type=float, default=100.0, help="weight^2 of the (normalized) bound rows")
 ap.add_argument("--nphi", type=int, default=41)
 ap.add_argument("--ntheta", type=int, default=48)
@@ -70,6 +77,10 @@ if a.init:
     d = np.load(a.init + ".npz")
     p0 = jnp.asarray(d["p"])
     hel = float(d["hel"])
+    if a.order == 2 and p0.shape[0] == L.n:  # first-order run -> append B2c
+        p0 = jnp.concatenate([p0, jnp.array([a.B2c0])])
+    if a.order == 1 and p0.shape[0] == L.n + 1:
+        raise SystemExit("--order 1 cannot continue a second-order run")
 else:
     rcl, zsl = [np.array([float(v) for v in s.split(",")]) for s in a.axis0.split(";")]
     rc = np.zeros(a.Kax + 1); rc[: len(rcl)] = rcl
@@ -140,7 +151,10 @@ else:
         B, _ = B_and_gradB(g["x"][0], X, I)
     assert float(jnp.dot(B, g["t"][0])) > 0, "could not orient the coils"
 
-print(f"nfp {a.nfp} nc {a.nc} mode {a.mode} helicity {hel} nparams {L.n} seed {a.seed}", flush=True)
+if a.order == 2 and p0.shape[0] == L.n:
+    p0 = jnp.concatenate([p0, jnp.array([a.B2c0])])
+NP = L.n + (1 if a.order == 2 else 0)
+print(f"nfp {a.nfp} nc {a.nc} mode {a.mode} helicity {hel} nparams {NP} order {a.order} seed {a.seed}", flush=True)
 
 theta = jnp.asarray(np.linspace(0, 2 * np.pi, a.ntheta, endpoint=False))
 rot = [jnp.asarray(np.array([[np.cos(t), -np.sin(t), 0], [np.sin(t), np.cos(t), 0], [0, 0, 1.0]]))
@@ -166,11 +180,20 @@ def nearest(p, S, k=8, tau=0.002):
     return -tau * jax.scipy.special.logsumexp(-d / tau, axis=1)
 
 
+def coil_GG(r, X, I):
+    """Coils' grad grad B at r, GG[i, j, k] = d_i d_j B_k."""
+    H = jax.jacfwd(jax.jacfwd(biot_savart))(r, X, I)  # H[k, i, j] = d^2 B_k / dr_i dr_j
+    return jnp.transpose(H, (1, 2, 0))
+
+
 def pieces(p):
-    rc, zs, eta, C = L.split(p)
+    rc, zs, eta, C = L.split(p[:L.n])
     q = na.solve(rc, zs, eta, hel, iota0=a.iota)
     X, I = full_coilset(C, L)
     BG = jax.lax.map(lambda r: B_and_gradB(r, X, I), q["x"])  # sequential: vmap made the Jacobian 5 GB at 32 coils
+    if a.order == 2:
+        q["r2"] = second_order(q, p[L.n])
+        q["GGc"] = jax.lax.map(lambda r: coil_GG(r, X, I), q["x"])
     return rc, zs, eta, C, q, X, I, BG
 
 
@@ -182,6 +205,10 @@ def rows_spec():
             ("Lcoil", a.nc, "b"), ("I", a.nc, "b")]
     if a.emax > 0:
         spec.append(("elong", a.nphi, "b"))
+    if a.zmax > 0:
+        spec.append(("zaxis", a.nphi, "b"))
+    if a.order == 2:
+        spec += [("B20", a.nphi, "t"), ("GG", a.nphi * 27, "t")]
     if a.wlen > 0:
         spec.append(("reg_len", a.nc, "t"))
     if a.wbend > 0:
@@ -193,7 +220,8 @@ SPEC = rows_spec()
 wb = np.sqrt(a.wpen)
 BOUNDS = dict(dpc=(a.dpc, np.inf, wb / a.dpc), dcc=(a.dcc, np.inf, wb / a.dcc), kappa=(-np.inf, a.kmax, wb / a.kmax),
               Lcoil=(-np.inf, a.Lmax, wb / a.Lmax), I=(0.0, a.imax * Iref if a.imax > 0 else np.inf, wb / Iref),
-              elong=(-np.inf, a.emax, wb / max(a.emax, 1)))
+              elong=(-np.inf, a.emax, wb / max(a.emax, 1)),
+              zaxis=(-a.zmax, a.zmax, wb / max(a.zmax, 1e-3)))
 lo, hi, tgt, isb, wrow = [], [], [], [], []
 for name, n, kind in SPEC:
     if kind == "t":
@@ -209,7 +237,7 @@ isb = np.array(isb)
 def fun_raw(p):
     rc, zs, eta, C, q, X, I, (Bc, Gc) = pieces(p)
     w = jnp.sqrt(q["dl"] * 2 * jnp.pi / a.nfp / a.nphi)
-    out = [((Bc - q["B"]) * w[:, None]).ravel(), ((Gc - q["G"]) * w[:, None, None]).ravel(),
+    out = [jnp.sqrt(a.w1) * ((Bc - q["B"]) * w[:, None]).ravel(), jnp.sqrt(a.w1) * ((Gc - q["G"]) * w[:, None, None]).ravel(),
            jnp.atleast_1d((q["iota"] - a.iota) / a.iota),
            jnp.atleast_1d((jnp.sum(q["dl"]) * 2 * jnp.pi / a.nphi - 2 * jnp.pi) / (2 * jnp.pi))]
     S = nae_surface(q)
@@ -228,6 +256,12 @@ def fun_raw(p):
     out += [jnp.concatenate(dpc), jnp.concatenate(dcc), jnp.concatenate(kap), jnp.stack(Ls), C[:, -1]]
     if a.emax > 0:
         out.append(elongation(q["X1c"], q["Y1s"], q["Y1c"]))
+    if a.zmax > 0:
+        out.append(q["Z"])
+    if a.order == 2:
+        wq = jnp.sqrt(q["dl"] / jnp.sum(q["dl"]))
+        out.append(jnp.sqrt(a.w2) * q["r2"]["B20_anomaly"] * wq / q["B0"])
+        out.append(jnp.sqrt(a.wgg) * (a.a / 2) * ((q["GGc"] - q["r2"]["GG"]) * w[:, None, None, None]).ravel())
     if a.wlen > 0:
         out.append(jnp.sqrt(a.wlen) * jnp.stack(Ls) / a.Lmax)
     if a.wbend > 0:
@@ -281,6 +315,12 @@ def report(p, tag, extra=None):
                 mean_kappa2=float(np.mean((sraw["kappa"] / a.kmax) ** 2)),
                 cost_reg=float(0.5 * sum(np.sum(np.asarray(fun(p))[sl] ** 2) for sl in reg_slices())))
     info["cost_field"] = info["cost_targets"] - info["cost_reg"]
+    if a.order == 2:
+        r2 = q["r2"]
+        gg = np.asarray(q["GGc"] - r2["GG"])
+        info.update(B2c=float(p[L.n]), B20_residual=float(r2["B20_residual"]),
+                    max_dGG_rel=float(np.max(np.linalg.norm(gg.reshape(gg.shape[0], -1), axis=1))
+                                      / np.max(np.linalg.norm(np.asarray(r2["GG"]).reshape(gg.shape[0], -1), axis=1))))
     if extra:
         info.update(extra)
     print(json.dumps(info), flush=True)
@@ -296,6 +336,6 @@ p = jnp.asarray(res.x)
 info = report(p, "final", dict(time_s=round(time.time() - t0), status=str(res.message), nit=int(res.nit)
                                if hasattr(res, "nit") else None, optimality=float(res.optimality)
                                if hasattr(res, "optimality") else None))
-np.savez(a.out + ".npz", p=np.asarray(p), hel=hel, mode=a.mode, nfp=a.nfp, nc=a.nc, K=a.K, Kax=a.Kax,
+np.savez(a.out + ".npz", p=np.asarray(p), order=a.order, hel=hel, mode=a.mode, nfp=a.nfp, nc=a.nc, K=a.K, Kax=a.Kax,
          args=json.dumps(vars(a)))
 json.dump(dict(init=info0, final=info, args=vars(a)), open(a.out + ".json", "w"), indent=1)

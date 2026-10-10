@@ -71,7 +71,8 @@ systemd-run --user --scope -q -p MemoryMax=10G -p MemorySwapMax=0 \
 * Fixed-size starts can be wildly infeasible (QA coils 8 mm from the surface) and strand the solver in an infeasible
   corner. `run_na2.py` sizes each coil from the NAE cross-section; keep it that way for new cases.
 * Helicity is computed from the starting axis and fixed during a run (it is an integer).
-* `pkill -f <pattern>` can match your own shell command (exit 144); kill by PID.
+* `pkill -f <pattern>` can match your own shell command (exit 144); kill by PID. Likewise a script that waits with
+  `pgrep -f "bash X.sh"` matches any monitor whose command line contains that text and waits forever: wait on a PID.
 * `to_desc.py` must run with `boot.setup(default="gpu")` (it does): the CPU solve took 25+ minutes.
 * The coils' far parts are nearly unconstrained by the on-axis objective (the paper's flat directions): expect
   length and curvature at their bounds until a regularizer is added (REPORT §6, §8).

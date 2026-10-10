@@ -1,0 +1,264 @@
+/home/jay/Documents/desc_dev/DESC/desc/__init__.py:94: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  from pynvml import (
+DESC /home/jay/Documents/desc_dev/DESC/desc
+DEVICE requested=gpu obtained=gpu (1x NVIDIA GeForce RTX 5070 Ti)
+[    0.9s] NAE: iota 1.2952 helicity -1.0 max elong 5.00
+[   84.5s] NAE fixed-boundary initial guess solved
+[   91.5s] cos(B_eq, B_coils) on the initial boundary: mean 0.9970
+[  105.3s] NAE fixed boundary: {"R0": 0.9473077355885829, "a": 0.1131994058097333, "A": 8.368486820335677, "helicity": [1, 5], "qs_booz_rho.25,.5,.75,1": [0.019788952275528435, 0.029742168175557224, 0.053934661090885176, 0.09282329055991122], "iota_axis": 1.1164445343269778, "iota_edge": 1.3715057940902438, "iota_min": 1.1164445343269778, "iota_max": 1.3715057940902438, "bn_rms": 0.04561197533089983, "bn_max": 0.16812114542532333, "axis_R0n": [0.95208, 0.0709, 0.00385, -5e-05, -7e-05, -2e-05, -0.0, 0.0, 0.0, 0.0, 0.0], "axis_Z0n": [0.0, -0.0, -0.0, 0.0, 0.0, 0.0, 4e-05, 0.0, -2e-05, -0.04261]}
+Building objective: Vacuum boundary error
+Precomputing transforms
+Building objective: force
+Precomputing transforms
+Building objective: fixed current
+Building objective: fixed pressure
+Building objective: fixed Psi
+Building objective: lcfs R
+Building objective: lcfs Z
+Number of parameters: 25
+Number of objectives: 3362
+
+Starting optimization
+Using method: proximal-lsq-exact
+Optimization terminated successfully.
+`ftol` condition satisfied. (ftol=1.00e-08)
+         Current function value: 7.199e-02
+         Total delta_x: 8.324e-02
+         Iterations: 37
+         Function evaluations: 38
+         Jacobian evaluations: 38
+==============================================================================================================
+                                                                 Start  -->   End
+Total (sum of squares):                                      9.821e-01  -->   7.199e-02, 
+Maximum absolute Boundary normal field error:                1.610e-02  -->   1.338e-02 (T*m^2)
+Minimum absolute Boundary normal field error:                8.718e-17  -->   3.908e-17 (T*m^2)
+Average absolute Boundary normal field error:                5.046e-03  -->   3.001e-03 (T*m^2)
+Maximum absolute Boundary normal field error:                1.552e-01  -->   1.290e-01 (normalized)
+Minimum absolute Boundary normal field error:                8.406e-16  -->   3.768e-16 (normalized)
+Average absolute Boundary normal field error:                4.865e-02  -->   2.894e-02 (normalized)
+Maximum absolute Boundary magnetic pressure error:           4.697e-02  -->   1.011e-02 (T^2*m^2)
+Minimum absolute Boundary magnetic pressure error:           2.963e-05  -->   8.711e-06 (T^2*m^2)
+Average absolute Boundary magnetic pressure error:           1.470e-02  -->   3.167e-03 (T^2*m^2)
+Maximum absolute Boundary magnetic pressure error:           5.725e-01  -->   1.232e-01 (normalized)
+Minimum absolute Boundary magnetic pressure error:           3.611e-04  -->   1.062e-04 (normalized)
+Average absolute Boundary magnetic pressure error:           1.791e-01  -->   3.860e-02 (normalized)
+Maximum absolute Force error:                                7.579e+01  -->   1.036e+02 (N)
+Minimum absolute Force error:                                1.842e-05  -->   6.824e-05 (N)
+Average absolute Force error:                                7.809e-01  -->   1.520e+00 (N)
+Maximum absolute Force error:                                1.176e-04  -->   1.608e-04 (normalized)
+Minimum absolute Force error:                                2.858e-11  -->   1.059e-10 (normalized)
+Average absolute Force error:                                1.212e-06  -->   2.358e-06 (normalized)
+Fixed current profile error:                                 0.000e+00  -->   0.000e+00 (A)
+Fixed pressure profile error:                                0.000e+00  -->   0.000e+00 (Pa)
+Fixed Psi error:                                             0.000e+00  -->   0.000e+00 (Wb)
+R boundary error:                                            4.348e-19  -->   4.337e-19 (m)
+Z boundary error:                                            1.759e-19  -->   1.517e-19 (m)
+==============================================================================================================
+
+[  354.2s] free boundary shell k=2: B.n rms 2.948e-02 max 1.130e-01 (Optimization terminated successfully.
+`ftol` condition satisfied. (ftol=1.00e-08))
+Building objective: Vacuum boundary error
+Precomputing transforms
+Building objective: force
+Precomputing transforms
+Building objective: fixed current
+Building objective: fixed pressure
+Building objective: fixed Psi
+Building objective: lcfs R
+Building objective: lcfs Z
+Number of parameters: 81
+Number of objectives: 3362
+
+Starting optimization
+Using method: proximal-lsq-exact
+Warning: A bad approximation caused failure to predict improvement.
+         Current function value: 3.803e-03
+         Total delta_x: 8.842e-02
+         Iterations: 39
+         Function evaluations: 69
+         Jacobian evaluations: 39
+==============================================================================================================
+                                                                 Start  -->   End
+Total (sum of squares):                                      4.453e-02  -->   3.803e-03, 
+Maximum absolute Boundary normal field error:                1.338e-02  -->   3.455e-03 (T*m^2)
+Minimum absolute Boundary normal field error:                1.993e-17  -->   5.561e-17 (T*m^2)
+Average absolute Boundary normal field error:                3.001e-03  -->   1.017e-03 (T*m^2)
+Maximum absolute Boundary normal field error:                1.155e-01  -->   2.984e-02 (normalized)
+Minimum absolute Boundary normal field error:                1.721e-16  -->   4.802e-16 (normalized)
+Average absolute Boundary normal field error:                2.592e-02  -->   8.781e-03 (normalized)
+Maximum absolute Boundary magnetic pressure error:           1.011e-02  -->   3.158e-03 (T^2*m^2)
+Minimum absolute Boundary magnetic pressure error:           8.708e-06  -->   2.049e-06 (T^2*m^2)
+Average absolute Boundary magnetic pressure error:           3.167e-03  -->   7.835e-04 (T^2*m^2)
+Maximum absolute Boundary magnetic pressure error:           8.739e-02  -->   2.729e-02 (normalized)
+Minimum absolute Boundary magnetic pressure error:           7.527e-05  -->   1.771e-05 (normalized)
+Average absolute Boundary magnetic pressure error:           2.737e-02  -->   6.772e-03 (normalized)
+Maximum absolute Force error:                                1.036e+02  -->   4.202e+03 (N)
+Minimum absolute Force error:                                6.824e-05  -->   2.236e-03 (N)
+Average absolute Force error:                                1.520e+00  -->   2.627e+01 (N)
+Maximum absolute Force error:                                1.140e-04  -->   4.624e-03 (normalized)
+Minimum absolute Force error:                                7.509e-11  -->   2.461e-09 (normalized)
+Average absolute Force error:                                1.672e-06  -->   2.890e-05 (normalized)
+Fixed current profile error:                                 0.000e+00  -->   0.000e+00 (A)
+Fixed pressure profile error:                                0.000e+00  -->   0.000e+00 (Pa)
+Fixed Psi error:                                             0.000e+00  -->   0.000e+00 (Wb)
+R boundary error:                                            2.711e-20  -->   2.711e-20 (m)
+Z boundary error:                                            3.796e-21  -->   6.776e-21 (m)
+==============================================================================================================
+
+[  689.7s] free boundary shell k=4: B.n rms 1.018e-02 max 1.580e-01 (A bad approximation caused failure to predict improvement.)
+Building objective: Vacuum boundary error
+Precomputing transforms
+Building objective: force
+Precomputing transforms
+Building objective: fixed current
+Building objective: fixed pressure
+Building objective: fixed Psi
+Building objective: lcfs R
+Building objective: lcfs Z
+Number of parameters: 169
+Number of objectives: 3362
+
+Starting optimization
+Using method: proximal-lsq-exact
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 9.498e-04
+         Total delta_x: 5.012e-02
+         Iterations: 100
+         Function evaluations: 124
+         Jacobian evaluations: 101
+==============================================================================================================
+                                                                 Start  -->   End
+Total (sum of squares):                                      3.912e-03  -->   9.498e-04, 
+Maximum absolute Boundary normal field error:                3.455e-03  -->   1.744e-03 (T*m^2)
+Minimum absolute Boundary normal field error:                3.269e-17  -->   8.397e-17 (T*m^2)
+Average absolute Boundary normal field error:                1.017e-03  -->   5.924e-04 (T*m^2)
+Maximum absolute Boundary normal field error:                2.983e-02  -->   1.506e-02 (normalized)
+Minimum absolute Boundary normal field error:                2.823e-16  -->   7.251e-16 (normalized)
+Average absolute Boundary normal field error:                8.781e-03  -->   5.116e-03 (normalized)
+Maximum absolute Boundary magnetic pressure error:           3.158e-03  -->   1.829e-03 (T^2*m^2)
+Minimum absolute Boundary magnetic pressure error:           2.319e-06  -->   7.672e-08 (T^2*m^2)
+Average absolute Boundary magnetic pressure error:           7.835e-04  -->   2.619e-04 (T^2*m^2)
+Maximum absolute Boundary magnetic pressure error:           2.826e-02  -->   1.636e-02 (normalized)
+Minimum absolute Boundary magnetic pressure error:           2.075e-05  -->   6.864e-07 (normalized)
+Average absolute Boundary magnetic pressure error:           7.010e-03  -->   2.343e-03 (normalized)
+Maximum absolute Force error:                                4.202e+03  -->   2.221e+03 (N)
+Minimum absolute Force error:                                2.236e-03  -->   9.098e-04 (N)
+Average absolute Force error:                                2.627e+01  -->   5.259e+01 (N)
+Maximum absolute Force error:                                4.787e-03  -->   2.531e-03 (normalized)
+Minimum absolute Force error:                                2.547e-09  -->   1.036e-09 (normalized)
+Average absolute Force error:                                2.992e-05  -->   5.991e-05 (normalized)
+Fixed current profile error:                                 0.000e+00  -->   0.000e+00 (A)
+Fixed pressure profile error:                                0.000e+00  -->   0.000e+00 (Pa)
+Fixed Psi error:                                             0.000e+00  -->   0.000e+00 (Wb)
+R boundary error:                                            9.489e-22  -->   1.569e-20 (m)
+Z boundary error:                                            6.837e-21  -->   3.614e-19 (m)
+==============================================================================================================
+
+[ 1295.6s] free boundary shell k=6: B.n rms 6.009e-03 max 6.538e-02 (Maximum number of iterations has been exceeded.)
+Building objective: Vacuum boundary error
+Precomputing transforms
+Building objective: force
+Precomputing transforms
+Building objective: fixed current
+Building objective: fixed pressure
+Building objective: fixed Psi
+Building objective: lcfs R
+Building objective: lcfs Z
+Number of parameters: 289
+Number of objectives: 3362
+
+Starting optimization
+Using method: proximal-lsq-exact
+Warning: A bad approximation caused failure to predict improvement.
+         Current function value: 5.652e-04
+         Total delta_x: 3.427e-02
+         Iterations: 58
+         Function evaluations: 89
+         Jacobian evaluations: 58
+==============================================================================================================
+                                                                 Start  -->   End
+Total (sum of squares):                                      9.308e-04  -->   5.652e-04, 
+Maximum absolute Boundary normal field error:                1.744e-03  -->   1.529e-03 (T*m^2)
+Minimum absolute Boundary normal field error:                8.189e-17  -->   4.764e-17 (T*m^2)
+Average absolute Boundary normal field error:                5.924e-04  -->   4.937e-04 (T*m^2)
+Maximum absolute Boundary normal field error:                1.491e-02  -->   1.307e-02 (normalized)
+Minimum absolute Boundary normal field error:                7.001e-16  -->   4.073e-16 (normalized)
+Average absolute Boundary normal field error:                5.065e-03  -->   4.220e-03 (normalized)
+Maximum absolute Boundary magnetic pressure error:           1.830e-03  -->   1.363e-03 (T^2*m^2)
+Minimum absolute Boundary magnetic pressure error:           1.641e-07  -->   4.477e-08 (T^2*m^2)
+Average absolute Boundary magnetic pressure error:           2.620e-04  -->   1.786e-04 (T^2*m^2)
+Maximum absolute Boundary magnetic pressure error:           1.620e-02  -->   1.207e-02 (normalized)
+Minimum absolute Boundary magnetic pressure error:           1.453e-06  -->   3.964e-07 (normalized)
+Average absolute Boundary magnetic pressure error:           2.320e-03  -->   1.581e-03 (normalized)
+Maximum absolute Force error:                                2.221e+03  -->   3.766e+03 (N)
+Minimum absolute Force error:                                9.098e-04  -->   4.571e-04 (N)
+Average absolute Force error:                                5.259e+01  -->   7.899e+01 (N)
+Maximum absolute Force error:                                2.504e-03  -->   4.246e-03 (normalized)
+Minimum absolute Force error:                                1.026e-09  -->   5.153e-10 (normalized)
+Average absolute Force error:                                5.929e-05  -->   8.904e-05 (normalized)
+Fixed current profile error:                                 0.000e+00  -->   0.000e+00 (A)
+Fixed pressure profile error:                                0.000e+00  -->   0.000e+00 (Pa)
+Fixed Psi error:                                             0.000e+00  -->   0.000e+00 (Wb)
+R boundary error:                                            1.323e-23  -->   7.941e-23 (m)
+Z boundary error:                                            0.000e+00  -->   0.000e+00 (m)
+==============================================================================================================
+
+[ 1695.7s] free boundary shell k=8: B.n rms 4.613e-03 max 2.805e-02 (A bad approximation caused failure to predict improvement.)
+Building objective: Vacuum boundary error
+Precomputing transforms
+Building objective: force
+Precomputing transforms
+Building objective: fixed current
+Building objective: fixed pressure
+Building objective: fixed Psi
+Number of parameters: 441
+Number of objectives: 3362
+
+Starting optimization
+Using method: proximal-lsq-exact
+Optimization terminated successfully.
+`ftol` condition satisfied. (ftol=1.00e-08)
+         Current function value: 4.727e-04
+         Total delta_x: 1.711e-02
+         Iterations: 34
+         Function evaluations: 45
+         Jacobian evaluations: 35
+==============================================================================================================
+                                                                 Start  -->   End
+Total (sum of squares):                                      6.303e-04  -->   4.727e-04, 
+Maximum absolute Boundary normal field error:                1.529e-03  -->   1.098e-03 (T*m^2)
+Minimum absolute Boundary normal field error:                8.457e-17  -->   4.811e-17 (T*m^2)
+Average absolute Boundary normal field error:                4.937e-04  -->   4.618e-04 (T*m^2)
+Maximum absolute Boundary normal field error:                1.362e-02  -->   9.785e-03 (normalized)
+Minimum absolute Boundary normal field error:                7.536e-16  -->   4.288e-16 (normalized)
+Average absolute Boundary normal field error:                4.399e-03  -->   4.116e-03 (normalized)
+Maximum absolute Boundary magnetic pressure error:           1.363e-03  -->   7.854e-04 (T^2*m^2)
+Minimum absolute Boundary magnetic pressure error:           2.980e-08  -->   2.271e-07 (T^2*m^2)
+Average absolute Boundary magnetic pressure error:           1.786e-04  -->   1.195e-04 (T^2*m^2)
+Maximum absolute Boundary magnetic pressure error:           1.355e-02  -->   7.807e-03 (normalized)
+Minimum absolute Boundary magnetic pressure error:           2.962e-07  -->   2.257e-06 (normalized)
+Average absolute Boundary magnetic pressure error:           1.775e-03  -->   1.188e-03 (normalized)
+Maximum absolute Force error:                                3.766e+03  -->   4.375e+03 (N)
+Minimum absolute Force error:                                4.571e-04  -->   9.219e-04 (N)
+Average absolute Force error:                                7.899e+01  -->   9.340e+01 (N)
+Maximum absolute Force error:                                4.766e-03  -->   5.537e-03 (normalized)
+Minimum absolute Force error:                                5.785e-10  -->   1.167e-09 (normalized)
+Average absolute Force error:                                9.997e-05  -->   1.182e-04 (normalized)
+Fixed current profile error:                                 0.000e+00  -->   0.000e+00 (A)
+Fixed pressure profile error:                                0.000e+00  -->   0.000e+00 (Pa)
+Fixed Psi error:                                             0.000e+00  -->   0.000e+00 (Wb)
+==============================================================================================================
+
+[ 1923.2s] free boundary shell k=10: B.n rms 4.149e-03 max 2.503e-02 (Optimization terminated successfully.
+`ftol` condition satisfied. (ftol=1.00e-08))
+[ 1926.6s] FREE BOUNDARY: {"R0": 0.9457123396952938, "a": 0.11582738124316955, "A": 8.164842626544864, "helicity": [1, 5], "qs_booz_rho.25,.5,.75,1": [0.006338290866693127, 0.02422821714318922, 0.05792156826907199, 0.10598685569684115], "iota_axis": 1.246781185929327, "iota_edge": 1.0447172187916591, "iota_min": 1.0447172187916591, "iota_max": 1.246781185929327, "bn_rms": 0.004148884972690875, "bn_max": 0.0250299534529202, "axis_R0n": [0.954, 0.0737, 0.00383, -0.00013, -8e-05, 0.0, -0.0, 0.0, 0.0, 0.0, -0.0], "axis_Z0n": [0.0, -0.0, -0.0, 0.0, 1e-05, 1e-05, 4e-05, 9e-05, -0.00068, -0.04751]}
+/home/jay/Documents/desc_dev/DESC/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 5.
+  warnings.warn(msg, err)
+/home/jay/Documents/desc_dev/DESC/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 5.
+  warnings.warn(msg, err)
+[ 1947.2s] coil check vs the free-boundary surface: {"L": 2.5964708661447116, "kappa": 15.62609339441651, "d_cc": 0.0400757424013152, "d_pc": 0.06716812525589624, "linked": 0}
+/home/jay/Documents/desc_dev/DESC/desc/utils.py:590: UserWarning: Integration terminated early. Plotting partial results.
+diffrax message: The maximum number of solver steps was reached. Try increasing `max_steps`.
+  warnings.warn(msg, err)
+[ 2098.2s] Poincare plot written
+[ 2098.2s] wrote runs2/elong_qh5s2_e5_fb_L10/score.json

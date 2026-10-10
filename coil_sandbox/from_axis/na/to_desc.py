@@ -32,7 +32,7 @@ os.makedirs(out, exist_ok=True)
 
 d = np.load(a.run + ".npz")
 L = Layout(int(d["nfp"]), int(d["nc"]), int(d["K"]), int(d["Kax"]), str(d["mode"]))
-rc, zs, eta, C = L.split(jnp.asarray(d["p"]))
+rc, zs, eta, C = L.split(jnp.asarray(d["p"])[:L.n])
 q = Qsc(rc=np.asarray(rc), zs=np.asarray(zs), nfp=L.nfp, etabar=float(eta), nphi=101)
 print(f"pyQSC: iota {q.iota:.4f} helicity {q.helicity} max elong {q.max_elongation:.2f} "
       f"L_gradB min {q.min_L_grad_B:.3f}", flush=True)

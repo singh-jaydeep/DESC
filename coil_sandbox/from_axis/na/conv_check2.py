@@ -14,7 +14,7 @@ from convert import to_desc_coils
 run = sys.argv[1]
 z = np.load(run + ".npz"); a = json.load(open(run + ".json"))["args"]
 L = Layout(int(z["nfp"]), int(z["nc"]), int(z["K"]), int(z["Kax"]), str(z["mode"]))
-rc, zs, eta, C = L.split(jnp.asarray(z["p"]))
+rc, zs, eta, C = L.split(jnp.asarray(z["p"])[:L.n])
 cs, arcs = to_desc_coils(C, L)
 t = np.linspace(0, 1, 401)
 for i, arc in enumerate(arcs):

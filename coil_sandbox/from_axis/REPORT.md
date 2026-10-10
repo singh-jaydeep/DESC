@@ -178,6 +178,111 @@ measures (iii) cleanly; these seeds are also from the prototype, not sweep 1.
 4. More seeds and continuation for QH nfp 4/5 (and nfp 6 if the trend holds).
 5. Then refinement in the PoP 2023 spirit (QS on the coils' own surfaces), with the user's go-ahead.
 
+## 10. Phase 2 results: the coils' own surfaces (vacuum free boundary, `na/score_fb.py`)
+
+Seeds: `elong_qa2s2_e5`, `elong_qh5s2_e5` (regularized w = 1e-3, elongation <= 5). Coils converted exactly
+(`na/convert.py`, pointwise 1e-15 m; GL 64 nodes per arc, since 24 left a 7e-4 quadrature error for these arcs).
+
+| seed, a (A) | Boozer QS rho .25 / .5 / .75 / 1 | iota axis (NAE) / edge | B.n rms | d_pc (bound) | Poincare |
+|---|---|---|---|---|---|
+| QA nfp2, a 0.167 (5.4) | 1.3e-2 / 3.4e-2 / 6.3e-2 / 1.0e-1 | 0.446 (0.420) / 0.331 | 2.2e-3 | 0.132 (0.148) | boundary at the edge of the confined region; superseded |
+| **QA nfp2, a 0.12 (7.6)** | **3.1e-3 / 1.3e-2 / 3.1e-2 / 6.0e-2** | **0.418 (0.420) / 0.372** | 3.2e-4 | 0.190 | **clean nested surfaces; DESC boundary lies on the traced field lines** |
+| QH nfp5, a 0.11 (8.2) | 6.3e-3 / 2.4e-2 / 5.8e-2 / 1.1e-1 | 1.247 (1.295) / 1.045 | 4.1e-3 | 0.067 (0.097) | boundary at the edge of the confined region (chaos just outside) |
+
+* The coils realize their first-order design (QA: iota on axis to 0.5%, axis R1 exact), but QS degrades as r^2
+  away from the axis: the second-order terms were never controlled.
+* Second-order diagnosis (`na/nae2.py`, validated vs pyQSC): B20 residual 0.56 (QA seed) and 1.92 (QH seed), against
+  0.135 / 0.007 for Landreman-Sengupta's reference QA / QH. B2c alone only reaches 0.48 / 1.85: the axis must change.
+* Solver health: most free-boundary shells end on a trust-region stall ("bad approximation"), ~1 rejected step per
+  accepted one, force error grows across shells. QA a 0.12 is validated independently (Poincare, iota); the QH
+  numbers are provisional. Suspected cause: inner proximal solve drift (as in the k5 stall); diagnostic deferred.
+* Coil-coil distance against the dense check is 0.031 (bound 0.040) for QA: node-node rows on an 80-segment
+  polyline miss up to ~1 cm between nodes. The branch's distance rows (with the gap) fix exactly this.
+
+## 11. Second-order near-axis stage (in progress)
+
+`run_na2.py --order 2`: B2c free; rows (B20 - <B20>) (second-order QS breaking, weight w2) and coil grad grad B vs
+NAE grad grad B (weight wgg x a/2, so B, gradB, gradgradB rows all measure field error at r = a). At the first-order
+seeds the coils' grad grad B is 96% off any NAE on their axis, so the weights are ramped (`na/o2.sh`).
+
+### 11.1 Second-order ladder on the two seeds (`na/o2.sh`), and what it does off-axis
+
+| run | coils' gradgradB vs NAE | B20 residual | first order dB / dG | iota (target) | axis abs(Z) |
+|---|---|---|---|---|---|
+| QA nfp2 seed | 96% | 0.48 (best B2c) | 0.11% / 0.85% | 0.420 (0.42) | 0.074 |
+| QA step 2 (wgg 1e-2, w2 1e-3) | 63% | 0.28 | 1.2% / 3.1% | 0.414 | 0.110 |
+| QA step 3 (1e-1, 1e-2) | 26% | 0.42 | 2.2% / 4.7% | 0.411 | 0.135 |
+| QA step 4 (1, 1e-1) | 13% | 0.24 | **11.4%** / 6.5% | 0.403 | 0.131 |
+| QH nfp5 seed | 96% | 1.85 | 0.18% / 0.50% | 1.295 (1.30) | 0.048 |
+| QH step 3 | 25% | 0.48 | 2.2% / 4.0% | 1.230 | 0.120 |
+| QH step 4 | 19% | 0.16 | 4.7% / 5.8% | 1.283 | 0.136 |
+
+Step 4 overpowers the first-order rows (the expansion axis stops being the coils' axis), so ladders now stop at
+step 3. In both cases **lowering second-order QS breaking raised the axis out of the midplane** (QA 0.074 -> 0.135,
+QH 0.048 -> 0.136).
+
+Free boundary (coils' own surfaces) of step 3:
+
+| | rho .25 / .5 / .75 / 1 | iota axis / edge | B.n rms |
+|---|---|---|---|
+| QA first-order seed, a 0.12 | 3.1e-3 / 1.3e-2 / 3.1e-2 / 6.0e-2 | 0.418 / 0.372 | 3.2e-4 |
+| **QA step 3, a 0.123** | 6.7e-3 / **1.0e-2 / 1.7e-2 / 2.8e-2** | 0.399 / 0.344 | 5.5e-4 |
+| QH first-order seed, a 0.11 | 6.3e-3 / 2.4e-2 / 5.8e-2 / 1.1e-1 | 1.247 / 1.045 | 4.1e-3 |
+| **QH step 3, a 0.088** | 2.7e-2 / 2.9e-2 / 3.4e-2 / 4.6e-2 | 1.186 / 1.193 | 1.6e-5 |
+
+**The second-order extension works off-axis** (QA edge 2.2x better; the r^2 growth is tamed: QA rises 4x from rho
+.25 to the edge vs 19x before; QH profile nearly flat), but the weighting gave up first order, which raised the
+near-axis floor (QA 3.1e-3 -> 6.7e-3; QH ~3%). Fix under test: `--w1` (stiff first-order rows) in step 3.
+
+### 11.2 The near-planar axis search (`--zmax`, `na/chainA.sh`, `na/sweepP2.sh`)
+
+Theory: with zero torsion the first-order sigma equation forces iota = 0 for QA (sigma' = -iota (eta^4/kappa^4 + 1 +
+sigma^2) cannot be periodic), and a planar axis has helicity 0 (no QH). Iota must come from torsion; small, fast
+vertical wiggles (higher nfp or higher Z harmonics) give torsion at small abs(Z).
+
+| capped run | first order dB / dG, iota | second order (step 3) | verdict |
+|---|---|---|---|
+| QA nfp2, abs(Z) <= 0.04, seeds 0 and 1 | 0.28-0.32% / 1.4-1.7%, iota 0.417-0.418 | s0: B20 0.34, first order 7.7% / 6.5%, iota **0.331** | first order fine; second order costs iota |
+| **QA nfp3, abs(Z) <= 0.02** | **0.01% / 0.07%, iota 0.400** | B20 stuck at 0.74, iota **0.284** | best first-order fit of the study; second order impossible at this cap |
+| QH nfp5, abs(Z) <= 0.03 | 14.7% / 9.1%, iota 1.269, a current at 0 | (stopped) | fails at first order |
+| QH nfp4, abs(Z) <= 0.04 | 12.2% / 7.8%, iota 1.115 | (stopped) | fails at first order |
+
+**Finding:** near-planar QA axes exist at first order with these coils (nfp 3 at 2 cm excursion), but second-order QS
+then costs rotational transform; near-planar QH fails already at first order. Levers left: an intermediate cap (the
+knee of the trade-off), more elongation (the cap of 5 binds in every capped run), a lower iota target; or a different
+coil class (per-coil horizontal hinges, as the user suggested).
+
+### 11.3 Stiff first order (`--w1 10`) and the session's outcome (2026-10-09 night)
+
+Free boundary (coils' own surfaces), QA nfp2, a ~ 0.12:
+
+| configuration | Boozer QS rho .25 / .5 / .75 / 1 | iota axis / edge | axis abs(Z) | Poincare |
+|---|---|---|---|---|
+| first-order seed | 3.1e-3 / 1.3e-2 / 3.1e-2 / 6.0e-2 | 0.418 / 0.372 | 0.074 | clean |
+| second order, step 3, w1 = 1 | 6.7e-3 / 1.0e-2 / 1.7e-2 / 2.8e-2 | 0.399 / 0.344 | 0.135 | - |
+| **second order, step 3, w1 = 10** (`o2w1_qa2s2_gg1e-1_w1e-2_w1x10`) | **3.2e-3 / 6.6e-3 / 1.3e-2 / 2.3e-2** | 0.396 / 0.325 | 0.101 | **clean nested surfaces past the boundary** |
+| near-planar abs(Z) <= 0.04, step 3, w1 = 10 | 8.1e-3 / 1.3e-2 / 2.3e-2 / 4.0e-2 | 0.266 / 0.225 | 0.040 | (B.n max 0.11: edge approximate) |
+
+* **Best result of the line:** z = 0 two-face coils (16 coils, every hinge on z = 0, currents 0.82-0.97x uniform)
+  whose own field has nested surfaces at A 6.8 and QS 0.3% near the axis, 0.7% at mid-radius, 2.3% at the edge.
+  Two independent seeds (s0 and s2) converge to the same state, so it is a robust basin.
+* Stiff first order is the right weighting for the second-order steps; it is now the default in `na/chainA.sh`.
+
+Near-planar search (`--zmax`), all seeds:
+
+* QA nfp2 abs(Z) <= 0.04 (2 seeds) and QA nfp3 abs(Z) <= 0.02 (2 seeds): excellent first-order fits (QA nfp3: 0.01% /
+  0.07%), but second-order QS then costs rotational transform: iota 0.33 (nfp2) and 0.28 (nfp3) with w1 = 1; with
+  w1 = 10 the cost moves entirely into iota (0.27). B20 residual cannot go below ~0.74 at nfp3, 2 cm.
+* QH nfp4 abs(Z) <= 0.04 and nfp5 <= 0.03: fail already at first order (12-15% field mismatch, a current at 0).
+* Uncapped QH nfp5 s0 with stiff first order: B20 residual stays 3.8-6.2 and iota falls 17%; QH seed s2 (w1 = 1)
+  remains the only usable second-order QH (B20 0.48; flat ~3% QS profile on its surface).
+
+**Conclusion for this coil class:** second-order QS, rotational transform and a flat axis form a three-way trade.
+The near-axis theory says why (iota comes from torsion, which needs out-of-plane excursion; QH needs a rotating
+normal). With z = 0 joints, the best QA keeps abs(Z) ~ 0.10; flattening to 0.04 halves QS quality and loses a third of
+iota. Next levers: a lower iota target for near-planar QA (accept iota ~ 0.27 and design for it), more elongation,
+higher nfp with Z harmonics, or a different coil class (per-coil horizontal hinges).
+
 ## 9. Files
 
 * `PLAN.md`: plan, rules, decisions, status. `CLAUDE.md`: orientation for agents.

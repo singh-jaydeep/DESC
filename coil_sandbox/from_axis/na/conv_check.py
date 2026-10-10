@@ -17,7 +17,7 @@ run = sys.argv[1]
 Mfit = int(sys.argv[2]) if len(sys.argv) > 2 else None
 z = np.load(run + ".npz"); a = json.load(open(run + ".json"))["args"]
 L = Layout(int(z["nfp"]), int(z["nc"]), int(z["K"]), int(z["Kax"]), str(z["mode"]))
-rc, zs, eta, C = L.split(jnp.asarray(z["p"]))
+rc, zs, eta, C = L.split(jnp.asarray(z["p"])[:L.n])
 q = NearAxis(L.nfp, 41).solve(rc, zs, eta, float(z["hel"]), iota0=a["iota"])
 pts_ax = np.asarray(q["x"])[::4]
 X, I = full_coilset(C, L)

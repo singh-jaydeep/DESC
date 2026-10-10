@@ -22,7 +22,7 @@ def one(jpath):
     z = np.load(jpath[:-5] + ".npz")
     ar = d["args"]
     L = Layout(int(z["nfp"]), int(z["nc"]), int(z["K"]), int(z["Kax"]), str(z["mode"]))
-    rc, zs, eta, C = L.split(jnp.asarray(z["p"]))
+    rc, zs, eta, C = L.split(jnp.asarray(z["p"])[:L.n])
     X, I = full_coilset(C, L)
     X = np.asarray(X)                                   # (2 nfp nc, 2 NPT + 1, 3); first nc are the unique coils
     hinges = []

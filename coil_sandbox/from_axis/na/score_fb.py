@@ -65,7 +65,7 @@ def stamp(msg):
 
 # ---- coils (exact)
 L = Layout(int(z["nfp"]), int(z["nc"]), int(z["K"]), int(z["Kax"]), str(z["mode"]))
-rc, zs, eta, C = L.split(jnp.asarray(z["p"]))
+rc, zs, eta, C = L.split(jnp.asarray(z["p"])[:L.n])
 cs, arcs = to_desc_coils(C, L)
 cs.save(os.path.join(out, "coils.h5"))
 src = S.source_grid(cs, gl_m=a.gl)[0]
