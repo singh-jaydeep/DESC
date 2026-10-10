@@ -1,1 +1,4 @@
 === start arc5_level 03:33:23
+work/ss_qh/nc5xyz/queue6c.sh: line 10: 3480821 Killed                     systemd-run --user --scope -p MemoryMax=12G -p MemorySwapMax=0 $PY run_al.py --eq $EQL --vacuum --bounds bounds/precise_qh_gil.json --maxiter 800 --cc-gap coils --cc-k 80000 --horizontal-hinges --link-mu 1e8 --start $N/arc5/result.h5 --out $N/arc5_level > $N/arc5_level/run.log 2>&1
+=== end arc5_level exit 137 03:35:44
+=== QUEUE6c DONE 03:35:49

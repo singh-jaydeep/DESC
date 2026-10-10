@@ -154,7 +154,7 @@ Cold starts are circles at r/a 2.6. Each run takes 5–12 min.
 | arc5 | 5 | 1.00 (total 1.25×) | cold arcs | 6.60e-4 | 7.72e-4 | 7.1e-4 | κ_MS 0.90, d_pc 1.20 |
 | level, cont/refine | 4 | 1.00 | — | 2.27e-3 | 1.77e-3 (traced 1.95e-3) | 6.9e-4 | removable, +7.4 cm |
 | **arcL125_level** | 4 | 1.25 | warm (cont/refine) | **1.29e-3** | **1.08e-3** | 6.9e-4 | **removable, +4.1 cm** |
-| arc5_level | 5 | 1.00 | warm (arc5) | *(running on CPU)* | | 6.9e-4 | GPU OOM twice at build |
+| arc5_level | 5 | 1.00 | warm (arc5) | **not run** | | 6.9e-4 | died at build 3×: GPU OOM (default and 0.92 memory fraction), CPU killed at the 12 GB cap |
 
 * **For arcB2 free, length is the whole effect.** At L × 1.25, 4 or 5 coils give the same B·n and the same QS, both at
   the target's own value. The free arcB2 coils become target-limited: further gains need a better single-stage target,
@@ -162,6 +162,14 @@ Cold starts are circles at r/a 2.6. Each run takes 5–12 min.
 * **Level hinges: −43% B·n and −39% QS from L × 1.25, still demountable.** The level/free ratio grows from 1.5× to 2.1×.
   The free coils use the extra length better, and level's remaining error is still about 70% ripple
   (proxy band 7.9e-4 of 1.08e-3).
+* **arc5_level (level hinges, 5 coils) could not be built.** With `--cc-gap coils`, the node count is chosen from the
+  coils, and arc5's coils need more nodes. The node-distance buffer (`CoilSetDistanceRows._node_rows`: pairs × N²,
+  float64) then exceeds the GPU and, on CPU, the 12 GB cap.
+  * Fixes: compute the selection distances `d0` in float32, or per pair (min/argmin plus the mask) instead of all at
+    once. Either is a DESC change, not made unattended.
+  * Alternatives: `--cc-gap bounds` with a fixed `--row-n`, or `--cc-k` below the ~50k active rows that nc4 level needed.
+  * Given §5's free result (count adds nothing for arcB2 at equal length), arcL125_level is probably the better use of
+    the length anyway.
 * These runs keep the boundary fixed. Coil continuation and single stage at L × 1.25 were not run.
 
 ## 6. Recommendations

@@ -1,0 +1,22 @@
+Running as unit: run-p3480821-i3485183.scope; invocation ID: 879a427a2f8d433db18209cf878844d9
+DESC /home/singh/Documents/DESC2/desc
+DEVICE requested=cpu obtained=cpu (1x cpu)
+  [mem] RSS 0.64 GB  peak 0.64 GB
+JOINT PLANE: each coil's hinges snapped to their mean height and held level (heights free) (largest move 4.89e-01 m; the START line is after the snap)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 4.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 4.
+  warnings.warn(msg, err)
+eq work/ss_qh/joint/cont/k4b/eq_k4.h5 NFP 4 sym True; start work/ss_qh/nc5xyz/arc5/result.h5: 5 unique coils (PiecewisePlanarArcCoil), 5 top-level; VACUUM
+BOUNDS L 2.926  Ltot -  kappa 13.67  kms 18.69  convex -  planar -  dcc 0.05851  dpc 0.1097
+  built coil length in 1.4 s
+  built coil curvature in 0.0 s
+  built coil mean squared curvature in 0.0 s
+  built coil-coil distance rows in 5.8 s
+  [mem] RSS 2.17 GB  peak 2.97 GB
+  [mem] RSS 2.55 GB  peak 3.32 GB
+  [mem] RSS 3.05 GB  peak 3.56 GB
+  [mem] RSS 3.56 GB  peak 3.74 GB
+  built plasma-coil distance field in 118.3 s
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: coil-coil distance rows: 348855 rows are within select_distance but only 80000 slots; the rest are dropped. Raise max_active_rows.
+  warnings.warn(msg, err)

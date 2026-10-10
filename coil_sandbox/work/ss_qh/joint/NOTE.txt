@@ -171,3 +171,5 @@ length is the whole effect. arcL125_level (warm from cont/refine, same flags): B
 REMOVABLE, clearance +0.041 m (0.074); kappa 1.001, kMS 0.94. Level/free at L x1.25 = 2.1x (1.53x at nominal).
 2026-10-10 03:35 arc5_level OOM at build (GPU 2.1 GB in active_row_count, cc-k 80000; nc4 level needed ~50k active rows so cc-k kept). Retry queue6b.sh with XLA_PYTHON_CLIENT_MEM_FRACTION=0.92.
 2026-10-10 03:45 arc5_level OOM again at MEM_FRACTION 0.92 (cc-gap coils picks more nodes for the arc5 coils; d0 = pairs x N^2 f64). Not editing DESC unattended; rerun on CPU (queue6c.sh).
+2026-10-10 03:36 arc5_level on CPU killed at the 12G cap during build (exit 137; system memory pressure also reaped the session's wait loops;
+WSL fine). Not retried: needs a DESC change (d0 float32 / per-pair) or a different node grid; user's call. Overnight write-up: fieldcheck/BEST_QS.md.
