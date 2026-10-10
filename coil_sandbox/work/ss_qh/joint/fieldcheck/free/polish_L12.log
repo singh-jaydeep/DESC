@@ -1,0 +1,65 @@
+E1009 20:07:11.808150 3176805 cuda_executor.cc:1743] Could not get kernel mode driver version: ( INVALID_ARGUMENT: Version does not match the format X.Y.Z )
+E1009 20:07:11.821454 3176697 cuda_executor.cc:1743] Could not get kernel mode driver version: ( INVALID_ARGUMENT: Version does not match the format X.Y.Z )
+DESC /home/singh/Documents/DESC2/desc
+DEVICE requested=gpu obtained=gpu (1x NVIDIA GeForce RTX 5070 Laptop GPU)
+/home/singh/Documents/DESC2/coil_sandbox/sandbox/boot.py:43: UserWarning: `desc` was imported (from /home/singh/Documents/DESC2/desc/__init__.py) before boot.setup(); the chosen DESC and the device choice may not take effect.
+  warnings.warn(f"`desc` was imported (from {getattr(sys.modules['desc'], '__file__', '?')}) before "
+DESC /home/singh/Documents/DESC2/desc
+DEVICE requested=gpu obtained=gpu (1x NVIDIA GeForce RTX 5070 Laptop GPU)
+=== free: polish work/ss_qh/joint/fieldcheck/free/eq_traced.h5 -> work/ss_qh/joint/fieldcheck/free/eq_traced_L12.h5  RES 12  maxiter 500
+start: L,M,N 10,10,10  force 2.44e-03  sqrt(g)>0 True
+Building objective: force
+Precomputing transforms
+Building objective: lcfs R
+Building objective: lcfs Z
+Building objective: fixed Psi
+Building objective: fixed pressure
+Building objective: fixed current
+Building objective: fixed sheet current
+Building objective: self_consistency R
+Building objective: self_consistency Z
+Building objective: lambda gauge
+Building objective: axis R self consistency
+Building objective: axis Z self consistency
+Number of parameters: 2784
+Number of objectives: 16562
+
+Starting optimization
+Using method: lsq-exact
+Optimization terminated successfully.
+`ftol` condition satisfied. (ftol=1.00e-12)
+`xtol` condition satisfied. (xtol=1.00e-14)
+         Current function value: 1.116e-07
+         Total delta_x: 6.479e-02
+         Iterations: 372
+         Function evaluations: 438
+         Jacobian evaluations: 373
+==============================================================================================================
+                                                                 Start  -->   End
+Total (sum of squares):                                      6.275e-06  -->   1.116e-07, 
+Maximum absolute Force error:                                7.587e+02  -->   1.273e+02 (N)
+Minimum absolute Force error:                                5.388e-04  -->   6.271e-04 (N)
+Average absolute Force error:                                2.212e+01  -->   2.978e+00 (N)
+Maximum absolute Force error:                                1.603e-03  -->   2.689e-04 (normalized)
+Minimum absolute Force error:                                1.138e-09  -->   1.325e-09 (normalized)
+Average absolute Force error:                                4.672e-05  -->   6.291e-06 (normalized)
+R boundary error:                                            0.000e+00  -->   0.000e+00 (m)
+Z boundary error:                                            0.000e+00  -->   0.000e+00 (m)
+Fixed Psi error:                                             0.000e+00  -->   0.000e+00 (Wb)
+Fixed pressure profile error:                                0.000e+00  -->   0.000e+00 (Pa)
+Fixed current profile error:                                 0.000e+00  -->   0.000e+00 (A)
+Fixed sheet current error:                                   0.000e+00  -->   0.000e+00 (~)
+==============================================================================================================
+
+after solve (16.9 min): L,M,N 12,12,12  force 3.24e-04  sqrt(g)>0 True
+coil field (trc) A 8.520  R0 1.0033  a 0.1178  iota [1.2396, 1.2518]  QS(Boozer, |B_nonsym|/<B>) rho 0.25 9.76e-04  rho 0.5 1.73e-03  rho 0.75 2.65e-03  rho 1 5.25e-03
+ rho0 | spread @rho | iota trace  this-eq
+ 0.10 | 0.0019 @0.104 | 1.2505  1.2517
+ 0.20 | 0.0029 @0.208 | 1.2505  1.2514
+ 0.30 | 0.0048 @0.313 | 1.2503  1.2509
+ 0.40 | 0.0066 @0.418 | 1.2501  1.2502
+ 0.50 | 0.0091 @0.523 | 1.2496  1.2495
+ 0.60 | 0.0106 @0.629 | 1.2488  1.2485
+ 0.70 | 0.0109 @0.735 | 1.2474  1.2472
+ 0.80 | 0.0091 @0.841 | 1.2450  1.2452
+ 0.90 | 0.0041 @0.947 | 1.2417  1.2419

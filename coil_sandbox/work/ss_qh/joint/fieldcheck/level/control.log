@@ -1,0 +1,29 @@
+E1009 19:09:25.558067 3153054 cuda_executor.cc:1743] Could not get kernel mode driver version: ( INVALID_ARGUMENT: Version does not match the format X.Y.Z )
+E1009 19:09:25.569763 3152898 cuda_executor.cc:1743] Could not get kernel mode driver version: ( INVALID_ARGUMENT: Version does not match the format X.Y.Z )
+DESC /home/singh/Documents/DESC2/desc
+DEVICE requested=gpu obtained=gpu (1x NVIDIA GeForce RTX 5070 Laptop GPU)
+/home/singh/Documents/DESC2/coil_sandbox/sandbox/boot.py:43: UserWarning: `desc` was imported (from /home/singh/Documents/DESC2/desc/__init__.py) before boot.setup(); the chosen DESC and the device choice may not take effect.
+  warnings.warn(f"`desc` was imported (from {getattr(sys.modules['desc'], '__file__', '?')}) before "
+DESC /home/singh/Documents/DESC2/desc
+DEVICE requested=gpu obtained=gpu (1x NVIDIA GeForce RTX 5070 Laptop GPU)
+W1009 19:21:22.056261 3152898 bfc_allocator.cc:502] Allocator (GPU_0_bfc) ran out of memory trying to allocate 4.04GiB (rounded to 4337428224)requested by op 
+If the cause is memory fragmentation maybe the environment variable 'TF_GPU_ALLOCATOR=cuda_malloc_async' will improve the situation. 
+Current allocation summary follows.
+Current allocation summary follows.
+W1009 19:21:22.056542 3152898 bfc_allocator.cc:513] *******************_________________________________________________________________________________
+Traceback (most recent call last):
+  File "/home/singh/Documents/DESC2/coil_sandbox/work/ss_qh/joint/fieldcheck/control.py", line 52, in <module>
+    eqs.solve(ftol=1e-12, xtol=1e-14, gtol=1e-12, maxiter=500, verbose=0)
+  File "/home/singh/Documents/DESC2/desc/equilibrium/equilibrium.py", line 2447, in solve
+    things, result = optimizer.optimize(
+                     ^^^^^^^^^^^^^^^^^^^
+  File "/home/singh/Documents/DESC2/desc/optimize/optimizer.py", line 318, in optimize
+    result = optimizers[method]["fun"](
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/singh/Documents/DESC2/desc/optimize/_desc_wrappers.py", line 546, in _optimize_desc_least_squares
+    result = lsqtr(
+             ^^^^^^
+  File "/home/singh/Documents/DESC2/desc/optimize/least_squares.py", line 194, in lsqtr
+    J = jac(x, *args).block_until_ready()
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+jax.errors.JaxRuntimeError: RESOURCE_EXHAUSTED: Out of memory while trying to allocate 4.04GiB.

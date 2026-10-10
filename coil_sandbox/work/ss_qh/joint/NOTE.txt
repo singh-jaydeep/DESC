@@ -135,3 +135,8 @@ checkpoint, so restarted deterministically with MAXITER=30 run.sh short (k4b -> 
 
 2026-10-09 hires done: k4b 30 its (MAXITER cap) cost 1.719e-1 -> 1.585e-1, 171 min; refine 2.2746e-3 vs res-8 2.2661e-3 (+0.4%).
 QS rho .5 5.76e-4 vs 7.02e-4, iota min 1.2132 vs 1.2075; coils/removability unchanged. Verdict: stick with res 8 (REPORT.md sec 7).
+
+2026-10-09 fieldcheck (fieldcheck/FIELDCHECK.md): level (cont/refine) and free arcB2 traced 400 fp: nested, no islands, iota to 0.002.
+Free-boundary solves dropped (residual floor, worse than target coords). Traced-surface eq (rho0 .95 fit, res 12; control within
+1-4%, direct Biot-Savart Boozer fit within 2-6%): QS rho .5 level 1.95e-3 (2.8x target), free 1.73e-3 (2.5x). Level excess ~70%
+32-coil (0,8) ripple, persists to axis; eps_eff < 0.35% everywhere, core 4x target (level). Next: coil-|B| ripple term, nc5, d_pc floor.

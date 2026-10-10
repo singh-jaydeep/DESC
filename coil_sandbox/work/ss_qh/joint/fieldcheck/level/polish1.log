@@ -1,0 +1,64 @@
+E1009 18:45:16.309735 3143283 cuda_executor.cc:1743] Could not get kernel mode driver version: ( INVALID_ARGUMENT: Version does not match the format X.Y.Z )
+E1009 18:45:16.321943 3143118 cuda_executor.cc:1743] Could not get kernel mode driver version: ( INVALID_ARGUMENT: Version does not match the format X.Y.Z )
+DESC /home/singh/Documents/DESC2/desc
+DEVICE requested=gpu obtained=gpu (1x NVIDIA GeForce RTX 5070 Laptop GPU)
+/home/singh/Documents/DESC2/coil_sandbox/sandbox/boot.py:43: UserWarning: `desc` was imported (from /home/singh/Documents/DESC2/desc/__init__.py) before boot.setup(); the chosen DESC and the device choice may not take effect.
+  warnings.warn(f"`desc` was imported (from {getattr(sys.modules['desc'], '__file__', '?')}) before "
+DESC /home/singh/Documents/DESC2/desc
+DEVICE requested=gpu obtained=gpu (1x NVIDIA GeForce RTX 5070 Laptop GPU)
+=== level: polish work/ss_qh/joint/fieldcheck/level/eq_traced.h5 -> work/ss_qh/joint/fieldcheck/level/eq_traced_p1.h5  RES same  maxiter 500
+start: L,M,N 10,10,10  force 1.56e-03  sqrt(g)>0 True
+Building objective: force
+Precomputing transforms
+Building objective: lcfs R
+Building objective: lcfs Z
+Building objective: fixed Psi
+Building objective: fixed pressure
+Building objective: fixed current
+Building objective: fixed sheet current
+Building objective: self_consistency R
+Building objective: self_consistency Z
+Building objective: lambda gauge
+Building objective: axis R self consistency
+Building objective: axis Z self consistency
+Number of parameters: 1635
+Number of objectives: 9922
+
+Starting optimization
+Using method: lsq-exact
+Optimization terminated successfully.
+`ftol` condition satisfied. (ftol=1.00e-12)
+         Current function value: 7.860e-06
+         Total delta_x: 6.814e-06
+         Iterations: 28
+         Function evaluations: 29
+         Jacobian evaluations: 29
+==============================================================================================================
+                                                                 Start  -->   End
+Total (sum of squares):                                      7.860e-06  -->   7.860e-06, 
+Maximum absolute Force error:                                4.743e+02  -->   4.743e+02 (N)
+Minimum absolute Force error:                                8.414e-04  -->   2.426e-04 (N)
+Average absolute Force error:                                1.686e+01  -->   1.686e+01 (N)
+Maximum absolute Force error:                                1.484e-03  -->   1.484e-03 (normalized)
+Minimum absolute Force error:                                2.633e-09  -->   7.591e-10 (normalized)
+Average absolute Force error:                                5.274e-05  -->   5.274e-05 (normalized)
+R boundary error:                                            0.000e+00  -->   0.000e+00 (m)
+Z boundary error:                                            0.000e+00  -->   0.000e+00 (m)
+Fixed Psi error:                                             0.000e+00  -->   0.000e+00 (Wb)
+Fixed pressure profile error:                                0.000e+00  -->   0.000e+00 (Pa)
+Fixed current profile error:                                 0.000e+00  -->   0.000e+00 (A)
+Fixed sheet current error:                                   0.000e+00  -->   0.000e+00 (~)
+==============================================================================================================
+
+after solve (0.6 min): L,M,N 10,10,10  force 1.56e-03  sqrt(g)>0 True
+coil field (trc) A 8.512  R0 0.9944  a 0.1168  iota [1.2040, 1.2293]  QS(Boozer, |B_nonsym|/<B>) rho 0.25 1.72e-03  rho 0.5 2.06e-03  rho 0.75 2.73e-03  rho 1 6.85e-03
+ rho0 | spread @rho | iota trace  this-eq
+ 0.10 | 0.0025 @0.114 | 1.2236  1.2290
+ 0.20 | 0.0035 @0.219 | 1.2232  1.2284
+ 0.30 | 0.0055 @0.325 | 1.2225  1.2272
+ 0.40 | 0.0086 @0.430 | 1.2216  1.2256
+ 0.50 | 0.0112 @0.535 | 1.2203  1.2235
+ 0.60 | 0.0582 @0.639 | 1.2187  1.2208
+ 0.70 | 0.0127 @0.743 | 1.2164  1.2175
+ 0.80 | 0.0100 @0.846 | 1.2132  1.2134
+ 0.90 | 0.0041 @0.949 | 1.2099  1.2078

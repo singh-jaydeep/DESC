@@ -1,0 +1,29 @@
+E1009 19:58:33.001899 3171350 cuda_executor.cc:1743] Could not get kernel mode driver version: ( INVALID_ARGUMENT: Version does not match the format X.Y.Z )
+E1009 19:58:33.014320 3171170 cuda_executor.cc:1743] Could not get kernel mode driver version: ( INVALID_ARGUMENT: Version does not match the format X.Y.Z )
+DESC /home/singh/Documents/DESC2/desc
+DEVICE requested=gpu obtained=gpu (1x NVIDIA GeForce RTX 5070 Laptop GPU)
+/home/singh/Documents/DESC2/coil_sandbox/sandbox/boot.py:43: UserWarning: `desc` was imported (from /home/singh/Documents/DESC2/desc/__init__.py) before boot.setup(); the chosen DESC and the device choice may not take effect.
+  warnings.warn(f"`desc` was imported (from {getattr(sys.modules['desc'], '__file__', '?')}) before "
+DESC /home/singh/Documents/DESC2/desc
+DEVICE requested=gpu obtained=gpu (1x NVIDIA GeForce RTX 5070 Laptop GPU)
+=== free: traced rho0 0.95 for 400 field periods x 48 planes in 0.6 min; lost: 0 points
+mapped 9601/9601 punctures into target coordinates; their rho in [0.9457, 0.9766]
+  fit pass 0: 9601 points, residual median 0.016 mm, max 0.080 mm
+  kept 9601/9601 punctures
+surface fit M=N=10: point-to-fit residual mean 0.020 mm, max 0.080 mm (max 0.0006 a)
+boundary change target(rho=1) -> traced: max |dR_mn| 5.29 mm, max |dZ_mn| 4.89 mm
+traced-surface equilibrium: relative force error 2.44e-03, sqrt(g) > 0 everywhere: True
+traced-surface equilibrium solved (L=M=N=10) in 6.6 min
+target at rho x 0.95 A 8.176  R0 1.0025  a 0.1226  iota [1.2400, 1.2516]  QS(Boozer, |B_nonsym|/<B>) rho 0.2375 4.25e-04  rho 0.475 6.84e-04  rho 0.7125 1.44e-03  rho 0.95 3.93e-03
+coil field (trc) A 8.520  R0 1.0033  a 0.1178  iota [1.2331, 1.2554]  QS(Boozer, |B_nonsym|/<B>) rho 0.25 1.01e-03  rho 0.5 1.69e-03  rho 0.75 2.66e-03  rho 1 4.85e-03
+ rho0 | rho spread: target  traced-eq | iota: trace   target   traced-eq
+ 0.10 |  0.0006  0.0054@0.104 | 1.2505  1.2515  1.2553
+ 0.20 |  0.0015  0.0046@0.208 | 1.2505  1.2512  1.2549
+ 0.30 |  0.0029  0.0044@0.313 | 1.2503  1.2506  1.2545
+ 0.40 |  0.0046  0.0052@0.418 | 1.2501  1.2497  1.2540
+ 0.50 |  0.0073  0.0076@0.523 | 1.2496  1.2486  1.2533
+ 0.60 |  0.0101  0.0096@0.629 | 1.2488  1.2472  1.2521
+ 0.70 |  0.0137  0.0105@0.735 | 1.2474  1.2456  1.2499
+ 0.80 |  0.0175  0.0094@0.841 | 1.2450  1.2438  1.2458
+ 0.90 |  0.0213  0.0046@0.947 | 1.2417  1.2419  1.2385
+done

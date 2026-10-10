@@ -1,0 +1,140 @@
+Running as unit: run-p3086456-i3090653.scope; invocation ID: 58adc22984e246b1bcdf54f6a1c9853f
+E1009 17:43:06.700283 3086553 cuda_executor.cc:1743] Could not get kernel mode driver version: ( INVALID_ARGUMENT: Version does not match the format X.Y.Z )
+E1009 17:43:06.713550 3086456 cuda_executor.cc:1743] Could not get kernel mode driver version: ( INVALID_ARGUMENT: Version does not match the format X.Y.Z )
+DESC /home/singh/Documents/DESC2/desc
+DEVICE requested=gpu obtained=gpu (1x NVIDIA GeForce RTX 5070 Laptop GPU)
+/home/singh/Documents/DESC2/coil_sandbox/sandbox/boot.py:43: UserWarning: `desc` was imported (from /home/singh/Documents/DESC2/desc/__init__.py) before boot.setup(); the chosen DESC and the device choice may not take effect.
+  warnings.warn(f"`desc` was imported (from {getattr(sys.modules['desc'], '__file__', '?')}) before "
+DESC /home/singh/Documents/DESC2/desc
+DEVICE requested=gpu obtained=gpu (1x NVIDIA GeForce RTX 5070 Laptop GPU)
+=== free
+coils work/ss_qh/matrix/on_arcB2/arcB2/result.h5
+eq work/ss_qh/matrix/ss/arcB2_k4b/eq_k4.h5 (L,M,N 8,8,8)
+current scale applied 1.05500; on the target boundary: <|B.n|>/<|B|> 1.485e-03 (max 6.407e-03), | |B_coil| - |B_eq| | / |B_eq| mean 1.553e-03 max 5.758e-03
+target physics   A 8.176  R0 1.0025  a 0.1226  iota [1.2400, 1.2516]  QS(Boozer, |B_nonsym|/<B>) rho 0.25 4.40e-04  rho 0.5 7.18e-04  rho 0.75 1.69e-03  rho 1 4.78e-03
+starts (R, Z): 0.1:(1.2283,0.0000) 0.2:(1.2343,0.0000) 0.3:(1.2405,0.0000) 0.4:(1.2467,0.0000) 0.5:(1.2531,0.0000) 0.6:(1.2596,0.0000) 0.7:(1.2662,0.0000) 0.8:(1.2730,0.0000) 0.9:(1.2800,0.0000) 0.95:(1.2835,0.0000) 1:(1.2871,0.0000) 1.03:(1.2893,0.0000) 1.06:(1.2914,0.0000)
+traced 13 lines x 400 field periods in 0.4 min
+  line rho0  0.10: rho mean 0.0998 std 2.29e-04 [0.0995, 0.1001]  iota trace 1.2505 target 1.2515  inside 401/401  lost after -
+  line rho0  0.20: rho mean 0.2001 std 4.66e-04 [0.1993, 0.2008]  iota trace 1.2505 target 1.2512  inside 401/401  lost after -
+  line rho0  0.30: rho mean 0.3007 std 9.27e-04 [0.2992, 0.3022]  iota trace 1.2503 target 1.2506  inside 401/401  lost after -
+  line rho0  0.40: rho mean 0.4017 std 1.58e-03 [0.3995, 0.4041]  iota trace 1.2501 target 1.2497  inside 401/401  lost after -
+  line rho0  0.50: rho mean 0.5029 std 2.41e-03 [0.4996, 0.5068]  iota trace 1.2496 target 1.2486  inside 401/401  lost after -
+  line rho0  0.60: rho mean 0.6046 std 3.33e-03 [0.6000, 0.6101]  iota trace 1.2488 target 1.2472  inside 401/401  lost after -
+  line rho0  0.70: rho mean 0.7065 std 4.28e-03 [0.7000, 0.7137]  iota trace 1.2474 target 1.2456  inside 401/401  lost after -
+  line rho0  0.80: rho mean 0.8085 std 5.19e-03 [0.8000, 0.8175]  iota trace 1.2450 target 1.2438  inside 401/401  lost after -
+  line rho0  0.90: rho mean 0.9104 std 6.06e-03 [0.9000, 0.9213]  iota trace 1.2417 target 1.2419  inside 401/401  lost after -
+  line rho0  0.95: rho mean 0.9613 std 6.54e-03 [0.9500, 0.9733]  iota trace 1.2400 target 1.2409  inside 401/401  lost after -
+  line rho0  1.00: rho mean 1.0000 std 6.28e-08 [1.0000, 1.0000]  iota trace 1.2381 target 1.2400  inside 401/401  lost after -
+  line rho0  1.03: rho mean 1.0000 std 0.00e+00 [1.0000, 1.0000]  iota trace 1.2366 target -  inside 401/401  lost after -
+  line rho0  1.06: rho mean 1.0000 std 0.00e+00 [1.0000, 1.0000]  iota trace 1.2348 target -  inside 401/401  lost after -
+Building objective: Vacuum boundary error
+Precomputing transforms
+Timer: Precomputing transforms = 20.6 ms
+ObjectiveFunction deriv_mode : batched
+ObjectiveFunction jac_chunk_size: 9283
+Timer: Objective build = 1.93 sec
+Building objective: force
+Precomputing transforms
+Timer: Precomputing transforms = 806 ms
+ObjectiveFunction deriv_mode : batched
+ObjectiveFunction jac_chunk_size: 4304
+Timer: Objective build = 869 ms
+ObjectiveFunction deriv_mode : blocked
+lcfs R jac_chunk_size: None
+lcfs Z jac_chunk_size: None
+fixed Psi jac_chunk_size: None
+fixed pressure jac_chunk_size: None
+fixed current jac_chunk_size: None
+fixed sheet current jac_chunk_size: None
+self_consistency R jac_chunk_size: None
+self_consistency Z jac_chunk_size: None
+lambda gauge jac_chunk_size: None
+axis R self consistency jac_chunk_size: None
+axis Z self consistency jac_chunk_size: None
+Timer: Objective build = 1.32 ms
+Timer: Eq Update LinearConstraintProjection build = 3.57 sec
+Timer: Proximal projection build = 34.1 sec
+Building objective: fixed pressure
+Building objective: fixed current
+Building objective: fixed Psi
+ObjectiveFunction deriv_mode : blocked
+fixed pressure jac_chunk_size: None
+fixed current jac_chunk_size: None
+fixed Psi jac_chunk_size: None
+Timer: Objective build = 659 ms
+Timer: LinearConstraintProjection build = 1.09 sec
+Number of parameters: 289
+Number of objectives: 1122
+Timer: Initializing the optimization = 35.9 sec
+
+Starting optimization
+Using method: proximal-lsq-exact
+   Iteration     Total nfev        Cost      Cost reduction    Step norm     Optimality   
+       0              1          2.499e-03                                    3.452e-02   
+       1              3          5.902e-04      1.909e-03      9.645e-03      1.606e-02   
+       2              5          7.594e-05      5.142e-04      2.448e-03      5.566e-03   
+       3              7          3.134e-05      4.460e-05      1.302e-03      1.275e-03   
+       4              9          2.600e-05      5.338e-06      6.581e-04      3.362e-04   
+       5             10          2.464e-05      1.358e-06      1.465e-03      1.529e-03   
+       6             11          2.369e-05      9.498e-07      1.733e-03      2.078e-03   
+       7             12          2.026e-05      3.437e-06      4.213e-04      1.410e-04   
+       8             13          2.004e-05      2.137e-07      8.449e-04      5.361e-04   
+       9             14          1.961e-05      4.297e-07      8.481e-04      5.179e-04   
+      10             15          1.906e-05      5.578e-07      8.075e-04      4.678e-04   
+      11             16          1.841e-05      6.458e-07      7.799e-04      4.248e-04   
+      12             17          1.779e-05      6.199e-07      8.243e-04      4.977e-04   
+      13             18          1.724e-05      5.473e-07      8.336e-04      4.772e-04   
+      14             19          1.683e-05      4.105e-07      8.406e-04      4.933e-04   
+      15             20          1.646e-05      3.676e-07      8.342e-04      5.010e-04   
+      16             21          1.609e-05      3.792e-07      8.227e-04      4.902e-04   
+      17             22          1.575e-05      3.340e-07      8.386e-04      4.926e-04   
+      18             23          1.547e-05      2.807e-07      8.606e-04      4.980e-04   
+      19             24          1.525e-05      2.201e-07      8.729e-04      5.021e-04   
+      20             25          1.507e-05      1.802e-07      8.815e-04      5.119e-04   
+      21             26          1.491e-05      1.627e-07      8.892e-04      5.207e-04   
+      22             27          1.476e-05      1.469e-07      8.946e-04      5.164e-04   
+      23             28          1.464e-05      1.241e-07      8.971e-04      5.042e-04   
+      24             29          1.454e-05      9.831e-08      8.936e-04      4.967e-04   
+      25             30          1.433e-05      2.076e-07      2.225e-04      4.386e-05   
+      26             31          1.433e-05      1.383e-09      4.462e-04      1.307e-04   
+      27             32          1.431e-05      1.679e-08      1.101e-04      1.444e-05   
+      28             39          1.431e-05      4.657e-11      2.359e-08      9.948e-06   
+      29             57          1.431e-05      0.000e+00      0.000e+00      9.948e-06   
+Warning: A bad approximation caused failure to predict improvement.
+         Current function value: 1.431e-05
+         Total delta_x: 2.069e-02
+         Iterations: 29
+         Function evaluations: 57
+         Jacobian evaluations: 29
+Timer: Solution time = 3.45 min
+Timer: Avg time per step = 6.91 sec
+==============================================================================================================
+                                                                 Start  -->   End
+Total (sum of squares):                                      2.499e-03  -->   1.431e-05, 
+Maximum absolute Boundary normal field error:                1.213e-03  -->   2.810e-04 (T*m^2)
+Minimum absolute Boundary normal field error:                4.878e-07  -->   6.418e-08 (T*m^2)
+Average absolute Boundary normal field error:                2.579e-04  -->   5.559e-05 (T*m^2)
+Maximum absolute Boundary normal field error:                1.220e-02  -->   2.826e-03 (normalized)
+Minimum absolute Boundary normal field error:                4.905e-06  -->   6.454e-07 (normalized)
+Average absolute Boundary normal field error:                2.593e-03  -->   5.590e-04 (normalized)
+Maximum absolute Boundary magnetic pressure error:           2.301e-03  -->   9.778e-05 (T^2*m^2)
+Minimum absolute Boundary magnetic pressure error:           3.532e-07  -->   8.133e-08 (T^2*m^2)
+Average absolute Boundary magnetic pressure error:           5.317e-04  -->   1.980e-05 (T^2*m^2)
+Maximum absolute Boundary magnetic pressure error:           3.724e-02  -->   1.583e-03 (normalized)
+Minimum absolute Boundary magnetic pressure error:           5.717e-06  -->   1.316e-06 (normalized)
+Average absolute Boundary magnetic pressure error:           8.606e-03  -->   3.204e-04 (normalized)
+Maximum absolute Force error:                                4.123e+01  -->   1.270e+03 (N)
+Minimum absolute Force error:                                2.675e-05  -->   3.780e-02 (N)
+Average absolute Force error:                                1.443e+00  -->   5.562e+01 (N)
+Maximum absolute Force error:                                8.496e-05  -->   2.617e-03 (normalized)
+Minimum absolute Force error:                                5.513e-11  -->   7.790e-08 (normalized)
+Average absolute Force error:                                2.973e-06  -->   1.146e-04 (normalized)
+Fixed pressure profile error:                                0.000e+00  -->   0.000e+00 (Pa)
+Fixed current profile error:                                 0.000e+00  -->   0.000e+00 (A)
+Fixed Psi error:                                             0.000e+00  -->   0.000e+00 (Wb)
+==============================================================================================================
+
+free boundary: A bad approximation caused failure to predict improvement.  nit 29  4.1 min  cost 1.431e-05
+free-bdry physics A 8.177  R0 1.0025  a 0.1226  iota [1.2380, 1.2493]  QS(Boozer, |B_nonsym|/<B>) rho 0.25 9.73e-04  rho 0.5 1.32e-03  rho 0.75 2.34e-03  rho 1 6.16e-03
+boundary offset free-bdry vs target: mean 2.03 mm, max 6.98 mm (= 0.017 a, 0.057 a); <|B|> 1.0539 vs 1.0539
+done

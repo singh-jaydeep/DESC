@@ -1,0 +1,4 @@
+control stage 1 saved work/ss_qh/joint/fieldcheck/level/control_L10.h5 (11.5 min)
+=== CONTROL level: target's own rho 0.95 surface, fit M=N=10, eq L=M=N=12, 23.0 min, force 1.13e-06
+target at rho x 0.95 A 8.073  R0 0.9940  a 0.1231  iota [1.2075, 1.2223]  QS(Boozer, |B_nonsym|/<B>) rho 0.2375 5.11e-04  rho 0.475 6.88e-04  rho 0.7125 9.04e-04  rho 0.95 2.36e-03
+control (pipeline)    A 8.513  R0 0.9949  a 0.1169  iota [1.2085, 1.2210]  QS(Boozer, |B_nonsym|/<B>) rho 0.25 5.04e-04  rho 0.5 6.62e-04  rho 0.75 9.00e-04  rho 1 2.41e-03

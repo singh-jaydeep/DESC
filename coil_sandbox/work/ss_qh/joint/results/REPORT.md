@@ -194,6 +194,20 @@ continuation result (`cont/`, L = M = N = 8, grids 16) change at L = M = N = 12 
 not into B·n, which the refine brings to the same value. Resolution did remove the k4b stall, so a res-12 step is the
 first thing to try when a res-8 single-stage step stalls (K5_STALL.md), at ~13× the cost per evaluation.
 
+## 8. Field quality of the actual coils (2026-10-09, `../fieldcheck/FIELDCHECK.md`)
+
+The complete chain for the best level example (`cont/refine` on `cont/k4b`), with free arcB2 as reference: trace the
+coil field, build its own equilibrium from a traced surface (validated by a control and a direct Biot–Savart fit), then
+Boozer QS and ε_eff.
+
+* **Surfaces are good.** Nested, no islands, confined to 6% beyond the boundary; ι matches the target to 0.002.
+* **QS of the coil field is 2.4–3.5× the target's** (ρ 0.5: 1.95e-3 vs 6.9e-4). Free arcB2 is 1.3–2.5× its target, so
+  level is about 10% worse at mid and outer radii and about 2× worse in the core.
+* **About 70% of level's excess is 32-coil mirror ripple** ((0, 8) Boozer mode), which persists to the axis: core ε_eff
+  is 4× the target's, though below 0.35% everywhere.
+* Recommended next: a coil-field |B| (ripple) term in stage 2 or refine, a 5-coils-per-half-period test, and a d_pc
+  floor experiment. Use the traced-surface pipeline, not free boundary, for evaluation.
+
 ## Files
 
 `../cont/` (continuation), `../quasr1328095/` (4-coil runs; `nc5/` own design + feasibility), `../devices/` (batch),

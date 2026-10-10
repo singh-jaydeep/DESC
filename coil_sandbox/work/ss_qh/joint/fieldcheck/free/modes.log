@@ -1,0 +1,39 @@
+E1009 20:24:48.923795 3183047 cuda_executor.cc:1743] Could not get kernel mode driver version: ( INVALID_ARGUMENT: Version does not match the format X.Y.Z )
+E1009 20:24:48.935852 3182948 cuda_executor.cc:1743] Could not get kernel mode driver version: ( INVALID_ARGUMENT: Version does not match the format X.Y.Z )
+DESC /home/singh/Documents/DESC2/desc
+DEVICE requested=gpu obtained=gpu (1x NVIDIA GeForce RTX 5070 Laptop GPU)
+--- Boozer |B|_mn / <|B|>, symmetry-breaking, rho 0.5 (traced) vs rho 0.475 (target)
+  L2 of breaking modes: target 8.35e-04  traced 1.88e-03
+   (m, n)    traced     target
+   ( 2,  0)  +1.21e-03  +2.39e-04
+   ( 0,  8)  -7.13e-04  -8.72e-06
+   ( 1,  0)  +4.86e-04  +4.05e-04
+   ( 2,  1)  +3.68e-04  +3.79e-04
+   ( 0,  6)  -3.41e-04  -7.91e-06
+   (-1, -9)  -3.18e-04  +8.91e-07
+   (-2, -1)  +3.16e-04  +3.31e-04
+   ( 1,  3)  -3.07e-04  -1.96e-04
+   ( 1,  4)  -2.85e-04  -7.13e-05
+   ( 1,  9)  -2.70e-04  -3.42e-06
+  breaking L2 traced/target by |n| (per field period; 8 = 32 coils): 0: 1.3e-03/4.7e-04  1: 4.9e-04/5.2e-04  2: 4.0e-04/3.2e-04  3: 3.8e-04/2.5e-04  4: 3.8e-04/1.9e-04  5: 2.7e-04/3.4e-05  6: 4.0e-04/3.1e-05  7: 2.8e-04/3.3e-05  8: 7.7e-04/1.5e-05  9: 4.6e-04/5.9e-06  10: 8.7e-05/1.9e-06  11: 1.2e-04/6.3e-07  12: 5.0e-05/2.7e-07  13: 2.6e-05/1.7e-07  14: 2.0e-05/1.2e-07  15: 1.5e-05/7.2e-08  16: 9.5e-06/3.9e-08
+--- Boozer |B|_mn / <|B|>, symmetry-breaking, rho 1.0 (traced) vs rho 0.95 (target)
+  L2 of breaking modes: target 5.40e-03  traced 6.96e-03
+   (m, n)    traced     target
+   ( 2,  1)  +3.69e-03  +3.25e-03
+   (-2, -1)  +3.37e-03  +3.07e-03
+   ( 0,  8)  -1.60e-03  -1.55e-05
+   (-4, -2)  +1.45e-03  -7.23e-05
+   ( 4,  2)  +1.41e-03  -1.27e-05
+   ( 3,  2)  -1.38e-03  -1.55e-03
+   ( 1,  0)  -1.28e-03  -1.08e-03
+   ( 3,  4)  -1.04e-03  -7.71e-04
+   (-3, -2)  -1.01e-03  -1.30e-03
+   (-3, -1)  +9.98e-04  +7.63e-04
+  breaking L2 traced/target by |n| (per field period; 8 = 32 coils): 0: 1.5e-03/1.1e-03  1: 5.2e-03/4.6e-03  2: 2.8e-03/2.2e-03  3: 6.7e-04/6.0e-04  4: 1.4e-03/1.1e-03  5: 6.5e-04/3.0e-04  6: 7.5e-04/2.0e-04  7: 1.4e-03/1.2e-04  8: 1.8e-03/5.3e-05  9: 1.3e-03/2.4e-05  10: 3.2e-04/1.2e-05  11: 5.4e-04/7.7e-06  12: 1.7e-04/4.9e-06  13: 1.1e-04/2.9e-06  14: 1.0e-04/1.7e-06  15: 8.8e-05/9.5e-07  16: 6.6e-05/5.2e-07
+--- boundary: traced surface minus target rho 0.95 surface (mm); total L2 R 2.38, Z 2.51
+  R: (m1,n0) +1.43  (m-1,n-1) -1.10  (m1,n1) -0.73  (m2,n0) +0.58  (m5,n1) -0.43  (m-5,n-1) -0.40  (m-3,n-1) -0.37  (m3,n0) +0.32
+  R L2 by |n|: 0: 1.59  1: 1.60  2: 0.67  3: 0.27  4: 0.16  5: 0.10  6: 0.06  7: 0.05  8: 0.08  9: 0.03  10: 0.03
+  R L2 by |m|: 0: 0.39  1: 1.99  2: 0.67  3: 0.54  4: 0.55  5: 0.61  6: 0.35  7: 0.13  8: 0.12  9: 0.06  10: 0.03
+  Z: (m-1,n0) -1.47  (m2,n-1) +0.90  (m-1,n1) -0.74  (m-2,n1) -0.72  (m-3,n1) -0.59  (m0,n-1) +0.58  (m-2,n0) -0.47  (m1,n-1) +0.45
+  Z L2 by |n|: 0: 1.58  1: 1.80  2: 0.66  3: 0.30  4: 0.13  5: 0.07  6: 0.06  7: 0.06  8: 0.06  9: 0.06  10: 0.04
+  Z L2 by |m|: 0: 0.62  1: 1.76  2: 1.25  3: 0.75  4: 0.57  5: 0.52  6: 0.29  7: 0.12  8: 0.07  9: 0.03  10: 0.01

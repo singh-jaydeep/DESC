@@ -1,0 +1,8 @@
+=== free: coil |B| on the traced-surface equilibrium's surfaces, fit in its Boozer angles (M=N=12)
+ rho | breaking L2: eq |B|  coil |B| | ripple |n| 6-9: eq  coil | max | |B|coil-|B|eq |/B00
+ 0.25 | 9.69e-04  1.03e-03 | 7.38e-04  8.23e-04 | 7.94e-02
+ 0.50 | 1.72e-03  1.76e-03 | 9.23e-04  1.00e-03 | 8.25e-02
+ 0.75 | 2.61e-03  2.64e-03 | 1.32e-03  1.38e-03 | 8.58e-02
+ 0.90 | 3.61e-03  3.62e-03 | 1.77e-03  1.81e-03 | 8.81e-02
+ 1.00 | 5.16e-03  5.14e-03 | 2.24e-03  2.25e-03 | 8.99e-02
+done

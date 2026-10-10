@@ -1,0 +1,11 @@
+E1009 19:33:30.958386 3161386 cuda_executor.cc:1743] Could not get kernel mode driver version: ( INVALID_ARGUMENT: Version does not match the format X.Y.Z )
+E1009 19:33:30.970466 3161280 cuda_executor.cc:1743] Could not get kernel mode driver version: ( INVALID_ARGUMENT: Version does not match the format X.Y.Z )
+DESC /home/singh/Documents/DESC2/desc
+DEVICE requested=gpu obtained=gpu (1x NVIDIA GeForce RTX 5070 Laptop GPU)
+/home/singh/Documents/DESC2/coil_sandbox/sandbox/boot.py:43: UserWarning: `desc` was imported (from /home/singh/Documents/DESC2/desc/__init__.py) before boot.setup(); the chosen DESC and the device choice may not take effect.
+  warnings.warn(f"`desc` was imported (from {getattr(sys.modules['desc'], '__file__', '?')}) before "
+DESC /home/singh/Documents/DESC2/desc
+DEVICE requested=gpu obtained=gpu (1x NVIDIA GeForce RTX 5070 Laptop GPU)
+=== CONTROL level: target's own rho 0.95 surface, fit M=N=10, eq L=M=N=12, 23.0 min, force 1.13e-06
+target at rho x 0.95 A 8.073  R0 0.9940  a 0.1231  iota [1.2075, 1.2223]  QS(Boozer, |B_nonsym|/<B>) rho 0.2375 5.11e-04  rho 0.475 6.88e-04  rho 0.7125 9.04e-04  rho 0.95 2.36e-03
+control (pipeline)    A 8.513  R0 0.9949  a 0.1169  iota [1.2085, 1.2210]  QS(Boozer, |B_nonsym|/<B>) rho 0.25 5.04e-04  rho 0.5 6.62e-04  rho 0.75 9.00e-04  rho 1 2.41e-03

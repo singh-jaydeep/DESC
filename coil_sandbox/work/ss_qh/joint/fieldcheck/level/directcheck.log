@@ -1,0 +1,12 @@
+E1009 22:35:13.593064 3221390 cuda_executor.cc:1743] Could not get kernel mode driver version: ( INVALID_ARGUMENT: Version does not match the format X.Y.Z )
+E1009 22:35:13.606669 3221233 cuda_executor.cc:1743] Could not get kernel mode driver version: ( INVALID_ARGUMENT: Version does not match the format X.Y.Z )
+DESC /home/singh/Documents/DESC2/desc
+DEVICE requested=gpu obtained=gpu (1x NVIDIA GeForce RTX 5070 Laptop GPU)
+=== level: coil |B| on the traced-surface equilibrium's surfaces, fit in its Boozer angles (M=N=12)
+ rho | breaking L2: eq |B|  coil |B| | ripple |n| 6-9: eq  coil | max | |B|coil-|B|eq |/B00
+ 0.25 | 1.79e-03  1.82e-03 | 1.20e-03  1.25e-03 | 1.03e-01
+ 0.50 | 1.93e-03  1.94e-03 | 1.58e-03  1.61e-03 | 1.07e-01
+ 0.75 | 2.81e-03  2.81e-03 | 2.35e-03  2.35e-03 | 1.12e-01
+ 0.90 | 4.20e-03  4.19e-03 | 3.12e-03  3.10e-03 | 1.15e-01
+ 1.00 | 5.59e-03  5.58e-03 | 3.82e-03  3.80e-03 | 1.18e-01
+done

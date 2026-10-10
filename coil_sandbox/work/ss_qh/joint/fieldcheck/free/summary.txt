@@ -1,0 +1,24 @@
+=== free
+coils work/ss_qh/matrix/on_arcB2/arcB2/result.h5
+eq work/ss_qh/matrix/ss/arcB2_k4b/eq_k4.h5 (L,M,N 8,8,8)
+current scale applied 1.05500; on the target boundary: <|B.n|>/<|B|> 1.485e-03 (max 6.407e-03), | |B_coil| - |B_eq| | / |B_eq| mean 1.553e-03 max 5.758e-03
+target physics   A 8.176  R0 1.0025  a 0.1226  iota [1.2400, 1.2516]  QS(Boozer, |B_nonsym|/<B>) rho 0.25 4.40e-04  rho 0.5 7.18e-04  rho 0.75 1.69e-03  rho 1 4.78e-03
+starts (R, Z): 0.1:(1.2283,0.0000) 0.2:(1.2343,0.0000) 0.3:(1.2405,0.0000) 0.4:(1.2467,0.0000) 0.5:(1.2531,0.0000) 0.6:(1.2596,0.0000) 0.7:(1.2662,0.0000) 0.8:(1.2730,0.0000) 0.9:(1.2800,0.0000) 0.95:(1.2835,0.0000) 1:(1.2871,0.0000) 1.03:(1.2893,0.0000) 1.06:(1.2914,0.0000)
+traced 13 lines x 400 field periods in 0.4 min
+  line rho0  0.10: rho mean 0.0998 std 2.29e-04 [0.0995, 0.1001]  iota trace 1.2505 target 1.2515  inside 401/401  lost after -
+  line rho0  0.20: rho mean 0.2001 std 4.66e-04 [0.1993, 0.2008]  iota trace 1.2505 target 1.2512  inside 401/401  lost after -
+  line rho0  0.30: rho mean 0.3007 std 9.27e-04 [0.2992, 0.3022]  iota trace 1.2503 target 1.2506  inside 401/401  lost after -
+  line rho0  0.40: rho mean 0.4017 std 1.58e-03 [0.3995, 0.4041]  iota trace 1.2501 target 1.2497  inside 401/401  lost after -
+  line rho0  0.50: rho mean 0.5029 std 2.41e-03 [0.4996, 0.5068]  iota trace 1.2496 target 1.2486  inside 401/401  lost after -
+  line rho0  0.60: rho mean 0.6046 std 3.33e-03 [0.6000, 0.6101]  iota trace 1.2488 target 1.2472  inside 401/401  lost after -
+  line rho0  0.70: rho mean 0.7065 std 4.28e-03 [0.7000, 0.7137]  iota trace 1.2474 target 1.2456  inside 401/401  lost after -
+  line rho0  0.80: rho mean 0.8085 std 5.19e-03 [0.8000, 0.8175]  iota trace 1.2450 target 1.2438  inside 401/401  lost after -
+  line rho0  0.90: rho mean 0.9104 std 6.06e-03 [0.9000, 0.9213]  iota trace 1.2417 target 1.2419  inside 401/401  lost after -
+  line rho0  0.95: rho mean 0.9613 std 6.54e-03 [0.9500, 0.9733]  iota trace 1.2400 target 1.2409  inside 401/401  lost after -
+  line rho0  1.00: rho mean 1.0000 std 6.28e-08 [1.0000, 1.0000]  iota trace 1.2381 target 1.2400  inside 401/401  lost after -
+  line rho0  1.03: rho mean 1.0000 std 0.00e+00 [1.0000, 1.0000]  iota trace 1.2366 target -  inside 401/401  lost after -
+  line rho0  1.06: rho mean 1.0000 std 0.00e+00 [1.0000, 1.0000]  iota trace 1.2348 target -  inside 401/401  lost after -
+free boundary: A bad approximation caused failure to predict improvement.  nit 29  4.1 min  cost 1.431e-05
+free-bdry physics A 8.177  R0 1.0025  a 0.1226  iota [1.2380, 1.2493]  QS(Boozer, |B_nonsym|/<B>) rho 0.25 9.73e-04  rho 0.5 1.32e-03  rho 0.75 2.34e-03  rho 1 6.16e-03
+boundary offset free-bdry vs target: mean 2.03 mm, max 6.98 mm (= 0.017 a, 0.057 a); <|B|> 1.0539 vs 1.0539
+done

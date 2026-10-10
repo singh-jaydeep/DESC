@@ -1,0 +1,31 @@
+E1009 18:34:38.640472 3137079 cuda_executor.cc:1743] Could not get kernel mode driver version: ( INVALID_ARGUMENT: Version does not match the format X.Y.Z )
+E1009 18:34:38.653934 3136930 cuda_executor.cc:1743] Could not get kernel mode driver version: ( INVALID_ARGUMENT: Version does not match the format X.Y.Z )
+DESC /home/singh/Documents/DESC2/desc
+DEVICE requested=gpu obtained=gpu (1x NVIDIA GeForce RTX 5070 Laptop GPU)
+/home/singh/Documents/DESC2/coil_sandbox/sandbox/boot.py:43: UserWarning: `desc` was imported (from /home/singh/Documents/DESC2/desc/__init__.py) before boot.setup(); the chosen DESC and the device choice may not take effect.
+  warnings.warn(f"`desc` was imported (from {getattr(sys.modules['desc'], '__file__', '?')}) before "
+DESC /home/singh/Documents/DESC2/desc
+DEVICE requested=gpu obtained=gpu (1x NVIDIA GeForce RTX 5070 Laptop GPU)
+=== level: traced rho0 0.95 for 400 field periods x 48 planes in 0.7 min; lost: 0 points
+mapped 9580/9601 punctures into target coordinates; their rho in [0.9153, 0.9860]
+  fit pass 0: 9580 points, residual median 0.081 mm, max 304.996 mm
+  fit pass 1: 9089 points, residual median 0.015 mm, max 0.144 mm
+  fit pass 2: 9576 points, residual median 0.015 mm, max 0.150 mm
+  kept 9576/9580 punctures
+surface fit M=N=10: point-to-fit residual mean 0.024 mm, max 0.150 mm (max 0.0012 a)
+boundary change target(rho=1) -> traced: max |dR_mn| 6.55 mm, max |dZ_mn| 6.22 mm
+traced-surface equilibrium: relative force error 1.56e-03, sqrt(g) > 0 everywhere: True
+traced-surface equilibrium solved (L=M=N=10) in 8.0 min
+target at rho x 0.95 A 8.073  R0 0.9940  a 0.1231  iota [1.2075, 1.2223]  QS(Boozer, |B_nonsym|/<B>) rho 0.2375 5.11e-04  rho 0.475 6.88e-04  rho 0.7125 9.04e-04  rho 0.95 2.36e-03
+coil field (trc) A 8.512  R0 0.9944  a 0.1168  iota [1.2040, 1.2293]  QS(Boozer, |B_nonsym|/<B>) rho 0.25 1.72e-03  rho 0.5 2.06e-03  rho 0.75 2.73e-03  rho 1 6.85e-03
+ rho0 | rho spread: target  traced-eq | iota: trace   target   traced-eq
+ 0.10 |  0.0159  0.0025@0.114 | 1.2236  1.2222  1.2290
+ 0.20 |  0.0155  0.0035@0.219 | 1.2232  1.2217  1.2284
+ 0.30 |  0.0148  0.0055@0.325 | 1.2225  1.2210  1.2272
+ 0.40 |  0.0136  0.0086@0.430 | 1.2216  1.2199  1.2256
+ 0.50 |  0.0131  0.0112@0.535 | 1.2203  1.2185  1.2235
+ 0.60 |  0.0136  0.0129@0.639 | 1.2187  1.2168  1.2208
+ 0.70 |  0.0146  0.0127@0.743 | 1.2164  1.2149  1.2175
+ 0.80 |  0.0201  0.0100@0.846 | 1.2132  1.2126  1.2134
+ 0.90 |  0.0278  0.0041@0.949 | 1.2099  1.2102  1.2078
+done
