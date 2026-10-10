@@ -1,0 +1,183 @@
+{
+ "settings": {
+  "eq": "work/ss_qh/matrix/ss/xyz_k4b/eq_k4.h5",
+  "start": "work/ss_qh/nc5xyz/starts/circ4_r2.6.h5",
+  "bounds": "bounds/precise_qh_gil.json",
+  "out": "work/ss_qh/nc5xyz/xyz4_cold",
+  "vacuum": true,
+  "a": null,
+  "maxiter": 800,
+  "gtol": 1e-06,
+  "ctol": 1e-06,
+  "field_n": 50,
+  "curv_n": 300,
+  "row_n": 256,
+  "cc_k": 30000,
+  "cc_gap": "bounds",
+  "options": "{}",
+  "link_mu": 100000000.0,
+  "fix_hinge_z": null,
+  "obj_weight": 1.0,
+  "horizontal_hinges": false,
+  "device": null
+ },
+ "bounds": {
+  "L": 2.9255111576633253,
+  "Ltot": null,
+  "kappa": 13.672824284132604,
+  "kms": 18.694612390476625,
+  "dcc": 0.05851022315326651,
+  "dpc": 0.1097066684123747,
+  "convex": null,
+  "planar": null,
+  "f": 0.0723161377547638,
+  "a": 0.12293743418309845,
+  "scale": "absolute"
+ },
+ "info": {
+  "kind": "FourierXYZCoil",
+  "gauge": "phase pinned (['Z_n', 'Z_n', 'Y_n', 'Y_n']), relative speed within +-0.5",
+  "field_grid": "uniform N=50 (101 nodes)",
+  "n_nodes": 513,
+  "speed_ratio": 1.5,
+  "cc_gap_mode": "bounds",
+  "cc_gap": 0.001313133406666363,
+  "pc_node_margin": 0.0003126508111110389
+ },
+ "solver": {
+  "message": "`gtol` condition satisfied.",
+  "nit": 153,
+  "n_outer": 10,
+  "optimality": 6.474017066952522e-07,
+  "constr_violation": 9.33556767362953e-07,
+  "wall_s": 327.4183883666992
+ },
+ "start": {
+  "per_coil": [
+   {
+    "L": 2.0083405684201643,
+    "kappa": 3.1285457287368543,
+    "kms": 9.78779837679679,
+    "corner": 0.0,
+    "convex": NaN,
+    "kappa_s_min": NaN,
+    "planar": 0.0
+   },
+   {
+    "L": 2.0083405684201643,
+    "kappa": 3.128545728736833,
+    "kms": 9.78779837679679,
+    "corner": 0.0,
+    "convex": NaN,
+    "kappa_s_min": NaN,
+    "planar": 0.0
+   },
+   {
+    "L": 2.0083405684201643,
+    "kappa": 3.1285457287368086,
+    "kms": 9.78779837679679,
+    "corner": 0.0,
+    "convex": NaN,
+    "kappa_s_min": NaN,
+    "planar": 0.0
+   },
+   {
+    "L": 2.0083405684201643,
+    "kappa": 3.1285457287368157,
+    "kms": 9.78779837679679,
+    "corner": 0.0,
+    "convex": NaN,
+    "kappa_s_min": NaN,
+    "planar": 0.0
+   }
+  ],
+  "L": 2.0083405684201643,
+  "L_total": 8.033362273680657,
+  "kappa": 3.1285457287368543,
+  "kms": 9.78779837679679,
+  "corner": 0.0,
+  "convex": NaN,
+  "planar": 0.0,
+  "d_cc": 0.03627105024890541,
+  "d_pc": 0.10528993664771559,
+  "linked": 0,
+  "linked_pairs": [],
+  "bn": 0.12069233327814163,
+  "bn_max": 0.27933991549060094,
+  "bn_local": 0.12095316497890743,
+  "bn_max_T": 0.301931150853769,
+  "vacuum": true,
+  "n_coils": 32
+ },
+ "result": {
+  "per_coil": [
+   {
+    "L": 2.9255111642292606,
+    "kappa": 11.649486436161167,
+    "kms": 11.604427562723451,
+    "corner": 0.0,
+    "convex": NaN,
+    "kappa_s_min": NaN,
+    "planar": 0.0
+   },
+   {
+    "L": 2.925511155295355,
+    "kappa": 13.682970629428295,
+    "kms": 14.349902533332624,
+    "corner": 0.0,
+    "convex": NaN,
+    "kappa_s_min": NaN,
+    "planar": 0.0
+   },
+   {
+    "L": 2.9255111573446624,
+    "kappa": 13.676045010521838,
+    "kms": 18.6946123177259,
+    "corner": 0.0,
+    "convex": NaN,
+    "kappa_s_min": NaN,
+    "planar": 0.0
+   },
+   {
+    "L": 2.925511156395486,
+    "kappa": 13.678506562118056,
+    "kms": 18.69461238825011,
+    "corner": 0.0,
+    "convex": NaN,
+    "kappa_s_min": NaN,
+    "planar": 0.0
+   }
+  ],
+  "L": 2.9255111642292606,
+  "L_total": 11.702044633264764,
+  "kappa": 13.682970629428295,
+  "kms": 18.69461238825011,
+  "corner": 0.0,
+  "convex": NaN,
+  "planar": 0.0,
+  "d_cc": 0.05982091769192157,
+  "d_pc": 0.13860234917351041,
+  "linked": 0,
+  "linked_pairs": [],
+  "bn": 0.0006379696269601658,
+  "bn_max": 0.0029111076407988667,
+  "bn_local": 0.0006445266669030112,
+  "bn_max_T": 0.0030551599535948715,
+  "vacuum": true,
+  "n_coils": 32
+ },
+ "margins": {
+  "L": 1.000000002244372,
+  "kappa": 1.0007420811593013,
+  "kMS": 0.9999999998809007,
+  "d_cc": 1.0224011201465035,
+  "d_pc": 1.2633903770782664
+ },
+ "active": [
+  "L",
+  "kappa",
+  "kMS"
+ ],
+ "joint_start": {},
+ "joint_result": {}
+}

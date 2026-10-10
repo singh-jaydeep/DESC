@@ -1,0 +1,106 @@
+{
+ "eq": "work/ss_qh/matrix/ss/xyz_k4b/eq_k4.h5",
+ "eq_kind": "h5",
+ "vacuum": true,
+ "nc": 5,
+ "r_over_a": 2.2,
+ "rep": "xyz",
+ "N": 6,
+ "B": 5,
+ "M": 3,
+ "knots": 32,
+ "method": "cubic2",
+ "from_coils": null,
+ "phase": "0",
+ "hinges": "phase",
+ "chord_angle": null,
+ "cut_angle": null,
+ "fit_deviation": null,
+ "bounds": {
+  "L": 2.9255111576633253,
+  "Ltot": null,
+  "kappa": 13.672824284132604,
+  "kms": 18.694612390476625,
+  "dcc": 0.05851022315326651,
+  "dpc": 0.1097066684123747,
+  "convex": null,
+  "planar": null,
+  "f": 0.07231613775476381,
+  "a": 0.12293743418309848,
+  "scale": "absolute"
+ },
+ "metrics": {
+  "per_coil": [
+   {
+    "L": 1.6993650963555238,
+    "kappa": 3.6973722248708936,
+    "kms": 13.670561369245098,
+    "corner": 0.0,
+    "convex": NaN,
+    "kappa_s_min": NaN,
+    "planar": 0.0
+   },
+   {
+    "L": 1.6993650963555234,
+    "kappa": 3.6973722248708514,
+    "kms": 13.670561369245103,
+    "corner": 0.0,
+    "convex": NaN,
+    "kappa_s_min": NaN,
+    "planar": 0.0
+   },
+   {
+    "L": 1.6993650963555234,
+    "kappa": 3.697372224870836,
+    "kms": 13.670561369245103,
+    "corner": 0.0,
+    "convex": NaN,
+    "kappa_s_min": NaN,
+    "planar": 0.0
+   },
+   {
+    "L": 1.6993650963555238,
+    "kappa": 3.697372224870826,
+    "kms": 13.670561369245098,
+    "corner": 0.0,
+    "convex": NaN,
+    "kappa_s_min": NaN,
+    "planar": 0.0
+   },
+   {
+    "L": 1.6993650963555238,
+    "kappa": 3.697372224870808,
+    "kms": 13.670561369245098,
+    "corner": 0.0,
+    "convex": NaN,
+    "kappa_s_min": NaN,
+    "planar": 0.0
+   }
+  ],
+  "L": 1.6993650963555238,
+  "L_total": 8.496825481777618,
+  "kappa": 3.6973722248708936,
+  "kms": 13.670561369245103,
+  "corner": 0.0,
+  "convex": NaN,
+  "planar": 0.0,
+  "d_cc": 0.05910683216993745,
+  "d_pc": 0.0560444766308525,
+  "linked": 0,
+  "linked_pairs": [],
+  "bn": 0.11528619940737983,
+  "bn_max": 0.2954332641926015,
+  "bn_local": 0.11524885254540071,
+  "bn_max_T": 0.31906968093217347,
+  "vacuum": true,
+  "n_coils": 40
+ },
+ "margins": {
+  "L": 0.5808780089264287,
+  "kappa": 0.2704175924473568,
+  "kMS": 0.7312567430501601,
+  "d_cc": 1.0101966628140886,
+  "d_pc": 0.5108575207132149
+ },
+ "verdict": "FAILS d_pc"
+}

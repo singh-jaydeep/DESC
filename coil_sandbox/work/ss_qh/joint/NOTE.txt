@@ -140,3 +140,34 @@ QS rho .5 5.76e-4 vs 7.02e-4, iota min 1.2132 vs 1.2075; coils/removability unch
 Free-boundary solves dropped (residual floor, worse than target coords). Traced-surface eq (rho0 .95 fit, res 12; control within
 1-4%, direct Biot-Savart Boozer fit within 2-6%): QS rho .5 level 1.95e-3 (2.8x target), free 1.73e-3 (2.5x). Level excess ~70%
 32-coil (0,8) ripple, persists to axis; eps_eff < 0.35% everywhere, core 4x target (level). Next: coil-|B| ripple term, nc5, d_pc floor.
+
+2026-10-09 23:3x overnight (user: "you have the box overnight ... look at different approaches to identifying the best QS coilset").
+spectrum.py: B.n residual is ~86% (level) / ~65% (free) ripple band |n| 6-9, transfer to |B| breaking ~1.1 there vs 0.2-0.5 low order
+-> a ripple term would mostly duplicate B.n. Proxy QS (coil |B| on target surfaces) within -25..+1% of traced-surface. Launching
+fieldcheck/screen.sh: proxy over ~30 QH coilsets (matrix, fixed_ss_eq, joint, devices), sequential, 12G cap. No optimization.
+2026-10-09 23:55 screen done (fieldcheck/spectrum/screen_table.md). Proxy QS rho .5: best m_onX_xyz 3.8e-4, m_base_xyz 5.9e-4,
+f_xyz/m_onA_xyz ~7.5e-4, best arcB2 f_arcB2 1.15e-3, best level j_hires 1.71e-3. QUASR q1632037/q1632468/q1775228 targets are
+unsolved (target QS ~0.1): ignore. Launching fieldcheck/chain_xyz.sh: full pipeline + direct + eps_eff + figures on xyzX, xyzB.
+2026-10-10 00:1x queued work/ss_qh/nc5xyz/run.sh (after chain_xyz): XYZ N6 nc5 (40 coils) on B_xyz, precise_QH bounds as-is (per-coil L
+unchanged = +25% conductor), cold circles r/a 2.6, run_al maxiter 800 --cc-k 30000 --link-mu 1e8; then spectrum proxy. Question:
+does the ripple floor (87% of xyzX's excess QS) fall with coil count?
+2026-10-10 01:15 nc5xyz/xyz5 (XYZ N6, 40 coils, B_xyz, cold circles): gtol in 75 inner its / 9 min. B.n 1.909e-4 (nc4 xyzX 6.26e-4),
+kappa 1.0006 (+0.06%), L/kMS at bound, d_cc 1.02, d_pc 1.19; conductor +25%. Proxy QS rho .5 1.68e-4 (target 1.37e-4; nc4 3.8e-4),
+ripple band 5e-5 (nc4 3.6e-4). Traced xyzX: QS rho .5 4.0e-4, eps_eff <=1.8e-4; xyzB 6.8e-4.
+Queue2 (nc5xyz/queue2.sh): xyz5_Lfix (per-coil L x0.8, bounds/precise_qh_gil_nc5_Lfix.json) -> full pipeline on xyz5 -> arc5
+(arcB2 M5 nc5 free on B_arcB2, cold arcs r/a 2.6, --cc-gap coils --cc-k 80000 --link-mu 1e8) -> proxies.
+2026-10-10 01:35 xyz5_Lfix (nc5, per-coil L x0.8 = nc4 total length): B.n 8.78e-4, proxy QS rho .5 3.71e-4 = nc4's 3.8e-4. Count alone
+gives nothing at fixed conductor. (spectrum.py "ripple 6-9" column is the nc4 band; for nc5 the ripple is |n|=10: compare totals.)
+Queued queue3.sh after queue2: xyz4_L125 (nc4, L x1.25 = xyz5 total length) and xyz4_cold (nc4 stated L), both cold circles r/a 2.6.
+2026-10-10 02:10 arc5 crashed at build (make_start arcs = MixedCoilSet); repacked (repack_arcs.py, exact) and re-queued as queue4.sh after queue3. xyz5 traced QS rho .25/.5/.75/1 1.65e-4/2.79e-4/3.98e-4/1.30e-3 (xyzX 2.76/4.04/6.10/15.6e-4), eps_eff ~ xyzX.
+2026-10-10 02:25 controls: xyz4_cold (nc4 stated L, cold) B.n 6.38e-4 proxy 3.95e-4 = warm xyzX (start not a factor). xyz4_L125 (nc4, L x1.25)
+B.n 2.98e-4 proxy 2.03e-4. -> conductor length is the main lever; nc5 helps modestly only with the length (xyz5 1.91e-4 / 1.68e-4).
+queue5.sh (after arc5): arcB2 at L x1.25 warm from on_arcB2 (free) and from cont/refine (level, same refine flags); full pipeline on xyz4_L125.
+2026-10-10 02:40 arc5 (arcB2 M5 nc5 free, B_arcB2, cold, stated L = +25% total): B.n 6.60e-4 (nc4 1.484e-3), kappa 1.001, kMS 0.90, d_cc 1.02,
+d_pc 1.20; proxy QS rho .5 7.72e-4 = target 7.11e-4 (target-limited). Queued queue6.sh: arc5_level = level hinges nc5 on cont/k4b, warm
+from arc5, cont/refine flags.
+2026-10-10 02:55 arcL125_free (nc4, L x1.25, warm from on_arcB2): B.n 6.12e-4 (1.484e-3), proxy 7.61e-4 = target 7.11e-4; = arc5 -> for arcB2
+length is the whole effect. arcL125_level (warm from cont/refine, same flags): B.n 1.285e-3 (2.266e-3, -43%), proxy 1.08e-3 (1.77e-3),
+REMOVABLE, clearance +0.041 m (0.074); kappa 1.001, kMS 0.94. Level/free at L x1.25 = 2.1x (1.53x at nominal).
+2026-10-10 03:35 arc5_level OOM at build (GPU 2.1 GB in active_row_count, cc-k 80000; nc4 level needed ~50k active rows so cc-k kept). Retry queue6b.sh with XLA_PYTHON_CLIENT_MEM_FRACTION=0.92.
+2026-10-10 03:45 arc5_level OOM again at MEM_FRACTION 0.92 (cc-gap coils picks more nodes for the arc5 coils; d0 = pairs x N^2 f64). Not editing DESC unattended; rerun on CPU (queue6c.sh).

@@ -1,0 +1,21 @@
+=== xyz5: traced rho0 0.95 for 400 field periods x 48 planes in 0.6 min; lost: 0 points
+mapped 9598/9601 punctures into target coordinates; their rho in [0.9495, 0.9508]
+  fit pass 0: 9598 points, residual median 0.008 mm, max 0.028 mm
+  kept 9598/9598 punctures
+surface fit M=N=10: point-to-fit residual mean 0.008 mm, max 0.028 mm (max 0.0002 a)
+boundary change target(rho=1) -> traced: max |dR_mn| 6.70 mm, max |dZ_mn| 6.33 mm
+traced-surface equilibrium: relative force error 7.66e-04, sqrt(g) > 0 everywhere: True
+traced-surface equilibrium solved (L=M=N=10) in 10.6 min
+target at rho x 0.95 A 8.110  R0 0.9970  a 0.1229  iota [1.2503, 1.2551]  QS(Boozer, |B_nonsym|/<B>) rho 0.2375 1.35e-04  rho 0.475 1.39e-04  rho 0.7125 3.12e-04  rho 0.95 1.16e-03
+coil field (trc) A 8.552  R0 0.9982  a 0.1167  iota [1.2489, 1.2527]  QS(Boozer, |B_nonsym|/<B>) rho 0.25 2.34e-04  rho 0.5 3.75e-04  rho 0.75 4.35e-04  rho 1 1.20e-03
+ rho0 | rho spread: target  traced-eq | iota: trace   target   traced-eq
+ 0.10 |  0.0003  0.0009@0.105 | 1.2540  1.2550  1.2502
+ 0.20 |  0.0009  0.0020@0.211 | 1.2538  1.2547  1.2508
+ 0.30 |  0.0016  0.0031@0.316 | 1.2535  1.2542  1.2515
+ 0.40 |  0.0023  0.0039@0.422 | 1.2530  1.2535  1.2522
+ 0.50 |  0.0026  0.0045@0.527 | 1.2524  1.2527  1.2526
+ 0.60 |  0.0026  0.0046@0.633 | 1.2518  1.2518  1.2526
+ 0.70 |  0.0021  0.0041@0.738 | 1.2511  1.2510  1.2521
+ 0.80 |  0.0014  0.0030@0.843 | 1.2506  1.2505  1.2511
+ 0.90 |  0.0007  0.0012@0.948 | 1.2503  1.2503  1.2497
+done

@@ -1,0 +1,14 @@
+=== xyz4L: polish work/ss_qh/joint/fieldcheck/xyz4L/eq_traced.h5 -> work/ss_qh/joint/fieldcheck/xyz4L/eq_traced_L12.h5  RES 12  maxiter 500
+start: L,M,N 10,10,10  force 9.34e-04  sqrt(g)>0 True
+after solve (14.6 min): L,M,N 12,12,12  force 9.76e-05  sqrt(g)>0 True
+coil field (trc) A 8.552  R0 0.9982  a 0.1167  iota [1.2503, 1.2539]  QS(Boozer, |B_nonsym|/<B>) rho 0.25 2.45e-04  rho 0.5 5.00e-04  rho 0.75 5.69e-04  rho 1 1.52e-03
+ rho0 | spread @rho | iota trace  this-eq
+ 0.10 | 0.0010 @0.105 | 1.2540  1.2539
+ 0.20 | 0.0018 @0.211 | 1.2538  1.2538
+ 0.30 | 0.0031 @0.316 | 1.2534  1.2536
+ 0.40 | 0.0045 @0.421 | 1.2529  1.2531
+ 0.50 | 0.0058 @0.527 | 1.2523  1.2526
+ 0.60 | 0.0066 @0.632 | 1.2517  1.2519
+ 0.70 | 0.0067 @0.738 | 1.2511  1.2512
+ 0.80 | 0.0054 @0.843 | 1.2506  1.2506
+ 0.90 | 0.0025 @0.948 | 1.2503  1.2503

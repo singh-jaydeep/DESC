@@ -1,0 +1,14 @@
+=== j_base_free_link  coils work/ss_qh/joint/base_free_link/result.h5  target precise_QH  current scale 0.99990
+boundary: rms B.n/B0 8.763e-03  (<|B.n|>/B0 6.421e-03)
+  band |n|      B.n L2     d|B| breaking L2   ratio
+     0-2   5.031e-03   1.831e-03        0.36
+     3-5   1.002e-02   5.225e-03        0.52
+     6-9   5.874e-03   7.586e-03        1.29
+     10+   7.980e-04   9.810e-04        1.23
+  d|B| along the symmetric modes (harmless for QS): 1.269e-03
+proxy QS (coil |B| on target surfaces, target Boozer angles): rho | breaking L2 coil  (target eq) | ripple 6-9 coil
+  0.25 | 3.522e-03  (4.783e-04) | 1.960e-03
+  0.50 | 3.664e-03  (2.234e-04) | 2.470e-03
+  0.75 | 5.069e-03  (3.807e-04) | 3.863e-03
+  0.95 | 8.095e-03  (1.138e-03) | 6.518e-03
+  1.00 | 9.328e-03  (1.408e-03) | 7.562e-03

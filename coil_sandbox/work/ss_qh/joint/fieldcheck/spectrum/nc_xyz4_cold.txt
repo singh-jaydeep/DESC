@@ -1,0 +1,14 @@
+=== nc_xyz4_cold  coils work/ss_qh/nc5xyz/xyz4_cold/result.h5  target work/ss_qh/matrix/ss/xyz_k4b/eq_k4.h5  current scale 1.00000
+boundary: rms B.n/B0 7.736e-04  (<|B.n|>/B0 6.379e-04)
+  band |n|      B.n L2     d|B| breaking L2   ratio
+     0-2   9.589e-05   2.458e-05        0.26
+     3-5   3.594e-04   1.168e-04        0.33
+     6-9   1.013e-03   1.185e-03        1.17
+     10+   1.937e-04   1.731e-04        0.89
+  d|B| along the symmetric modes (harmless for QS): 3.639e-05
+proxy QS (coil |B| on target surfaces, target Boozer angles): rho | breaking L2 coil  (target eq) | ripple 6-9 coil
+  0.25 | 3.391e-04  (1.372e-04) | 3.130e-04
+  0.50 | 3.946e-04  (1.367e-04) | 3.711e-04
+  0.75 | 6.917e-04  (3.854e-04) | 5.665e-04
+  0.95 | 1.526e-03  (1.140e-03) | 1.004e-03
+  1.00 | 1.897e-03  (1.476e-03) | 1.185e-03

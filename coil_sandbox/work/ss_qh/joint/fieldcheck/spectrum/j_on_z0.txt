@@ -1,0 +1,14 @@
+=== j_on_z0  coils work/ss_qh/joint/on_z0/arcB2_z0/result.h5  target work/ss_qh/joint/ss_z0_k4b/eq_k4.h5  current scale 1.06374
+boundary: rms B.n/B0 7.847e-03  (<|B.n|>/B0 6.375e-03)
+  band |n|      B.n L2     d|B| breaking L2   ratio
+     0-2   5.242e-03   5.177e-03        0.99
+     3-5   4.628e-03   4.199e-03        0.91
+     6-9   8.380e-03   9.605e-03        1.15
+     10+   1.346e-03   1.660e-03        1.23
+  d|B| along the symmetric modes (harmless for QS): 5.298e-04
+proxy QS (coil |B| on target surfaces, target Boozer angles): rho | breaking L2 coil  (target eq) | ripple 6-9 coil
+  0.25 | 4.871e-03  (2.089e-03) | 2.450e-03
+  0.50 | 6.842e-03  (3.656e-03) | 3.461e-03
+  0.75 | 9.745e-03  (4.742e-03) | 5.499e-03
+  0.95 | 1.403e-02  (6.790e-03) | 8.514e-03
+  1.00 | 1.562e-02  (7.817e-03) | 9.583e-03

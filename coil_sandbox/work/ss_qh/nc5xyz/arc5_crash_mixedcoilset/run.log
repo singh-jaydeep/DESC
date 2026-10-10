@@ -1,0 +1,21 @@
+Running as unit: run-p3399188-i3403513.scope; invocation ID: ff3ad7a461fb42b38c78148d013f6f0e
+E1010 02:03:58.201992 3399319 cuda_executor.cc:1743] Could not get kernel mode driver version: ( INVALID_ARGUMENT: Version does not match the format X.Y.Z )
+E1010 02:03:58.217165 3399188 cuda_executor.cc:1743] Could not get kernel mode driver version: ( INVALID_ARGUMENT: Version does not match the format X.Y.Z )
+DESC /home/singh/Documents/DESC2/desc
+DEVICE requested=gpu obtained=gpu (1x NVIDIA GeForce RTX 5070 Laptop GPU)
+  [mem] RSS 0.83 GB  peak 0.83 GB
+eq work/ss_qh/matrix/ss/arcB2_k4b/eq_k4.h5 NFP 4 sym True; start work/ss_qh/nc5xyz/starts/arcB2_r2.6.h5: 5 unique coils (PiecewisePlanarArcCoil), 5 top-level; VACUUM
+BOUNDS L 2.926  Ltot -  kappa 13.67  kms 18.69  convex -  planar -  dcc 0.05851  dpc 0.1097
+  built coil length in 2.3 s
+  built coil curvature in 0.1 s
+  built coil mean squared curvature in 0.1 s
+Traceback (most recent call last):
+  File "/home/singh/Documents/DESC2/coil_sandbox/run_al.py", line 155, in <module>
+    c.build(verbose=0)
+  File "/home/singh/Documents/DESC2/desc/objectives/_coils.py", line 3255, in build
+    a, b = (U[np.array(v)] for v in zip(*self._pairs))  # independent coils
+    ^^^^
+  File "/home/singh/Documents/DESC2/desc/objectives/_coils.py", line 3255, in <genexpr>
+    a, b = (U[np.array(v)] for v in zip(*self._pairs))  # independent coils
+            ~^^^^^^^^^^^^^
+IndexError: index 5 is out of bounds for axis 0 with size 5

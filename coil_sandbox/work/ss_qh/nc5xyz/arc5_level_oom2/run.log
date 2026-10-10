@@ -1,0 +1,115 @@
+Running as unit: run-p3475288-i3479647.scope; invocation ID: 6a6a0b42f4e34587a9e02be4b2396b40
+E1010 03:29:11.384826 3475446 cuda_executor.cc:1743] Could not get kernel mode driver version: ( INVALID_ARGUMENT: Version does not match the format X.Y.Z )
+E1010 03:29:11.397692 3475288 cuda_executor.cc:1743] Could not get kernel mode driver version: ( INVALID_ARGUMENT: Version does not match the format X.Y.Z )
+DESC /home/singh/Documents/DESC2/desc
+DEVICE requested=gpu obtained=gpu (1x NVIDIA GeForce RTX 5070 Laptop GPU)
+  [mem] RSS 0.83 GB  peak 0.83 GB
+JOINT PLANE: each coil's hinges snapped to their mean height and held level (heights free) (largest move 4.89e-01 m; the START line is after the snap)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 4.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 4.
+  warnings.warn(msg, err)
+eq work/ss_qh/joint/cont/k4b/eq_k4.h5 NFP 4 sym True; start work/ss_qh/nc5xyz/arc5/result.h5: 5 unique coils (PiecewisePlanarArcCoil), 5 top-level; VACUUM
+BOUNDS L 2.926  Ltot -  kappa 13.67  kms 18.69  convex -  planar -  dcc 0.05851  dpc 0.1097
+  built coil length in 2.2 s
+  built coil curvature in 0.2 s
+  built coil mean squared curvature in 0.2 s
+  built coil-coil distance rows in 9.5 s
+E1010 03:29:35.953750 3475464 xtile_compiler.cc:399] Fusion: input_reduce_fusion = f64[66177]{0} fusion(a.1, b.1), kind=kCustom, calls=fused_reduce.clone, backend_config={"operation_queue_id":"0","wait_on_operation_queues":[],"fusion_backend_config":{"kind":"__triton","block_level_fusion_config":{"num_warps":"8","output_tiles":[{"sizes":["64"]}],"num_ctas":1,"num_stages":1,"is_tma_allowed":true,"is_warp_specialization_allowed":false}},"force_earliest_schedule":false,"reification_cost":[],"device_type":"DEVICE_TYPE_INVALID"}
+E1010 03:29:35.953800 3475464 xtile_compiler.cc:401] Computation: fused_reduce.clone {
+  param_0.2 = f64[66177,144]{1,0} parameter(0)
+  param_1.2 = f64[144]{0} parameter(1)
+  broadcast.2 = f64[66177,144]{1,0} broadcast(param_1.2), dimensions={1}
+  multiply.2 = f64[66177,144]{1,0} multiply(param_0.2, broadcast.2)
+  constant_2 = f64[] constant(0)
+  ROOT reduce.2 = f64[66177]{0} reduce(multiply.2, constant_2), dimensions={1}, to_apply=scalar_add_computation
+}
+E1010 03:29:40.515067 3475464 xtile_compiler.cc:399] Fusion: input_reduce_fusion = f64[67584]{0} fusion(a.1, b.1), kind=kCustom, calls=fused_reduce.clone, backend_config={"operation_queue_id":"0","wait_on_operation_queues":[],"fusion_backend_config":{"kind":"__triton","block_level_fusion_config":{"num_warps":"8","output_tiles":[{"sizes":["64"]}],"num_ctas":1,"num_stages":1,"is_tma_allowed":true,"is_warp_specialization_allowed":false}},"force_earliest_schedule":false,"reification_cost":[],"device_type":"DEVICE_TYPE_INVALID"}
+E1010 03:29:40.515120 3475464 xtile_compiler.cc:401] Computation: fused_reduce.clone {
+  param_0.4 = f64[67584,144]{1,0} parameter(0)
+  param_1.5 = f64[144]{0} parameter(1)
+  broadcast.4 = f64[67584,144]{1,0} broadcast(param_1.5), dimensions={1}
+  multiply.4 = f64[67584,144]{1,0} multiply(param_0.4, broadcast.4)
+  constant_3 = f64[] constant(0)
+  ROOT reduce.2 = f64[67584]{0} reduce(multiply.4, constant_3), dimensions={1}, to_apply=scalar_add_computation
+}
+  [mem] RSS 2.86 GB  peak 3.69 GB
+  [mem] RSS 2.86 GB  peak 3.69 GB
+E1010 03:30:16.272843 3475460 xtile_compiler.cc:399] Fusion: input_reduce_fusion = f64[50000]{0} fusion(a.1, b.1), kind=kCustom, calls=fused_reduce.clone, backend_config={"operation_queue_id":"0","wait_on_operation_queues":[],"fusion_backend_config":{"kind":"__triton","block_level_fusion_config":{"num_warps":"8","output_tiles":[{"sizes":["64"]}],"num_ctas":1,"num_stages":1,"is_tma_allowed":true,"is_warp_specialization_allowed":false}},"force_earliest_schedule":false,"reification_cost":[],"device_type":"DEVICE_TYPE_INVALID"}
+E1010 03:30:16.272892 3475460 xtile_compiler.cc:401] Computation: fused_reduce.clone {
+  param_0.2 = f64[50000,144]{1,0} parameter(0)
+  param_1.2 = f64[144]{0} parameter(1)
+  broadcast.2 = f64[50000,144]{1,0} broadcast(param_1.2), dimensions={1}
+  multiply.2 = f64[50000,144]{1,0} multiply(param_0.2, broadcast.2)
+  constant_2 = f64[] constant(0)
+  ROOT reduce.2 = f64[50000]{0} reduce(multiply.2, constant_2), dimensions={1}, to_apply=scalar_add_computation
+}
+  [mem] RSS 4.07 GB  peak 4.20 GB
+  [mem] RSS 4.17 GB  peak 4.35 GB
+  [mem] RSS 4.34 GB  peak 4.45 GB
+  [mem] RSS 3.95 GB  peak 4.51 GB
+E1010 03:32:20.777700 3475457 xtile_compiler.cc:399] Fusion: input_reduce_fusion = f64[20329]{0} fusion(a.1, b.1), kind=kCustom, calls=fused_reduce.clone, backend_config={"operation_queue_id":"0","wait_on_operation_queues":[],"fusion_backend_config":{"kind":"__triton","block_level_fusion_config":{"num_warps":"8","output_tiles":[{"sizes":["64"]}],"num_ctas":1,"num_stages":1,"is_tma_allowed":true,"is_warp_specialization_allowed":false}},"force_earliest_schedule":false,"reification_cost":[],"device_type":"DEVICE_TYPE_INVALID"}
+E1010 03:32:20.777754 3475457 xtile_compiler.cc:401] Computation: fused_reduce.clone {
+  param_0.2 = f64[20329,144]{1,0} parameter(0)
+  param_1.2 = f64[144]{0} parameter(1)
+  broadcast.2 = f64[20329,144]{1,0} broadcast(param_1.2), dimensions={1}
+  multiply.2 = f64[20329,144]{1,0} multiply(param_0.2, broadcast.2)
+  constant_2 = f64[] constant(0)
+  ROOT reduce.2 = f64[20329]{0} reduce(multiply.2, constant_2), dimensions={1}, to_apply=scalar_add_computation
+}
+  built plasma-coil distance field in 180.5 s
+W1010 03:32:36.993616 3475457 hlo_rematerialization.cc:3233] Can't reduce memory use below 4.16GiB (4462662983 bytes) by rematerialization; only reduced to 4.21GiB (4516871040 bytes), down from 4.21GiB (4516871040 bytes) originally
+  [mem] RSS 4.56 GB  peak 4.67 GB
+W1010 03:32:47.236015 3475288 bfc_allocator.cc:502] Allocator (GPU_0_bfc) ran out of memory trying to allocate 2.10GiB (rounded to 2258435584)requested by op 
+If the cause is memory fragmentation maybe the environment variable 'TF_GPU_ALLOCATOR=cuda_malloc_async' will improve the situation. 
+Current allocation summary follows.
+Current allocation summary follows.
+W1010 03:32:47.236128 3475288 bfc_allocator.cc:513] **x______________________________************************************_______________________________
+Traceback (most recent call last):
+  File "/home/singh/Documents/DESC2/coil_sandbox/run_al.py", line 163, in <module>
+    f"{int(cc.active_row_count(params0))} of {a.cc_k}; field {getattr(pc, 'field_info', {})}", flush=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/singh/Documents/DESC2/desc/objectives/_coils.py", line 3431, in active_row_count
+    return int(self._rows(params, self._constants)[2])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/singh/Documents/DESC2/desc/objectives/_coils.py", line 3326, in _rows
+    return self._node_rows(params, constants)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/singh/Documents/DESC2/desc/objectives/_coils.py", line 3344, in _node_rows
+    jax.debug.callback(lambda n: _warn_rows_overflow(self.name, n, K), count)
+  File "/home/singh/miniforge3/envs/desc-env2/lib/python3.12/site-packages/jax/_src/debugging.py", line 471, in debug_callback
+    debug_callback_p.bind(
+  File "/home/singh/miniforge3/envs/desc-env2/lib/python3.12/site-packages/jax/_src/core.py", line 648, in bind
+    return self.bind_with_trace(prev_trace, args, avals, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/singh/miniforge3/envs/desc-env2/lib/python3.12/site-packages/jax/_src/core.py", line 656, in bind_with_trace
+    return trace.process_primitive(self, args, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/singh/miniforge3/envs/desc-env2/lib/python3.12/site-packages/jax/_src/core.py", line 1217, in process_primitive
+    return primitive.impl(*args, **params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/singh/miniforge3/envs/desc-env2/lib/python3.12/site-packages/jax/_src/debugging.py", line 97, in debug_callback_impl
+    args = api.device_put(args, cpu_device)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/singh/miniforge3/envs/desc-env2/lib/python3.12/site-packages/jax/_src/api.py", line 2732, in device_put
+    out_flat = dispatch._batched_device_put_impl(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/singh/miniforge3/envs/desc-env2/lib/python3.12/site-packages/jax/_src/dispatch.py", line 602, in _batched_device_put_impl
+    y = _device_put_impl(x, device=device, src=src, copy=cp, aval=aval)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/singh/miniforge3/envs/desc-env2/lib/python3.12/site-packages/jax/_src/dispatch.py", line 582, in _device_put_impl
+    return _device_put_sharding_impl(x, aval, device, copy)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/singh/miniforge3/envs/desc-env2/lib/python3.12/site-packages/jax/_src/dispatch.py", line 536, in _device_put_sharding_impl
+    return pxla.batched_device_put(aval, sharding, shards, devices)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/singh/miniforge3/envs/desc-env2/lib/python3.12/site-packages/jax/_src/interpreters/pxla.py", line 248, in batched_device_put
+    return xc.batched_device_put(aval, sharding, xs, list(devices), committed,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/singh/miniforge3/envs/desc-env2/lib/python3.12/site-packages/jax/_src/profiler.py", line 384, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/singh/miniforge3/envs/desc-env2/lib/python3.12/site-packages/jax/_src/array.py", line 641, in _value
+    npy_value, did_copy = self._single_device_array_to_np_array_did_copy()
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+jax.errors.JaxRuntimeError: RESOURCE_EXHAUSTED: Out of memory while trying to allocate 2.10GiB.

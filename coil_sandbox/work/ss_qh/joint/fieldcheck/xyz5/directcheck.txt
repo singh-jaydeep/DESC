@@ -1,0 +1,8 @@
+=== xyz5: coil |B| on the traced-surface equilibrium's surfaces, fit in its Boozer angles (M=N=12)
+ rho | breaking L2: eq |B|  coil |B| | ripple |n| 6-9: eq  coil | max | |B|coil-|B|eq |/B00
+ 0.25 | 1.64e-04  1.77e-04 | 1.94e-05  2.67e-05 | 1.01e-01
+ 0.50 | 2.77e-04  2.91e-04 | 2.60e-05  4.95e-05 | 1.05e-01
+ 0.75 | 3.93e-04  4.13e-04 | 5.29e-05  8.73e-05 | 1.09e-01
+ 0.90 | 7.42e-04  7.63e-04 | 8.26e-05  1.24e-04 | 1.11e-01
+ 1.00 | 1.28e-03  1.30e-03 | 1.17e-04  1.61e-04 | 1.13e-01
+done

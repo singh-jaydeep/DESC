@@ -1,0 +1,14 @@
+=== arcL125_free  coils work/ss_qh/nc5xyz/arcL125_free/result.h5  target work/ss_qh/matrix/ss/arcB2_k4b/eq_k4.h5  current scale 1.05501
+boundary: rms B.n/B0 7.706e-04  (<|B.n|>/B0 6.113e-04)
+  band |n|      B.n L2     d|B| breaking L2   ratio
+     0-2   4.239e-04   1.770e-04        0.42
+     3-5   5.870e-04   2.653e-04        0.45
+     6-9   7.772e-04   7.296e-04        0.94
+     10+   1.010e-04   6.851e-05        0.68
+  d|B| along the symmetric modes (harmless for QS): 8.561e-05
+proxy QS (coil |B| on target surfaces, target Boozer angles): rho | breaking L2 coil  (target eq) | ripple 6-9 coil
+  0.25 | 4.769e-04  (4.371e-04) | 2.019e-04
+  0.50 | 7.606e-04  (7.109e-04) | 2.550e-04
+  0.75 | 1.736e-03  (1.667e-03) | 3.971e-04
+  0.95 | 3.925e-03  (3.860e-03) | 6.633e-04
+  1.00 | 4.755e-03  (4.690e-03) | 7.654e-04

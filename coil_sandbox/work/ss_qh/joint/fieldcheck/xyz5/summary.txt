@@ -1,0 +1,21 @@
+=== xyz5
+coils work/ss_qh/nc5xyz/xyz5/result.h5
+eq work/ss_qh/matrix/ss/xyz_k4b/eq_k4.h5 (L,M,N 8,8,8)
+current scale applied 1.00000; on the target boundary: <|B.n|>/<|B|> 1.910e-04 (max 8.091e-04), | |B_coil| - |B_eq| | / |B_eq| mean 1.803e-04 max 5.582e-04
+target physics   A 8.110  R0 0.9970  a 0.1229  iota [1.2503, 1.2551]  QS(Boozer, |B_nonsym|/<B>) rho 0.25 1.38e-04  rho 0.5 1.38e-04  rho 0.75 3.90e-04  rho 1 1.50e-03
+starts (R, Z): 0.1:(1.2197,0.0000) 0.2:(1.2253,0.0000) 0.3:(1.2311,0.0000) 0.4:(1.2369,0.0000) 0.5:(1.2428,0.0000) 0.6:(1.2488,0.0000) 0.7:(1.2549,0.0000) 0.8:(1.2611,0.0000) 0.9:(1.2674,0.0000) 0.95:(1.2706,0.0000) 1:(1.2737,0.0000) 1.03:(1.2757,0.0000) 1.06:(1.2776,0.0000)
+traced 13 lines x 400 field periods in 0.7 min
+  line rho0  0.10: rho mean 0.1000 std 9.75e-05 [0.0998, 0.1002]  iota trace 1.2540 target 1.2550  inside 401/401  lost after -
+  line rho0  0.20: rho mean 0.2001 std 2.54e-04 [0.1997, 0.2006]  iota trace 1.2538 target 1.2547  inside 401/401  lost after -
+  line rho0  0.30: rho mean 0.3003 std 4.60e-04 [0.2996, 0.3012]  iota trace 1.2535 target 1.2542  inside 401/401  lost after -
+  line rho0  0.40: rho mean 0.4006 std 6.66e-04 [0.3995, 0.4018]  iota trace 1.2530 target 1.2535  inside 401/401  lost after -
+  line rho0  0.50: rho mean 0.5009 std 8.04e-04 [0.4996, 0.5022]  iota trace 1.2524 target 1.2527  inside 401/401  lost after -
+  line rho0  0.60: rho mean 0.6010 std 8.16e-04 [0.5997, 0.6023]  iota trace 1.2518 target 1.2518  inside 401/401  lost after -
+  line rho0  0.70: rho mean 0.7010 std 6.73e-04 [0.6999, 0.7020]  iota trace 1.2511 target 1.2510  inside 401/401  lost after -
+  line rho0  0.80: rho mean 0.8007 std 4.06e-04 [0.8000, 0.8014]  iota trace 1.2506 target 1.2505  inside 401/401  lost after -
+  line rho0  0.90: rho mean 0.9003 std 1.86e-04 [0.9000, 0.9007]  iota trace 1.2503 target 1.2503  inside 401/401  lost after -
+  line rho0  0.95: rho mean 0.9502 std 1.90e-04 [0.9499, 0.9506]  iota trace 1.2502 target 1.2504  inside 401/401  lost after -
+  line rho0  1.00: rho mean 0.9999 std 1.17e-04 [0.9996, 1.0000]  iota trace 1.2504 target 1.2508  inside 401/401  lost after -
+  line rho0  1.03: rho mean 1.0000 std 0.00e+00 [1.0000, 1.0000]  iota trace 1.2506 target -  inside 401/401  lost after -
+  line rho0  1.06: rho mean 1.0000 std 0.00e+00 [1.0000, 1.0000]  iota trace 1.2508 target -  inside 401/401  lost after -
+done

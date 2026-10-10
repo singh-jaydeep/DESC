@@ -1,0 +1,201 @@
+{
+ "settings": {
+  "eq": "work/ss_qh/matrix/ss/xyz_k4b/eq_k4.h5",
+  "start": "work/ss_qh/nc5xyz/starts/circ_r2.6.h5",
+  "bounds": "bounds/precise_qh_gil_nc5_Lfix.json",
+  "out": "work/ss_qh/nc5xyz/xyz5_Lfix",
+  "vacuum": true,
+  "a": null,
+  "maxiter": 800,
+  "gtol": 1e-06,
+  "ctol": 1e-06,
+  "field_n": 50,
+  "curv_n": 300,
+  "row_n": 256,
+  "cc_k": 30000,
+  "cc_gap": "bounds",
+  "options": "{}",
+  "link_mu": 100000000.0,
+  "fix_hinge_z": null,
+  "obj_weight": 1.0,
+  "horizontal_hinges": false,
+  "device": null
+ },
+ "bounds": {
+  "L": 2.34040892613066,
+  "Ltot": null,
+  "kappa": 13.672824284132604,
+  "kms": 18.694612390476625,
+  "dcc": 0.05851022315326651,
+  "dpc": 0.1097066684123747,
+  "convex": null,
+  "planar": null,
+  "f": 0.0723161377547638,
+  "a": 0.12293743418309845,
+  "scale": "absolute"
+ },
+ "info": {
+  "kind": "FourierXYZCoil",
+  "gauge": "phase pinned (['Z_n', 'Z_n', 'Z_n', 'Y_n', 'Y_n']), relative speed within +-0.5",
+  "field_grid": "uniform N=50 (101 nodes)",
+  "n_nodes": 513,
+  "speed_ratio": 1.5,
+  "cc_gap_mode": "bounds",
+  "cc_gap": 0.0008404053802664727,
+  "pc_node_margin": 0.00020009651911106496
+ },
+ "solver": {
+  "message": "`gtol` condition satisfied.",
+  "nit": 243,
+  "n_outer": 11,
+  "optimality": 1.8426597865373975e-07,
+  "constr_violation": 5.2626775826070116e-08,
+  "wall_s": 692.6598761081696
+ },
+ "start": {
+  "per_coil": [
+   {
+    "L": 2.008340568420164,
+    "kappa": 3.1285457287368676,
+    "kms": 9.787798376796792,
+    "corner": 0.0,
+    "convex": NaN,
+    "kappa_s_min": NaN,
+    "planar": 0.0
+   },
+   {
+    "L": 2.0083405684201643,
+    "kappa": 3.1285457287368414,
+    "kms": 9.787798376796788,
+    "corner": 0.0,
+    "convex": NaN,
+    "kappa_s_min": NaN,
+    "planar": 0.0
+   },
+   {
+    "L": 2.008340568420164,
+    "kappa": 3.12854572873682,
+    "kms": 9.787798376796792,
+    "corner": 0.0,
+    "convex": NaN,
+    "kappa_s_min": NaN,
+    "planar": 0.0
+   },
+   {
+    "L": 2.0083405684201647,
+    "kappa": 3.128545728736823,
+    "kms": 9.787798376796786,
+    "corner": 0.0,
+    "convex": NaN,
+    "kappa_s_min": NaN,
+    "planar": 0.0
+   },
+   {
+    "L": 2.0083405684201643,
+    "kappa": 3.128545728736825,
+    "kms": 9.78779837679679,
+    "corner": 0.0,
+    "convex": NaN,
+    "kappa_s_min": NaN,
+    "planar": 0.0
+   }
+  ],
+  "L": 2.0083405684201647,
+  "L_total": 10.041702842100822,
+  "kappa": 3.1285457287368676,
+  "kms": 9.787798376796792,
+  "corner": 0.0,
+  "convex": NaN,
+  "planar": 0.0,
+  "d_cc": 0.027704806620397347,
+  "d_pc": 0.10519878156882928,
+  "linked": 0,
+  "linked_pairs": [],
+  "bn": 0.12010425824163118,
+  "bn_max": 0.27179106964371347,
+  "bn_local": 0.12026868634991958,
+  "bn_max_T": 0.29370355645591456,
+  "vacuum": true,
+  "n_coils": 40
+ },
+ "result": {
+  "per_coil": [
+   {
+    "L": 2.340408918490468,
+    "kappa": 10.602425145177792,
+    "kms": 13.97380826767822,
+    "corner": 0.0,
+    "convex": NaN,
+    "kappa_s_min": NaN,
+    "planar": 0.0
+   },
+   {
+    "L": 2.3404089246941155,
+    "kappa": 13.672593448711892,
+    "kms": 15.089128047179662,
+    "corner": 0.0,
+    "convex": NaN,
+    "kappa_s_min": NaN,
+    "planar": 0.0
+   },
+   {
+    "L": 2.3404089429521426,
+    "kappa": 13.678030258516925,
+    "kms": 16.373840101222875,
+    "corner": 0.0,
+    "convex": NaN,
+    "kappa_s_min": NaN,
+    "planar": 0.0
+   },
+   {
+    "L": 2.340408929327893,
+    "kappa": 13.67294679212817,
+    "kms": 18.694612404979242,
+    "corner": 0.0,
+    "convex": NaN,
+    "kappa_s_min": NaN,
+    "planar": 0.0
+   },
+   {
+    "L": 2.3404089281185003,
+    "kappa": 11.900340234924915,
+    "kms": 18.694611859719878,
+    "corner": 0.0,
+    "convex": NaN,
+    "kappa_s_min": NaN,
+    "planar": 0.0
+   }
+  ],
+  "L": 2.3404089429521426,
+  "L_total": 11.70204464358312,
+  "kappa": 13.678030258516925,
+  "kms": 18.694612404979242,
+  "corner": 0.0,
+  "convex": NaN,
+  "planar": 0.0,
+  "d_cc": 0.05934565287809981,
+  "d_pc": 0.1237443186289185,
+  "linked": 0,
+  "linked_pairs": [],
+  "bn": 0.0008783503790376004,
+  "bn_max": 0.003809530585095295,
+  "bn_local": 0.0009026381538546498,
+  "bn_max_T": 0.003998041013870662,
+  "vacuum": true,
+  "n_coils": 40
+ },
+ "margins": {
+  "L": 1.0000000071874118,
+  "kappa": 1.000380753403696,
+  "kMS": 1.0000000007757646,
+  "d_cc": 1.0142783547867336,
+  "d_pc": 1.1279562165152797
+ },
+ "active": [
+  "L",
+  "kappa",
+  "kMS"
+ ],
+ "joint_start": {},
+ "joint_result": {}
+}

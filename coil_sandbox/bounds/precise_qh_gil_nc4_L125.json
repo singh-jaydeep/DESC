@@ -1,0 +1,11 @@
+{
+  "_note": "precise_QH Gil set with per-coil L x 1.25: 4 coils/hp at the same total conductor as nc5 at the stated L (2026-10-10 control). Absolute.",
+  "scale": "absolute",
+  "L": 3.656888947079157,
+  "kappa": 13.672824284132604,
+  "kappa_MS": 18.694612390476625,
+  "d_cc": 0.05851022315326651,
+  "d_pc": 0.1097066684123747,
+  "convex_excess": null,
+  "planar_max": null
+}

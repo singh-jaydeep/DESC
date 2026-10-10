@@ -1,0 +1,14 @@
+=== d_q1632468_free  coils work/ss_qh/joint/devices/q1632468/free_warm/result.h5  target work/ss_qh/joint/devices/q1632468/eq.h5  current scale 46.03423
+boundary: rms B.n/B0 7.832e-03  (<|B.n|>/B0 6.340e-03)
+  band |n|      B.n L2     d|B| breaking L2   ratio
+     0-2   4.054e-03   1.783e-01        43.98
+     3-5   5.480e-03   6.291e-02        11.48
+     6-9   8.213e-03   1.162e-02        1.42
+     10+   1.035e-03   2.066e-03        2.00
+  d|B| along the symmetric modes (harmless for QS): 3.663e-01
+proxy QS (coil |B| on target surfaces, target Boozer angles): rho | breaking L2 coil  (target eq) | ripple 6-9 coil
+  0.25 | 9.324e-03  (7.000e-02) | 4.051e-03
+  0.50 | 9.324e-03  (1.053e-01) | 4.905e-03
+  0.75 | 1.048e-02  (1.492e-01) | 6.346e-03
+  0.95 | 1.277e-02  (1.885e-01) | 8.051e-03
+  1.00 | 1.358e-02  (1.988e-01) | 8.595e-03

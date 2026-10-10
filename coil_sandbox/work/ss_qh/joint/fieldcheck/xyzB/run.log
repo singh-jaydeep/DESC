@@ -1,0 +1,29 @@
+E1010 00:31:48.395160 3335108 cuda_executor.cc:1743] Could not get kernel mode driver version: ( INVALID_ARGUMENT: Version does not match the format X.Y.Z )
+E1010 00:31:48.407350 3335008 cuda_executor.cc:1743] Could not get kernel mode driver version: ( INVALID_ARGUMENT: Version does not match the format X.Y.Z )
+DESC /home/singh/Documents/DESC2/desc
+DEVICE requested=gpu obtained=gpu (1x NVIDIA GeForce RTX 5070 Laptop GPU)
+/home/singh/Documents/DESC2/coil_sandbox/sandbox/boot.py:43: UserWarning: `desc` was imported (from /home/singh/Documents/DESC2/desc/__init__.py) before boot.setup(); the chosen DESC and the device choice may not take effect.
+  warnings.warn(f"`desc` was imported (from {getattr(sys.modules['desc'], '__file__', '?')}) before "
+DESC /home/singh/Documents/DESC2/desc
+DEVICE requested=gpu obtained=gpu (1x NVIDIA GeForce RTX 5070 Laptop GPU)
+=== xyzB
+coils work/ss_qh/matrix/base/xyzN6/result.h5
+eq precise_QH (L,M,N 8,8,8)
+current scale applied 1.00000; on the target boundary: <|B.n|>/<|B|> 9.345e-04 (max 4.643e-03), | |B_coil| - |B_eq| | / |B_eq| mean 9.824e-04 max 2.863e-03
+target physics   A 8.000  R0 0.9947  a 0.1243  iota [1.2523, 1.2562]  QS(Boozer, |B_nonsym|/<B>) rho 0.25 4.81e-04  rho 0.5 2.25e-04  rho 0.75 3.86e-04  rho 1 1.44e-03
+starts (R, Z): 0.1:(1.2201,0.0000) 0.2:(1.2258,0.0000) 0.3:(1.2316,0.0000) 0.4:(1.2374,0.0000) 0.5:(1.2434,0.0000) 0.6:(1.2494,0.0000) 0.7:(1.2555,0.0000) 0.8:(1.2616,0.0000) 0.9:(1.2679,0.0000) 0.95:(1.2711,0.0000) 1:(1.2743,0.0000) 1.03:(1.2762,0.0000) 1.06:(1.2781,0.0000)
+traced 13 lines x 400 field periods in 0.7 min
+  line rho0  0.10: rho mean 0.1013 std 7.68e-04 [0.1000, 0.1023]  iota trace 1.2586 target 1.2559  inside 401/401  lost after -
+  line rho0  0.20: rho mean 0.2015 std 7.20e-04 [0.2000, 0.2024]  iota trace 1.2584 target 1.2560  inside 401/401  lost after -
+  line rho0  0.30: rho mean 0.3016 std 7.01e-04 [0.3000, 0.3024]  iota trace 1.2580 target 1.2561  inside 401/401  lost after -
+  line rho0  0.40: rho mean 0.4016 std 7.23e-04 [0.4000, 0.4025]  iota trace 1.2576 target 1.2561  inside 401/401  lost after -
+  line rho0  0.50: rho mean 0.5014 std 7.44e-04 [0.5000, 0.5024]  iota trace 1.2569 target 1.2562  inside 401/401  lost after -
+  line rho0  0.60: rho mean 0.6010 std 7.26e-04 [0.5998, 0.6021]  iota trace 1.2561 target 1.2561  inside 401/401  lost after -
+  line rho0  0.70: rho mean 0.7005 std 6.98e-04 [0.6990, 0.7016]  iota trace 1.2552 target 1.2559  inside 401/401  lost after -
+  line rho0  0.80: rho mean 0.8001 std 7.48e-04 [0.7983, 0.8010]  iota trace 1.2543 target 1.2554  inside 401/401  lost after -
+  line rho0  0.90: rho mean 0.9000 std 9.19e-04 [0.8978, 0.9011]  iota trace 1.2538 target 1.2543  inside 401/401  lost after -
+  line rho0  0.95: rho mean 0.9502 std 1.03e-03 [0.9479, 0.9516]  iota trace 1.2537 target 1.2534  inside 401/401  lost after -
+  line rho0  1.00: rho mean 0.9997 std 4.93e-04 [0.9983, 1.0000]  iota trace 1.2537 target 1.2523  inside 401/401  lost after -
+  line rho0  1.03: rho mean 1.0000 std 0.00e+00 [1.0000, 1.0000]  iota trace 1.2439 target -  inside 401/401  lost after -
+  line rho0  1.06: rho mean 1.0000 std 0.00e+00 [1.0000, 1.0000]  iota trace 1.2540 target -  inside 401/401  lost after -
+done

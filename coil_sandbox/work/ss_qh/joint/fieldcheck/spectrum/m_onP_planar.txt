@@ -1,0 +1,14 @@
+=== m_onP_planar  coils work/ss_qh/matrix/on_planar/planarN7/result.h5  target work/ss_qh/matrix/ss/planar_k4b/eq_k4.h5  current scale 1.19677
+boundary: rms B.n/B0 8.587e-03  (<|B.n|>/B0 6.871e-03)
+  band |n|      B.n L2     d|B| breaking L2   ratio
+     0-2   6.484e-03   7.097e-03        1.09
+     3-5   3.224e-03   2.265e-03        0.70
+     6-9   9.133e-03   9.881e-03        1.08
+     10+   1.092e-03   9.087e-04        0.83
+  d|B| along the symmetric modes (harmless for QS): 1.033e-03
+proxy QS (coil |B| on target surfaces, target Boozer angles): rho | breaking L2 coil  (target eq) | ripple 6-9 coil
+  0.25 | 8.658e-03  (1.620e-03) | 4.001e-03
+  0.50 | 8.710e-03  (3.143e-03) | 4.860e-03
+  0.75 | 1.043e-02  (5.212e-03) | 6.685e-03
+  0.95 | 1.332e-02  (8.409e-03) | 9.242e-03
+  1.00 | 1.432e-02  (9.811e-03) | 1.009e-02

@@ -1,0 +1,14 @@
+=== m_base_xyz  coils work/ss_qh/matrix/base/xyzN6/result.h5  target precise_QH  current scale 1.00000
+boundary: rms B.n/B0 1.177e-03  (<|B.n|>/B0 9.337e-04)
+  band |n|      B.n L2     d|B| breaking L2   ratio
+     0-2   2.220e-04   6.629e-05        0.30
+     3-5   8.056e-04   2.717e-04        0.34
+     6-9   1.405e-03   1.637e-03        1.16
+     10+   2.104e-04   2.295e-04        1.09
+  d|B| along the symmetric modes (harmless for QS): 7.754e-05
+proxy QS (coil |B| on target surfaces, target Boozer angles): rho | breaking L2 coil  (target eq) | ripple 6-9 coil
+  0.25 | 6.542e-04  (4.783e-04) | 4.528e-04
+  0.50 | 5.903e-04  (2.234e-04) | 5.486e-04
+  0.75 | 9.342e-04  (3.807e-04) | 8.381e-04
+  0.95 | 1.816e-03  (1.138e-03) | 1.408e-03
+  1.00 | 2.151e-03  (1.408e-03) | 1.631e-03

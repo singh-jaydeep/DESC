@@ -1,0 +1,6 @@
+E1010 03:22:48.155957 3469531 cuda_executor.cc:1743] Could not get kernel mode driver version: ( INVALID_ARGUMENT: Version does not match the format X.Y.Z )
+E1010 03:22:48.169931 3469434 cuda_executor.cc:1743] Could not get kernel mode driver version: ( INVALID_ARGUMENT: Version does not match the format X.Y.Z )
+DESC /home/singh/Documents/DESC2/desc
+DEVICE requested=gpu obtained=gpu (1x NVIDIA GeForce RTX 5070 Laptop GPU)
+target      0.25: 7.415e-06  0.50: 1.925e-05  0.75: 7.423e-05  0.90: 1.538e-04   (8 s)
+coil field  0.25: 8.416e-05  0.50: 3.088e-04  0.75: 4.142e-04  0.90: 2.809e-04   (7 s)

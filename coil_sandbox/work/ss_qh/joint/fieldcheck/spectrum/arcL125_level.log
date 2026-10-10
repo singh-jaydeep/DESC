@@ -1,0 +1,18 @@
+E1010 02:53:15.944560 3451598 cuda_executor.cc:1743] Could not get kernel mode driver version: ( INVALID_ARGUMENT: Version does not match the format X.Y.Z )
+E1010 02:53:15.956481 3451498 cuda_executor.cc:1743] Could not get kernel mode driver version: ( INVALID_ARGUMENT: Version does not match the format X.Y.Z )
+DESC /home/singh/Documents/DESC2/desc
+DEVICE requested=gpu obtained=gpu (1x NVIDIA GeForce RTX 5070 Laptop GPU)
+=== arcL125_level  coils work/ss_qh/nc5xyz/arcL125_level/result.h5  target work/ss_qh/joint/cont/k4b/eq_k4.h5  current scale 1.15281
+boundary: rms B.n/B0 1.641e-03  (<|B.n|>/B0 1.286e-03)
+  band |n|      B.n L2     d|B| breaking L2   ratio
+     0-2   7.857e-04   4.351e-04        0.55
+     3-5   1.005e-03   5.284e-04        0.53
+     6-9   1.969e-03   2.151e-03        1.09
+     10+   2.857e-04   2.475e-04        0.87
+  d|B| along the symmetric modes (harmless for QS): 1.461e-04
+proxy QS (coil |B| on target surfaces, target Boozer angles): rho | breaking L2 coil  (target eq) | ripple 6-9 coil
+  0.25 | 8.437e-04  (5.161e-04) | 6.053e-04
+  0.50 | 1.077e-03  (6.936e-04) | 7.935e-04
+  0.75 | 1.593e-03  (9.910e-04) | 1.213e-03
+  0.95 | 3.051e-03  (2.306e-03) | 1.903e-03
+  1.00 | 3.655e-03  (2.873e-03) | 2.159e-03
