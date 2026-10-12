@@ -1,0 +1,406 @@
+/home/jay/Documents/desc_dev/DESC/desc/__init__.py:94: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  from pynvml import (
+DESC /home/jay/Documents/desc_dev/DESC/desc
+DEVICE requested=gpu obtained=gpu (1x NVIDIA GeForce RTX 5070 Ti)
+--field-term bn is blind to the current scale: holding the coil current SUM fixed
+  [mem] RSS 0.76 GB  peak 0.76 GB
+JOINT PLANE: every hinge snapped to z = 0.0 m and its z held there (largest move 0.00e+00 m)
+eq qa2best/ss4_eq_b14.h5 (h5) NFP 2 sym True L,M,N 14,14,14 dim_x 6103; start qa2best/ss4/coils_k6.h5: 4 unique coils (PiecewisePlanarArcCoil), 16 total
+SETTINGS {'eq': 'qa2best/ss4_eq_b14.h5', 'start': 'qa2best/ss4/coils_k6.h5', 'out': 'qa2best/ss7_b14', 'bounds': '../../bounds/fa_qa2_a0167.json', 'a': None, 'device': None, 'length_mult': 0.999, 'fix_coils': False, 'fix_hinge_z': 0.0, 'horizontal_hinges': False, 'dry': False, 'field_term': 'bn', 'fix_current_sum': True, 'helicity': '1,0', 'qs_rho': '0.25,0.5,0.75,1.0', 'A_min': 6.5, 'A_max': 7.0, 'vol_band': 0.02, 'V0': 0.24924885650248618, 'bn_norm': 0.36262355746578623, 'qs_form': 'boozer', 'iota_min': 0.3, 'kmin': 4, 'kmax': 6, 'maxiter': 60, 'ftol': 1e-06, 'xtol': 1e-06, 'gtol': 1e-08, 'max_tr': None, 'method': 'lsq-composite', 'hessian': 'secant', 'finish_steps': None, 'init_tr': None, 'track_steps': False, 'perturb_order': 2, 'solve_tol': 1e-08, 'lambda_pin': 0.0, 'force_chunk': 200, 'inner_sn': 0, 'solve_options': None, 'tau_bn': 0.0005, 'tau_qs': 0.0015, 'tau_qs_rel': 0.5, 'tau_A': 0.01, 'tau_V': 0.005, 'tau_iota': 0.01, 'tau_L': 0.01, 'tau_kappa': 0.01, 'tau_kms': 0.01, 'tau_dpc': 0.01, 'tau_dcc': 1e-06, 'dcc_backoff': 0.025, 'dpc_backoff': 0.02, 'no_arc_backoffs': False, 'eval_m': 25, 'eval_n': 25, 'plasma_m': 40, 'plasma_n': 40, 'coil_grid_n': 150, 'src_gl': 64, 'src_n': 400, 'bs_chunk': None, 'jac_chunk': None, 'dcc_k': 20000, 'dist': 'rows', 'rows_backoff': 0.01, 'rows_select': 1.6, 'cc_rows': 12000, 'pc_rows': 12000, 'pc_gap': 0.005, 'tau_rows': 0.01, 'P': {'L': 3.9372588, 'Ltot': None, 'kappa': 10.173652694610778, 'kms': None, 'convex': None, 'planar': None, 'dcc': 0.04, 'dpc': 0.147795}}
+BOUNDS (judged, absolute) L 3.937  Ltot -  kappa 10.17  kms -  convex -  planar -  dcc 0.04  dpc 0.1478
+ENFORCED L 3.937  Ltot -  kappa 10.12  kms -  convex -  planar -  dcc 0.04223  dpc 0.1508
+/home/jay/Documents/desc_dev/DESC/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+/home/jay/Documents/desc_dev/DESC/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+START physics  A 6.885  R0 0.8427  a 0.1224  iota [0.3107, 0.3546]  QS(Boozer, |B_nonsym|/<B>) rho 0.25 4.34e-03  rho 0.5 4.38e-03  rho 0.75 8.57e-03  rho 1 1.76e-02
+START coils    bn 6.0604e-04 (max 5.892e-02)  L 1.000  kappa 0.999  d_cc 1.024  d_pc 1.105  linked 0  -> FAILS L
+QS two-term rms at the start 0.01038 -> tau_qs 0.0015
+B.n normalization frozen at the start: 0.36262; volume band around V0 = 0.24925
+quadrature scales s (expected; compare the s(qw) column): bn 6.283  qs 41.87  iota 1  kappa 0.3622  dcc 9.06e+04
+/home/jay/Documents/desc_dev/DESC/desc/utils.py:590: FutureWarning: constants is deprecated and will be removed in a future release. Users should not include constants in the arguments of their objective compute methods. Instead declare all the constants in the build method and use as self._constants.
+  warnings.warn(msg, err)
+/home/jay/Documents/desc_dev/DESC/desc/utils.py:590: FutureWarning: constants is deprecated and will be removed in a future release. Users should not include constants in the arguments of their objective compute methods. Instead declare all the constants in the build method and use as self._constants.
+  warnings.warn(msg, err)
+/home/jay/Documents/desc_dev/DESC/desc/utils.py:590: FutureWarning: constants is deprecated and will be removed in a future release. Users should not include constants in the arguments of their objective compute methods. Instead declare all the constants in the build method and use as self._constants.
+  warnings.warn(msg, err)
+/home/jay/Documents/desc_dev/DESC/desc/utils.py:590: FutureWarning: constants is deprecated and will be removed in a future release. Users should not include constants in the arguments of their objective compute methods. Instead declare all the constants in the build method and use as self._constants.
+  warnings.warn(msg, err)
+/home/jay/Documents/desc_dev/DESC/desc/utils.py:590: FutureWarning: constants is deprecated and will be removed in a future release. Users should not include constants in the arguments of their objective compute methods. Instead declare all the constants in the build method and use as self._constants.
+  warnings.warn(msg, err)
+
+TERMS AT THE START
+term                             dim_f    weight     norm    s(qw)  target/bounds           raw min    raw max       cost  err/tol  share
+Vacuum B.n error                  1326       318   0.3626    6.283  = 0                   -0.001181  0.0009938     0.4143     0.91   1.7%
+QS Boozer rho 0.25                1596       333        -    39.95  = 0                   -0.001529    0.00374      1.074     1.47   4.4%
+QS Boozer rho 0.5                 1596       333        -    39.95  = 0                    -0.00199   0.001913      1.093     1.48   4.5%
+QS Boozer rho 0.75                1596       333        -    39.95  = 0                   -0.002993   0.003822      4.194      2.9  17.2%
+QS Boozer rho 1                   1596       333        -    39.95  = 0                   -0.005001   0.007275      17.58     5.93  72.2%
+aspect ratio                         1      14.8        -        1  [6.5, 7]                  6.885      6.885          0        0   0.0%
+rotational transform                20       333        -        1  [0.3, inf]               0.3107     0.3545          0        0   0.0%
+volume                               1       802        -        1  [0.2443, 0.2542]         0.2492     0.2492          0        0   0.0%
+coil length                          4      25.4        -        2  [0, 3.937]                3.861      3.939   0.001159   0.0481   0.0%
+coil curvature                    1204      27.3        -    5.013  [0, 10.12]                    0      10.15    0.00514    0.101   0.0%
+coil-coil distance rows          12036  2.48e+03        -    109.7  [0.0404, inf]            0.0404      1.446          0        0   0.0%
+plasma-coil distance rows        12000       670        -    109.5  [0.1493, inf]            0.1586     0.2388          0        0   0.0%
+total cost 0.5 sum f^2                                                                                                       24.36
+
+===== step k=4: 80 boundary modes free, maxiter 60 =====
+Building objective: Vacuum B.n error
+Precomputing transforms
+Timer: Precomputing transforms = 26.4 ms
+Building objective: QS Boozer rho 0.25
+Precomputing transforms
+Timer: Precomputing transforms = 164 ms
+Building objective: QS Boozer rho 0.5
+Precomputing transforms
+Timer: Precomputing transforms = 117 ms
+Building objective: QS Boozer rho 0.75
+Precomputing transforms
+Timer: Precomputing transforms = 147 ms
+Building objective: QS Boozer rho 1
+Precomputing transforms
+Timer: Precomputing transforms = 132 ms
+Building objective: aspect ratio
+Precomputing transforms
+Timer: Precomputing transforms = 40.1 ms
+Building objective: rotational transform
+Precomputing transforms
+Timer: Precomputing transforms = 34.2 ms
+Building objective: volume
+Precomputing transforms
+Timer: Precomputing transforms = 39.3 ms
+Building objective: coil length
+Precomputing transforms
+Timer: Precomputing transforms = 102 us
+Building objective: coil curvature
+Precomputing transforms
+Timer: Precomputing transforms = 77.5 us
+Building objective: coil-coil distance rows
+Building objective: plasma-coil distance rows
+ObjectiveFunction deriv_mode : blocked
+Vacuum B.n error jac_chunk_size: None
+QS Boozer rho 0.25 jac_chunk_size: None
+QS Boozer rho 0.5 jac_chunk_size: None
+QS Boozer rho 0.75 jac_chunk_size: None
+QS Boozer rho 1 jac_chunk_size: None
+aspect ratio jac_chunk_size: None
+rotational transform jac_chunk_size: None
+volume jac_chunk_size: None
+coil length jac_chunk_size: None
+coil curvature jac_chunk_size: None
+coil-coil distance rows jac_chunk_size: None
+plasma-coil distance rows jac_chunk_size: None
+Timer: Objective build = 1.24 sec
+Building objective: force
+Precomputing transforms
+Timer: Precomputing transforms = 826 ms
+ObjectiveFunction deriv_mode : blocked
+force jac_chunk_size: 200
+Timer: Objective build = 898 ms
+ObjectiveFunction deriv_mode : blocked
+lcfs R jac_chunk_size: None
+lcfs Z jac_chunk_size: None
+fixed Psi jac_chunk_size: None
+fixed pressure jac_chunk_size: None
+fixed current jac_chunk_size: None
+fixed sheet current jac_chunk_size: None
+self_consistency R jac_chunk_size: None
+self_consistency Z jac_chunk_size: None
+lambda gauge jac_chunk_size: None
+axis R self consistency jac_chunk_size: None
+axis Z self consistency jac_chunk_size: None
+Timer: Objective build = 910 us
+Timer: Eq Update LinearConstraintProjection build = 6.51 sec
+  [mem] RSS 5.04 GB  peak 5.17 GB
+  [mem] RSS 5.05 GB  peak 5.17 GB
+  [mem] RSS 5.05 GB  peak 5.17 GB
+  [mem] RSS 5.05 GB  peak 5.17 GB
+Timer: Proximal projection build = 8.49 min
+Building objective: lcfs R
+Building objective: fixed Psi
+Building objective: fixed pressure
+Building objective: fixed current
+Building objective: fixed sheet current
+Building objective: lcfs Z
+Building objective: summed coil current
+Building objective: hinge joint plane
+Building objective: fixed shift
+Building objective: fixed rotation
+Building objective: fixed arc reference
+ObjectiveFunction deriv_mode : blocked
+lcfs R jac_chunk_size: None
+fixed Psi jac_chunk_size: None
+fixed pressure jac_chunk_size: None
+fixed current jac_chunk_size: None
+fixed sheet current jac_chunk_size: None
+lcfs Z jac_chunk_size: None
+summed coil current jac_chunk_size: None
+hinge joint plane jac_chunk_size: None
+fixed shift jac_chunk_size: None
+fixed rotation jac_chunk_size: None
+fixed arc reference jac_chunk_size: None
+Timer: Objective build = 1.54 sec
+Timer: LinearConstraintProjection build = 3.81 sec
+Number of parameters: 147
+Number of objectives: 32976
+Timer: Initializing the optimization = 8.58 min
+
+Starting optimization
+Using method: proximal-lsq-composite
+  [mem] RSS 5.52 GB  peak 5.52 GB
+  [mem] RSS 5.85 GB  peak 5.95 GB
+  [mem] RSS 5.85 GB  peak 5.95 GB
+  [mem] RSS 5.85 GB  peak 5.95 GB
+  [mem] RSS 5.85 GB  peak 5.95 GB
+   Iteration     Total nfev        Cost      Cost reduction    Step norm     Optimality   
+       0              1          2.436e+01                                    5.542e-01   
+  [mem] RSS 6.66 GB  peak 6.82 GB
+  [mem] RSS 6.69 GB  peak 6.82 GB
+  [mem] RSS 6.69 GB  peak 6.84 GB
+  [mem] RSS 6.69 GB  peak 6.84 GB
+  [mem] RSS 6.69 GB  peak 6.84 GB
+  [mem] RSS 6.69 GB  peak 6.84 GB
+  [mem] RSS 6.69 GB  peak 6.84 GB
+       1              4          2.263e+01      1.728e+00      9.080e+00      1.170e-01   
+  [mem] RSS 6.69 GB  peak 6.84 GB
+  [mem] RSS 6.69 GB  peak 6.84 GB
+  [mem] RSS 6.69 GB  peak 6.84 GB
+  [mem] RSS 6.69 GB  peak 6.84 GB
+  [mem] RSS 6.69 GB  peak 6.84 GB
+       2              5          2.198e+01      6.452e-01      8.744e+00      2.168e-01   
+  [mem] RSS 6.74 GB  peak 6.84 GB
+  [mem] RSS 6.74 GB  peak 6.84 GB
+       3              6          2.124e+01      7.435e-01      6.954e+00      1.321e-01   
+  [mem] RSS 6.69 GB  peak 6.85 GB
+  [mem] RSS 6.75 GB  peak 6.87 GB
+  [mem] RSS 6.75 GB  peak 6.87 GB
+  [mem] RSS 6.75 GB  peak 6.87 GB
+  [mem] RSS 6.75 GB  peak 6.87 GB
+  [mem] RSS 6.75 GB  peak 6.87 GB
+  [mem] RSS 6.69 GB  peak 6.87 GB
+  [mem] RSS 6.69 GB  peak 6.87 GB
+  [mem] RSS 6.75 GB  peak 6.87 GB
+  [mem] RSS 6.75 GB  peak 6.87 GB
+  [mem] RSS 6.75 GB  peak 6.87 GB
+  [mem] RSS 6.75 GB  peak 6.87 GB
+       4             10          2.122e+01      1.828e-02      6.474e-01      6.129e-02   
+       5             11          2.100e+01      2.221e-01      4.627e-01      5.082e-02   
+  [mem] RSS 6.70 GB  peak 6.87 GB
+  [mem] RSS 6.76 GB  peak 6.87 GB
+  [mem] RSS 6.76 GB  peak 6.87 GB
+  [mem] RSS 6.70 GB  peak 6.87 GB
+  [mem] RSS 6.70 GB  peak 6.87 GB
+  [mem] RSS 6.70 GB  peak 6.87 GB
+  [mem] RSS 6.76 GB  peak 6.87 GB
+  [mem] RSS 6.76 GB  peak 6.87 GB
+  [mem] RSS 6.76 GB  peak 6.87 GB
+       6             15          2.100e+01      2.428e-03      2.766e-02      3.546e-02   
+Optimization terminated successfully.
+`xtol` condition satisfied. (xtol=1.00e-06)
+         Current function value: 2.100e+01
+         Max scaled gradient: 3.546e-02
+         Total delta_x: 6.025e-03
+         Iterations: 6
+         Function evaluations: 15
+         Jacobian evaluations: 7
+Timer: Solution time = 1.33 hrs
+Timer: Avg time per step = 11.4 min
+==============================================================================================================
+                                                                 Start  -->   End
+Total (sum of squares):                                      2.436e+01  -->   2.100e+01, 
+Maximum absolute Boundary normal field error:                1.181e-03  -->   2.100e-03 (T*m^2, T^2*m^2)
+Minimum absolute Boundary normal field error:                4.460e-08  -->   4.418e-08 (T*m^2, T^2*m^2)
+Average absolute Boundary normal field error:                1.084e-04  -->   2.555e-04 (T*m^2, T^2*m^2)
+Maximum absolute Boundary normal field error:                3.256e-03  -->   5.791e-03 (normalized)
+Minimum absolute Boundary normal field error:                1.230e-07  -->   1.218e-07 (normalized)
+Average absolute Boundary normal field error:                2.989e-04  -->   7.047e-04 (normalized)
+Maximum absolute Quasi-symmetry (1,0) Boozer error:          3.740e-03  -->   3.539e-03 (T)
+Minimum absolute Quasi-symmetry (1,0) Boozer error:          1.808e-18  -->   8.069e-18 (T)
+Average absolute Quasi-symmetry (1,0) Boozer error:          8.911e-06  -->   9.222e-06 (T)
+Maximum absolute Quasi-symmetry (1,0) Boozer error:          1.990e-03  -->   1.905e-03 (T)
+Minimum absolute Quasi-symmetry (1,0) Boozer error:          8.831e-13  -->   1.250e-11 (T)
+Average absolute Quasi-symmetry (1,0) Boozer error:          1.419e-05  -->   1.642e-05 (T)
+Maximum absolute Quasi-symmetry (1,0) Boozer error:          3.822e-03  -->   3.809e-03 (T)
+Minimum absolute Quasi-symmetry (1,0) Boozer error:          6.976e-11  -->   1.700e-09 (T)
+Average absolute Quasi-symmetry (1,0) Boozer error:          3.001e-05  -->   3.386e-05 (T)
+Maximum absolute Quasi-symmetry (1,0) Boozer error:          7.276e-03  -->   6.453e-03 (T)
+Minimum absolute Quasi-symmetry (1,0) Boozer error:          5.884e-10  -->   7.226e-09 (T)
+Average absolute Quasi-symmetry (1,0) Boozer error:          6.652e-05  -->   8.377e-05 (T)
+Aspect ratio:                                                6.885e+00  -->   6.825e+00 (dimensionless)
+Maximum Rotational transform:                                3.545e-01  -->   3.364e-01 (dimensionless)
+Minimum Rotational transform:                                3.107e-01  -->   3.173e-01 (dimensionless)
+Average Rotational transform:                                3.379e-01  -->   3.295e-01 (dimensionless)
+Plasma volume:                                               2.492e-01  -->   2.540e-01 (m^3)
+Maximum Coil length:                                         3.939e+00  -->   3.938e+00 (m)
+Minimum Coil length:                                         3.861e+00  -->   3.859e+00 (m)
+Average Coil length:                                         3.893e+00  -->   3.892e+00 (m)
+Maximum Coil curvature:                                      1.015e+01  -->   1.014e+01 (m^-1)
+Minimum Coil curvature:                                      0.000e+00  -->   0.000e+00 (m^-1)
+Average Coil curvature:                                      2.608e+00  -->   2.609e+00 (m^-1)
+Maximum Coil-coil distance rows:                             1.446e+00  -->   1.446e+00 (m)
+Minimum Coil-coil distance rows:                             4.040e-02  -->   4.040e-02 (m)
+Average Coil-coil distance rows:                             6.412e-02  -->   6.412e-02 (m)
+Maximum Plasma-coil distance rows:                           2.388e-01  -->   2.388e-01 (m)
+Minimum Plasma-coil distance rows:                           1.586e-01  -->   1.588e-01 (m)
+Average Plasma-coil distance rows:                           2.175e-01  -->   2.176e-01 (m)
+Maximum absolute Force error:                                1.826e+03  -->   3.317e+05 (N)
+Minimum absolute Force error:                                2.129e-04  -->   3.170e-03 (N)
+Average absolute Force error:                                8.422e+00  -->   2.348e+02 (N)
+Maximum absolute Force error:                                2.526e-03  -->   4.589e-01 (normalized)
+Minimum absolute Force error:                                2.946e-10  -->   4.386e-09 (normalized)
+Average absolute Force error:                                1.165e-05  -->   3.249e-04 (normalized)
+R boundary error:                                            4.623e-19  -->   1.088e-19 (m)
+Fixed Psi error:                                             0.000e+00  -->   0.000e+00 (Wb)
+Fixed pressure profile error:                                0.000e+00  -->   0.000e+00 (Pa)
+Fixed current profile error:                                 0.000e+00  -->   0.000e+00 (A)
+Fixed sheet current error:                                   0.000e+00  -->   0.000e+00 (~)
+Z boundary error:                                            6.858e-19  -->   1.865e-19 (m)
+Summed coil current error:                                   2.328e-10  -->   2.328e-10 (A)
+Fixed parameters error:                                      0.000e+00  -->   0.000e+00 (~)
+==============================================================================================================
+
+  [mem] RSS 6.63 GB  peak 6.87 GB
+/home/jay/Documents/desc_dev/DESC/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+/home/jay/Documents/desc_dev/DESC/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+/home/jay/Documents/desc_dev/DESC/desc/utils.py:590: FutureWarning: constants is deprecated and will be removed in a future release. Users should not include constants in the arguments of their objective compute methods. Instead declare all the constants in the build method and use as self._constants.
+  warnings.warn(msg, err)
+/home/jay/Documents/desc_dev/DESC/desc/utils.py:590: FutureWarning: constants is deprecated and will be removed in a future release. Users should not include constants in the arguments of their objective compute methods. Instead declare all the constants in the build method and use as self._constants.
+  warnings.warn(msg, err)
+/home/jay/Documents/desc_dev/DESC/desc/utils.py:590: FutureWarning: constants is deprecated and will be removed in a future release. Users should not include constants in the arguments of their objective compute methods. Instead declare all the constants in the build method and use as self._constants.
+  warnings.warn(msg, err)
+/home/jay/Documents/desc_dev/DESC/desc/utils.py:590: FutureWarning: constants is deprecated and will be removed in a future release. Users should not include constants in the arguments of their objective compute methods. Instead declare all the constants in the build method and use as self._constants.
+  warnings.warn(msg, err)
+/home/jay/Documents/desc_dev/DESC/desc/utils.py:590: FutureWarning: constants is deprecated and will be removed in a future release. Users should not include constants in the arguments of their objective compute methods. Instead declare all the constants in the build method and use as self._constants.
+  warnings.warn(msg, err)
+
+TERMS AFTER k=4
+term                             dim_f    weight     norm    s(qw)  target/bounds           raw min    raw max       cost  err/tol  share
+Vacuum B.n error                  1326       318   0.3626    6.283  = 0                   -0.001063     0.0021      1.667     1.83   7.9%
+QS Boozer rho 0.25                1596       333        -    39.95  = 0                    -0.00146   0.003539      1.036     1.44   4.9%
+QS Boozer rho 0.5                 1596       333        -    39.95  = 0                   -0.001905   0.001894      1.138     1.51   5.4%
+QS Boozer rho 0.75                1596       333        -    39.95  = 0                    -0.00282   0.003809      4.034     2.84  19.2%
+QS Boozer rho 1                   1596       333        -    39.95  = 0                   -0.004483   0.006453      13.12     5.12  62.5%
+aspect ratio                         1      14.8        -        1  [6.5, 7]                  6.825      6.825          0        0   0.0%
+rotational transform                20       333        -        1  [0.3, inf]               0.3173     0.3364          0        0   0.0%
+volume                               1       802        -        1  [0.2443, 0.2542]          0.254      0.254          0        0   0.0%
+coil length                          4      25.4        -        2  [0, 3.937]                3.859      3.938  0.0001501   0.0173   0.0%
+coil curvature                    1204      27.3        -    5.013  [0, 10.12]                    0      10.14    0.00391   0.0884   0.0%
+coil-coil distance rows          12036  2.48e+03        -    109.7  [0.0404, inf]            0.0404      1.446  3.877e-05  0.00881   0.0%
+plasma-coil distance rows        12000       670        -    109.5  [0.1493, inf]            0.1588     0.2388          0        0   0.0%
+total cost 0.5 sum f^2                                                                                                          21
+k=4 physics  A 6.825  R0 0.8432  a 0.1235  iota [0.3173, 0.3364]  QS(Boozer, |B_nonsym|/<B>) rho 0.25 4.34e-03  rho 0.5 4.55e-03  rho 0.75 8.57e-03  rho 1 1.55e-02
+k=4 coils    bn 1.0239e-03 (max 4.335e-02)  L 1.000  kappa 0.999  d_cc 1.024  d_pc 1.102  linked 0  -> FAILS L
+k=4 solver   Optimization terminated successfully.
+`xtol` condition satisfied. (xtol=1.00e-06)  nit 6  wall 88.8 min
+k=4 joint    max |hinge z - 0.0| 0.0e+00 m
+
+===== step k=5: 120 boundary modes free, maxiter 60 =====
+Building objective: Vacuum B.n error
+Precomputing transforms
+Timer: Precomputing transforms = 31.0 ms
+Building objective: QS Boozer rho 0.25
+Precomputing transforms
+Timer: Precomputing transforms = 207 ms
+Building objective: QS Boozer rho 0.5
+Precomputing transforms
+Timer: Precomputing transforms = 258 ms
+Building objective: QS Boozer rho 0.75
+Precomputing transforms
+Timer: Precomputing transforms = 127 ms
+Building objective: QS Boozer rho 1
+Precomputing transforms
+Timer: Precomputing transforms = 111 ms
+Building objective: aspect ratio
+Precomputing transforms
+Timer: Precomputing transforms = 41.2 ms
+Building objective: rotational transform
+Precomputing transforms
+Timer: Precomputing transforms = 38.2 ms
+Building objective: volume
+Precomputing transforms
+Timer: Precomputing transforms = 41.2 ms
+Building objective: coil length
+Precomputing transforms
+Timer: Precomputing transforms = 103 us
+Building objective: coil curvature
+Precomputing transforms
+Timer: Precomputing transforms = 73.3 us
+Building objective: coil-coil distance rows
+Building objective: plasma-coil distance rows
+ObjectiveFunction deriv_mode : blocked
+Vacuum B.n error jac_chunk_size: None
+QS Boozer rho 0.25 jac_chunk_size: None
+QS Boozer rho 0.5 jac_chunk_size: None
+QS Boozer rho 0.75 jac_chunk_size: None
+QS Boozer rho 1 jac_chunk_size: None
+aspect ratio jac_chunk_size: None
+rotational transform jac_chunk_size: None
+volume jac_chunk_size: None
+coil length jac_chunk_size: None
+coil curvature jac_chunk_size: None
+coil-coil distance rows jac_chunk_size: None
+plasma-coil distance rows jac_chunk_size: None
+Timer: Objective build = 3.11 sec
+Building objective: force
+Precomputing transforms
+Timer: Precomputing transforms = 67.7 ms
+ObjectiveFunction deriv_mode : blocked
+force jac_chunk_size: 200
+Timer: Objective build = 86.3 ms
+ObjectiveFunction deriv_mode : blocked
+lcfs R jac_chunk_size: None
+lcfs Z jac_chunk_size: None
+fixed Psi jac_chunk_size: None
+fixed pressure jac_chunk_size: None
+fixed current jac_chunk_size: None
+fixed sheet current jac_chunk_size: None
+self_consistency R jac_chunk_size: None
+self_consistency Z jac_chunk_size: None
+lambda gauge jac_chunk_size: None
+axis R self consistency jac_chunk_size: None
+axis Z self consistency jac_chunk_size: None
+Timer: Objective build = 682 us
+Timer: Eq Update LinearConstraintProjection build = 1.05 sec
+Timer: Proximal projection build = 41.2 sec
+Building objective: lcfs R
+Building objective: fixed Psi
+Building objective: fixed pressure
+Building objective: fixed current
+Building objective: fixed sheet current
+Building objective: lcfs Z
+Building objective: summed coil current
+Building objective: hinge joint plane
+Building objective: fixed shift
+Building objective: fixed rotation
+Building objective: fixed arc reference
+ObjectiveFunction deriv_mode : blocked
+lcfs R jac_chunk_size: None
+fixed Psi jac_chunk_size: None
+fixed pressure jac_chunk_size: None
+fixed current jac_chunk_size: None
+fixed sheet current jac_chunk_size: None
+lcfs Z jac_chunk_size: None
+summed coil current jac_chunk_size: None
+hinge joint plane jac_chunk_size: None
+fixed shift jac_chunk_size: None
+fixed rotation jac_chunk_size: None
+fixed arc reference jac_chunk_size: None
+Timer: Objective build = 518 ms
+Timer: LinearConstraintProjection build = 2.57 sec
+Number of parameters: 187
+Number of objectives: 32976
+Timer: Initializing the optimization = 44.4 sec
+
+Starting optimization
+Using method: proximal-lsq-composite
+  [mem] RSS 7.08 GB  peak 7.23 GB
+   Iteration     Total nfev        Cost      Cost reduction    Step norm     Optimality   
+       0              1          2.100e+01                                    2.121e-01   
+  [mem] RSS 7.40 GB  peak 7.55 GB
+  [mem] RSS 7.40 GB  peak 7.55 GB
+  [mem] RSS 7.40 GB  peak 7.55 GB
+  [mem] RSS 7.40 GB  peak 7.55 GB
+  [mem] RSS 7.40 GB  peak 7.55 GB

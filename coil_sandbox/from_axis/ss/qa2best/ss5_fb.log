@@ -1,0 +1,20 @@
+/home/jay/Documents/desc_dev/DESC/desc/__init__.py:94: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  from pynvml import (
+DESC /home/jay/Documents/desc_dev/DESC/desc
+DEVICE requested=gpu obtained=gpu (1x NVIDIA GeForce RTX 5070 Ti)
+Traceback (most recent call last):
+  File "/home/jay/Documents/desc_dev/DESC/coil_sandbox/from_axis/ss/fb_rescore.py", line 27, in <module>
+    eq, cs = load(a.eq), load(a.coils)
+             ~~~~^^^^^^
+  File "/home/jay/Documents/desc_dev/DESC/desc/io/optimizable_io.py", line 58, in load
+    with h5py.File(load_from, "r") as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/home/jay/miniconda3/envs/desc-dev/lib/python3.13/site-packages/h5py/_hl/files.py", line 566, in __init__
+    fid = make_fid(name, mode, userblock_size, fapl, fcpl, swmr=swmr)
+  File "/home/jay/miniconda3/envs/desc-dev/lib/python3.13/site-packages/h5py/_hl/files.py", line 241, in make_fid
+    fid = h5f.open(name, flags, fapl=fapl)
+  File "h5py/_objects.pyx", line 54, in h5py._objects.with_phil.wrapper
+  File "h5py/_objects.pyx", line 55, in h5py._objects.with_phil.wrapper
+  File "h5py/h5f.pyx", line 104, in h5py.h5f.open
+FileNotFoundError: [Errno 2] Unable to synchronously open file (unable to open file: name = 'qa2best/ss5/eq_k.h5', errno = 2, error message = 'No such file or directory', flags = 0, o_flags = 0)
+ALLDONE

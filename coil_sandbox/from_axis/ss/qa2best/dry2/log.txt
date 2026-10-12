@@ -1,0 +1,48 @@
+/home/jay/Documents/desc_dev/DESC/desc/__init__.py:94: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  from pynvml import (
+DESC /home/jay/Documents/desc_dev/DESC/desc
+DEVICE requested=gpu obtained=gpu (1x NVIDIA GeForce RTX 5070 Ti)
+--field-term bn is blind to the current scale: holding the coil current SUM fixed
+  [mem] RSS 0.76 GB  peak 0.76 GB
+JOINT PLANE: every hinge snapped to z = 0.0 m and its z held there (largest move 0.00e+00 m)
+eq qa2best/eq0_b12.h5 (h5) NFP 2 sym True L,M,N 12,12,12 dim_x 4074; start qa2best/coils0.h5: 4 unique coils (PiecewisePlanarArcCoil), 16 total
+SETTINGS {'eq': 'qa2best/eq0_b12.h5', 'start': 'qa2best/coils0.h5', 'out': 'qa2best/dry2', 'bounds': '../../bounds/fa_qa2_a0167.json', 'a': None, 'device': None, 'length_mult': 1.0, 'fix_coils': False, 'fix_hinge_z': 0.0, 'horizontal_hinges': False, 'dry': True, 'field_term': 'bn', 'fix_current_sum': True, 'helicity': '1,0', 'qs_rho': '0.25,0.5,0.75,1.0', 'A_min': 6.5, 'A_max': 7.0, 'vol_band': 0.02, 'V0': None, 'bn_norm': None, 'qs_form': 'boozer', 'iota_min': 0.3, 'kmin': 1, 'kmax': 6, 'maxiter': 50, 'ftol': 1e-06, 'xtol': 1e-06, 'gtol': 1e-08, 'max_tr': None, 'method': 'lsq-composite', 'hessian': 'secant', 'finish_steps': None, 'init_tr': None, 'track_steps': False, 'perturb_order': 2, 'solve_tol': 1e-06, 'lambda_pin': 0.0, 'force_chunk': 200, 'inner_sn': 0, 'solve_options': None, 'tau_bn': 0.002, 'tau_qs': None, 'tau_qs_rel': 0.5, 'tau_A': 0.01, 'tau_V': 0.005, 'tau_iota': 0.01, 'tau_L': 0.01, 'tau_kappa': 0.01, 'tau_kms': 0.01, 'tau_dpc': 0.01, 'tau_dcc': 1e-06, 'dcc_backoff': 0.025, 'dpc_backoff': 0.02, 'no_arc_backoffs': False, 'eval_m': 25, 'eval_n': 25, 'plasma_m': 40, 'plasma_n': 40, 'coil_grid_n': 150, 'src_gl': 64, 'src_n': 400, 'bs_chunk': None, 'jac_chunk': None, 'dcc_k': 20000, 'dist': 'rows', 'rows_backoff': 0.01, 'rows_select': 1.6, 'cc_rows': 12000, 'pc_rows': 12000, 'pc_gap': 0.005, 'tau_rows': 0.01, 'P': {'L': 3.9412, 'Ltot': None, 'kappa': 10.173652694610778, 'kms': None, 'convex': None, 'planar': None, 'dcc': 0.04, 'dpc': 0.147795}}
+BOUNDS (judged, absolute) L 3.941  Ltot -  kappa 10.17  kms -  convex -  planar -  dcc 0.04  dpc 0.1478
+ENFORCED L 3.941  Ltot -  kappa 10.12  kms -  convex -  planar -  dcc 0.04223  dpc 0.1508
+/home/jay/Documents/desc_dev/DESC/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+/home/jay/Documents/desc_dev/DESC/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+START physics  A 6.802  R0 0.8360  a 0.1229  iota [0.3209, 0.3664]  QS(Boozer, |B_nonsym|/<B>) rho 0.25 3.50e-03  rho 0.5 6.71e-03  rho 0.75 1.31e-02  rho 1 2.37e-02
+START coils    bn 9.5419e-04 (max 7.339e-02)  L 1.002  kappa 1.014  d_cc 1.000  d_pc 1.080  linked 0  -> FAILS L,kappa,d_cc
+QS two-term rms at the start 0.01425 -> tau_qs 0.007126
+B.n normalization frozen at the start: 0.36262; volume band around V0 = 0.24925
+quadrature scales s (expected; compare the s(qw) column): bn 6.283  qs 41.87  iota 1  kappa 0.3622  dcc 9.06e+04
+/home/jay/Documents/desc_dev/DESC/desc/utils.py:590: FutureWarning: constants is deprecated and will be removed in a future release. Users should not include constants in the arguments of their objective compute methods. Instead declare all the constants in the build method and use as self._constants.
+  warnings.warn(msg, err)
+/home/jay/Documents/desc_dev/DESC/desc/utils.py:590: FutureWarning: constants is deprecated and will be removed in a future release. Users should not include constants in the arguments of their objective compute methods. Instead declare all the constants in the build method and use as self._constants.
+  warnings.warn(msg, err)
+/home/jay/Documents/desc_dev/DESC/desc/utils.py:590: FutureWarning: constants is deprecated and will be removed in a future release. Users should not include constants in the arguments of their objective compute methods. Instead declare all the constants in the build method and use as self._constants.
+  warnings.warn(msg, err)
+/home/jay/Documents/desc_dev/DESC/desc/utils.py:590: FutureWarning: constants is deprecated and will be removed in a future release. Users should not include constants in the arguments of their objective compute methods. Instead declare all the constants in the build method and use as self._constants.
+  warnings.warn(msg, err)
+/home/jay/Documents/desc_dev/DESC/desc/utils.py:590: FutureWarning: constants is deprecated and will be removed in a future release. Users should not include constants in the arguments of their objective compute methods. Instead declare all the constants in the build method and use as self._constants.
+  warnings.warn(msg, err)
+
+TERMS AT THE START
+term                             dim_f    weight     norm    s(qw)  target/bounds           raw min    raw max       cost  err/tol  share
+Vacuum B.n error                  1326      79.6   0.3626    6.283  = 0                   -0.001712    0.00181     0.1054    0.459   0.7%
+QS Boozer rho 0.25                1176      70.2        -    34.29  = 0                   -0.001203   0.002589    0.03101    0.249   0.2%
+QS Boozer rho 0.5                 1176      70.2        -    34.29  = 0                   -0.002891   0.003257     0.1138    0.477   0.7%
+QS Boozer rho 0.75                1176      70.2        -    34.29  = 0                   -0.005987   0.006225     0.4352    0.933   2.8%
+QS Boozer rho 1                   1176      70.2        -    34.29  = 0                    -0.01003    0.01064       1.42     1.69   9.3%
+aspect ratio                         1      14.8        -        1  [6.5, 7]                  6.802      6.802          0        0   0.0%
+rotational transform                20       333        -        1  [0.3, inf]               0.3209     0.3662          0        0   0.0%
+volume                               1       802        -        1  [0.2443, 0.2542]         0.2492     0.2492          0        0   0.0%
+coil length                          4      25.4        -        2  [0, 3.941]                3.942      3.949    0.02168    0.208   0.1%
+coil curvature                    1204      27.3        -    5.013  [0, 10.12]                    0      10.32      1.696     1.84  11.1%
+coil-coil distance rows          12036  2.48e+03        -    109.7  [0.0404, inf]           0.03927      1.451      11.45     4.79  75.0%
+plasma-coil distance rows        12000       670        -    109.5  [0.1493, inf]            0.1547     0.2388          0        0   0.0%
+total cost 0.5 sum f^2                                                                                                       15.28
+
+--dry: wrote qa2best/dry2/result.json; no optimization run

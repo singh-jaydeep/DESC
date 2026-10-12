@@ -113,7 +113,7 @@ def parse():
                         "when continuing from a later step, with --tau-qs and --bn-norm, so nothing re-anchors")
     g.add_argument("--bn-norm", type=float, default=None,
                    help="frozen B.n normalization (default: computed at the start); pass it when continuing")
-    g.add_argument("--qs-form", choices=["scale-invariant", "stock"], default="scale-invariant",
+    g.add_argument("--qs-form", choices=["scale-invariant", "stock", "boozer"], default="scale-invariant",
                    help="scale-invariant: f_C/|B|^3 pointwise (DESC PR #2304, sandbox/qs_scale_invariant.py); "
                         "stock: f_C / B_scale^3, whose value moves with |B| (~B^3), i.e. with plasma size at "
                         "fixed Psi")
@@ -190,6 +190,21 @@ def parse():
     g.add_argument("--bs-chunk", type=int, default=None, help="Biot-Savart chunk (eval points)")
     g.add_argument("--jac-chunk", type=int, default=None, help="jac_chunk_size of the heavy terms")
     g.add_argument("--dcc-k", type=int, default=20000, help="two-pass capacity, coil-coil")
+    g = ap.add_argument_group("distance terms")
+    g.add_argument("--dist", choices=["penalty", "rows"], default="penalty",
+                   help="penalty: CoilSetDistancePenalty + PlasmaCoilSetMinDistance (eq moving, kinked). rows: the "
+                        "branch's smooth CoilSetDistanceRows + PlasmaCoilSetDistanceRows (node mode, gap included, "
+                        "no backoff needed beyond --rows-backoff). PlasmaCoilSetDistanceRows holds the plasma FIXED: "
+                        "it is rebuilt on the current boundary at every k step, so within a step it measures to "
+                        "the step's starting boundary (judge by the dense check)")
+    g.add_argument("--rows-backoff", type=float, default=0.01, help="rows: bounds enforced x(1 + this)")
+    g.add_argument("--rows-select", type=float, default=2.0, help="rows: select_distance = this x the bound")
+    g.add_argument("--cc-rows", type=int, default=6000, help="rows: coil-coil slots")
+    g.add_argument("--pc-rows", type=int, default=8000, help="rows: plasma-coil slots")
+    g.add_argument("--pc-gap", type=float, default=None,
+                   help="rows: explicit plasma-coil gap [m] (the build-time estimate uses the surface's principal "
+                        "curvature, which came out at 52 m on a from_axis QA boundary)")
+    g.add_argument("--tau-rows", type=float, default=0.01, help="rows: fractional shortfall per row")
     return ap.parse_args()
 
 
@@ -261,7 +276,8 @@ def build_terms(eq, cs, a, E):
     terms = [
         Field(eq, cs, eval_grid=grid_bn(), field_grid=src, bs_chunk_size=a.bs_chunk, field_fixed=a.fix_coils,
               weight=1 / (a.tau_bn * s_bn), **FK, **JC),
-        QS(eq, helicity=hel, grid=qs_grid(eq, a), weight=1 / (a.tau_qs * s_qs), **JC),
+        *(boozer_terms(eq, a, hel) if a.qs_form == "boozer" else
+          [QS(eq, helicity=hel, grid=qs_grid(eq, a), weight=1 / (a.tau_qs * s_qs), **JC)]),
         O.AspectRatio(eq, bounds=(a.A_min, a.A_max), normalize=False, weight=1 / (a.tau_A * A_scale)),
         O.RotationalTransform(eq, bounds=(a.iota_min, np.inf), normalize=False, grid=grid_iota(),
                               weight=1 / (a.tau_iota * a.iota_min * s_iota)),
@@ -269,12 +285,17 @@ def build_terms(eq, cs, a, E):
     if a.vol_band > 0:  # band around the START volume (a.V0, set once in main)
         terms.append(O.Volume(eq, bounds=(a.V0 * (1 - a.vol_band), a.V0 * (1 + a.vol_band)), normalize=False,
                               weight=1 / (a.tau_V * a.V0)))
+    P_ = getattr(a, "P", None) or E
     dpc = O.PlasmaCoilSetMinDistance(eq, cs, bounds=(E["dpc"], np.inf), normalize=False,
                                      plasma_grid=LinearGrid(M=a.plasma_m, N=a.plasma_n, NFP=eq.NFP, sym=eq.sym),
                                      coil_grid=cg, eq_fixed=False, coils_fixed=a.fix_coils,
                                      weight=1 / (a.tau_dpc * E["dpc"]))
     if a.fix_coils:  # the coil-only terms are constants: leave them out
         return terms + [dpc], S_
+    if a.dist != "rows":
+        terms_tail = [dpc]
+    else:
+        terms_tail = []
     if E["L"] is not None:
         terms.append(O.CoilLength(cs, bounds=(0.0, E["L"]), normalize=False, grid=lg,
                                   weight=1 / (a.tau_L * E["L"])))
@@ -283,16 +304,47 @@ def build_terms(eq, cs, a, E):
     if E["kms"] is not None:
         terms.append(O.CoilMeanSquaredCurvature(cs, bounds=(0.0, E["kms"]), normalize=False, grid=cg,
                                                 weight=1 / (a.tau_kms * E["kms"])))
+    if a.dist == "rows":
+        dcc = P_["dcc"] * (1 + a.rows_backoff)
+        dpcr = P_["dpc"] * (1 + a.rows_backoff)
+        terms += [
+            O.CoilSetDistanceRows(cs, select_distance=a.rows_select * dcc, bounds=(dcc, np.inf), normalize=False,
+                                  max_active_rows=a.cc_rows, signed=True, distance="node",
+                                  weight=1 / (a.tau_rows * dcc), **JC),
+            O.PlasmaCoilSetDistanceRows(eq, cs, select_distance=a.rows_select * dpcr, bounds=(dpcr, np.inf),
+                                        normalize=False, max_active_rows=a.pc_rows, distance="node",
+                                        plasma_grid=LinearGrid(M=a.plasma_m, N=a.plasma_n, NFP=eq.NFP, sym=eq.sym),
+                                        gap=a.pc_gap, weight=1 / (a.tau_rows * dpcr), **JC),
+        ]
+        return terms, S_
     terms += [
         O.CoilSetDistancePenalty(cs, d_min=E["dcc"], grid=cg, dist_chunk_size=1, distance_method="segment",
                                  max_active_pairs=(a.dcc_k or None), signed=bool(a.dcc_k), deriv_mode="rev",
                                  normalize=False, weight=1 / (a.tau_dcc * s_dcc)),
-        dpc,
+        *terms_tail,
     ]
     return terms, S_
 
 
+def boozer_terms(eq, a, hel, weighted=True):
+    """--qs-form boozer: one QuasisymmetryBoozer per --qs-rho surface (non-symmetric |B|_mn in T, spectral, so a
+    local spike in f_C, e.g. where the poloidal angle folds at a sharp cross-section tip, cannot dominate). Weight
+    1 / (tau_qs sqrt(n_surf)): tau_qs is the rms over surfaces of each surface's L2 norm."""
+    rhos = floats(a.qs_rho)
+    w = 1 / (a.tau_qs * np.sqrt(len(rhos))) if weighted else 1.0
+    return [O.QuasisymmetryBoozer(eq, helicity=hel, normalize=False, weight=w, name=f"QS Boozer rho {r:g}",
+                                  grid=LinearGrid(rho=np.array([r]), M=2 * eq.M_grid, N=2 * eq.N_grid, NFP=eq.NFP,
+                                                  sym=False)) for r in rhos]
+
+
 def start_qs_rms(eq, a):
+    if a.qs_form == "boozer":
+        hel = tuple(int(v) for v in a.helicity.split(","))
+        v = []
+        for o in boozer_terms(eq, a, hel, weighted=False):
+            o.build(verbose=0)
+            v.append(float(np.linalg.norm(o.compute_unscaled(eq.params_dict))))
+        return float(np.sqrt(np.mean(np.square(v))))
     """The start's QS two-term rms (normalized, quadrature-weighted), to set tau_qs relative to it."""
     g = qs_grid(eq, a)
     s = np.sqrt(g.num_nodes * np.sum(np.array(g.weights) ** 2))
@@ -471,6 +523,7 @@ def main():
     if P["L"] is not None:
         P["L"] *= a.length_mult
     E = enforced(P, a, S.is_piecewise(cs))
+    a.P = P  # the judged bounds (rows use them with --rows-backoff instead of the penalty backoffs)
     print(f"eq {a.eq} ({kind}) NFP {eq.NFP} sym {eq.sym} L,M,N {eq.L},{eq.M},{eq.N} dim_x {eq.dim_x}; "
           f"start {a.start}: {nc} unique coils ({type(next(S.iter_unique(cs))).__name__}), "
           f"{S.expected_coils(cs, eq)} total\nSETTINGS {vars(a)}\n"
