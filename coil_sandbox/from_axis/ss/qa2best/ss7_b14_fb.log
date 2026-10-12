@@ -1,0 +1,166 @@
+/home/jay/Documents/desc_dev/DESC/desc/__init__.py:94: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  from pynvml import (
+DESC /home/jay/Documents/desc_dev/DESC/desc
+DEVICE requested=gpu obtained=gpu (1x NVIDIA GeForce RTX 5070 Ti)
+START (single-stage state) {"A": 6.825285611825367, "a": 0.12354016377306853, "R0": 0.8431969022828741, "qs_booz": [0.004341472779271066, 0.004550157678878119, 0.008568276869879508, 0.015450960813913757], "iota_min": 0.317258498026516, "iota_max": 0.3364024201207112, "iota_axis": 0.3323897917033614, "iota_edge": 0.32053962226150584, "bn_rms": 0.0009099019265336444, "neg_jac_frac_rho08_1": [0.0, 0.009374436632413918]}
+Building objective: Vacuum boundary error
+Precomputing transforms
+Building objective: force
+Precomputing transforms
+Building objective: fixed current
+Building objective: fixed pressure
+Building objective: fixed Psi
+Building objective: lcfs R
+Building objective: lcfs Z
+Number of parameters: 81
+Number of objectives: 6498
+
+Starting optimization
+Using method: proximal-lsq-exact
+Warning: A bad approximation caused failure to predict improvement.
+         Current function value: 8.122e-06
+         Total delta_x: 4.010e-03
+         Iterations: 24
+         Function evaluations: 54
+         Jacobian evaluations: 24
+==============================================================================================================
+                                                                 Start  -->   End
+Total (sum of squares):                                      7.376e-02  -->   8.122e-06, 
+Maximum absolute Boundary normal field error:                3.951e-04  -->   2.245e-04 (T*m^2)
+Minimum absolute Boundary normal field error:                4.002e-17  -->   3.243e-17 (T*m^2)
+Average absolute Boundary normal field error:                8.443e-05  -->   3.058e-05 (T*m^2)
+Maximum absolute Boundary normal field error:                3.761e-03  -->   2.137e-03 (normalized)
+Minimum absolute Boundary normal field error:                3.808e-16  -->   3.086e-16 (normalized)
+Average absolute Boundary normal field error:                8.035e-04  -->   2.910e-04 (normalized)
+Maximum absolute Boundary magnetic pressure error:           1.460e-02  -->   2.219e-04 (T^2*m^2)
+Minimum absolute Boundary magnetic pressure error:           1.025e-05  -->   1.661e-08 (T^2*m^2)
+Average absolute Boundary magnetic pressure error:           4.801e-03  -->   3.463e-05 (T^2*m^2)
+Maximum absolute Boundary magnetic pressure error:           1.595e-01  -->   2.426e-03 (normalized)
+Minimum absolute Boundary magnetic pressure error:           1.120e-04  -->   1.816e-07 (normalized)
+Average absolute Boundary magnetic pressure error:           5.248e-02  -->   3.785e-04 (normalized)
+Maximum absolute Force error:                                3.317e+05  -->   2.153e+03 (N)
+Minimum absolute Force error:                                3.170e-03  -->   1.505e-07 (N)
+Average absolute Force error:                                2.348e+02  -->   1.251e+01 (N)
+Maximum absolute Force error:                                4.616e-01  -->   2.997e-03 (normalized)
+Minimum absolute Force error:                                4.412e-09  -->   2.095e-13 (normalized)
+Average absolute Force error:                                3.268e-04  -->   1.740e-05 (normalized)
+Fixed current profile error:                                 0.000e+00  -->   0.000e+00 (A)
+Fixed pressure profile error:                                0.000e+00  -->   0.000e+00 (Pa)
+Fixed Psi error:                                             0.000e+00  -->   0.000e+00 (Wb)
+R boundary error:                                            2.334e-19  -->   0.000e+00 (m)
+Z boundary error:                                            2.299e-19  -->   0.000e+00 (m)
+==============================================================================================================
+
+[3283s] shell k=4: B.n rms 4.649e-04 (A bad approximation caused failure to predict improvement.)
+Building objective: Vacuum boundary error
+Precomputing transforms
+Building objective: force
+Precomputing transforms
+Building objective: fixed current
+Building objective: fixed pressure
+Building objective: fixed Psi
+Building objective: lcfs R
+Building objective: lcfs Z
+Number of parameters: 289
+Number of objectives: 6498
+
+Starting optimization
+Using method: proximal-lsq-exact
+Warning: A bad approximation caused failure to predict improvement.
+         Current function value: 3.169e-06
+         Total delta_x: 5.401e-03
+         Iterations: 34
+         Function evaluations: 73
+         Jacobian evaluations: 34
+==============================================================================================================
+                                                                 Start  -->   End
+Total (sum of squares):                                      7.968e-06  -->   3.169e-06, 
+Maximum absolute Boundary normal field error:                2.245e-04  -->   1.603e-04 (T*m^2)
+Minimum absolute Boundary normal field error:                3.605e-17  -->   3.255e-17 (T*m^2)
+Average absolute Boundary normal field error:                3.058e-05  -->   2.319e-05 (T*m^2)
+Maximum absolute Boundary normal field error:                2.127e-03  -->   1.518e-03 (normalized)
+Minimum absolute Boundary normal field error:                3.416e-16  -->   3.083e-16 (normalized)
+Average absolute Boundary normal field error:                2.897e-04  -->   2.197e-04 (normalized)
+Maximum absolute Boundary magnetic pressure error:           2.219e-04  -->   1.204e-04 (T^2*m^2)
+Minimum absolute Boundary magnetic pressure error:           3.288e-08  -->   1.346e-08 (T^2*m^2)
+Average absolute Boundary magnetic pressure error:           3.464e-05  -->   1.756e-05 (T^2*m^2)
+Maximum absolute Boundary magnetic pressure error:           2.394e-03  -->   1.299e-03 (normalized)
+Minimum absolute Boundary magnetic pressure error:           3.548e-07  -->   1.452e-07 (normalized)
+Average absolute Boundary magnetic pressure error:           3.737e-04  -->   1.895e-04 (normalized)
+Maximum absolute Force error:                                2.153e+03  -->   2.388e+03 (N)
+Minimum absolute Force error:                                1.505e-07  -->   8.439e-05 (N)
+Average absolute Force error:                                1.251e+01  -->   7.709e+00 (N)
+Maximum absolute Force error:                                2.959e-03  -->   3.281e-03 (normalized)
+Minimum absolute Force error:                                2.068e-13  -->   1.160e-10 (normalized)
+Average absolute Force error:                                1.718e-05  -->   1.059e-05 (normalized)
+Fixed current profile error:                                 0.000e+00  -->   0.000e+00 (A)
+Fixed pressure profile error:                                0.000e+00  -->   0.000e+00 (Pa)
+Fixed Psi error:                                             0.000e+00  -->   0.000e+00 (Wb)
+R boundary error:                                            6.420e-20  -->   9.924e-20 (m)
+Z boundary error:                                            6.527e-20  -->   8.131e-20 (m)
+==============================================================================================================
+
+[7470s] shell k=8: B.n rms 4.012e-04 (A bad approximation caused failure to predict improvement.)
+Building objective: Vacuum boundary error
+Precomputing transforms
+Building objective: force
+Precomputing transforms
+Building objective: fixed current
+Building objective: fixed pressure
+Building objective: fixed Psi
+Number of parameters: 841
+Number of objectives: 6498
+
+Starting optimization
+Using method: proximal-lsq-exact
+W1012 17:01:44.605314    6529 bfc_allocator.cc:501] Allocator (GPU_0_bfc) ran out of memory trying to allocate 6.25GiB (rounded to 6712568832)requested by op 
+If the cause is memory fragmentation maybe the environment variable 'TF_GPU_ALLOCATOR=cuda_malloc_async' will improve the situation. 
+Current allocation summary follows.
+Current allocation summary follows.
+W1012 17:01:44.606647    6529 bfc_allocator.cc:512] *********____***____________________________________________________________________________________
+E1012 17:01:44.606802    6529 pjrt_stream_executor_client.cc:3314] Execution of replica 0 failed: RESOURCE_EXHAUSTED: Out of memory while trying to allocate 6712568600 bytes. [tf-allocator-allocation-error='']
+Traceback (most recent call last):
+  File "/home/jay/Documents/desc_dev/DESC/coil_sandbox/from_axis/ss/fb_rescore.py", line 72, in <module>
+    eq, res = eq.optimize(obj, cons + bc, optimizer="proximal-lsq-exact", verbose=1, maxiter=a.maxiter,
+              ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                          ftol=1e-8, xtol=1e-10, gtol=1e-8, copy=True)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jay/Documents/desc_dev/DESC/desc/equilibrium/equilibrium.py", line 2548, in optimize
+    things, result = optimizer.optimize(
+                     ~~~~~~~~~~~~~~~~~~^
+        self,
+        ^^^^^
+    ...<10 lines>...
+        copy=copy,
+        ^^^^^^^^^^
+    )
+    ^
+  File "/home/jay/Documents/desc_dev/DESC/desc/optimize/optimizer.py", line 318, in optimize
+    result = optimizers[method]["fun"](
+        objective,
+    ...<6 lines>...
+        options,
+    )
+  File "/home/jay/Documents/desc_dev/DESC/desc/optimize/_desc_wrappers.py", line 546, in _optimize_desc_least_squares
+    result = lsqtr(
+        objective.compute_scaled_error,
+    ...<10 lines>...
+        options=options,
+    )
+  File "/home/jay/Documents/desc_dev/DESC/desc/optimize/least_squares.py", line 194, in lsqtr
+    J = jac(x, *args).block_until_ready()
+        ~~~^^^^^^^^^^
+  File "/home/jay/Documents/desc_dev/DESC/desc/optimize/_constraint_wrappers.py", line 425, in jac_scaled_error
+    return self._jac(x_reduced, constants, "scaled_error")
+           ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jay/Documents/desc_dev/DESC/desc/optimize/_constraint_wrappers.py", line 388, in _jac
+    df = getattr(self._objective, "jvp_" + op)(v.T, x, constants)
+  File "/home/jay/Documents/desc_dev/DESC/desc/optimize/_constraint_wrappers.py", line 1221, in jvp_scaled_error
+    return self._jvp(v, x, constants, op)
+           ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jay/Documents/desc_dev/DESC/desc/optimize/_constraint_wrappers.py", line 1276, in _jvp
+    return getattr(self._objective, "jvp_" + op)(tangents, xg, constants[0])
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+jaxlib._jax.XlaRuntimeError: RESOURCE_EXHAUSTED: Out of memory while trying to allocate 6712568600 bytes.
+--------------------
+For simplicity, JAX has removed its internal frames from the traceback of the following exception. Set JAX_TRACEBACK_FILTERING=off to include these.

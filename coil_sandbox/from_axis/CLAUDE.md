@@ -2,7 +2,8 @@
 
 Goal: find axes (then QS equilibria) that coils with **two planar faces per coil and every hinge on z = 0** can
 produce, by the near-axis single-stage method of Giuliani et al. JCP 2022 (`singlestage_QS.pdf`). Read first:
-`REPORT.md` (findings), `PLAN.md` (agreed rules, decisions, phases, status). Results to look at: `viewer.html`.
+`REPORT.md` (findings), `PLAN.md` (agreed rules, decisions, phases, status), `NAE_HANDOFF.md` (near-axis scans after
+REPORT section 11: level hinges, low iota, planar coils; open items), `ss/NOTES.md` (single stage, free boundary). Results to look at: `viewer.html`.
 
 ## Where things are
 

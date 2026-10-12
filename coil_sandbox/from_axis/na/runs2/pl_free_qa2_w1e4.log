@@ -1,0 +1,62 @@
+ERROR:2026-10-12 16:36:29,548:jax._src.xla_bridge:487: Jax plugin configuration error: Exception when calling jax_plugins.xla_cuda12.initialize()
+Traceback (most recent call last):
+  File "/home/jay/miniconda3/envs/desc-dev/lib/python3.13/site-packages/jax/_src/xla_bridge.py", line 485, in discover_pjrt_plugins
+    plugin_module.initialize()
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/jay/miniconda3/envs/desc-dev/lib/python3.13/site-packages/jax_plugins/xla_cuda12/__init__.py", line 328, in initialize
+    _check_cuda_versions(raise_on_first_error=True)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jay/miniconda3/envs/desc-dev/lib/python3.13/site-packages/jax_plugins/xla_cuda12/__init__.py", line 285, in _check_cuda_versions
+    local_device_count = cuda_versions.cuda_device_count()
+RuntimeError: jaxlib/cuda/versions_helpers.cc:113: operation cuInit(0) failed: CUDA_ERROR_NO_DEVICE
+DESC /home/jay/Documents/desc_dev/DESC/desc
+DEVICE requested=cpu obtained=cpu (1x cpu)
+nfp 2 nc 4 mode free helicity 0.0 nparams 89 order 2 seed -1
+{"tag": "init", "cost": 0.4196754028220022, "cost_targets": 0.41957940059876225, "cost_bounds": 9.600222324021316e-05, "max_dB": 0.005565714582345123, "max_dG_rel": 0.03107731703260044, "iota": 0.06377456691708888, "eta": 1.224906632596723, "hel": 0.0, "max_elong": 1.4272941664576488, "axis_rc": [0.8106, 0.0442, 0.00152, 4e-05, -0.0, -0.0], "axis_zs": [0.0, -0.04737, -0.0017, -7e-05, -0.0, -0.0], "max_abs_Zaxis": 0.047397006047576705, "min_dpc": 0.14775722048169376, "min_dcc": 0.03999997482566622, "max_kappa": 10.173658361048087, "Lcoil": [3.945, 3.944, 3.943, 3.943], "I_over_uniform": [0.862, 0.833, 0.793, 0.78], "n_active_bounds": 13, "L_total": 15.77483532872408, "coil_R_max": 1.562226293729277, "coil_absz_max": 0.7285119980640189, "mean_kappa2": 0.08293647126280514, "cost_reg": 0.0021301190565144188, "cost_field": 0.41254094774102995, "fold_deg": [-0.03, -0.04, -0.02, -0.02], "tilt_u_deg": [-1.6, -1.8, 0.9, 3.7], "hinge_z": [[-0.20001, 0.03254], [-0.2, -0.03737], [-0.2, 0.15966], [0.03901, -0.05492]], "max_abs_hinge_z": 0.20001490261857682, "max_hinge_dz": 0.3596627253503901, "B2c": 2.5760643049065175, "B20_residual": 0.05911439415816867, "max_dGG_rel": 0.2533736361376471}
+   Iteration     Total nfev        Cost      Cost reduction    Step norm     Optimality   
+       0              1          4.197e-01                                    5.713e-03   
+       1              2          4.149e-01      4.792e-03      7.391e-01      3.875e-04   
+       2              3          4.149e-01      1.819e-05      5.195e-02      9.535e-06   
+       3              4          4.149e-01      1.938e-07      3.729e-02      1.900e-06   
+       4              5          4.149e-01      2.002e-07      6.458e-02      1.143e-06   
+       5              6          4.149e-01      1.641e-07      9.742e-02      1.156e-06   
+       6              7          4.149e-01      8.477e-08      1.145e-01      1.600e-06   
+       7              8          4.149e-01      3.108e-08      1.372e-01      2.007e-07   
+       8              9          4.149e-01      6.132e-09      9.319e-02      8.218e-07   
+       9             10          4.149e-01      6.482e-09      6.558e-02      1.687e-07   
+      10             11          4.149e-01      3.824e-09      1.071e-01      9.138e-08   
+      11             12          4.149e-01      2.604e-09      8.735e-02      4.585e-08   
+      12             13          4.149e-01      1.672e-09      8.174e-02      1.944e-07   
+      13             14          4.149e-01      1.637e-09      7.302e-02      1.167e-07   
+      14             15          4.149e-01      1.401e-09      7.295e-02      5.510e-08   
+      15             16          4.149e-01      1.403e-09      7.988e-02      1.221e-07   
+      16             17          4.149e-01      1.300e-09      8.176e-02      7.958e-08   
+      17             18          4.149e-01      1.242e-09      8.479e-02      6.752e-08   
+      18             19          4.149e-01      1.075e-09      8.598e-02      4.870e-08   
+      19             20          4.149e-01      1.130e-09      7.872e-02      1.151e-07   
+      20             21          4.149e-01      7.438e-10      8.244e-02      1.441e-07   
+      21             22          4.149e-01      8.538e-10      7.513e-02      1.716e-07   
+      22             23          4.149e-01      5.995e-10      7.231e-02      1.318e-07   
+      23             24          4.149e-01      5.451e-10      6.607e-02      6.192e-08   
+      24             25          4.149e-01      3.405e-10      6.109e-02      1.348e-07   
+      25             26          4.149e-01      5.579e-10      5.629e-02      3.697e-08   
+      26             27          4.149e-01      3.158e-10      5.004e-02      7.633e-08   
+      27             28          4.149e-01      2.383e-10      4.485e-02      9.154e-08   
+      28             29          4.149e-01      2.966e-10      3.948e-02      4.825e-08   
+      29             30          4.149e-01      1.395e-10      4.821e-02      1.200e-07   
+      30             31          4.149e-01      2.013e-10      4.316e-02      1.113e-07   
+      31             32          4.149e-01      1.223e-10      4.088e-02      4.733e-08   
+      32             33          4.149e-01      1.371e-10      3.535e-02      2.931e-08   
+      33             34          4.149e-01      3.288e-11      3.245e-02      3.267e-08   
+      34             35          4.149e-01      1.141e-10      2.460e-02      4.864e-08   
+      35             37          4.149e-01      1.338e-11      1.567e-02      3.482e-08   
+      36             38          4.149e-01      4.125e-11      1.025e-02      2.090e-08   
+Optimization terminated successfully.
+`ftol` condition satisfied. (ftol=1.00e-10)
+         Current function value: 4.149e-01
+         Max scaled gradient: 2.090e-08
+         Total delta_x: 2.035e-03
+         Iterations: 36
+         Function evaluations: 38
+         Jacobian evaluations: 37
+{"tag": "final", "cost": 0.41486469494956063, "cost_targets": 0.4147687708556229, "cost_bounds": 9.592409393765312e-05, "max_dB": 0.0055645574102034965, "max_dG_rel": 0.031072569901732697, "iota": 0.06371805016356506, "eta": 1.2248822356699214, "hel": 0.0, "max_elong": 1.427002969220875, "axis_rc": [0.81058, 0.04417, 0.00152, 4e-05, -0.0, -0.0], "axis_zs": [0.0, -0.04735, -0.0017, -7e-05, -0.0, -0.0], "max_abs_Zaxis": 0.04737974663386686, "min_dpc": 0.14775721106143164, "min_dcc": 0.03999997432201289, "max_kappa": 10.173658418370342, "Lcoil": [3.945, 3.944, 3.943, 3.943], "I_over_uniform": [0.862, 0.833, 0.793, 0.78], "n_active_bounds": 13, "L_total": 15.774830699042818, "coil_R_max": 1.5623956902633835, "coil_absz_max": 0.7284446420113913, "mean_kappa2": 0.08294328222974791, "cost_reg": 0.0021301295303061156, "cost_field": 0.41263815141852117, "fold_deg": [-0.0, -0.0, -0.0, -0.0], "tilt_u_deg": [-1.6, -1.8, 0.9, 3.7], "hinge_z": [[-0.20001, 0.03243], [-0.2, -0.03751], [-0.2, 0.16083], [0.03901, -0.05396]], "max_abs_hinge_z": 0.20001490785779688, "max_hinge_dz": 0.3608296423044276, "B2c": 2.576190659585196, "B20_residual": 0.059085969052983044, "max_dGG_rel": 0.2533708720376655, "time_s": 59, "status": "Optimization terminated successfully.\n`ftol` condition satisfied. (ftol=1.00e-10)", "nit": 36, "optimality": 2.0902541634897438e-08}

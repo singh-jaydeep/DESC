@@ -47,6 +47,14 @@ ap.add_argument("--Lmax", type=float, default=2.93)
 ap.add_argument("--kmax", type=float, default=13.7)
 ap.add_argument("--imax", type=float, default=2.0, help="each current in [0, imax x uniform]; <= 0 disables")
 ap.add_argument("--emax", type=float, default=0.0, help="max NAE elongation; <= 0 disables")
+ap.add_argument("--hzmax", type=float, default=0.0,
+                help="--mode free: bound rows |z| <= hzmax on every hinge (<= 0: no bound)")
+ap.add_argument("--wlevel", type=float, default=0.0,
+                help="--mode free: weight of the per-coil LEVEL rows (z_a - z_b) / a, target 0: each coil's two hinges "
+                     "at one height (a horizontal joint per coil); 1e4 holds them level to ~1e-5 m")
+ap.add_argument("--wplanar", type=float, default=0.0,
+                help="weight of the per-coil PLANAR rows (alpha_u + alpha_l), target 0: both arcs in one plane (no "
+                     "fold; the coil is a planar curve, still two sine-series arcs meeting at the hinges)")
 ap.add_argument("--zmax", type=float, default=0.0, help="max |Z| of the expansion axis (bound rows); <= 0 disables")
 ap.add_argument("--wlen", type=float, default=0.0, help="regularizer: weight of sum_i (L_i / L_max)^2 (target 0)")
 ap.add_argument("--wbend", type=float, default=0.0, help="regularizer: weight of sum_i int (kappa / kappa_max)^2 ds / L_i")
@@ -77,6 +85,12 @@ if a.init:
     d = np.load(a.init + ".npz")
     p0 = jnp.asarray(d["p"])
     hel = float(d["hel"])
+    if str(d["mode"]) == "z0" and a.mode == "free":  # z = 0 hinges -> free hinges starting at z = 0
+        L0 = Layout(a.nfp, a.nc, a.K, a.Kax, "z0")
+        C0 = np.asarray(p0[L0.n_axis:L0.n]).reshape(a.nc, L0.per)
+        zc = np.zeros((a.nc, 1))
+        Cf = np.concatenate([C0[:, :2], zc, C0[:, 2:4], zc, C0[:, 4:]], axis=1)
+        p0 = jnp.concatenate([p0[:L0.n_axis], jnp.asarray(Cf.ravel()), p0[L0.n:]])
     if a.order == 2 and p0.shape[0] == L.n:  # first-order run -> append B2c
         p0 = jnp.concatenate([p0, jnp.array([a.B2c0])])
     if a.order == 1 and p0.shape[0] == L.n + 1:
@@ -209,6 +223,12 @@ def rows_spec():
         spec.append(("zaxis", a.nphi, "b"))
     if a.order == 2:
         spec += [("B20", a.nphi, "t"), ("GG", a.nphi * 27, "t")]
+    if a.mode == "free" and a.hzmax > 0:
+        spec.append(("hz", 2 * a.nc, "b"))
+    if a.mode == "free" and a.wlevel > 0:
+        spec.append(("hlevel", a.nc, "t"))
+    if a.wplanar > 0:
+        spec.append(("planar", a.nc, "t"))
     if a.wlen > 0:
         spec.append(("reg_len", a.nc, "t"))
     if a.wbend > 0:
@@ -221,7 +241,8 @@ wb = np.sqrt(a.wpen)
 BOUNDS = dict(dpc=(a.dpc, np.inf, wb / a.dpc), dcc=(a.dcc, np.inf, wb / a.dcc), kappa=(-np.inf, a.kmax, wb / a.kmax),
               Lcoil=(-np.inf, a.Lmax, wb / a.Lmax), I=(0.0, a.imax * Iref if a.imax > 0 else np.inf, wb / Iref),
               elong=(-np.inf, a.emax, wb / max(a.emax, 1)),
-              zaxis=(-a.zmax, a.zmax, wb / max(a.zmax, 1e-3)))
+              zaxis=(-a.zmax, a.zmax, wb / max(a.zmax, 1e-3)),
+              hz=(-a.hzmax, a.hzmax, wb / max(a.hzmax, 1e-3)))
 lo, hi, tgt, isb, wrow = [], [], [], [], []
 for name, n, kind in SPEC:
     if kind == "t":
@@ -262,6 +283,12 @@ def fun_raw(p):
         wq = jnp.sqrt(q["dl"] / jnp.sum(q["dl"]))
         out.append(jnp.sqrt(a.w2) * q["r2"]["B20_anomaly"] * wq / q["B0"])
         out.append(jnp.sqrt(a.wgg) * (a.a / 2) * ((q["GGc"] - q["r2"]["GG"]) * w[:, None, None, None]).ravel())
+    if a.mode == "free" and a.hzmax > 0:
+        out.append(jnp.concatenate([C[:, 2], C[:, 5]]))
+    if a.mode == "free" and a.wlevel > 0:
+        out.append(jnp.sqrt(a.wlevel) * (C[:, 2] - C[:, 5]) / a.a)
+    if a.wplanar > 0:
+        out.append(jnp.sqrt(a.wplanar) * (C[:, L.nh] + C[:, L.nh + 1]))
     if a.wlen > 0:
         out.append(jnp.sqrt(a.wlen) * jnp.stack(Ls) / a.Lmax)
     if a.wbend > 0:
@@ -315,6 +342,17 @@ def report(p, tag, extra=None):
                 mean_kappa2=float(np.mean((sraw["kappa"] / a.kmax) ** 2)),
                 cost_reg=float(0.5 * sum(np.sum(np.asarray(fun(p))[sl] ** 2) for sl in reg_slices())))
     info["cost_field"] = info["cost_targets"] - info["cost_reg"]
+    info["fold_deg"] = np.degrees(np.asarray(C[:, L.nh] + C[:, L.nh + 1])).round(2).tolist()
+    info["tilt_u_deg"] = np.degrees(np.asarray(C[:, L.nh])).round(1).tolist()
+    if a.wplanar > 0:
+        info["cost_field"] -= float(0.5 * np.sum(blocks(np.asarray(fun(p)))["planar"] ** 2))
+    if a.mode == "free":
+        Cn = np.asarray(C)
+        info.update(hinge_z=np.stack([Cn[:, 2], Cn[:, 5]], 1).round(5).tolist(),
+                    max_abs_hinge_z=float(np.abs(Cn[:, [2, 5]]).max()),
+                    max_hinge_dz=float(np.abs(Cn[:, 2] - Cn[:, 5]).max()))
+        if a.wlevel > 0:
+            info["cost_field"] -= float(0.5 * np.sum(blocks(np.asarray(fun(p)))["hlevel"] ** 2))
     if a.order == 2:
         r2 = q["r2"]
         gg = np.asarray(q["GGc"] - r2["GG"])

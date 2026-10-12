@@ -69,8 +69,13 @@ for k in [int(v) for v in a.shells.split(",")]:
     Zm = eq.surface.Z_basis.modes[np.max(np.abs(eq.surface.Z_basis.modes), 1) > k, :]
     bc = tuple(c for c in (FixBoundaryR(eq=eq, modes=Rm) if len(Rm) else None,
                            FixBoundaryZ(eq=eq, modes=Zm) if len(Zm) else None) if c is not None)
-    eq, res = eq.optimize(obj, cons + bc, optimizer="proximal-lsq-exact", verbose=1, maxiter=a.maxiter,
-                          ftol=1e-8, xtol=1e-10, gtol=1e-8, copy=True)
+    try:
+        eq, res = eq.optimize(obj, cons + bc, optimizer="proximal-lsq-exact", verbose=1, maxiter=a.maxiter,
+                              ftol=1e-8, xtol=1e-10, gtol=1e-8, copy=True)
+    except Exception as e:  # e.g. GPU out of memory at the full-boundary shell: score the last completed shell
+        log["shells"].append(dict(k=k, failed=repr(e)[:300]))
+        print(f"[{time.time() - t0:.0f}s] shell k={k} FAILED ({type(e).__name__}); scoring the previous shell", flush=True)
+        break
     b = bn_rms(eq)
     log["shells"].append(dict(k=k, bn_rms=b, nit=int(res.get("nit", -1)), message=str(res.get("message", ""))))
     print(f"[{time.time() - t0:.0f}s] shell k={k}: B.n rms {b:.3e} ({res.get('message', '')})", flush=True)
