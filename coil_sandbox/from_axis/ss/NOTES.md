@@ -112,3 +112,37 @@ study at basis 8) whose QS differs by up to 2x at the edge. Basis 12 is under-re
 quoted at basis 12 carry roughly +-20% (mid) / +-50% (edge) branch uncertainty. Move to basis 14, solve-tol 1e-8.
 ss7_b14: basis 14 (force cost 6e-7), solve-tol 1e-8, from ss4 pair, tau_qs 1.5e-3, tau_bn 5e-4, L 0.999x, k 4..6
 ss7_b14 k=4 (7 its, ~8 min/eval at basis 14): 4.34e-3 / 4.55e-3 / 8.57e-3 / 1.55e-2, iota 0.317-0.336, B.n 1.02e-3. Same frontier as ss4 (basis 12) within branch uncertainty.
+
+## 2026-10-12: basis 14
+
+* The 10-12 launch of "finish basis 14" never ran: a rebase rewrote `run1.sh` with CRLF (core.autocrlf) and it failed
+  with "cannot execute"; the chain fell through to a free-boundary rescore of ss7_b14 k=4. Fixed (LF, `.gitattributes`).
+* **Basis-14 rule-2 score of ss7_b14 k=4** (`qa2best/ss7_b14_fb/eq_fb.h5`, shells 4 and 8; shell 14 ran out of GPU
+  memory, 6.25 GB allocation with all boundary modes free; `fb_rescore.py` now scores the last completed shell):
+  B.n 9.1e-4 -> 4.6e-4 -> 4.0e-4; Boozer QS **4.25e-3 / 4.29e-3 / 8.45e-3 / 1.75e-2**, iota 0.313-0.356, A 6.89;
+  coils L 0.999, kappa 0.999, d_cc 1.024, d_pc 1.109: FEASIBLE (`qa2best/ss7_b14_fb_score/score.json`).
+  This agrees with the basis-12 score of ss4 (4.37e-3 / 4.35e-3 / 8.58e-3 / 1.67e-2) to 1-5%: the ss4 numbers hold at
+  basis 14. The k=4 single-stage edge gain at basis 14 (1.55e-2 reported) did not survive the free boundary (1.75e-2).
+* ss7b_b14 (k = 5, 6 from ss7_b14 k=4, basis 14, solve-tol 1e-8, --track-steps): k=5 iterations 1-7 cost 21.00 -> 19.59,
+  14 evaluations, steps 1.4-3.6 (no collapse, unlike basis 12).
+
+## Literature QS metrics (2026-10-12; `qs_metrics.py`, `qs_booz_fix.py`, `qa2best/qs_metrics.json`)
+
+ss7b_b14 (k=5) killed after 7 accepted steps and ~35 min of rejected trials. State scored: ss7_b14 k=4 coils on their
+own basis-14 free-boundary surface (`qa2best/ss7_b14_fb/eq_fb.h5`). References: DESC example equilibria (fixed-boundary
+targets, NO coils). Boozer amplitudes are cos(m theta_B - n zeta_B) modes (ptolemy transform, as QuasisymmetryBoozer;
+the raw `|B|_mn_B` product basis gives 1.2-2x larger numbers and is NOT the literature convention) over B_00.
+
+max breaking Boozer mode / B00 at rho .25/.5/.75/1:
+  ours k=4 b14   3.6e-3 / 2.0e-3 / 3.7e-3 / 6.9e-3      phase 2 start 2.2e-3 / 3.2e-3 / 6.4e-3 / 9.8e-3
+  precise_QA     6.3e-5 / 2.7e-5 / 3.3e-5 / 2.1e-4      reactor_QA    2.7e-3 / 1.8e-3 / 2.9e-3 / 5.1e-3
+  NCSX           6.9e-3 / 6.6e-3 / 1.3e-2 / 2.7e-2      ARIES-CS      9.7e-3 / 1.1e-2 / 1.4e-2 / 2.2e-2
+L2 of breaking modes / B00:
+  ours 4.2e-3 / 4.3e-3 / 8.4e-3 / 1.7e-2   precise_QA 8.1e-5 / 4.2e-5 / 5.6e-5 / 2.8e-4   reactor_QA 2.9e-3 / 2.9e-3 / 4.1e-3 / 7.3e-3
+  NCSX 9.7e-3 / 1.3e-2 / 2.0e-2 / 3.9e-2   ARIES-CS 1.1e-2 / 1.4e-2 / 1.9e-2 / 3.6e-2
+two-term rms(f_C / B^3): ours 2.4e-2 / 3.2e-2 / 5.9e-2 / (138: fold spike; median 6.0e-2); precise_QA 2.1e-4 / 9.8e-5 /
+  1.3e-4 / 5.8e-4; reactor_QA 4.4e-3 / 4.5e-3 / 6.5e-3 / 1.2e-2; NCSX 4.6e-2 / 5.3e-2 / 7.6e-2 / 1.5e-1; ARIES-CS 2.3e-2 / 2.9e-2 / 5.1e-2 / 1.3e-1
+eps_eff (DESC "effective ripple", Bounce2D X=Y=32, Y_B=128, 20 transits; resolution NOT convergence-checked), rho .25/.5/.75:
+  ours 1.0e-3 / 1.0e-3 / 2.7e-3; precise_QA 4.6e-7 / 3.2e-7 / 1.3e-6; reactor_QA 2.2e-4 / 8.1e-4 / 2.8e-3;
+  NCSX 2.0e-3 / 1.9e-3 / 3.8e-3; ARIES-CS 6.3e-4 / 2.3e-4 / 8.0e-4
+Viewer: `viewer_ss.html` (`../../view.py`; phase 2 start, ss4, ss7 k=4, each on its own free-boundary surface).

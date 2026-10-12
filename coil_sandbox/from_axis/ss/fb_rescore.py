@@ -18,6 +18,7 @@ ap = argparse.ArgumentParser()
 ap.add_argument("eq"); ap.add_argument("coils"); ap.add_argument("out")
 ap.add_argument("--shells", default="4,8,12")
 ap.add_argument("--maxiter", type=int, default=60)
+ap.add_argument("--no-poincare", action="store_true")
 ap.add_argument("--helicity", default="1,0")
 ap.add_argument("--bounds", default="../../bounds/fa_qa2_a0167.json")
 ap.add_argument("--device", default="gpu")
@@ -62,7 +63,7 @@ def physics(eq):
 
 log = {"eq": a.eq, "coils": a.coils, "start": physics(eq), "shells": []}
 print("START (single-stage state)", json.dumps(log["start"]), flush=True)
-for k in [int(v) for v in a.shells.split(",")]:
+for k in ([] if a.shells == "none" else [int(v) for v in a.shells.split(",")]):  # "none": score as is
     cons = (ForceBalance(eq=eq, jac_chunk_size=200), FixCurrent(eq=eq), FixPressure(eq=eq), FixPsi(eq=eq))
     obj = ObjectiveFunction(VacuumBoundaryError(eq=eq, field=cs, field_fixed=True, field_grid=src))
     Rm = eq.surface.R_basis.modes[np.max(np.abs(eq.surface.R_basis.modes), 1) > k, :]
@@ -89,6 +90,8 @@ log["coil_check"] = {k: m[k] for k in ("L", "kappa", "d_cc", "d_pc", "linked")}
 log["coil_verdict"] = S.verdict(m, P)
 print("COILS", S.report(m, P), S.verdict(m, P), flush=True)
 json.dump(log, open(os.path.join(a.out, "score.json"), "w"), indent=1)
+if a.no_poincare:
+    raise SystemExit(0)
 fig, ax = plot_surfaces(eq)
 gt = LinearGrid(rho=np.linspace(0.1, 1.1, 11), theta=np.array([0.0]), zeta=np.array([0.0]), NFP=1)
 dt = eq.compute(["R", "Z"], grid=gt)

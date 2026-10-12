@@ -1,0 +1,145 @@
+# Best z = 0 two-face-coil QA so far (reference for anyone trying to beat it), 2026-10-12
+
+QA, nfp 2, 16 coils (4 per half period), each coil two planar faces, **every hinge on z = 0**, all scaled engineering
+bounds met. The coils' own vacuum field has nested surfaces at aspect ratio 6.9 with the largest symmetry-breaking Boozer
+mode at 0.2-0.7% of B00. This file says where it is, how it was made, how it scores, what is not yet trustworthy,
+and what a better result has to show. Details and every dead end: `ss/NOTES.md` (single stage), `REPORT.md` sections
+10-11 and `NAE_HANDOFF.md` (near-axis stage).
+
+## 1. The files
+
+All under `coil_sandbox/from_axis/ss/qa2best/`. Two states that are the same design to 4 digits (the hinges agree to
+1e-4 m); quote the first, which was scored at the higher resolution.
+
+| what | file |
+|---|---|
+| **coils** (DESC `CoilSet` of 4 `PiecewisePlanarArcCoil`, B = 2, M = 5, NFP 2, sym) | `ss7_b14/coils_k4.h5` |
+| **their free-boundary vacuum equilibrium**, L = M = N = 14 | `ss7_b14_fb/eq_fb.h5` |
+| its score (QS, iota, B.n, coil check) | `ss7_b14_fb_score/score.json` |
+| basis-12 twin: coils, free-boundary equilibrium, score, Poincare plot | `ss4/coils_k6.h5`, `ss4_fb/eq_fb.h5`, `ss4_fb/score.json`, `ss4_fb/poincare.png` |
+| literature QS metrics with reference equilibria; B.n statistics | `qs_metrics.json`, `bn_report.json` |
+| 3D viewer (start, ss4, this state, each on its own free-boundary surface) | `../viewer_ss.html` |
+| the near-axis parent (parameters, numbers, log) | `../../na/runs2/o2w1_qa2s2_gg1e-1_w1e-2_w1x10.{npz,json,log}` |
+| the parent's free-boundary score (Phase 2) | `../../na/runs2/o2w1_qa2s2_gg1e-1_w1e-2_w1x10_fb_a0.12_L10/` |
+
+Units: the near-axis normalization, B0 = 1 T on axis, axis length 2 pi (R0 ~ 0.84 m). Psi = 0.04524 Wb.
+
+## 2. What it is
+
+| quantity | value |
+|---|---|
+| R0, a, aspect ratio | 0.843 m, 0.122 m, 6.89 |
+| iota, axis -> edge | 0.356 -> 0.313 (crosses 1/3) |
+| axis excursion from the midplane | max abs(Z) ~ 0.10 m |
+| cross-sections | elongation ~5 at zeta = 0 (thin D), pointed tips near the half period |
+| coil currents | 281, 298, 257, 292 kA (0.91-1.06 x their mean) |
+| hinges (R, phi), all z = 0 exactly | inner 0.723 / 0.559 / 0.429 / 0.322 m, outer 1.746 / 1.511 / 1.416 / 1.397 m |
+| fold between a coil's two faces | 33, 73, 94, 55 deg |
+
+Coil check against the bounds (`../../bounds/fa_qa2_a0167.json`: the Gil et al. set scaled by a = 0.167, absolute):
+
+| | value | bound | ratio |
+|---|---|---|---|
+| length per coil (max) | 3.938 m | <= 3.941 | 0.999 |
+| curvature (max) | 10.16 /m | <= 10.17 | 0.999 |
+| coil-coil distance (min) | 0.0409 m | >= 0.040 | 1.024 |
+| plasma-coil distance (min) | 0.164 m | >= 0.148 | 1.109 |
+| linked pairs | 0 | | |
+
+Length and curvature are active. Relaxing the length bound by 10% changed nothing (`ss6_L110`), so they are not what
+limits QS.
+
+## 3. Scores
+
+All on the coils' OWN surface: a vacuum free-boundary DESC solve with these coils and no other objective
+(`ss/fb_rescore.py`), then metrics on that equilibrium. This is not the single-stage equilibrium (see section 5).
+
+Boozer amplitudes are single helical modes cos(m theta_B - n zeta_B) (as `QuasisymmetryBoozer`), over B00, with
+M_booz = N_booz = 2 x the equilibrium's. Surfaces rho = 0.25 / 0.5 / 0.75 / 1.
+
+| metric | this state | Phase 2 start (its parent) |
+|---|---|---|
+| largest breaking Boozer mode / B00 | 0.36% / 0.20% / 0.37% / 0.69% | 0.22% / 0.32% / 0.64% / 0.98% |
+| L2 of all breaking modes / B00 | 0.42% / 0.43% / 0.84% / 1.74% | 0.32% / 0.66% / 1.33% / 2.32% |
+| two-term rms(f_C / B^3) | 2.4e-2 / 3.2e-2 / 5.9e-2 / unusable (fold) | 1.9e-2 / 3.5e-2 / unusable / unusable |
+| effective ripple eps_eff, rho .25/.5/.75 (one resolution, NOT converged) | 1.0e-3 / 1.0e-3 / 2.7e-3 | 5.0e-4 / 1.3e-3 / 3.2e-3 |
+
+The same code on DESC's example equilibria (fixed-boundary TARGETS, no coils, so they are flattered relative to us):
+
+| largest breaking mode / B00 | rho 0.25 | 0.5 | 0.75 | 1 |
+|---|---|---|---|---|
+| precise_QA | 0.006% | 0.003% | 0.003% | 0.02% |
+| reactor_QA | 0.27% | 0.18% | 0.29% | 0.51% |
+| NCSX | 0.69% | 0.66% | 1.3% | 2.7% |
+| ARIES-CS | 0.97% | 1.1% | 1.4% | 2.2% |
+
+Normalized B.n of the coils on the free-boundary surface (abs(B.n) / surface-mean abs(B), area-weighted, 193 x 193 grid):
+
+| | this state | ss4 (basis 12) | Phase 2 start |
+|---|---|---|---|
+| mean | 0.018% | 0.024% | 0.048% |
+| rms | 0.040% | 0.046% | 0.092% |
+| 99th / 99.9th percentile | 0.14% / 0.35% | 0.16% / 0.39% | 0.39% / 0.72% |
+| max | 9.6% | 8.1% | 7.5% |
+| max away from the fold | 0.45% | 0.46% | 1.2% |
+
+The 9.6% is one spot (0.011% of the area above 1%) at the pinched inboard tip of the flattest cross-section
+(R ~ 0.57, Z ~ 0, zeta ~ 1.30), where DESC's surface folds (section 5). This B.n is NOT a stage-2 B.n: the surface was
+fitted to the coils, so it only says the solve found the coils' flux surface.
+
+Poincare (`ss4_fb/poincare.png`): nested out to the boundary, which sits on a traced surface; a weak island chain just
+outside (rho ~ 1.1).
+
+## 4. How it was made
+
+1. **Near-axis stage** (`na/run_na2.py`, CPU, `na/chainA.sh qa2 2`): joint optimization of the axis, eta-bar and the
+   coils so the coils reproduce the near-axis QS field on the axis (Giuliani et al. JCP 2022), hinges on z = 0 by
+   construction. First order -> length/bending regularizer -> second-order ladder (B20 and grad grad B rows) with stiff
+   first order (`--w1 10`). Result `o2w1_qa2s2_gg1e-1_w1e-2_w1x10`; seed s0 reaches the same state.
+2. **Phase 2 score** (`na/score_fb.py`): exact conversion to DESC coils, NAE initial guess at a = 0.12, vacuum free
+   boundary in shells. QS L2 0.32% / 0.66% / 1.3% / 2.3%.
+3. **Single stage** (`../single_stage.py` via `ss/run1.sh`): proximal-lsq-composite (secant), `--fix-hinge-z 0`,
+   the branch's distance rows (`--dist rows --pc-gap 0.005`), **Boozer QS objective** (`--qs-form boozer`, rho .25/.5/.75/1),
+   B.n on the moving boundary with the current sum fixed, bands on A (6.5-7), volume (+-2%), iota >= 0.30.
+   Boundary continuation k = 1..6. What mattered:
+   * `ss2` (tau_qs 0.3x start, tau_bn 2e-3): first real gain. `ss3` (tau_qs 1.5e-3): big reported gain, half of it fake
+     (the boundary left the coils' surface, B.n 0.5%).
+   * `ss4` (tau_bn 5e-4, tau_qs 1.5e-3, L enforced at 0.999x, start = ss3 coils + THEIR free-boundary equilibrium):
+     the result. Reported and free-boundary numbers agree to 3-12%.
+   * `ss7_b14`: the same at basis 14, solve-tol 1e-8, one k step: the coils moved by < 1e-3; its free-boundary score
+     at basis 14 reproduces ss4's basis-12 score to 1-5%.
+4. **Rule-2 score** after every candidate: `ss/fb_rescore.py EQ COILS OUT --shells 4,8[,12]`.
+
+To reproduce the last step from the parent: `ss/prep.py` (coils into one CoilSet, equilibrium to basis 12), then
+`run1.sh` with the env vars and flags listed per run in `ss/NOTES.md`.
+
+## 5. What is not yet trustworthy (read before quoting or comparing)
+
+* **Every QS number goes through a DESC equilibrium**, not the coils' Biot-Savart field directly. A traced-field
+  measurement (trace the coil field lines, fit surfaces, Boozer-transform those) has NOT been run on this state; a tool
+  for it exists from the precise_QH work (`coil_sandbox/work/ss_qh/joint/fieldcheck/`, read `FIELDCHECK.md`; not
+  yet read or run by the author of this file).
+* **The free-boundary equilibrium folds at the edge**: sqrt(g) < 0 on ~1% of points at rho = 1 (none at rho <= 0.8 at
+  basis 14), at the pinched cross-section tips. Flux surfaces are nested; the poloidal angle folds. Pointwise
+  quantities (two-term, B.n max) are wrong there; Boozer spectra are less sensitive. Trust rho <= 0.75 more than rho = 1.
+* **Basis 12 has branch solutions on this boundary**: re-solving after a 1e-5 nudge gives QS differing by ~20% (mid)
+  to ~50% (edge), independent of tolerance. Basis 14: 0.5-4%. Score at basis >= 14.
+* **The outer free-boundary shell (all modes free) runs out of GPU memory at basis 14** (16 GB card); the basis-14
+  boundary is refined to mode 8 only.
+* **The single stage stalls**: after 0-7 accepted steps per k step it rejects trials until it gives up (basis 12:
+  "precision loss"; basis 14: 7 good steps then ~10 rejections, run killed). The design is NOT a converged optimum
+  of the single-stage problem; nobody knows how much is left.
+* **The single stage over-reports** when B.n is loosely weighted. Only free-boundary scores count.
+* **eps_eff** was computed at one resolution. **The edge tip** (B.n 9.6% spot, island chain outside) is unexplained:
+  a DESC corner artifact or proximity to a separatrix.
+* **No baseline**: the same pipeline with free hinges or conventional coils under the same bounds has not been run,
+  so the cost of the z = 0 plane is unknown.
+
+## 6. To beat it
+
+A better result must, on its coils' own free-boundary surface at basis >= 14 (and ideally by traced field):
+largest breaking Boozer mode below 0.36% / 0.20% / 0.37% / 0.69% (rho .25/.5/.75/1) or L2 below
+0.42% / 0.43% / 0.84% / 1.74%, with nested Poincare surfaces, coils inside the same scaled bounds, unlinked,
+currents within [0, 2x] of uniform, every hinge on z = 0, at comparable aspect ratio (~7) and iota (>= 0.3) or with
+the difference stated. Leads not yet scored by free boundary are in `NAE_HANDOFF.md` (lower vacuum iota with z = 0
+hinges; per-coil level hinges, which leave the single plane).

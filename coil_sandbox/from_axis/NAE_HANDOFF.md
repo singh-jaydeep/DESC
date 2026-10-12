@@ -81,7 +81,7 @@ Cold starts, planar from the beginning (free hinges |z| <= 0.2, full chain, `cha
 | first order | 0.402 / 24.5% | 0.409 / 23.3% | 0.420 / 0.12% |
 | + regularizer | 0.422 / 16.9% | 0.421 / 17.1% | 0.420 / 0.14% |
 | second order, step 1 | 0.192 / 11.2% | 0.146 / 9.3% | |
-| second order, step 3 | 0.064 / 0.59% | (running at the time of writing) | 0.372 / 1.0% (seed s2) |
+| second order, step 3 | 0.064 / 0.59% | 0.064 / 0.59% | 0.372 / 1.0% (seed s2) |
 
 * Planar coils (4 per half period, these bounds) can hold iota 0.42 only at a 17-25% on-axis mismatch; once second
   order is weighted they give up the transform and settle on a nearly axisymmetric state (iota 0.06, elongation 1.4).
