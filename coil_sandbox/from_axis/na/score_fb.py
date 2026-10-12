@@ -46,6 +46,7 @@ ap.add_argument("--ntransit", type=int, default=150)
 ap.add_argument("--out", default=None)
 ap.add_argument("--device", default="gpu")
 ap.add_argument("--resume", default=None, help="eq_fb.h5 to continue the free boundary from")
+ap.add_argument("--chunk", type=int, default=200, help="ForceBalance jac_chunk_size (raise on a large-memory GPU)")
 ap.add_argument("--shells", default=None, help="comma list of k (default kstep, 2 kstep, ..., LMN)")
 a = ap.parse_args()
 
@@ -76,7 +77,8 @@ log["nae"] = dict(iota=float(q.iota), helicity=float(q.helicity), max_elongation
                   axis_rc=np.asarray(rc).tolist(), axis_zs=np.asarray(zs).tolist(), etabar=float(eta))
 stamp(f"NAE: iota {q.iota:.4f} helicity {q.helicity} max elong {q.max_elongation:.2f}")
 eq = Equilibrium.from_near_axis(q, r=r, L=a.LMN, M=a.LMN, N=a.LMN)
-eq.solve(verbose=0, maxiter=200, ftol=1e-8, xtol=1e-10, gtol=1e-8)
+eq.solve(objective=ObjectiveFunction(ForceBalance(eq, jac_chunk_size=a.chunk)), verbose=0, maxiter=200, ftol=1e-8,
+         xtol=1e-10, gtol=1e-8)  # chunked: the default "auto" asks for 9 GB at basis 12
 eq.save(os.path.join(out, "eq_nae_fixed.h5"))
 stamp("NAE fixed-boundary initial guess solved")
 
@@ -137,22 +139,38 @@ shells = [int(v) for v in a.shells.split(",")] if a.shells else list(range(a.kst
 if shells[-1] != a.LMN and not a.shells:
     shells.append(a.LMN)
 log["shells"] = []
+done_f = os.path.join(out, "shells_done.json")  # resume: shells already finished in this OUT are skipped
+done = json.load(open(done_f)) if os.path.exists(done_f) and os.path.exists(os.path.join(out, "eq_fb.h5")) else []
+if done and not a.resume:
+    from desc.io import load
+    eq = load(os.path.join(out, "eq_fb.h5"))
+    log["shells"] = done
+    stamp(f"RESUME: shells {[d['k'] for d in done]} already done, continuing from eq_fb.h5")
 for k in shells:
+    if any(d["k"] == k for d in done):
+        continue
     # optimize(copy=True) returns a new eq: build the objective and constraints for THIS eq every shell
-    constraints = (ForceBalance(eq=eq), FixCurrent(eq=eq), FixPressure(eq=eq), FixPsi(eq=eq))
+    constraints = (ForceBalance(eq=eq, jac_chunk_size=a.chunk), FixCurrent(eq=eq), FixPressure(eq=eq), FixPsi(eq=eq))
     objective = ObjectiveFunction(VacuumBoundaryError(eq=eq, field=cs, field_fixed=True, field_grid=src))
     Rm = eq.surface.R_basis.modes[np.max(np.abs(eq.surface.R_basis.modes), 1) > k, :]
     Zm = eq.surface.Z_basis.modes[np.max(np.abs(eq.surface.Z_basis.modes), 1) > k, :]
     bc = tuple(c for c in (FixBoundaryR(eq=eq, modes=Rm) if len(Rm) else None,
                            FixBoundaryZ(eq=eq, modes=Zm) if len(Zm) else None) if c is not None)
-    eq, res = eq.optimize(objective, constraints + bc, optimizer="proximal-lsq-exact", verbose=1,
-                          maxiter=a.maxiter, ftol=1e-8, xtol=1e-10, gtol=1e-8, copy=True)
+    try:
+        eq, res = eq.optimize(objective, constraints + bc, optimizer="proximal-lsq-exact", verbose=1,
+                              maxiter=a.maxiter, ftol=1e-8, xtol=1e-10, gtol=1e-8, copy=True)
+    except Exception as e:  # e.g. GPU out of memory at the all-modes shell: score the last completed shell
+        log["shell_failed"] = dict(k=k, error=repr(e)[:300])
+        stamp(f"free boundary shell k={k} FAILED ({type(e).__name__}); scoring the previous shell")
+        break
     bn, bnmax = bn_rms(eq)
     log["shells"].append(dict(k=k, bn_rms=bn, bn_max=bnmax, nit=int(res.get("nit", -1)),
                               message=str(res.get("message", ""))))
     stamp(f"free boundary shell k={k}: B.n rms {bn:.3e} max {bnmax:.3e} ({res.get('message', '')})")
     eq.save(os.path.join(out, f"eq_fb_k{k}.h5"))
-    eq.save(os.path.join(out, "eq_fb.h5"))
+    eq.save(os.path.join(out, "tmp_eq_fb.h5"))
+    os.replace(os.path.join(out, "tmp_eq_fb.h5"), os.path.join(out, "eq_fb.h5"))
+    json.dump(log["shells"], open(done_f, "w"))
 
 log["free_boundary"] = physics(eq)
 stamp("FREE BOUNDARY: " + json.dumps(log["free_boundary"]))

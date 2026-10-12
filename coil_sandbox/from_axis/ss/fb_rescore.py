@@ -19,6 +19,7 @@ ap.add_argument("eq"); ap.add_argument("coils"); ap.add_argument("out")
 ap.add_argument("--shells", default="4,8,12")
 ap.add_argument("--maxiter", type=int, default=60)
 ap.add_argument("--no-poincare", action="store_true")
+ap.add_argument("--chunk", type=int, default=200, help="ForceBalance jac_chunk_size (raise on a large-memory GPU)")
 ap.add_argument("--helicity", default="1,0")
 ap.add_argument("--bounds", default="../../bounds/fa_qa2_a0167.json")
 ap.add_argument("--device", default="gpu")
@@ -63,8 +64,16 @@ def physics(eq):
 
 log = {"eq": a.eq, "coils": a.coils, "start": physics(eq), "shells": []}
 print("START (single-stage state)", json.dumps(log["start"]), flush=True)
+done_f = os.path.join(a.out, "shells_done.json")  # resume: shells already finished in this OUT are skipped
+done = json.load(open(done_f)) if os.path.exists(done_f) and os.path.exists(os.path.join(a.out, "eq_fb.h5")) else []
+if done:
+    eq = load(os.path.join(a.out, "eq_fb.h5"))
+    log["shells"] = done
+    print(f"RESUME: shells {[d['k'] for d in done]} already done, continuing from eq_fb.h5", flush=True)
 for k in ([] if a.shells == "none" else [int(v) for v in a.shells.split(",")]):  # "none": score as is
-    cons = (ForceBalance(eq=eq, jac_chunk_size=200), FixCurrent(eq=eq), FixPressure(eq=eq), FixPsi(eq=eq))
+    if any(d["k"] == k for d in done):
+        continue
+    cons = (ForceBalance(eq=eq, jac_chunk_size=a.chunk), FixCurrent(eq=eq), FixPressure(eq=eq), FixPsi(eq=eq))
     obj = ObjectiveFunction(VacuumBoundaryError(eq=eq, field=cs, field_fixed=True, field_grid=src))
     Rm = eq.surface.R_basis.modes[np.max(np.abs(eq.surface.R_basis.modes), 1) > k, :]
     Zm = eq.surface.Z_basis.modes[np.max(np.abs(eq.surface.Z_basis.modes), 1) > k, :]
@@ -80,7 +89,9 @@ for k in ([] if a.shells == "none" else [int(v) for v in a.shells.split(",")]): 
     b = bn_rms(eq)
     log["shells"].append(dict(k=k, bn_rms=b, nit=int(res.get("nit", -1)), message=str(res.get("message", ""))))
     print(f"[{time.time() - t0:.0f}s] shell k={k}: B.n rms {b:.3e} ({res.get('message', '')})", flush=True)
-    eq.save(os.path.join(a.out, "eq_fb.h5"))
+    eq.save(os.path.join(a.out, "tmp_eq_fb.h5"))
+    os.replace(os.path.join(a.out, "tmp_eq_fb.h5"), os.path.join(a.out, "eq_fb.h5"))
+    json.dump([d for d in log["shells"] if "failed" not in d], open(done_f, "w"))
 log["free_boundary"] = physics(eq)
 print("FREE BOUNDARY", json.dumps(log["free_boundary"]), flush=True)
 P = S.paper_bounds(eq, S.n_unique(cs), None, a.bounds)

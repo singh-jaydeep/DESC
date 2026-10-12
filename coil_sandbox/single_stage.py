@@ -134,6 +134,14 @@ def parse():
     g.add_argument("--finish-steps", type=int, default=None, help="lsq-composite finish_steps")
     g.add_argument("--init-tr", default=None,
                    help="lsq-exact initial_trust_radius: scipy (solver default), conngould, mix, or a number")
+    g.add_argument("--ckpt-every", type=int, default=0, metavar="N",
+                   help="write ckpt_eq.h5 / ckpt_coils.h5 / ckpt.json to --out after every N accepted iterations "
+                        "(lsq-composite only), and log EVERY trial evaluation (accepted or rejected) to "
+                        "trials_kK.txt as it happens. 0 = off")
+    g.add_argument("--auto-resume", action="store_true",
+                   help="continue whatever is in --out: a mid-step checkpoint (same k) if there is one, else the "
+                        "last finished eq_kK/coils_kK (k = K + 1); exits 0 if kmax is already done. The anchors "
+                        "(tau_qs, V0, bn_norm) are read back from --out/anchors.json so nothing re-anchors")
     g.add_argument("--track-steps", action="store_true",
                    help="record every attempted step (predicted/actual reduction, ratio) in result.json")
     g.add_argument("--perturb-order", type=int, default=2)
@@ -475,6 +483,142 @@ def coil_check(cs, eq, P):
     return m, f"bn {m['bn']:.4e} (max {m['bn_max']:.3e})  {S.report(m, P)}  linked {m['linked']}  -> {S.verdict(m, P)}"
 
 
+class Checkpointer:
+    """Live trial log and per-iteration checkpoints for a proximal-lsq-composite step.
+
+    The optimizer builds its ProximalProjection internally, so its build and compute_scaled are patched (once) to
+    hand the live instance to the active Checkpointer and to report every evaluation. `trial` writes one line per
+    objective evaluation (elapsed s, hinge cost) the moment it returns: a run of lines with no "accepted" line in
+    between is a run of rejected trials. `callback` (the solver calls it after each ACCEPTED step with the
+    proximal's x) looks up the full state the proximal cached for that x and saves copies of eq and coils,
+    atomically (tmp + rename), so a killed run restarts from its last accepted iterate.
+    """
+
+    active = None
+
+    def __init__(self, out, eq, cs, every):
+        self.out, self.eq, self.cs, self.every = out, eq, cs, every
+        self.prox = self.bounds = self.fh = None
+        self.k = self.it = self.nfev = 0
+        self.t0 = time.time()
+        self.last_cost = None
+
+    @classmethod
+    def install(cls):
+        import desc.optimize._constraint_wrappers as CW
+
+        if getattr(CW.ProximalProjection, "_ss_ckpt", False):
+            return
+        build0, cs0 = CW.ProximalProjection.build, CW.ProximalProjection.compute_scaled
+
+        def build(self, *args, **kw):
+            r = build0(self, *args, **kw)
+            if cls.active is not None:
+                cls.active.prox, cls.active.bounds = self, None
+            return r
+
+        def compute_scaled(self, x, constants=None):
+            f = cs0(self, x, constants)
+            if cls.active is not None and cls.active.prox is self:
+                cls.active.trial(f)
+            return f
+
+        CW.ProximalProjection.build, CW.ProximalProjection.compute_scaled = build, compute_scaled
+        CW.ProximalProjection._ss_ckpt = True
+
+    def start_step(self, k):
+        self.k, self.it, self.nfev, self.t0 = k, 0, 0, time.time()
+        if self.fh:
+            self.fh.close()
+        self.fh = open(os.path.join(self.out, f"trials_k{k}.txt"), "a")
+        self.fh.write(f"# k={k} started {time.strftime('%Y-%m-%d %H:%M:%S')}: nfev elapsed_s cost | accepted iteration\n")
+        self.fh.flush()
+
+    def trial(self, f):
+        try:
+            if self.bounds is None:
+                self.bounds = tuple(np.asarray(v) for v in self.prox.scaled_bounds())
+            lo, hi, tgt, isb = self.bounds
+            sv = np.asarray(f)
+            r = np.where(isb, np.maximum(0, sv - hi) - np.maximum(0, lo - sv), sv - tgt)
+            self.last_cost = 0.5 * float(r @ r)
+        except Exception as e:  # noqa: BLE001  (never let logging kill a run)
+            self.last_cost = float("nan")
+            print(f"  [ckpt] trial cost failed: {e!r}", flush=True)
+        self.nfev += 1
+        self.fh.write(f"{self.nfev:5d} {time.time() - self.t0:9.1f} {self.last_cost:.10e}\n")
+        self.fh.flush()
+
+    def callback(self, x, *args):
+        self.it += 1
+        self.fh.write(f"      accepted iteration {self.it} at nfev {self.nfev} cost {self.last_cost:.10e}\n")
+        self.fh.flush()
+        if self.every and self.it % self.every == 0:
+            try:
+                self.save(np.asarray(x))
+            except Exception as e:  # noqa: BLE001
+                print(f"  [ckpt] save failed at iteration {self.it}: {e!r}", flush=True)
+        return False
+
+    def save(self, x):
+        P = self.prox
+        hit = [i for i in range(len(P._allx) - 1, -1, -1) if np.array_equal(np.asarray(P._allx[i]), x)]
+        if not hit:
+            print(f"  [ckpt] iteration {self.it}: state not in the proximal cache, not saved", flush=True)
+            return
+        plist = P._objective.unpack_state(P._allxopt[hit[0]], False)
+        for thing, params, name in zip(P.things, plist, ("ckpt_eq.h5", "ckpt_coils.h5")):
+            c = thing.copy()
+            c.params_dict = params
+            tmp = os.path.join(self.out, "tmp_" + name)  # keeps the .h5 extension DESC's save keys on
+            c.save(tmp)
+            os.replace(tmp, os.path.join(self.out, name))
+        tmp = os.path.join(self.out, "ckpt.json.tmp")
+        json.dump(dict(k=self.k, iteration=self.it, nfev=self.nfev, cost=self.last_cost,
+                       time=time.strftime("%Y-%m-%d %H:%M:%S")), open(tmp, "w"))
+        os.replace(tmp, os.path.join(self.out, "ckpt.json"))  # written last: its presence means the pair is whole
+        print(f"  [ckpt] saved k={self.k} iteration {self.it} (cost {self.last_cost:.6g})", flush=True)
+
+    def end_step(self):
+        for name in ("ckpt.json", "ckpt_eq.h5", "ckpt_coils.h5"):  # superseded by eq_kK / coils_kK
+            f = os.path.join(self.out, name)
+            if os.path.exists(f):
+                os.remove(f)
+
+
+def auto_resume(a):
+    """Point a.eq / a.start / a.kmin at what --out already holds. Returns the earlier result.json record or None."""
+    import glob
+    import re
+
+    done = sorted(int(re.search(r"eq_k(\d+)\.h5$", f).group(1)) for f in glob.glob(os.path.join(a.out, "eq_k*.h5"))
+                  if os.path.exists(f.replace("eq_k", "coils_k")))
+    ck = os.path.join(a.out, "ckpt.json")
+    rec = None
+    if os.path.exists(os.path.join(a.out, "result.json")):
+        try:
+            rec = json.load(open(os.path.join(a.out, "result.json")))
+        except Exception:  # noqa: BLE001  (a torn file from a kill: start the record again)
+            rec = None
+    if os.path.exists(ck) and (not done or json.load(open(ck))["k"] > done[-1]):
+        c = json.load(open(ck))
+        a.eq, a.start, a.kmin = os.path.join(a.out, "ckpt_eq.h5"), os.path.join(a.out, "ckpt_coils.h5"), int(c["k"])
+        print(f"AUTO-RESUME: mid-step checkpoint k={c['k']} iteration {c['iteration']} (cost {c['cost']:.6g})", flush=True)
+    elif done:
+        K = done[-1]
+        if K >= a.kmax:
+            print(f"AUTO-RESUME: k={K} already finished (kmax {a.kmax}); nothing to do", flush=True)
+            raise SystemExit(0)
+        a.eq, a.start, a.kmin = os.path.join(a.out, f"eq_k{K}.h5"), os.path.join(a.out, f"coils_k{K}.h5"), K + 1
+        print(f"AUTO-RESUME: continuing after finished k={K}", flush=True)
+    else:
+        print("AUTO-RESUME: nothing in --out yet; fresh start", flush=True)
+        return None
+    if rec is not None:
+        rec["steps"] = [st for st in rec.get("steps", []) if st["k"] < a.kmin]
+    return rec
+
+
 def main():
     a = parse()
     if a.inner_sn:
@@ -490,6 +634,13 @@ def main():
         a.fix_current_sum = True
         print("--field-term bn is blind to the current scale: holding the coil current SUM fixed", flush=True)
     os.makedirs(a.out, exist_ok=True)
+    rec_prev = auto_resume(a) if a.auto_resume else None
+    anchors_f = os.path.join(a.out, "anchors.json")
+    if a.auto_resume and os.path.exists(anchors_f):
+        for key, v in json.load(open(anchors_f)).items():
+            if getattr(a, key) is None:
+                setattr(a, key, v)
+        print(f"anchors from {anchors_f}: tau_qs {a.tau_qs} V0 {a.V0} bn_norm {a.bn_norm}", flush=True)
     S.memwatch(every=120)
     eq, kind = S.load_equilibrium(a.eq)
     dd = eq.compute(["p", "current"])
@@ -553,8 +704,17 @@ def main():
     objective = O.ObjectiveFunction(tuple(terms))
     objective.build(verbose=0)
     table0 = term_table(terms, "TERMS AT THE START")
+    if not os.path.exists(anchors_f):  # frozen for every later resume of this --out
+        json.dump(dict(tau_qs=a.tau_qs, V0=a.V0, bn_norm=a.bn_norm), open(anchors_f, "w"))
     rec = dict(settings=vars(a), qs_rms_start=qs0, device=DEVICE, bounds=P, enforced=E, start=dict(physics=p0, coils=m0, terms=table0),
                steps=[])
+    if rec_prev is not None:  # resumed: keep the original start and the finished steps
+        rec = dict(rec_prev, resumed=rec_prev.get("resumed", []) + [dict(settings=vars(a), start=rec["start"])])
+    ck = None
+    if a.ckpt_every > 0 and not a.fix_coils:
+        ck = Checkpointer(a.out, eq, cs, a.ckpt_every)
+        Checkpointer.install()
+        Checkpointer.active = ck
     json.dump(rec, open(os.path.join(a.out, "result.json"), "w"), indent=1, default=float)
     if a.dry:
         print(f"\n--dry: wrote {a.out}/result.json; no optimization run")
@@ -586,6 +746,11 @@ def main():
                 opts["finish_steps"] = a.finish_steps
         if a.track_steps:
             opts["track_steps"] = True
+        if ck is not None:
+            ck.eq, ck.cs = eq, cs
+            ck.start_step(k)
+            if a.method == "lsq-composite":
+                opts["callback"] = ck.callback
         t0 = time.time()
         things = [eq] if a.fix_coils else [eq, cs]
         out, res = Optimizer(f"proximal-{a.method}").optimize(
@@ -612,7 +777,11 @@ def main():
                                  physics=p, coils=m, terms=table,
                                  step_log=[{q: np.asarray(v).tolist() for q, v in r.items()}
                                            for r in res.get("step_log", [])]))
-        json.dump(rec, open(os.path.join(a.out, "result.json"), "w"), indent=1, default=float)
+        tmpf = os.path.join(a.out, "result.json.tmp")
+        json.dump(rec, open(tmpf, "w"), indent=1, default=float)
+        os.replace(tmpf, os.path.join(a.out, "result.json"))
+        if ck is not None:
+            ck.end_step()
     print(f"\nwrote {a.out}: eq_k*.h5, coils_k*.h5, result.json")
 
 

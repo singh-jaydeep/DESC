@@ -1,0 +1,33 @@
+# Pinned to this box's desc-dev environment (python 3.13), 2026-10-12: results must be comparable with the local runs.
+# jax[cuda12] wheels carry their own CUDA libraries (nvidia-*-cu12), so a plain debian image works.
+jax[cuda12]==0.7.2
+numpy==2.2.6
+scipy==1.15.3
+adv-jax-math==1.3
+equinox==0.13.2
+diffrax==0.7.0
+lineax==0.0.8
+optimistix==0.1.0
+interpax==0.3.12
+interpax_fft==0.0.7
+jax-finufft==1.2.0
+jaxtyping==0.3.9
+optax==0.2.8
+orthax==0.2.7
+quadax==0.2.11
+h5py==3.15.1
+netCDF4==1.7.3
+matplotlib==3.10.8
+plotly==6.5.2
+pylatexenc==2.10
+mpmath==1.3.0
+sympy
+scikit-image==0.25.2
+shapely==2.1.2
+termcolor==3.3.0
+colorama==0.4.6
+psutil==7.2.1
+nvidia-ml-py==13.590.48
+pynvml==13.0.1
+nvgpu==0.10.0
+pandas==3.0.1

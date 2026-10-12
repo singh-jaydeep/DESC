@@ -115,10 +115,17 @@ To reproduce the last step from the parent: `ss/prep.py` (coils into one CoilSet
 
 ## 5. What is not yet trustworthy (read before quoting or comparing)
 
-* **Every QS number goes through a DESC equilibrium**, not the coils' Biot-Savart field directly. A traced-field
-  measurement (trace the coil field lines, fit surfaces, Boozer-transform those) has NOT been run on this state; a tool
-  for it exists from the precise_QH work (`coil_sandbox/work/ss_qh/joint/fieldcheck/`, read `FIELDCHECK.md`; not
-  yet read or run by the author of this file).
+* **Traced-field check, done** (`ss/trace_check.py`, adapted from `work/ss_qh/joint/fieldcheck/fieldcheck.py`;
+  `ss/qa2best/trace_ss7k4/`): 13 lines of the coils' Biot-Savart field, 200 field periods, mapped into the
+  free-boundary equilibrium's flux coordinates. No line lost; each stays on one flux label to +-0.004-0.011 in rho for
+  rho 0.1-0.9 (0.5-1.3 mm); traced iota within 0.002 of the equilibrium's out to rho 0.95. At rho = 1 the spread is 0.06
+  and iota is off by 0.014. On the boundary abs(B_coil) differs from abs(B_eq) by 0.019% mean (5% at the fold spot).
+  So the equilibrium represents the coil field inside rho ~ 0.9 but not exactly: worst-case estimate +-0.1-0.15%
+  (absolute) on Boozer amplitudes from a 0.01 rho surface offset; not measured. A traced-surface equilibrium fit
+  (`tracedsurf.py`, `polish.py`, `directcheck.py` in that directory; rho spread 0.0002-0.003 on precise_QH) has NOT
+  been run and would settle it.
+* **Every QS number goes through a DESC equilibrium**, not the coils' Biot-Savart field directly (see the
+  check above for how close the two are).
 * **The free-boundary equilibrium folds at the edge**: sqrt(g) < 0 on ~1% of points at rho = 1 (none at rho <= 0.8 at
   basis 14), at the pinched cross-section tips. Flux surfaces are nested; the poloidal angle folds. Pointwise
   quantities (two-term, B.n max) are wrong there; Boozer spectra are less sensitive. Trust rho <= 0.75 more than rho = 1.
