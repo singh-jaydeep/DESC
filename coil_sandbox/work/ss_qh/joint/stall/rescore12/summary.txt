@@ -1,0 +1,54 @@
+RESCORE work/ss_qh/joint/ss_z0_k4b/eq_k4.h5 -> basis 12: 300 its 478 s, force 1.0156e-10; saved work/ss_qh/joint/stall/rescore12/k4b_start/eq12.h5
+== k4b_start
+START physics  A 8.090  R0 0.9954  a 0.1230  iota [1.1804, 1.2031]  QS(Boozer, |B_nonsym|/<B>) rho 0.25 2.08e-03  rho 0.5 3.65e-03  rho 0.75 4.92e-03  rho 1 7.87e-03
+START coils    bn 6.8228e-03 (max 2.358e-02)  L 1.001  kappa 0.999  kMS 0.969  d_cc 1.001  d_pc 1.053  linked 0  -> FAILS L
+QS two-term rms at the start 0.01428 -> tau_qs 0.01695
+Vacuum B.n error                  1326      31.8   0.4253    6.283  = 0                   -0.009722   0.008396      1.241     1.58  76.0%
+QS two-term (scale-invariant)    12005      1.42        -    41.41  = 0                     -0.1069     0.1069      0.355    0.843  21.7%
+rotational transform                20        84        -        1  [1.19, inf]                1.18      1.203    0.02591    0.228   1.6%
+total cost 0.5 sum f^2                                                                                                       1.634
+RESCORE work/ss_qh/joint/ss_z0_k5/eq_k5.h5 -> basis 12: 300 its 485 s, force 8.6694e-11; saved work/ss_qh/joint/stall/rescore12/k5_orig/eq12.h5
+== k5_orig
+START physics  A 8.090  R0 0.9954  a 0.1230  iota [1.1804, 1.2031]  QS(Boozer, |B_nonsym|/<B>) rho 0.25 2.08e-03  rho 0.5 3.65e-03  rho 0.75 4.92e-03  rho 1 7.87e-03
+START coils    bn 6.8092e-03 (max 2.339e-02)  L 1.001  kappa 0.999  kMS 0.971  d_cc 1.001  d_pc 1.053  linked 0  -> FAILS L
+QS two-term rms at the start 0.01425 -> tau_qs 0.01695
+Vacuum B.n error                  1326      31.8   0.4253    6.283  = 0                   -0.009656   0.008385      1.235     1.57  76.0%
+QS two-term (scale-invariant)    12005      1.42        -    41.41  = 0                     -0.1075     0.1075     0.3532    0.841  21.7%
+rotational transform                20        84        -        1  [1.19, inf]                1.18      1.203    0.02589    0.228   1.6%
+total cost 0.5 sum f^2                                                                                                       1.625
+RESCORE work/ss_qh/joint/stall/k5_tol6/eq_k5_resolved.h5 -> basis 12: 300 its 476 s, force 2.4094e-10; saved work/ss_qh/joint/stall/rescore12/k5_tol6/eq12.h5
+== k5_tol6
+START physics  A 8.088  R0 0.9952  a 0.1230  iota [1.1807, 1.2002]  QS(Boozer, |B_nonsym|/<B>) rho 0.25 1.95e-03  rho 0.5 3.49e-03  rho 0.75 4.86e-03  rho 1 7.84e-03
+START coils    bn 6.4807e-03 (max 2.269e-02)  L 1.001  kappa 0.999  kMS 0.967  d_cc 1.002  d_pc 1.065  linked 0  -> FAILS L
+QS two-term rms at the start 0.01401 -> tau_qs 0.01695
+Vacuum B.n error                  1326      31.8   0.4253    6.283  = 0                   -0.008946   0.008117      1.119      1.5  74.8%
+QS two-term (scale-invariant)    12005      1.42        -    41.41  = 0                     -0.1163     0.1163     0.3418    0.827  22.8%
+rotational transform                20        84        -        1  [1.19, inf]               1.181        1.2    0.02413     0.22   1.6%
+total cost 0.5 sum f^2                                                                                                       1.496
+RESCORE work/ss_qh/joint/stall/k5_comp_secant/eq_k5_resolved.h5 -> basis 12: 300 its 490 s, force 1.3654e-09; saved work/ss_qh/joint/stall/rescore12/k5_comp/eq12.h5
+== k5_comp
+START physics  A 8.085  R0 0.9950  a 0.1231  iota [1.1798, 1.2044]  QS(Boozer, |B_nonsym|/<B>) rho 0.25 1.87e-03  rho 0.5 3.18e-03  rho 0.75 4.37e-03  rho 1 7.34e-03
+START coils    bn 6.2954e-03 (max 2.282e-02)  L 1.001  kappa 0.999  kMS 0.952  d_cc 1.003  d_pc 1.086  linked 0  -> FAILS L
+QS two-term rms at the start 0.01366 -> tau_qs 0.01695
+Vacuum B.n error                  1326      31.8   0.4253    6.283  = 0                   -0.008609   0.008154      1.058     1.45  74.5%
+QS two-term (scale-invariant)    12005      1.42        -    41.41  = 0                     -0.1168     0.1168     0.3249    0.806  22.9%
+rotational transform                20        84        -        1  [1.19, inf]                1.18      1.204     0.0251    0.224   1.8%
+total cost 0.5 sum f^2                                                                                                       1.421
+RESCORE work/ss_qh/joint/stall/k5_pin_comp/eq_k5_resolved.h5 -> basis 12: 300 its 480 s, force 1.5869e-09; saved work/ss_qh/joint/stall/rescore12/k5_pincomp/eq12.h5
+== k5_pincomp
+START physics  A 8.175  R0 1.0023  a 0.1226  iota [1.1788, 1.2088]  QS(Boozer, |B_nonsym|/<B>) rho 0.25 2.12e-03  rho 0.5 2.21e-03  rho 0.75 3.30e-03  rho 1 7.51e-03
+START coils    bn 5.4950e-03 (max 2.162e-02)  L 1.001  kappa 0.997  kMS 0.906  d_cc 1.007  d_pc 1.107  linked 0  -> FAILS L
+QS two-term rms at the start 0.01149 -> tau_qs 0.01695
+Vacuum B.n error                  1326      31.8   0.4253    6.283  = 0                   -0.008093   0.007433     0.7291     1.21  73.2%
+QS two-term (scale-invariant)    12005      1.42        -    41.41  = 0                     -0.1049     0.1049     0.2298    0.678  23.1%
+rotational transform                20        84        -        1  [1.19, inf]               1.179      1.209    0.03173    0.252   3.2%
+total cost 0.5 sum f^2                                                                                                      0.9955
+RESCORE work/ss_qh/joint/stall/k5_sn/eq_k5.h5 -> basis 12: 300 its 484 s, force 8.6729e-11; saved work/ss_qh/joint/stall/rescore12/k5_sn/eq12.h5
+== k5_sn
+START physics  A 8.090  R0 0.9954  a 0.1230  iota [1.1804, 1.2031]  QS(Boozer, |B_nonsym|/<B>) rho 0.25 2.08e-03  rho 0.5 3.65e-03  rho 0.75 4.92e-03  rho 1 7.87e-03
+START coils    bn 6.8092e-03 (max 2.339e-02)  L 1.001  kappa 0.999  kMS 0.971  d_cc 1.001  d_pc 1.053  linked 0  -> FAILS L
+QS two-term rms at the start 0.01425 -> tau_qs 0.01695
+Vacuum B.n error                  1326      31.8   0.4253    6.283  = 0                   -0.009656   0.008385      1.235     1.57  76.0%
+QS two-term (scale-invariant)    12005      1.42        -    41.41  = 0                     -0.1075     0.1075     0.3532    0.841  21.7%
+rotational transform                20        84        -        1  [1.19, inf]                1.18      1.203    0.02589    0.228   1.6%
+total cost 0.5 sum f^2                                                                                                       1.625

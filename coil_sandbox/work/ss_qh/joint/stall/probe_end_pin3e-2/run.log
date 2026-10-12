@@ -1,0 +1,37 @@
+Running as unit: run-r4d01cb9fec7443b7b487d2ea402e9a33.scope; invocation ID: 00623f3020c24cf984ce897910b4cb82
+/home/jay/Documents/desc_dev/DESC/desc/__init__.py:94: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  from pynvml import (
+DESC /home/jay/Documents/desc_dev/DESC/desc
+DEVICE requested=gpu obtained=gpu (1x NVIDIA GeForce RTX 5070 Ti)
+PROX_REG=shift: proximal (dF/dx)^-1 patched
+probe k=5: 120 boundary modes free; terms [('Vacuum B.n error', 1326), ('QS two-term (scale-invariant)', 5445), ('aspect ratio', 1), ('rotational transform', 20), ('volume', 1), ('coil length', 4), ('coil curvature', 1204), ('coil mean squared curvature', 4), ('coil-coil distance penalty', 72), ('plasma-coil minimum distance', 8)]
+    [solve] nit 0 nfev 1 cost 1.154e-07 |g|inf nan '`gtol` condition satisfied. (gtol=1.00e-10)'
+    [solve] nit 0 nfev 1 cost 1.154e-07 |g|inf nan '`gtol` condition satisfied. (gtol=1.00e-10)'
+
+PROBE  f eval 22.2 s, jac 23.3 s; x dim 187, rows 8085; cost 1.62045; |g|_inf 0.1503; |h_gn| 1250; tr_scipy |x/scale| 1249
+singular values of scaled J: max 3.52 min 0.000243  cond 1.45e+04; count < 1e-8 max: 0
+terms: Vacuum B.n error c 1.23 |g| 0.581 act 1326/1326; QS two-term (scale c 0.348 |g| 0.483 act 5445/5445; aspect ratio c 0 |g| 0 act 0/1; rotational transfo c 0.0257 |g| 0.0906 act 6/20; volume c 0.000127 |g| 0.0281 act 1/1; coil length c 0.00359 |g| 0.188 act 3/4; coil curvature c 0.000106 |g| 0.0374 act 5/1204; coil mean squared  c 0 |g| 0 act 0/4; coil-coil distance c 0.00779 |g| 0.1 act 7/72; plasma-coil minimu c 0 |g| 0 act 0/8
+    [solve] nit 7 nfev 8 cost 1.152e-07 |g|inf nan '`gtol` condition satisfied. (gtol=1.00e-10)'
+gn t=0.001 |h| 1.250e+00  pred +2.4375e-03  actual -7.4575e-02  paired -7.4575e-02  ratio -30.5946  (5 s)
+    dc_act/dc_pred per term: Vacuum B.n +1.85e-03/+1.87e-03 e3.0e-02  QS two-ter +4.86e-04/+5.06e-04 e3.5e-01  aspect rat +0.00e+00/+0.00e+00 e0.0e+00  rotational +2.68e-05/+4.44e-05 e4.0e-01  volume +1.78e-07/+1.77e-07 e2.1e-03  coil lengt -1.54e-04/+6.03e-06 e2.6e+01  coil curva -7.68e-02/+2.05e-07 e2.3e+04 act5->10  coil mean  +0.00e+00/+0.00e+00 e0.0e+00  coil-coil  +1.08e-05/+1.19e-05 e2.2e-01  plasma-coi +0.00e+00/+0.00e+00 e0.0e+00
+    [solve] nit 4 nfev 5 cost 1.153e-07 |g|inf nan '`gtol` condition satisfied. (gtol=1.00e-10)'
+gn t=0.0001 |h| 1.250e-01  pred +2.4386e-04  actual +1.8592e-04  paired +1.8592e-04  ratio +0.7624  (2 s)
+    dc_act/dc_pred per term: Vacuum B.n +1.87e-04/+1.87e-04 e3.0e-03  QS two-ter +4.86e-05/+5.06e-05 e3.7e-01  aspect rat +0.00e+00/+0.00e+00 e0.0e+00  rotational +2.69e-06/+4.44e-06 e4.0e-01  volume +1.77e-08/+1.77e-08 e2.1e-04  coil lengt -9.83e-07/+6.03e-07 e2.6e+00  coil curva -5.24e-05/+2.05e-08 e6.3e+03 act5->6  coil mean  +0.00e+00/+0.00e+00 e0.0e+00  coil-coil  +1.18e-06/+1.19e-06 e2.0e-02  plasma-coi +0.00e+00/+0.00e+00 e0.0e+00
+    [solve] nit 2 nfev 3 cost 1.154e-07 |g|inf nan '`gtol` condition satisfied. (gtol=1.00e-10)'
+gn t=1e-05 |h| 1.250e-02  pred +2.4387e-05  actual +2.3687e-05  paired +2.3687e-05  ratio +0.9713  (2 s)
+    dc_act/dc_pred per term: Vacuum B.n +1.87e-05/+1.87e-05 e3.0e-04  QS two-ter +4.81e-06/+5.06e-06 e5.8e-01  aspect rat +0.00e+00/+0.00e+00 e0.0e+00  rotational +2.87e-07/+4.44e-07 e3.6e-01  volume +1.77e-09/+1.77e-09 e2.0e-05  coil lengt +4.45e-08/+6.03e-08 e2.6e-01  coil curva -2.73e-07/+2.05e-09 e4.8e+03 act5->6  coil mean  +0.00e+00/+0.00e+00 e0.0e+00  coil-coil  +1.19e-07/+1.19e-07 e2.0e-03  plasma-coi +0.00e+00/+0.00e+00 e0.0e+00
+    [solve] nit 2 nfev 3 cost 1.154e-07 |g|inf nan '`gtol` condition satisfied. (gtol=1.00e-10)'
+sd |h| 1.000e-03  pred +2.3217e-04  actual -8.7108e-04  paired -8.7108e-04  ratio -3.7518  (2 s)
+    dc_act/dc_pred per term: Vacuum B.n +2.34e-04/+2.34e-04 e2.0e-04  QS two-ter -7.08e-06/-5.45e-06 e2.4e-02  aspect rat +0.00e+00/+0.00e+00 e0.0e+00  rotational -5.02e-06/-4.20e-06 e2.1e-01  volume +3.28e-07/+3.28e-07 e5.3e-05  coil lengt +3.66e-06/+3.67e-06 e1.5e-03  coil curva -1.10e-03/+5.13e-06 e1.2e+02 act5->7  coil mean  +0.00e+00/+0.00e+00 e0.0e+00  coil-coil  -1.04e-06/-1.04e-06 e2.9e-04  plasma-coi +0.00e+00/+0.00e+00 e0.0e+00
+    [solve] nit 1 nfev 2 cost 1.154e-07 |g|inf nan '`gtol` condition satisfied. (gtol=1.00e-10)'
+sd |h| 1.000e-04  pred +2.3359e-05  actual +1.4009e-05  paired +1.4009e-05  ratio +0.5997  (2 s)
+    dc_act/dc_pred per term: Vacuum B.n +2.35e-05/+2.35e-05 e2.0e-05  QS two-ter -6.99e-07/-5.19e-07 e3.6e-02  aspect rat +0.00e+00/+0.00e+00 e0.0e+00  rotational -4.76e-07/-4.20e-07 e1.5e-01  volume +3.28e-08/+3.28e-08 e5.3e-06  coil lengt +3.67e-07/+3.67e-07 e1.5e-04  coil curva -8.59e-06/+5.20e-07 e1.1e+02 act5->6  coil mean  +0.00e+00/+0.00e+00 e0.0e+00  coil-coil  -1.04e-07/-1.04e-07 e2.9e-05  plasma-coi +0.00e+00/+0.00e+00 e0.0e+00
+    [solve] nit 1 nfev 2 cost 1.154e-07 |g|inf nan '`gtol` condition satisfied. (gtol=1.00e-10)'
+sd |h| 1.000e-05  pred +2.3373e-06  actual +2.2851e-06  paired +2.2851e-06  ratio +0.9776  (2 s)
+    dc_act/dc_pred per term: Vacuum B.n +2.35e-06/+2.35e-06 e2.0e-06  QS two-ter -1.01e-07/-5.17e-08 e2.6e-01  aspect rat +0.00e+00/+0.00e+00 e0.0e+00  rotational -3.15e-08/-4.20e-08 e6.3e-01  volume +3.28e-09/+3.28e-09 e8.1e-07  coil lengt +3.67e-08/+3.67e-08 e1.5e-05  coil curva +3.90e-08/+5.20e-08 e4.1e+01 act5->6  coil mean  +0.00e+00/+0.00e+00 e0.0e+00  coil-coil  -1.04e-08/-1.04e-08 e2.7e-06  plasma-coi +0.00e+00/+0.00e+00 e0.0e+00
+    [solve] nit 1 nfev 2 cost 1.154e-07 |g|inf nan '`gtol` condition satisfied. (gtol=1.00e-10)'
+sd |h| 1.000e-06  pred +2.3375e-07  actual +2.1415e-07  paired +2.1415e-07  ratio +0.9162  (2 s)
+    dc_act/dc_pred per term: Vacuum B.n +2.35e-07/+2.35e-07 e2.3e-07  QS two-ter -4.19e-08/-5.16e-09 e2.6e+00  aspect rat +0.00e+00/+0.00e+00 e0.0e+00  rotational +1.30e-08/-4.20e-09 e6.4e+00  volume +3.28e-10/+3.28e-10 e1.5e-06  coil lengt +3.67e-09/+3.67e-09 e1.8e-06  coil curva +5.20e-09/+5.20e-09 e7.5e-08  coil mean  +0.00e+00/+0.00e+00 e0.0e+00  coil-coil  -1.04e-09/-1.04e-09 e1.7e-06  plasma-coi +0.00e+00/+0.00e+00 e0.0e+00
+    [solve] nit 1 nfev 2 cost 1.154e-07 |g|inf nan '`gtol` condition satisfied. (gtol=1.00e-10)'
+sd |h| 1.000e-07  pred +2.3375e-08  actual +5.7473e-09  paired +5.7473e-09  ratio +0.2459  (2 s)
+    dc_act/dc_pred per term: Vacuum B.n +2.35e-08/+2.35e-08 e1.1e-06  QS two-ter -3.60e-08/-5.16e-10 e2.6e+01  aspect rat +0.00e+00/+0.00e+00 e0.0e+00  rotational +1.74e-08/-4.20e-10 e6.4e+01  volume +3.28e-11/+3.28e-11 e5.1e-05  coil lengt +3.67e-10/+3.67e-10 e5.7e-06  coil curva +5.20e-10/+5.20e-10 e8.2e-07  coil mean  +0.00e+00/+0.00e+00 e0.0e+00  coil-coil  -1.04e-10/-1.04e-10 e9.6e-06  plasma-coi +0.00e+00/+0.00e+00 e0.0e+00

@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Near-axis z=0 coil candidates</title>
+<style>
+:root {
+  --bg: #f6f6f3; --panel: #ffffff; --ink: #1d1d1b; --muted: #6b6b66; --line: #dcdcd6;
+  --surf: rgba(70, 110, 160, 0.22); --plane: rgba(150, 120, 40, 0.35); --copy: rgba(110, 110, 105, 0.45);
+  --axis: #111; --hinge: #c0392b; --sel: #eef2f8;
+  --c0: #1f6fb4; --c1: #d9822b; --c2: #2e8b57; --c3: #8e44ad; --c4: #b03a48; --c5: #127c7c;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #15161a; --panel: #1d1f24; --ink: #e8e8e4; --muted: #9a9a94; --line: #34363d;
+    --surf: rgba(120, 160, 220, 0.20); --plane: rgba(210, 180, 90, 0.30); --copy: rgba(170, 170, 165, 0.35);
+    --axis: #f2f2ee; --hinge: #ff6b5b; --sel: #262a33;
+    --c0: #5aa6e8; --c1: #f0a050; --c2: #5cc28a; --c3: #b68ae0; --c4: #e8707e; --c5: #4cc0c0;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #15161a; --panel: #1d1f24; --ink: #e8e8e4; --muted: #9a9a94; --line: #34363d;
+  --surf: rgba(120, 160, 220, 0.20); --plane: rgba(210, 180, 90, 0.30); --copy: rgba(170, 170, 165, 0.35);
+  --axis: #f2f2ee; --hinge: #ff6b5b; --sel: #262a33;
+  --c0: #5aa6e8; --c1: #f0a050; --c2: #5cc28a; --c3: #b68ae0; --c4: #e8707e; --c5: #4cc0c0;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif; }
+.wrap { display: grid; grid-template-columns: 330px 1fr; height: 100vh; }
+aside { background: var(--panel); border-right: 1px solid var(--line); overflow: auto; padding: 14px 16px; }
+h1 { font-size: 16px; margin: 0 0 4px; }
+.sub { color: var(--muted); font-size: 12px; margin-bottom: 12px; }
+.group { margin: 12px 0 4px; font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+.item { padding: 6px 8px; border-radius: 6px; cursor: pointer; display: grid; grid-template-columns: 1fr auto; gap: 2px 8px; border: 1px solid transparent; }
+.item:hover { border-color: var(--line); }
+.item.on { background: var(--sel); border-color: var(--line); }
+.item .n { font-weight: 600; font-variant-numeric: tabular-nums; }
+.item .m { color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; grid-column: 1 / -1; }
+.badge { font-size: 11px; padding: 1px 6px; border-radius: 10px; border: 1px solid var(--line); color: var(--muted); align-self: center; }
+.badge.good { color: var(--c2); border-color: var(--c2); }
+main { position: relative; overflow: hidden; }
+canvas { width: 100%; height: 100%; display: block; touch-action: none; cursor: grab; }
+.hud { position: absolute; top: 12px; right: 12px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; font-size: 12px; max-width: 340px; }
+.hud table { border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.hud td { padding: 1px 8px 1px 0; }
+.hud td:first-child { color: var(--muted); }
+.controls { position: absolute; left: 12px; bottom: 12px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; font-size: 12px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.controls label { display: inline-flex; gap: 4px; align-items: center; cursor: pointer; }
+.controls button { font: inherit; background: transparent; color: var(--ink); border: 1px solid var(--line); border-radius: 6px; padding: 2px 8px; cursor: pointer; }
+.legend { margin-top: 8px; color: var(--muted); }
+.legend span { display: inline-block; width: 10px; height: 10px; border-radius: 2px; vertical-align: middle; margin-right: 4px; }
+@media (max-width: 760px) {
+  .wrap { grid-template-columns: 1fr; grid-template-rows: 42vh 58vh; height: auto; }
+  aside { border-right: none; border-bottom: 1px solid var(--line); }
+  main { height: 58vh; }
+  .hud { position: static; margin: 8px 16px; max-width: none; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <aside>
+    <h1>Near-axis z=0 coil candidates</h1>
+    <div class="sub">Giuliani-style near-axis single stage, two planar faces per coil, every hinge on z = 0. Drag to rotate, scroll / pinch to zoom.</div>
+    <div id="list"></div>
+  </aside>
+  <main>
+    <canvas id="cv"></canvas>
+    <div class="hud" id="hud"></div>
+    <div class="controls">
+      <label><input type="checkbox" id="tSurf" checked> NAE surface (r = a)</label>
+      <label><input type="checkbox" id="tCopies" checked> all coils</label>
+      <label><input type="checkbox" id="tPlane" checked> z = 0 plane</label>
+      <label><input type="checkbox" id="tAxis" checked> axis</label>
+      <button id="bTop">top</button><button id="bSide">side</button><button id="bIso">iso</button>
+      <button id="bTheme">theme</button>
+    </div>
+  </main>
+</div>
+<script>
+const DATA = __DATA__;
+const $ = (id) => document.getElementById(id);
+const cv = $("cv"), ctx = cv.getContext("2d");
+let cur = 0, yaw = -0.6, pitch = 1.05, zoom = 1.0;
+const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+
+function caseOf(n) { const r = n.match(/^reg_(q[ah]\d)s\d+/); if (r) return "reg_" + r[1]; const m = n.match(/s1_(q[ah]\d)/); return m ? m[1] : n.replace(/_s\d+$/, ""); }
+const LABEL = { reg_qa2: "Regularized: QA nfp 2 s2 (w = length + bending weight)", reg_qh5: "Regularized: QH nfp 5 s2 (w = length + bending weight)", qa2: "QA, nfp 2", qa3: "QA, nfp 3", qh3: "QH, nfp 3", qh4: "QH, nfp 4", qh5: "QH, nfp 5" };
+
+function buildList() {
+  const groups = {};
+  DATA.forEach((d, i) => { const c = caseOf(d.info.name); (groups[c] = groups[c] || []).push(i); });
+  const el = $("list"); el.innerHTML = "";
+  Object.keys(groups).sort().forEach((g) => {
+    const h = document.createElement("div"); h.className = "group";
+    const f = DATA[groups[g][0]].info;
+    h.textContent = (LABEL[g] || g) + ` (${f.n_coils} coils)`; el.appendChild(h);
+    groups[g].forEach((i) => {
+      const s = DATA[i].info;
+      const good = s.dG < 0.03 && s.dB < 0.05 && Math.abs(s.iota - s.iota_target) / s.iota_target < 0.03;
+      const it = document.createElement("div"); it.className = "item" + (i === cur ? " on" : "");
+      it.innerHTML = `<span class="n">${s.name}</span><span class="badge ${good ? "good" : ""}">${good ? "good fit" : "weak fit"}</span>` +
+        `<span class="m">ΔB ${(100 * s.dB).toFixed(1)}%  Δ∇B ${(100 * s.dG).toFixed(1)}%  ι ${s.iota.toFixed(3)} / ${s.iota_target}  |Z|ax ${s.absZ.toFixed(3)}</span>`;
+      it.onclick = () => { cur = i; buildList(); hud(); draw(); };
+      el.appendChild(it);
+    });
+  });
+}
+
+function hud() {
+  const s = DATA[cur].info;
+  const f = (v, d = 3) => (v === null || v === undefined) ? "–" : Number(v).toFixed(d);
+  const rows = [
+    ["config", `${s.name} (${s.mode}, seed ${s.seed})`],
+    ["type", `${s.hel === 0 ? "QA" : "QH"}, nfp ${s.nfp}, ${s.nc} coils / half period, ${s.n_coils} total`],
+    ["on-axis fit", `ΔB ${(100 * s.dB).toFixed(2)}%   Δ∇B ${(100 * s.dG).toFixed(2)}%   cost ${s.cost.toExponential(2)}`],
+    ["ι (target)", `${f(s.iota)} (${s.iota_target})`],
+    ["axis", `R1 ${f(s.R1)}  Z1 ${f(s.Z1)}  max |Z| ${f(s.absZ)}`],
+    ["η̄, elongation", `${f(s.eta, 2)}, ${f(s.elong, 2)}`],
+    ["clearance to r = a", `${f(s.dpc)} (≥ ${f(s.dpc_bound)}), a = ${s.a}`],
+    ["coil–coil", `${f(s.dcc)} (≥ ${f(s.dcc_bound)})`],
+    ["κ max", `${f(s.kappa, 2)} (≤ ${f(s.kappa_bound, 2)})`],
+    ["L max", `${f(s.Lmax, 3)} (≤ ${f(s.L_bound, 3)})`],
+    ["I / uniform", s.I.map((v) => v.toFixed(2)).join(", ")],
+    ["solver", `${s.nit} its, optimality ${s.optimality ? s.optimality.toExponential(1) : "–"}`],
+  ];
+  const cols = ["--c0", "--c1", "--c2", "--c3", "--c4", "--c5"];
+  let leg = "";
+  for (let i = 0; i < s.nc; i++) leg += `<span style="background:${css(cols[i % 6])}"></span>coil ${i} &nbsp;`;
+  $("hud").innerHTML = "<table>" + rows.map((r) => `<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join("") + "</table>" +
+    `<div class="legend">${leg}<span style="background:${css("--hinge")};border-radius:5px"></span>hinge</div>`;
+}
+
+function resize() {
+  const r = cv.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
+  cv.width = r.width * dpr; cv.height = r.height * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0); draw();
+}
+function proj(p) {
+  const r = cv.getBoundingClientRect();
+  const cy = Math.cos(yaw), sy = Math.sin(yaw), cp = Math.cos(pitch), sp = Math.sin(pitch);
+  const x1 = cy * p[0] - sy * p[1], y1 = sy * p[0] + cy * p[1];
+  const y2 = cp * y1 - sp * p[2], z2 = sp * y1 + cp * p[2];
+  const s = Math.min(r.width, r.height) * 0.33 * zoom;
+  return [r.width / 2 + s * x1, r.height / 2 - s * z2, y2];
+}
+function poly(pts, color, w, dash) {
+  if (!pts.length) return;
+  ctx.beginPath(); ctx.strokeStyle = color; ctx.lineWidth = w; ctx.setLineDash(dash || []);
+  pts.forEach((p, i) => { const q = proj(p); i ? ctx.lineTo(q[0], q[1]) : ctx.moveTo(q[0], q[1]); });
+  ctx.stroke(); ctx.setLineDash([]);
+}
+function draw() {
+  const r = cv.getBoundingClientRect();
+  ctx.fillStyle = css("--bg"); ctx.fillRect(0, 0, r.width, r.height);
+  const D = DATA[cur];
+  if ($("tPlane").checked) {
+    for (const R of [0.5, 1.0, 1.5]) {
+      const c = []; for (let k = 0; k <= 96; k++) { const t = 2 * Math.PI * k / 96; c.push([R * Math.cos(t), R * Math.sin(t), 0]); }
+      poly(c, css("--plane"), 1, [4, 4]);
+    }
+  }
+  if ($("tSurf").checked) {
+    const S = D.surf, nt = S[0].length;
+    for (let i = 0; i < S.length; i += 2) poly(S[i], css("--surf"), 1);
+    for (let j = 0; j < nt; j += 3) poly(S.map((row) => row[j]), css("--surf"), 1);
+  }
+  const nc = D.info.nc, cols = ["--c0", "--c1", "--c2", "--c3", "--c4", "--c5"];
+  if ($("tCopies").checked) D.coils.forEach((c, i) => { if (i >= nc) poly(c, css("--copy"), 1.2); });
+  for (let i = 0; i < nc; i++) poly(D.coils[i], css(cols[i % 6]), 2.6);
+  if ($("tAxis").checked) poly(D.axis, css("--axis"), 2, [6, 3]);
+  ctx.fillStyle = css("--hinge");
+  D.hinges.forEach((h) => { const q = proj(h); ctx.beginPath(); ctx.arc(q[0], q[1], 3.5, 0, 2 * Math.PI); ctx.fill(); });
+}
+let drag = null;
+cv.addEventListener("pointerdown", (e) => { drag = [e.clientX, e.clientY]; cv.setPointerCapture(e.pointerId); });
+cv.addEventListener("pointermove", (e) => {
+  if (!drag) return;
+  yaw += (e.clientX - drag[0]) * 0.008; pitch = Math.max(0, Math.min(Math.PI, pitch - (e.clientY - drag[1]) * 0.008));
+  drag = [e.clientX, e.clientY]; draw();
+});
+cv.addEventListener("pointerup", () => (drag = null));
+cv.addEventListener("wheel", (e) => { e.preventDefault(); zoom *= Math.exp(-e.deltaY * 0.0015); draw(); }, { passive: false });
+let pinch = null;
+cv.addEventListener("touchmove", (e) => {
+  if (e.touches.length !== 2) return;
+  const d = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+  if (pinch) { zoom *= d / pinch; draw(); } pinch = d;
+}, { passive: true });
+cv.addEventListener("touchend", () => (pinch = null));
+["tSurf", "tCopies", "tPlane", "tAxis"].forEach((id) => ($(id).onchange = draw));
+$("bTop").onclick = () => { pitch = 0; draw(); };
+$("bSide").onclick = () => { pitch = Math.PI / 2; draw(); };
+$("bIso").onclick = () => { yaw = -0.6; pitch = 1.05; draw(); };
+$("bTheme").onclick = () => {
+  const root = document.documentElement;
+  const dark = root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  root.dataset.theme = dark ? "light" : "dark"; hud(); draw();
+};
+window.addEventListener("resize", resize);
+const h0 = decodeURIComponent(location.hash.slice(1));
+if (h0) { const k = DATA.findIndex((d) => d.info.name === h0); if (k >= 0) cur = k; }
+buildList(); hud(); resize();
+</script>
+</body>
+</html>

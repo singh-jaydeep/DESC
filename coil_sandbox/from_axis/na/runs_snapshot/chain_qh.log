@@ -1,0 +1,30 @@
++ C='--nfp 4 --nc 4 --iota 1.25 --rcoil 0.42 --dpa 0.28 --Lmax 2.93 --kmax 13.7 --dcc 0.0585 --eta0 1.6 --welong 1 --emax 5'
++ python run_na.py --nfp 4 --nc 4 --iota 1.25 --rcoil 0.42 --dpa 0.28 --Lmax 2.93 --kmax 13.7 --dcc 0.0585 --eta0 1.6 --welong 1 --emax 5 --mode z0 --axis0 '1,0.17;0,-0.13' --maxfev 1500 --out runs/qh_z0
+nfp 4 nc 4 mode z0 helicity -1.0 nparams 80
+{"tag": "init", "cost": 23.5369038716064, "fB": 0.19743129801743226, "fG": 20.3908038165862, "max_dB": 0.5815898042130125, "max_dG_rel": 1.0325142211166898, "iota": 1.4405960026786364, "eta": 1.6, "hel": -1.0, "max_elong": 3.3434278845165757, "axis_rc": [1.0, 0.17, 0.0, 0.0, 0.0, 0.0], "axis_zs": [0.0, -0.13, 0.0, 0.0, 0.0, 0.0], "Lcoil": [2.459, 2.459, 2.459, 2.459], "I": [0.01562, 0.01562, 0.01562, 0.01562], "pen": 0.0}
+The maximum number of function evaluations is exceeded.
+Function evaluations 1500, initial cost 2.3537e+01, final cost 1.3648e-03, first-order optimality 6.30e-03.
+time 874s status 0 nfev 1500
+{"tag": "final", "cost": 0.0013648072824950883, "fB": 1.519886719307287e-05, "fG": 0.001197703575655347, "max_dB": 0.0056997330114500555, "max_dG_rel": 0.013634831108735068, "iota": 1.2434565398712862, "eta": 1.3169492179056925, "hel": -1.0, "max_elong": 4.858397424375157, "axis_rc": [0.89992, 0.09963, 0.00411, -0.00016, 9e-05, 2e-05], "axis_zs": [0.0, -0.09846, -0.00592, -9e-05, 1e-05, -2e-05], "Lcoil": [2.931, 2.932, 2.932, 2.931], "I": [0.02652, 0.13558, -0.28173, 0.18111], "pen": 0.0}
++ python run_na.py --nfp 4 --nc 4 --iota 1.25 --rcoil 0.42 --dpa 0.28 --Lmax 2.93 --kmax 13.7 --dcc 0.0585 --eta0 1.6 --welong 1 --emax 5 --mode free --axis0 '1,0.17;0,-0.13' --maxfev 1500 --out runs/qh_free
+nfp 4 nc 4 mode free helicity -1.0 nparams 88
+{"tag": "init", "cost": 19.692465836632934, "fB": 0.15854313399884956, "fG": 19.503631417926652, "max_dB": 0.47610630872074416, "max_dG_rel": 1.0226278466341947, "iota": 1.4405960026786364, "eta": 1.6, "hel": -1.0, "max_elong": 3.3434278845165757, "axis_rc": [1.0, 0.17, 0.0, 0.0, 0.0, 0.0], "axis_zs": [0.0, -0.13, 0.0, 0.0, 0.0, 0.0], "Lcoil": [2.459, 2.459, 2.459, 2.459], "I": [0.01562, 0.01562, 0.01562, 0.01562], "pen": 0.0}
+The maximum number of function evaluations is exceeded.
+Function evaluations 1500, initial cost 1.9692e+01, final cost 2.8133e-03, first-order optimality 3.81e-02.
+time 1032s status 0 nfev 1500
+{"tag": "final", "cost": 0.002813265351746896, "fB": 9.750520615664619e-05, "fG": 0.002184210349437875, "max_dB": 0.0131044970501737, "max_dG_rel": 0.017321719341663655, "iota": 1.2099142730492705, "eta": 1.7645136400104353, "hel": -1.0, "max_elong": 3.697523763211299, "axis_rc": [0.83889, 0.12854, 0.01145, 0.00094, 0.0002, 2e-05], "axis_zs": [0.0, -0.13786, -0.01174, -0.00117, -9e-05, -3e-05], "Lcoil": [2.93, 2.933, 2.931, 2.931], "I": [0.03031, 0.08723, -0.18777, 0.13244], "pen": 0.0}
++ C2='--nfp 4 --nc 4 --iota 1.25 --rcoil 0.42 --dpa 0.28 --Lmax 2.93 --kmax 13.7 --dcc 0.0585 --eta0 1.6 --welong 10 --emax 4 --imax 2'
++ python run_na.py --nfp 4 --nc 4 --iota 1.25 --rcoil 0.42 --dpa 0.28 --Lmax 2.93 --kmax 13.7 --dcc 0.0585 --eta0 1.6 --welong 10 --emax 4 --imax 2 --mode z0 --axis0 '1,0.17;0,-0.13' --maxfev 2500 --out runs/qh_z0_c
+nfp 4 nc 4 mode z0 helicity -1.0 nparams 80
+{"tag": "init", "cost": 23.5369038716064, "fB": 0.19743129801743226, "fG": 20.3908038165862, "max_dB": 0.5815898042130125, "max_dG_rel": 1.0325142211166898, "iota": 1.4405960026786364, "eta": 1.6, "hel": -1.0, "max_elong": 3.3434278845165757, "axis_rc": [1.0, 0.17, 0.0, 0.0, 0.0, 0.0], "axis_zs": [0.0, -0.13, 0.0, 0.0, 0.0, 0.0], "Lcoil": [2.459, 2.459, 2.459, 2.459], "I": [0.01562, 0.01562, 0.01562, 0.01562], "pen": 0.0}
+`xtol` termination condition is satisfied.
+Function evaluations 1650, initial cost 2.3537e+01, final cost 8.4258e-02, first-order optimality 1.25e-01.
+time 1045s status 3 nfev 1650
+{"tag": "final", "cost": 0.08425776950216954, "fB": 0.0209251907033118, "fG": 0.02423443452628777, "max_dB": 0.14951396021781468, "max_dG_rel": 0.0521151893310626, "iota": 1.1579152728459672, "eta": 1.8930772069685176, "hel": -1.0, "max_elong": 2.5446213235601114, "axis_rc": [0.98824, 0.20504, 0.02479, 0.00166, -0.0, 0.0], "axis_zs": [0.0, -0.17893, -0.02379, -0.00186, 0.0001, 3e-05], "Lcoil": [2.949, 2.936, 2.939, 2.869], "I": [0.03126, 0.02127, 0.02222, 0.00682], "pen": 0.0}
++ python run_na.py --nfp 4 --nc 4 --iota 1.25 --rcoil 0.42 --dpa 0.28 --Lmax 2.93 --kmax 13.7 --dcc 0.0585 --eta0 1.6 --welong 10 --emax 4 --imax 2 --mode z0 --init runs/qh_z0 --maxfev 2500 --out runs/qh_z0_c_warm
+nfp 4 nc 4 mode z0 helicity -1.0 nparams 80
+{"tag": "init", "cost": 2308.4981588718124, "fB": 1.519886719307287e-05, "fG": 0.001197703575655347, "max_dB": 0.0056997330114500555, "max_dG_rel": 0.013634831108735068, "iota": 1.2434565398712862, "eta": 1.3169492179056925, "hel": -1.0, "max_elong": 4.858397424375157, "axis_rc": [0.89992, 0.09963, 0.00411, -0.00016, 9e-05, 2e-05], "axis_zs": [0.0, -0.09846, -0.00592, -9e-05, 1e-05, -2e-05], "Lcoil": [2.931, 2.932, 2.932, 2.931], "I": [0.02652, 0.13558, -0.28173, 0.18111], "pen": 0.0}
+`xtol` termination condition is satisfied.
+Function evaluations 675, initial cost 2.3085e+03, final cost 1.7397e-01, first-order optimality 1.77e-01.
+time 401s status 3 nfev 675
+{"tag": "final", "cost": 0.17397249038062468, "fB": 0.03647706915220222, "fG": 0.09044355512887017, "max_dB": 0.20655645685314786, "max_dG_rel": 0.12360161661394013, "iota": 1.1006929973783193, "eta": 1.476861662258892, "hel": -1.0, "max_elong": 3.155012776390397, "axis_rc": [1.0512, 0.17419, 0.01859, 0.00088, -0.00027, -6e-05], "axis_zs": [0.0, -0.15035, -0.01408, -0.00087, 0.00016, 5e-05], "Lcoil": [2.947, 3.005, 2.785, 2.94], "I": [0.03151, 0.03132, -9e-05, 0.01565], "pen": 0.0}

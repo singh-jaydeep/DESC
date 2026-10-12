@@ -359,6 +359,10 @@ class VacuumBoundaryError(_Objective):
         return out
 
 
+class _SkipInterpolator(Exception):
+    """Internal sentinel: vacuum mode needs no singular-integral interpolator."""
+
+
 class BoundaryError(_Objective):
     """Target for free boundary conditions on LCFS for finite beta equilibrium.
 
@@ -421,6 +425,16 @@ class BoundaryError(_Objective):
         Size to split singular integral computation into chunks.
         If no chunking should be done or the chunk size is the full input
         then supply ``None``. Default is ``bs_chunk_size``.
+    vacuum : bool
+        If True, assume the plasma carries no current so that the plasma
+        contribution to the external field is identically zero. This skips the
+        singular virtual-casing integral entirely -- both the interpolator
+        construction at build time and the integral at every compute -- which is
+        the dominant cost of this objective. Unlike ``VacuumBoundaryError`` this
+        retains the sheet-current residual block, so it can be used for vacuum
+        free-boundary problems with a ``FourierCurrentPotentialField`` surface.
+        Only valid when the enclosed toroidal current is zero everywhere; using it
+        on a finite-current equilibrium silently drops a real term.
 
     """
 
@@ -455,6 +469,7 @@ class BoundaryError(_Objective):
         "_sheet_current",
         "_sheet_data_keys",
         "_use_same_grid",
+        "_vacuum",
     ]
 
     _scalar = False
@@ -487,10 +502,12 @@ class BoundaryError(_Objective):
         *,
         bs_chunk_size=None,
         B_plasma_chunk_size=None,
+        vacuum=False,
         **kwargs,
     ):
         if target is None and bounds is None:
             target = 0
+        self._vacuum = vacuum
         self._eq = eq
         self._source_grid = source_grid
         self._eval_grid = eval_grid
@@ -531,7 +548,7 @@ class BoundaryError(_Objective):
             jac_chunk_size=jac_chunk_size,
         )
 
-    def build(self, use_jit=True, verbose=1):
+    def build(self, use_jit=True, verbose=1):  # noqa: C901
         """Build constant arrays.
 
         Parameters
@@ -582,7 +599,22 @@ class BoundaryError(_Objective):
             "Source grids for singular integrals must be non-symmetric",
         )
 
-        if self._st is None or self._sz is None or self._q is None:
+        if self._vacuum:
+            # B_plasma == 0 for a vacuum equilibrium, so the singular virtual-casing
+            # integral is skipped entirely (it is the dominant cost of this objective).
+            warnif(
+                self._sheet_current,
+                UserWarning,
+                "vacuum=True drops the field radiated by the sheet current, because "
+                "DESC folds the sheet K into K_vc before the virtual-casing integral. "
+                "This is exact only while Phi_mn, I and G are all zero (e.g. when they "
+                "are pinned by FixSheetCurrent). Do not use it with free sheet DOFs.",
+            )
+            self._st = setdefault(self._st, 1)
+            self._sz = setdefault(self._sz, 1)
+            self._q = setdefault(self._q, 1)
+            interpolator = None
+        elif self._st is None or self._sz is None or self._q is None:
             ratio_data = eq.compute(
                 ["|e_theta x e_zeta|", "e_theta", "e_zeta"], grid=source_grid
             )
@@ -592,9 +624,13 @@ class BoundaryError(_Objective):
             self._q = setdefault(self._q, q)
 
         try:
+            if self._vacuum:
+                raise _SkipInterpolator
             interpolator = FFTInterpolator(
                 eval_grid, source_grid, self._st, self._sz, self._q
             )
+        except _SkipInterpolator:
+            interpolator = None
         except AssertionError as e:
             warnif(
                 True,
@@ -717,14 +753,17 @@ class BoundaryError(_Objective):
                 self._constants["sheet_eval_data"] = sheet_eval_data
                 source_data["K_vc"] += sheet_source_data["K"]
 
-            Bplasma = virtual_casing_biot_savart(
-                eval_data,
-                source_data,
-                interpolator,
-                chunk_size=self._B_plasma_chunk_size,
-            )
-            # need extra factor of B/2 bc we're evaluating on plasma surface
-            Bplasma = Bplasma + eval_data["B"] / 2
+            if self._vacuum:
+                Bplasma = jnp.zeros_like(eval_data["B"])
+            else:
+                Bplasma = virtual_casing_biot_savart(
+                    eval_data,
+                    source_data,
+                    interpolator,
+                    chunk_size=self._B_plasma_chunk_size,
+                )
+                # need extra factor of B/2 bc we're evaluating on plasma surface
+                Bplasma = Bplasma + eval_data["B"] / 2
 
             self._constants["source_data"] = source_data
             self._constants["eval_data"] = eval_data
@@ -842,14 +881,17 @@ class BoundaryError(_Objective):
                 )
                 source_data["K_vc"] += sheet_source_data["K"]
 
-            Bplasma = virtual_casing_biot_savart(
-                eval_data,
-                source_data,
-                constants["interpolator"],
-                chunk_size=self._B_plasma_chunk_size,
-            )
-            # need extra factor of B/2 bc we're evaluating on plasma surface
-            Bplasma = Bplasma + eval_data["B"] / 2
+            if self._vacuum:
+                Bplasma = jnp.zeros_like(eval_data["B"])
+            else:
+                Bplasma = virtual_casing_biot_savart(
+                    eval_data,
+                    source_data,
+                    constants["interpolator"],
+                    chunk_size=self._B_plasma_chunk_size,
+                )
+                # need extra factor of B/2 bc we're evaluating on plasma surface
+                Bplasma = Bplasma + eval_data["B"] / 2
 
         x = jnp.array([eval_data["R"], eval_data["phi"], eval_data["Z"]]).T
         # can always pass in field params. If they're None, it just uses the

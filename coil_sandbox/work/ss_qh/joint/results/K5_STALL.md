@@ -1,5 +1,9 @@
 # Open issue: the k = 5 single-stage step stalls (trust-region collapse)
 
+**Resolved 2026-10-09: summary and takeaways in `K5_FINDINGS.md`; lab notebook `../stall/DIAGNOSIS.md`.** Earlier note: The proximal re-solve drifts along the unfixed theta gauge, so
+QS/iota jump by a step-independent amount at every trial point (5e-6 at solve-tol 1e-10); the stall is that noise, not the
+coil hinges. `--solve-tol 1e-6` clears it (cost 1.620 → 1.493); `--method lsq-composite --hessian secant` reaches 1.430.
+
 Not investigated, on purpose: the joint-plane study moved on (2026-10-08). This note is for a session that wants to
 make `single_stage.py` converge better. The same family of early stops shows up in the matrix
 (`../../matrix/RESULTS.md`: k steps stopping on ftol 1e-6), so a fix here probably helps every single-stage run.

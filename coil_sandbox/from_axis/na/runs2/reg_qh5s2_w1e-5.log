@@ -1,0 +1,26 @@
+ERROR:2026-10-09 14:55:13,561:jax._src.xla_bridge:487: Jax plugin configuration error: Exception when calling jax_plugins.xla_cuda12.initialize()
+Traceback (most recent call last):
+  File "/home/jay/miniconda3/envs/desc-dev/lib/python3.13/site-packages/jax/_src/xla_bridge.py", line 485, in discover_pjrt_plugins
+    plugin_module.initialize()
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/jay/miniconda3/envs/desc-dev/lib/python3.13/site-packages/jax_plugins/xla_cuda12/__init__.py", line 328, in initialize
+    _check_cuda_versions(raise_on_first_error=True)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jay/miniconda3/envs/desc-dev/lib/python3.13/site-packages/jax_plugins/xla_cuda12/__init__.py", line 285, in _check_cuda_versions
+    local_device_count = cuda_versions.cuda_device_count()
+RuntimeError: jaxlib/cuda/versions_helpers.cc:113: operation cuInit(0) failed: CUDA_ERROR_NO_DEVICE
+DESC /home/jay/Documents/desc_dev/DESC/desc
+DEVICE requested=cpu obtained=cpu (1x cpu)
+nfp 5 nc 3 mode z0 helicity -1.0 nparams 63 seed -1
+{"tag": "init", "cost": 5.302111266481114e-05, "cost_targets": 5.302029232549514e-05, "cost_bounds": 8.203393159941164e-10, "max_dB": 0.00037800677328957334, "max_dG_rel": 0.002052458519411308, "iota": 1.300347904691396, "eta": 1.1756278306316654, "hel": -1.0, "max_elong": 5.994498058550244, "axis_rc": [0.95546, 0.07284, 0.0041, -0.00013, -8e-05, -1e-05], "axis_zs": [0.0, -0.04133, -0.00073, 0.00011, 5e-05, 0.0], "max_abs_Zaxis": 0.04147014921690298, "min_dpc": 0.09734974748062598, "min_dcc": 0.03999999201015911, "max_kappa": 15.44545837442644, "Lcoil": [2.596, 2.596, 2.596], "I_over_uniform": [0.723, 1.031, 1.247], "n_active_bounds": 22, "L_total": 7.788010383063639, "coil_R_max": 1.3477595743697708, "coil_absz_max": 0.6739080975850507, "mean_kappa2": 0.1729216761726157, "cost_reg": 1.646046096518713e-05, "cost_field": 3.655983136030801e-05}
+   Iteration     Total nfev        Cost      Cost reduction    Step norm     Optimality   
+       0              1          5.302e-05                                    1.097e-08   
+       1              2          5.302e-05      1.439e-12      8.302e-05      3.577e-09   
+`gtol` condition satisfied. (gtol=1.00e-08)
+         Current function value: 5.302e-05
+         Max scaled gradient: 3.577e-09
+         Total delta_x: 8.227e-08
+         Iterations: 1
+         Function evaluations: 2
+         Jacobian evaluations: 2
+{"tag": "final", "cost": 5.3021111225827105e-05, "cost_targets": 5.302031675933098e-05, "cost_bounds": 7.944664961227282e-10, "max_dB": 0.00037802444535114694, "max_dG_rel": 0.0020524632857561566, "iota": 1.300347873725187, "eta": 1.1756278304776022, "hel": -1.0, "max_elong": 5.994498220664204, "axis_rc": [0.95546, 0.07284, 0.0041, -0.00013, -8e-05, -1e-05], "axis_zs": [0.0, -0.04133, -0.00073, 0.00011, 5e-05, 0.0], "max_abs_Zaxis": 0.041470148412194326, "min_dpc": 0.09734974786313144, "min_dcc": 0.03999999200245057, "max_kappa": 15.445458356986597, "Lcoil": [2.596, 2.596, 2.596], "I_over_uniform": [0.723, 1.031, 1.247], "n_active_bounds": 20, "L_total": 7.7880098699841875, "coil_R_max": 1.3477595569718983, "coil_absz_max": 0.6739080535019305, "mean_kappa2": 0.1729216450347986, "cost_reg": 1.6460458811505978e-05, "cost_field": 3.655985794782501e-05, "time_s": 5, "status": "`gtol` condition satisfied. (gtol=1.00e-08)", "nit": 1, "optimality": 3.576792938859423e-09}

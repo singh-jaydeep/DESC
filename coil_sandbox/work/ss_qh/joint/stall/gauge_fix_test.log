@@ -1,0 +1,15 @@
+basis-10 reference: QS 4.225-4.245e-04  Booz 2.07e-03 3.64e-03 7.83-7.84e-03  iota [1.1805, 1.2028-1.2030]
+branch A (unfixed)             force 1.153671e-07  |G| 6.203e-01  QS 4.2157478e-04  Booz 2.1091e-03 3.7035e-03 7.9846e-03  iota [1.180709, 1.203807]
+branch B (unfixed, A's bdry)   force 1.124094e-07  |G| 6.149e-01  QS 4.4454952e-04  Booz 2.1302e-03 3.7521e-03 8.1907e-03  iota [1.181107, 1.203464]
+--- weight 0.001
+from A [122 its 46 s]          force 1.130084e-07  |G| 6.128e-01  QS 4.4540937e-04  Booz 2.1227e-03 3.7448e-03 8.1960e-03  iota [1.181155, 1.203121]
+from B [30 its 18 s]           force 1.130084e-07  |G| 6.128e-01  QS 4.4540938e-04  Booz 2.1227e-03 3.7448e-03 8.1960e-03  iota [1.181155, 1.203121]
+   A-start vs B-start: QS rel 1.07e-08  iota max 1.92e-09  |dRZ_lmn| 1.64e-08  |dL_lmn| 9.12e-08
+--- weight 0.01
+from A [162 its 50 s]          force 9.746723e-07  |G| 5.659e-01  QS 5.2303718e-04  Booz 1.7265e-03 3.4055e-03 9.1142e-03  iota [1.181743, 1.189524]
+from B [162 its 50 s]          force 9.746723e-07  |G| 5.659e-01  QS 5.2303716e-04  Booz 1.7265e-03 3.4055e-03 9.1142e-03  iota [1.181743, 1.189524]
+   A-start vs B-start: QS rel 4.68e-08  iota max 3.48e-10  |dRZ_lmn| 1.31e-09  |dL_lmn| 1.15e-08
+--- weight 0.1
+from A [155 its 48 s]          force 1.771464e-04  |G| 4.128e-01  QS 9.6414107e-03  Booz 4.9321e-03 7.9545e-03 3.8552e-02  iota [0.985346, 1.402393]
+from B [158 its 49 s]          force 1.771464e-04  |G| 4.128e-01  QS 9.6414108e-03  Booz 4.9321e-03 7.9545e-03 3.8552e-02  iota [0.985346, 1.402393]
+   A-start vs B-start: QS rel 1.88e-08  iota max 1.13e-09  |dRZ_lmn| 5.33e-10  |dL_lmn| 7.56e-09

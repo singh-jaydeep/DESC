@@ -1,0 +1,20 @@
+ERROR:2026-10-09 19:02:41,984:jax._src.xla_bridge:487: Jax plugin configuration error: Exception when calling jax_plugins.xla_cuda12.initialize()
+Traceback (most recent call last):
+  File "/home/jay/miniconda3/envs/desc-dev/lib/python3.13/site-packages/jax/_src/xla_bridge.py", line 485, in discover_pjrt_plugins
+    plugin_module.initialize()
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/jay/miniconda3/envs/desc-dev/lib/python3.13/site-packages/jax_plugins/xla_cuda12/__init__.py", line 328, in initialize
+    _check_cuda_versions(raise_on_first_error=True)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jay/miniconda3/envs/desc-dev/lib/python3.13/site-packages/jax_plugins/xla_cuda12/__init__.py", line 285, in _check_cuda_versions
+    local_device_count = cuda_versions.cuda_device_count()
+RuntimeError: jaxlib/cuda/versions_helpers.cc:113: operation cuInit(0) failed: CUDA_ERROR_NO_DEVICE
+DESC /home/jay/Documents/desc_dev/DESC/desc
+DEVICE requested=cpu obtained=cpu (1x cpu)
+nfp 5 nc 3 mode z0 helicity -1.0 nparams 64 order 2 seed -1
+{"tag": "init", "cost": 0.5859408033108217, "cost_targets": 0.582754100863356, "cost_bounds": 0.003186702447465655, "max_dB": 0.14718379967352815, "max_dG_rel": 0.09053964010645357, "iota": 1.2685963369485118, "eta": 1.1686508722396853, "hel": -1.0, "max_elong": 5.011125254706751, "axis_rc": [0.99205, 0.0726, 0.00221, -0.00051, -4e-05, 1e-05], "axis_zs": [0.0, -0.02961, 0.00115, 0.00046, 5e-05, -1e-05], "max_abs_Zaxis": 0.030095201294143982, "min_dpc": 0.09701673192005857, "min_dcc": 0.03999769277762663, "max_kappa": 15.447129544375827, "Lcoil": [2.596, 2.603, 1.659], "I_over_uniform": [1.821, 1.588, -0.003], "n_active_bounds": 33, "L_total": 6.857869472111582, "coil_R_max": 1.5888182898468044, "coil_absz_max": 0.4901853442954907, "mean_kappa2": 0.11377695693796673, "cost_reg": 0.0013266138538661077, "cost_field": 0.5814274870094899, "B2c": 0.0, "B20_residual": 2.2740550190473496, "max_dGG_rel": 0.9826208023672784}
+   Iteration     Total nfev        Cost      Cost reduction    Step norm     Optimality   
+       0              1          5.859e-01                                    8.016e-01   
+       1              2          1.641e-01      4.219e-01      4.101e+00      1.080e-02   
+       2              3          1.590e-01      5.111e-03      3.361e+00      4.601e-03   
+       3              4          1.565e-01      2.451e-03      3.734e+00      5.364e-03   
