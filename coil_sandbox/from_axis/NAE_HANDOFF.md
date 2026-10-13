@@ -181,6 +181,34 @@ lh       kmax13.23 |  0.0380  0.77  0.401  0.491  0.278  4.18 | 0.1478 0.0400  1
   discard them. Coil count is redone with a staged chain: `na/ncchain.py`, runs `nc{4,5,6}_s{1..4}`.
 
 
+## 6. Coils per half period (`na/ncchain.py`, runs `nc{4,5,6}_s{1..4}`)
+
+Staged chain per coil count: s1 first order cold (seed 2), s2 second order weak weights, s3 final weights (z = 0),
+s4 hinges within 0.2 a and tilt <= 2 degrees. Per-coil bounds unchanged. The 4-coil control reproduces section 4/5
+exactly (0.0738, 0.0493). Full table: `na/runs2/ncchain_table.out`.
+
+```
+nc4 s3 cost_field   0.0738 iota 0.372 B20 0.403 dGG 0.564 elong 4.65 dcc 0.0400 Ltot 15.78 nit 247 'ol` condition sati
+nc4 s4 cost_field   0.0493 iota 0.390 B20 0.427 dGG 0.375 elong 4.57 dcc 0.0400 Ltot 15.77 nit 229 'ol` condition sati
+nc5 s1 cost_field   0.0003 iota 0.420 B20 nan dGG nan elong 4.43 dcc 0.0400 Ltot 16.53 nit 600 ' number of iterations
+nc5 s2 cost_field   0.0019 iota 0.419 B20 0.423 dGG 0.289 elong 4.56 dcc 0.0400 Ltot 19.42 nit 194 'ol` condition sati
+nc5 s3 cost_field   0.0178 iota 0.407 B20 0.407 dGG 0.289 elong 4.55 dcc 0.0400 Ltot 19.67 nit 103 'ol` condition sati
+nc5 s4 cost_field   0.0080 iota 0.416 B20 0.406 dGG 0.195 elong 4.06 dcc 0.0400 Ltot 19.62 nit 538 'ol` condition sati
+nc6 s1 cost_field   0.0001 iota 0.420 B20 nan dGG nan elong 5.00 dcc 0.0400 Ltot 18.12 nit 600 ' number of iterations
+nc6 s2 cost_field   0.0006 iota 0.420 B20 0.360 dGG 0.182 elong 4.38 dcc 0.0400 Ltot 21.23 nit 151 'ol` condition sati
+nc6 s3 cost_field   0.0043 iota 0.417 B20 0.373 dGG 0.155 elong 4.59 dcc 0.0400 Ltot 22.54 nit 352 'ol` condition sati
+nc6 s4 cost_field   0.0027 iota 0.418 B20 0.352 dGG 0.127 elong 4.56 dcc 0.0400 Ltot 22.56 nit 600 ' number of iterati
+```
+
+* **Coil count is the largest lever found**: z = 0 cost 0.074 / 0.018 / 0.0043 for 4 / 5 / 6 coils (x0.24, x0.06), with
+  iota 0.372 / 0.407 / 0.417 against the 0.42 target. Loosened hinges on top: 0.049 / 0.0080 / 0.0027.
+* Price: total length 15.8 / 19.7 / 22.5 (+25%, +43%); d_cc at its 0.04 bound throughout.
+* B20 still 0.35-0.41. dGG falls to 0.13-0.16.
+* Not converged: s1 for 5 and 6 coils and nc6_s4 stopped at 600 iterations (nc6_s4 still descending slowly).
+* Ranking of the relaxations at iota 0.42 (cost / z = 0 4-coil base): 6 coils 0.06, 5 coils 0.24, length x1.3 0.35,
+  hinge band 0.3 a free 0.41, length x1.15 0.60, band 0.2 a + 2 deg 0.67, curvature x1.3 0.93, d_cc 0.02 0.93, d_pc 0.6 a 0.97.
+* None of sections 4-6 is free-boundary scored.
+
 ## Open, in rough order of value
 
 1. Free-boundary score (rule 2) of level hinges H = 0.05 and H = 0.20, and of the iota 0.20 state: none has been scored.

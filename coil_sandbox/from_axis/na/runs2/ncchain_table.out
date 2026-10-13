@@ -1,0 +1,12 @@
+nc4 s3 cost_field   0.0738 iota 0.372 B20 0.403 dGG 0.564 elong 4.65 dcc 0.0400 Ltot 15.78 nit 247 'ol` condition satisfied. (ftol=1.00e-10)'
+nc4 s4 cost_field   0.0493 iota 0.390 B20 0.427 dGG 0.375 elong 4.57 dcc 0.0400 Ltot 15.77 nit 229 'ol` condition satisfied. (ftol=1.00e-10)'
+nc5 s1 cost_field   0.0003 iota 0.420 B20 nan dGG nan elong 4.43 dcc 0.0400 Ltot 16.53 nit 600 ' number of iterations has been exceeded.'
+nc5 s2 cost_field   0.0019 iota 0.419 B20 0.423 dGG 0.289 elong 4.56 dcc 0.0400 Ltot 19.42 nit 194 'ol` condition satisfied. (gtol=1.00e-08)'
+nc5 s3 cost_field   0.0178 iota 0.407 B20 0.407 dGG 0.289 elong 4.55 dcc 0.0400 Ltot 19.67 nit 103 'ol` condition satisfied. (gtol=1.00e-08)'
+nc5 s4 cost_field   0.0080 iota 0.416 B20 0.406 dGG 0.195 elong 4.06 dcc 0.0400 Ltot 19.62 nit 538 'ol` condition satisfied. (gtol=1.00e-08)'
+nc6 s1 cost_field   0.0001 iota 0.420 B20 nan dGG nan elong 5.00 dcc 0.0400 Ltot 18.12 nit 600 ' number of iterations has been exceeded.'
+nc6 s2 cost_field   0.0006 iota 0.420 B20 0.360 dGG 0.182 elong 4.38 dcc 0.0400 Ltot 21.23 nit 151 'ol` condition satisfied. (ftol=1.00e-10)'
+nc6 s3 cost_field   0.0043 iota 0.417 B20 0.373 dGG 0.155 elong 4.59 dcc 0.0400 Ltot 22.54 nit 352 'ol` condition satisfied. (gtol=1.00e-08)'
+nc6 s4 cost_field   0.0027 iota 0.418 B20 0.352 dGG 0.127 elong 4.56 dcc 0.0400 Ltot 22.56 nit 600 ' number of iterations has been exceeded.'
+
+[exited with code 0]
