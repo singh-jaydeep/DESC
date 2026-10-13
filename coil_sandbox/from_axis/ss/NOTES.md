@@ -181,3 +181,15 @@ independent displacement measure. iota 0.42 start: surface moved 0.12 mm rms / 1
 0.35/0.67/1.31/2.37% -> 0.29/0.71/1.34/2.37% (old repair: 0.90/1.09/1.78/3.62%). Design B: QS unchanged to 7% at the
 edge, B.n 0.14% -> 0.10% rms, max 22.6% -> 0.44%, sqrt(g) positive everywhere (li030/repaired/). The ss4 redux can
 now be rerun fairly. `repair_lib.py` is a shim; all callers get the new repair with no change.
+
+## 2026-10-13: ss4 redux done (Modal `ss12_ref042_q15r`, 77 min, files in `ref042r/`)
+
+Same pipeline as design B on the iota 0.42 parent, with the new repair. Start repair kept QS (0.29/0.71/1.34/2.37%);
+no repair was needed after any of the six k steps (gate). Single stage k=6: QS 0.39/0.42/0.69/1.42%, iota 0.299-0.352,
+B.n 0.13% rms, length 0.1% over. Free-boundary rescore (shells 4, 8): QS 0.36/0.45/0.74/1.51%, iota 0.296-0.354,
+A 6.90, coils feasible. BUT both shells ended "bad approximation" with B.n not reduced (0.185% -> 0.187% rms), and the
+boundary creased inside shell 8 (10.7% B.n spot, curvature 4e5 /m). Repaired afterwards (0.07 mm rms / 0.55 mm max):
+QS 0.37/0.48/0.74/1.49%, B.n 0.23% rms / 1.5% max, sqrt(g) > 0 (`ref042r/fb_repaired/`).
+Reading: against ss4 (0.42/0.43/0.84/1.74%) a 10-15% gain at mid radius and edge, none inside; design B
+(0.25/0.28/0.47/0.89%) is still 35-40% better. So most of design B's gain came from the lower iota, not from the
+cleaner solve. Open: why the rescore cannot lower B.n below 0.19% here (ss4 reached 0.04%).

@@ -1,0 +1,230 @@
+{
+ "name": "ss12_ref042_q15r",
+ "attempts": [
+  {
+   "started": "2026-10-13 15:16:30",
+   "commit": "d97172432eda41ff89ffb296cab0bf9153e82464",
+   "gpu": "NVIDIA A100-SXM4-40GB, 40960 MiB",
+   "steps": [
+    {
+     "i": 0,
+     "cmd": [
+      "python",
+      "prep.py",
+      "../na/runs2/o2w1_qa2s2_gg1e-1_w1e-2_w1x10_fb_a0.12_L10",
+      "/vol/ss12_ref042_q15r/start",
+      "--LMN",
+      "12"
+     ],
+     "rc": 0,
+     "minutes": 3.2
+    },
+    {
+     "i": 1,
+     "cmd": [
+      "python",
+      "../../single_stage.py",
+      "--eq",
+      "/vol/ss12_ref042_q15r/start/eq0_b12.h5",
+      "--start",
+      "/vol/ss12_ref042_q15r/start/coils0.h5",
+      "--out",
+      "/vol/ss12_ref042_q15r/ss",
+      "--bounds",
+      "../../bounds/fa_qa2_a0167.json",
+      "--fix-hinge-z",
+      "0",
+      "--dist",
+      "rows",
+      "--rows-select",
+      "1.6",
+      "--cc-rows",
+      "12000",
+      "--pc-rows",
+      "12000",
+      "--pc-gap",
+      "0.005",
+      "--plasma-m",
+      "40",
+      "--plasma-n",
+      "40",
+      "--helicity",
+      "1,0",
+      "--qs-form",
+      "boozer",
+      "--qs-rho",
+      "0.25,0.5,0.75,1.0",
+      "--A-min",
+      "6.5",
+      "--A-max",
+      "7.0",
+      "--iota-min",
+      "0.3",
+      "--tau-bn",
+      "5e-4",
+      "--tau-qs-rel",
+      "0.15",
+      "--length-mult",
+      "0.999",
+      "--src-gl",
+      "64",
+      "--force-chunk",
+      "400",
+      "--method",
+      "lsq-composite",
+      "--hessian",
+      "secant",
+      "--solve-tol",
+      "1e-6",
+      "--kmin",
+      "1",
+      "--kmax",
+      "6",
+      "--maxiter",
+      "50",
+      "--track-steps",
+      "--ckpt-every",
+      "1",
+      "--auto-resume",
+      "--repair-steps"
+     ],
+     "rc": 0,
+     "minutes": 61.1
+    },
+    {
+     "i": 2,
+     "cmd": [
+      "bash",
+      "-c",
+      "k=$(ls /vol/ss12_ref042_q15r/ss/eq_k*.h5 | sed 's/.*eq_k\\([0-9]*\\).h5/\\1/' | sort -n | tail -1) && python fb_rescore.py /vol/ss12_ref042_q15r/ss/eq_k$k.h5 /vol/ss12_ref042_q15r/ss/coils_k$k.h5 /vol/ss12_ref042_q15r/fb --shells 4,8 --repair"
+     ],
+     "rc": 0,
+     "minutes": 12.0
+    },
+    {
+     "i": 3,
+     "cmd": [
+      "python",
+      "tip.py",
+      "/vol/ss12_ref042_q15r/fb/eq_fb.h5",
+      "/vol/ss12_ref042_q15r/ss/coils_k6.h5",
+      "/vol/ss12_ref042_q15r/fb/tip.png",
+      "--device",
+      "gpu"
+     ],
+     "rc": 0,
+     "minutes": 0.6
+    }
+   ],
+   "finished": "2026-10-13 16:33:25",
+   "rc": 0
+  }
+ ],
+ "job": {
+  "what": "single stage at basis 12 from ../na/runs2/o2w1_qa2s2_gg1e-1_w1e-2_w1x10_fb_a0.12_L10 (tau_qs 0.15 x start, iota >= 0.3), repairs, then free-boundary rescore",
+  "steps": [
+   {
+    "cmd": [
+     "python",
+     "prep.py",
+     "../na/runs2/o2w1_qa2s2_gg1e-1_w1e-2_w1x10_fb_a0.12_L10",
+     "{OUT}/start",
+     "--LMN",
+     "12"
+    ],
+    "cwd": "coil_sandbox/from_axis/ss"
+   },
+   {
+    "cmd": [
+     "python",
+     "../../single_stage.py",
+     "--eq",
+     "{OUT}/start/eq0_b12.h5",
+     "--start",
+     "{OUT}/start/coils0.h5",
+     "--out",
+     "{OUT}/ss",
+     "--bounds",
+     "../../bounds/fa_qa2_a0167.json",
+     "--fix-hinge-z",
+     "0",
+     "--dist",
+     "rows",
+     "--rows-select",
+     "1.6",
+     "--cc-rows",
+     "12000",
+     "--pc-rows",
+     "12000",
+     "--pc-gap",
+     "0.005",
+     "--plasma-m",
+     "40",
+     "--plasma-n",
+     "40",
+     "--helicity",
+     "1,0",
+     "--qs-form",
+     "boozer",
+     "--qs-rho",
+     "0.25,0.5,0.75,1.0",
+     "--A-min",
+     "6.5",
+     "--A-max",
+     "7.0",
+     "--iota-min",
+     "0.3",
+     "--tau-bn",
+     "5e-4",
+     "--tau-qs-rel",
+     "0.15",
+     "--length-mult",
+     "0.999",
+     "--src-gl",
+     "64",
+     "--force-chunk",
+     "400",
+     "--method",
+     "lsq-composite",
+     "--hessian",
+     "secant",
+     "--solve-tol",
+     "1e-6",
+     "--kmin",
+     "1",
+     "--kmax",
+     "6",
+     "--maxiter",
+     "50",
+     "--track-steps",
+     "--ckpt-every",
+     "1",
+     "--auto-resume",
+     "--repair-steps"
+    ],
+    "cwd": "coil_sandbox/from_axis/ss"
+   },
+   {
+    "cmd": [
+     "bash",
+     "-c",
+     "k=$(ls {OUT}/ss/eq_k*.h5 | sed 's/.*eq_k\\([0-9]*\\).h5/\\1/' | sort -n | tail -1) && python fb_rescore.py {OUT}/ss/eq_k$k.h5 {OUT}/ss/coils_k$k.h5 {OUT}/fb --shells 4,8 --repair"
+    ],
+    "cwd": "coil_sandbox/from_axis/ss"
+   },
+   {
+    "cmd": [
+     "python",
+     "tip.py",
+     "{OUT}/fb/eq_fb.h5",
+     "{OUT}/ss/coils_k6.h5",
+     "{OUT}/fb/tip.png",
+     "--device",
+     "gpu"
+    ],
+    "cwd": "coil_sandbox/from_axis/ss"
+   }
+  ],
+  "name": "ss12_ref042_q15r"
+ }
+}
