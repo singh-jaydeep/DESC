@@ -52,6 +52,9 @@ ap.add_argument("--hzmax", type=float, default=0.0,
 ap.add_argument("--wlevel", type=float, default=0.0,
                 help="--mode free: weight of the per-coil LEVEL rows (z_a - z_b) / a, target 0: each coil's two hinges "
                      "at one height (a horizontal joint per coil); 1e4 holds them level to ~1e-5 m")
+ap.add_argument("--tiltmax", type=float, default=0.0,
+                help="--mode free: bound rows |hinge line tilt from horizontal| <= tiltmax degrees per coil "
+                     "(dz / horizontal distance between the coil's two hinges); <= 0: no bound. For exactly level use --wlevel")
 ap.add_argument("--wplanar", type=float, default=0.0,
                 help="weight of the per-coil PLANAR rows (alpha_u + alpha_l), target 0: both arcs in one plane (no "
                      "fold; the coil is a planar curve, still two sine-series arcs meeting at the hinges)")
@@ -227,6 +230,8 @@ def rows_spec():
         spec.append(("hz", 2 * a.nc, "b"))
     if a.mode == "free" and a.wlevel > 0:
         spec.append(("hlevel", a.nc, "t"))
+    if a.mode == "free" and a.tiltmax > 0:
+        spec.append(("htilt", a.nc, "b"))
     if a.wplanar > 0:
         spec.append(("planar", a.nc, "t"))
     if a.wlen > 0:
@@ -237,12 +242,14 @@ def rows_spec():
 
 
 SPEC = rows_spec()
+TILT = float(np.tan(np.radians(max(a.tiltmax, 0.0))))
 wb = np.sqrt(a.wpen)
 BOUNDS = dict(dpc=(a.dpc, np.inf, wb / a.dpc), dcc=(a.dcc, np.inf, wb / a.dcc), kappa=(-np.inf, a.kmax, wb / a.kmax),
               Lcoil=(-np.inf, a.Lmax, wb / a.Lmax), I=(0.0, a.imax * Iref if a.imax > 0 else np.inf, wb / Iref),
               elong=(-np.inf, a.emax, wb / max(a.emax, 1)),
               zaxis=(-a.zmax, a.zmax, wb / max(a.zmax, 1e-3)),
-              hz=(-a.hzmax, a.hzmax, wb / max(a.hzmax, 1e-3)))
+              hz=(-a.hzmax, a.hzmax, wb / max(a.hzmax, 1e-3)),
+              htilt=(-TILT, TILT, wb / max(TILT, 1e-3)))
 lo, hi, tgt, isb, wrow = [], [], [], [], []
 for name, n, kind in SPEC:
     if kind == "t":
@@ -253,6 +260,13 @@ for name, n, kind in SPEC:
 wrow = np.array(wrow)
 lo_s, hi_s, tgt_s = np.array(lo) * wrow, np.array(hi) * wrow, np.array(tgt)
 isb = np.array(isb)
+
+
+def hinge_tilt(C):
+    """tan of each coil's hinge-line tilt from horizontal; hinges are (R, phi, z) at C[:, 0:3] and C[:, 3:6]"""
+    dx = C[:, 0] * jnp.cos(C[:, 1]) - C[:, 3] * jnp.cos(C[:, 4])
+    dy = C[:, 0] * jnp.sin(C[:, 1]) - C[:, 3] * jnp.sin(C[:, 4])
+    return (C[:, 2] - C[:, 5]) / jnp.sqrt(dx**2 + dy**2)
 
 
 def fun_raw(p):
@@ -287,6 +301,8 @@ def fun_raw(p):
         out.append(jnp.concatenate([C[:, 2], C[:, 5]]))
     if a.mode == "free" and a.wlevel > 0:
         out.append(jnp.sqrt(a.wlevel) * (C[:, 2] - C[:, 5]) / a.a)
+    if a.mode == "free" and a.tiltmax > 0:
+        out.append(hinge_tilt(C))
     if a.wplanar > 0:
         out.append(jnp.sqrt(a.wplanar) * (C[:, L.nh] + C[:, L.nh + 1]))
     if a.wlen > 0:
@@ -350,7 +366,8 @@ def report(p, tag, extra=None):
         Cn = np.asarray(C)
         info.update(hinge_z=np.stack([Cn[:, 2], Cn[:, 5]], 1).round(5).tolist(),
                     max_abs_hinge_z=float(np.abs(Cn[:, [2, 5]]).max()),
-                    max_hinge_dz=float(np.abs(Cn[:, 2] - Cn[:, 5]).max()))
+                    max_hinge_dz=float(np.abs(Cn[:, 2] - Cn[:, 5]).max()),
+                    hinge_tilt_deg=np.degrees(np.arctan(np.asarray(hinge_tilt(C)))).round(2).tolist())
         if a.wlevel > 0:
             info["cost_field"] -= float(0.5 * np.sum(blocks(np.asarray(fun(p)))["hlevel"] ** 2))
     if a.order == 2:
