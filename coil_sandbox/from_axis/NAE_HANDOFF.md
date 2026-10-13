@@ -147,6 +147,40 @@ One knob at a time at iota 0.42, at z = 0 and at (0.2 a, 2 degrees): plasma-coil
 and max length x1.15/x1.3, coil-coil distance 0.03/0.02, coils per half period 5/6 (cold starts with a cold 4-coil
 control). Results: `na/runs2/loose2_scan.out`.
 
+```
+hinge         knob |    cost /base   iota    B20    dGG elong |    dpc    dcc   kmax   Ltot nit status
+z0            base |  0.0738  1.00  0.372  0.403  0.564  4.65 | 0.1478 0.0400  10.17  15.78 278 `gtol` condition satisfied.
+z0       Lmax4.532 |  0.0441  0.60  0.390  0.282  0.506  4.63 | 0.1509 0.0400  10.17  17.61 157 `gtol` condition satisfied.
+z0       Lmax5.124 |  0.0257  0.35  0.401  0.346  0.373  5.00 | 0.1721 0.0400  10.17  20.50 138 `gtol` condition satisfied.
+z0         dcc0.02 |  0.0684  0.93  0.377  0.419  0.493  4.59 | 0.1478 0.0200  10.17  15.77 77 Optimization terminated succ
+z0         dcc0.03 |  0.0710  0.96  0.375  0.409  0.528  4.62 | 0.1478 0.0300  10.17  15.78 61 Optimization terminated succ
+z0       dpc0.1002 |  0.0719  0.97  0.372  0.297  0.515  4.78 | 0.1042 0.0400  10.17  15.71 512 Optimization terminated succ
+z0       dpc0.1169 |  0.0723  0.98  0.372  0.319  0.550  4.77 | 0.1169 0.0400  10.17  15.70 377 Optimization terminated succ
+z0       dpc0.1336 |  0.0732  0.99  0.373  0.386  0.555  4.63 | 0.1336 0.0400  10.17  15.65 153 Optimization terminated succ
+z0       kmax11.70 |  0.0711  0.96  0.375  0.413  0.522  4.57 | 0.1478 0.0400  11.70  15.78 97 Optimization terminated succ
+z0       kmax13.23 |  0.0689  0.93  0.377  0.414  0.497  4.34 | 0.1478 0.0400  13.23  15.78 136 Optimization terminated succ
+lh            base |  0.0493  1.00  0.390  0.427  0.375  4.57 | 0.1478 0.0400  10.18  15.77 212 `gtol` condition satisfied.
+lh       Lmax4.532 |  0.0231  0.47  0.406  0.417  0.259  4.80 | 0.1535 0.0400  10.17  18.13 323 `gtol` condition satisfied.
+lh       Lmax5.124 |  0.0130  0.26  0.412  0.338  0.219  4.90 | 0.1563 0.0400  10.17  20.12 454 `gtol` condition satisfied.
+lh         dcc0.02 |  0.0339  0.69  0.409  0.454  0.275  3.75 | 0.1478 0.0200  10.17  15.77 305 `gtol` condition satisfied.
+lh         dcc0.03 |  0.0418  0.85  0.396  0.454  0.317  4.49 | 0.1478 0.0300  10.18  15.77 322 `gtol` condition satisfied.
+lh       dpc0.1002 |  0.0444  0.90  0.394  0.502  0.311  4.87 | 0.1308 0.0400  10.18  15.77 246 `gtol` condition satisfied.
+lh       dpc0.1169 |  0.0444  0.90  0.394  0.502  0.311  4.87 | 0.1308 0.0400  10.18  15.77 229 Optimization terminated succ
+lh       dpc0.1336 |  0.0441  0.90  0.395  0.503  0.296  4.68 | 0.1336 0.0400  10.17  15.77 446 `gtol` condition satisfied.
+lh       kmax11.70 |  0.0412  0.84  0.397  0.488  0.298  4.48 | 0.1478 0.0400  11.70  15.77 350 `gtol` condition satisfied.
+lh       kmax13.23 |  0.0380  0.77  0.401  0.491  0.278  4.18 | 0.1478 0.0400  13.23  15.77 392 `gtol` condition satisfied.
+```
+
+* **Length is the big lever**: +15% per-coil length gives 0.60 (z0) / 0.47 (lh) of the base cost, +30% gives 0.35 / 0.26.
+  It compounds with the hinge band: lh + 30% length is 0.013, 18% of the z = 0 base. The longer coils sit *further*
+  from the plasma (d_pc 0.147 -> 0.15-0.17), and +15% at z = 0 is the only change so far that lowers B20 (0.40 -> 0.28).
+* Curvature x1.3: 0.93 (z0), 0.77 (lh). Coil-coil 0.02: 0.93 (z0), 0.69 (lh). Both matter more once hinges are loose.
+* Plasma-coil distance: almost nothing (0.97-0.99 at z0; 0.90 at lh, where the coils stop at 0.78 a and go no closer).
+  Its only visible effect is B20 at z = 0 (0.40 -> 0.30 at 0.6 a).
+* The cold starts for 5 and 6 coils (and the 4-coil control) at second order did not converge (600 iterations, cost > 1);
+  discard them. Coil count is redone with a staged chain: `na/ncchain.py`, runs `nc{4,5,6}_s{1..4}`.
+
+
 ## Open, in rough order of value
 
 1. Free-boundary score (rule 2) of level hinges H = 0.05 and H = 0.20, and of the iota 0.20 state: none has been scored.
