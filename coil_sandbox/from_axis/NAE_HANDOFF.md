@@ -90,6 +90,63 @@ Cold starts, planar from the beginning (free hinges |z| <= 0.2, full chain, `cha
 * Caveats: first-order planar runs stopped on maxiter (400), not converged; 4 coils per half period only; "planar"
   allows an in-plane corner at the hinges.
 
+## 4. Thin hinge band with a tilt bound (`na/loose.sh`, `na/loose_table.py`, runs `lo_qa2_i*_h*_t*`, `hi_qa2_iota0.50`)
+
+Hinges of every coil within |z| <= H (H = 0.1, 0.2, 0.3 a; a = 0.167, so 0.0167, 0.0334, 0.0501), hinge line level,
+tilted <= 2 degrees (`--tiltmax 2`), or free inside the band; iota target 0.30, 0.42, 0.50, each continued from its own
+z = 0 state. `/z0` is the field cost over that z = 0 state's. All 27 converged (ftol/gtol).
+
+```
+iota tgt   H/a   tilt |    cost   /z0   iota    B20    dGG elong | max|z| max tilt(deg) nit status
+0.30         0    z=0 |  0.0472  1.00  0.281  0.354  0.499  3.97 | 0.0000  0.00 208 Optimization terminated succ
+0.30       0.1      2 |  0.0375  0.79  0.286  0.388  0.392  4.05 | 0.0167  1.97 188 `gtol` condition satisfied. 
+0.30       0.1   free |  0.0375  0.79  0.286  0.387  0.392  4.04 | 0.0167  1.97 147 Optimization terminated succ
+0.30       0.1  level |  0.0408  0.87  0.284  0.358  0.429  3.86 | 0.0167  0.00 153 `gtol` condition satisfied. 
+0.30       0.2      2 |  0.0296  0.63  0.289  0.387  0.319  3.92 | 0.0334  2.00 206 `gtol` condition satisfied. 
+0.30       0.2   free |  0.0279  0.59  0.290  0.381  0.302  3.98 | 0.0334  3.57 172 `gtol` condition satisfied. 
+0.30       0.2  level |  0.0322  0.68  0.288  0.390  0.335  3.78 | 0.0334  0.00 386 `gtol` condition satisfied. 
+0.30       0.3      2 |  0.0242  0.51  0.293  0.410  0.232  3.68 | 0.0501  2.00 182 `gtol` condition satisfied. 
+0.30       0.3   free |  0.0216  0.46  0.294  0.368  0.222  3.68 | 0.0501  5.38 303 Optimization terminated succ
+0.30       0.3  level |  0.0287  0.61  0.292  0.384  0.274  3.72 | 0.0501  0.00 216 `gtol` condition satisfied. 
+0.42         0    z=0 |  0.0738  1.00  0.372  0.403  0.564  4.65 | 0.0000  0.00 278 `gtol` condition satisfied. 
+0.42       0.1      2 |  0.0598  0.81  0.382  0.392  0.472  4.50 | 0.0167  1.74 214 `gtol` condition satisfied. 
+0.42       0.1   free |  0.0598  0.81  0.382  0.392  0.472  4.50 | 0.0167  1.74 193 Optimization terminated succ
+0.42       0.1  level |  0.0626  0.85  0.380  0.414  0.467  4.56 | 0.0167  0.00 213 `gtol` condition satisfied. 
+0.42       0.2      2 |  0.0493  0.67  0.390  0.427  0.375  4.57 | 0.0334  2.00 212 `gtol` condition satisfied. 
+0.42       0.2   free |  0.0424  0.57  0.394  0.451  0.333  4.67 | 0.0334  3.75 168 `gtol` condition satisfied. 
+0.42       0.2  level |  0.0523  0.71  0.387  0.445  0.369  4.52 | 0.0334  0.00 148 `gtol` condition satisfied. 
+0.42       0.3      2 |  0.0340  0.46  0.403  0.492  0.258  4.44 | 0.0501  2.00 274 `gtol` condition satisfied. 
+0.42       0.3   free |  0.0303  0.41  0.403  0.447  0.243  4.43 | 0.0501  5.28 177 Optimization terminated succ
+0.42       0.3  level |  0.0406  0.55  0.397  0.493  0.281  4.46 | 0.0501  0.00 264 `gtol` condition satisfied. 
+0.50         0    z=0 |  0.0938  1.00  0.424  0.370  0.609  4.93 | 0.0000  0.00 100 Optimization terminated succ
+0.50       0.1      2 |  0.0773  0.82  0.436  0.324  0.536  4.66 | 0.0167  1.81 420 `gtol` condition satisfied. 
+0.50       0.1   free |  0.0773  0.82  0.436  0.324  0.536  4.66 | 0.0167  1.81 379 Optimization terminated succ
+0.50       0.1  level |  0.0803  0.86  0.431  0.380  0.548  4.87 | 0.0167  0.00 260 `gtol` condition satisfied. 
+0.50       0.2      2 |  0.0418  0.45  0.479  0.485  0.332  4.40 | 0.0334  2.00 340 Optimization terminated succ
+0.50       0.2   free |  0.0403  0.43  0.478  0.477  0.327  4.40 | 0.0334  3.98 308 `gtol` condition satisfied. 
+0.50       0.2  level |  0.0664  0.71  0.441  0.461  0.409  5.00 | 0.0334  0.00 334 Optimization terminated succ
+0.50       0.3      2 |  0.0365  0.39  0.481  0.482  0.320  4.67 | 0.0501  2.00 562 `gtol` condition satisfied. 
+0.50       0.3   free |  0.0335  0.36  0.483  0.454  0.308  4.77 | 0.0501  5.46 212 Optimization terminated succ
+0.50       0.3  level |  0.0467  0.50  0.456  0.523  0.284  5.00 | 0.0501  0.00 361 `gtol` condition satisfied.
+```
+
+* Field cost: 0.1 a gives 13-21% off, 0.2 a 29-57%, 0.3 a 39-64%. Roughly linear in H, no threshold.
+* Tilt matters as much as height. At 0.1 a the band only permits ~1.8 degrees, so "2" and "free" coincide. At 0.2-0.3 a
+  the 2-degree bound captures most of the free gain (free uses 3.6-5.5 degrees); level gives about half to two thirds.
+* The gain grows with iota: at 0.3 a free, cost is 0.46 / 0.41 / 0.36 of z = 0 for iota 0.30 / 0.42 / 0.50. The
+  iota 0.50 target with 0.2 a and 2 degrees reaches iota 0.48 at a cost (0.042) below the z = 0 iota 0.30 state (0.047).
+* Achieved iota is under target in every run and moves toward it as the band widens; the cost includes that miss.
+* The second-order residual B20 does **not** improve (0.35-0.52 everywhere, often worse). max dGG (second-order
+  gradient mismatch) halves. So the band buys first-order field accuracy and transform, not second-order QS.
+* Caveat on section 1: the heights there were quoted against a = 0.12; with a = 0.167 they are 0.12, 0.30, 0.6, 1.2 a.
+* Not free-boundary scored. The single stage (`ss/single_stage.py`) has no height cap or tilt bound yet.
+
+## 5. Weakening the engineering bounds (`na/loose2.sh`, `na/loose2_table.py`, runs `l2_qa2_*`)
+
+One knob at a time at iota 0.42, at z = 0 and at (0.2 a, 2 degrees): plasma-coil distance 0.8/0.7/0.6 a, max curvature
+and max length x1.15/x1.3, coil-coil distance 0.03/0.02, coils per half period 5/6 (cold starts with a cold 4-coil
+control). Results: `na/runs2/loose2_scan.out`.
+
 ## Open, in rough order of value
 
 1. Free-boundary score (rule 2) of level hinges H = 0.05 and H = 0.20, and of the iota 0.20 state: none has been scored.
