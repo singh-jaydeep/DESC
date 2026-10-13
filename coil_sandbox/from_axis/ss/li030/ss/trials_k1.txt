@@ -1,0 +1,33 @@
+# k=1 started 2026-10-13 01:24:43: nfev elapsed_s cost | accepted iteration
+    1      86.5 3.4724786289e+01
+    2     334.2 2.0528810899e+01
+      accepted iteration 1 at nfev 2 cost 2.0528810899e+01
+    3     348.2 1.9036597222e+01
+      accepted iteration 2 at nfev 3 cost 1.9036597222e+01
+    4     357.1 1.8672936191e+01
+      accepted iteration 3 at nfev 4 cost 1.8672936191e+01
+    5     365.8 1.8554312093e+01
+      accepted iteration 4 at nfev 5 cost 1.8554312093e+01
+    6     373.7 1.8463982312e+01
+      accepted iteration 5 at nfev 6 cost 1.8463982312e+01
+    7     381.8 1.8376917423e+01
+      accepted iteration 6 at nfev 7 cost 1.8376917423e+01
+    8     390.9 1.8347694591e+01
+      accepted iteration 7 at nfev 8 cost 1.8347694591e+01
+    9     397.9 1.8315586852e+01
+      accepted iteration 8 at nfev 9 cost 1.8315586852e+01
+   10     405.0 1.8300714879e+01
+      accepted iteration 9 at nfev 10 cost 1.8300714879e+01
+   11     412.0 1.8298587009e+01
+      accepted iteration 10 at nfev 11 cost 1.8298587009e+01
+   12     418.3 1.8297879049e+01
+      accepted iteration 11 at nfev 12 cost 1.8297879049e+01
+   13     424.5 1.8298046320e+01
+   14     425.9 1.8298046320e+01
+   15     427.3 1.8298046320e+01
+   16     428.7 1.8298046320e+01
+   17     430.1 1.8298046320e+01
+   18     431.5 1.8298046320e+01
+   19     435.8 1.8298085518e+01
+   20     439.9 1.8297872813e+01
+      accepted iteration 12 at nfev 20 cost 1.8297872813e+01

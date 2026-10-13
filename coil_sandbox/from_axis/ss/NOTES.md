@@ -146,3 +146,20 @@ eps_eff (DESC "effective ripple", Bounce2D X=Y=32, Y_B=128, 20 transits; resolut
   ours 1.0e-3 / 1.0e-3 / 2.7e-3; precise_QA 4.6e-7 / 3.2e-7 / 1.3e-6; reactor_QA 2.2e-4 / 8.1e-4 / 2.8e-3;
   NCSX 2.0e-3 / 1.9e-3 / 3.8e-3; ARIES-CS 6.3e-4 / 2.3e-4 / 8.0e-4
 Viewer: `viewer_ss.html` (`../../view.py`; phase 2 start, ss4, ss7 k=4, each on its own free-boundary surface).
+
+
+## 2026-10-12 (evening): boundary creases, repair, Modal, design B (li030)
+
+Full account and comparison with ss4: `../BEST_QA_Z0.md` section 0. Short log:
+* Free-boundary screen of `li_qa2_iota0.30` (basis 12, laptop): B.n max jumped to 13-20% at shell 6 with rms 0.15%.
+  `tip.py` / `tip_trace.py`: a crease in DESC's boundary parametrization, not in the coils' field. `repair_eq.py`
+  (-> `repair_lib.py`): surface moved <= 1.7 mm, B.n max 20% -> 0.67%, sqrt(g) min/median at rho = 1 -0.05 -> +0.59,
+  QS within 3-7%. One more shell re-creases it. Score after shell 8: L2 0.19 / 0.43 / 0.89 / 1.67%, iota 0.28 -> 0.25.
+* Modal (`../cloud/`): plumbing, checkpoint/kill/resume test (passed), acceptance (`accept_b14`: the ss7_b14 k=4
+  re-score reproduced to 0.7% in QS, 30 min vs ~125 min on the laptop: 4.1x on an A100 40 GB). Traps met: jobs must be
+  launched with `modal run --detach`; the image needs tk (`desc.plotting` imports tkinter) and MPLBACKEND=Agg; run.log on
+  the Volume lags by up to one 2-minute commit; `modal app stop` needs `-y`; a finished container lingers ~1 min.
+* Basis-14 screen on Modal (`fb_li030_b14`) stopped after 2 shells (too slow for what it buys; outputs on the Volume).
+* `ss12_li030_q15` (Modal, 1 h): design B. Steps, repairs and both re-scores in BEST_QA_Z0.md section 0.
+* Re-score WITH repair after each shell is not faithful (B.n 0.39% rms): `--repair` now repairs BEFORE each shell.
+* Defined, not yet run: `ss12_ref042_q15` (ss4 redux), `fb_lv005_b12` + `ss12_lv005_q15` (level hinges).

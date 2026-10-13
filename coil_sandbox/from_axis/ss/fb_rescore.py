@@ -20,7 +20,7 @@ ap.add_argument("eq"); ap.add_argument("coils"); ap.add_argument("out")
 ap.add_argument("--shells", default="4,8,12")
 ap.add_argument("--maxiter", type=int, default=60)
 ap.add_argument("--no-poincare", action="store_true")
-ap.add_argument("--repair", action="store_true", help="after every shell: equal-arclength boundary angle + interior re-solved by continuation (repair_lib.py)")
+ap.add_argument("--repair", action="store_true", help="BEFORE every shell: equal-arclength boundary angle + interior re-solved by continuation (repair_lib.py). Not after: the refit itself costs 0.2-0.4%% of B.n (ss12_li030_q15), so the last word must be a free-boundary shell; check the result with tip.py")
 ap.add_argument("--chunk", type=int, default=200, help="ForceBalance jac_chunk_size (raise on a large-memory GPU)")
 ap.add_argument("--helicity", default="1,0")
 ap.add_argument("--bounds", default="../../bounds/fa_qa2_a0167.json")
@@ -75,6 +75,13 @@ if done:
 for k in ([] if a.shells == "none" else [int(v) for v in a.shells.split(",")]):  # "none": score as is
     if any(d["k"] == k for d in done):
         continue
+    rinfo = None
+    if a.repair:  # BEFORE the shell: the refit moves the surface ~0.5-1.5 mm (B.n 0.2-0.4% rms), which this shell removes
+        try:
+            eq, rinfo = repair(eq, chunk=a.chunk)
+        except Exception as e:  # keep the equilibrium if the repair itself fails
+            rinfo = dict(failed=repr(e)[:300])
+            print(f"REPAIR FAILED before shell k={k}: {e!r}", flush=True)
     cons = (ForceBalance(eq=eq, jac_chunk_size=a.chunk), FixCurrent(eq=eq), FixPressure(eq=eq), FixPsi(eq=eq))
     obj = ObjectiveFunction(VacuumBoundaryError(eq=eq, field=cs, field_fixed=True, field_grid=src))
     Rm = eq.surface.R_basis.modes[np.max(np.abs(eq.surface.R_basis.modes), 1) > k, :]
@@ -88,13 +95,6 @@ for k in ([] if a.shells == "none" else [int(v) for v in a.shells.split(",")]): 
         log["shells"].append(dict(k=k, failed=repr(e)[:300]))
         print(f"[{time.time() - t0:.0f}s] shell k={k} FAILED ({type(e).__name__}); scoring the previous shell", flush=True)
         break
-    rinfo = None
-    if a.repair:
-        try:
-            eq, rinfo = repair(eq, chunk=a.chunk)
-        except Exception as e:  # keep the shell's equilibrium if the repair itself fails
-            rinfo = dict(failed=repr(e)[:300])
-            print(f"REPAIR FAILED after shell k={k}: {e!r}", flush=True)
     b = bn_rms(eq)
     log["shells"].append(dict(k=k, bn_rms=b, nit=int(res.get("nit", -1)), message=str(res.get("message", "")), repair=rinfo))
     print(f"[{time.time() - t0:.0f}s] shell k={k}: B.n rms {b:.3e} ({res.get('message', '')})", flush=True)

@@ -100,3 +100,21 @@ def ss_b12(tag, src, tau_qs_rel, iota_min, a_band=(6.6, 7.6), kmax=6, maxiter=50
 
 LI030 = "../na/runs2/li_qa2_iota0.30_fb_a0.12_L12_rep"
 ss_b12("li030_q15", LI030, 0.15, 0.22)
+
+
+# ---- next, agreed 2026-10-12 (after ss12_li030_q15):
+# (1) "ss4 redux": the SAME pipeline (basis 12, repairs, same weights) on the iota 0.42 parent that ss4 came from.
+#     Separates the two things that changed between ss4 and ss12_li030_q15: a lower-iota parent, and a single stage
+#     that converges because the boundary is kept clean. iota floor 0.30 as in ss4.
+REF042 = "../na/runs2/o2w1_qa2s2_gg1e-1_w1e-2_w1x10_fb_a0.12_L10"   # Phase 2 free-boundary state (basis 10 -> 12 in prep)
+ss_b12("ref042_q15", REF042, 0.15, 0.30, a_band=(6.5, 7.0))
+
+# (2) per-coil level hinges, H = 0.05 (leaves the single joint plane): free-boundary score at basis 12 with repairs,
+#     then the single stage with each coil's hinges held level at its own height.
+JOBS["fb_lv005_b12"] = dict(
+    what="free-boundary score of lv_qa2_h0.05 (level hinges, |z| <= 0.05) at basis 12, shells 2,4,6,8, repairs",
+    steps=[dict(cmd=["python", "score_fb.py", "runs2/lv_qa2_h0.05", "--LMN", "12", "--a", "0.12", "--shells", "2,4,6,8",
+                     "--maxiter", "60", "--repair", "--out", "{OUT}/fb"], cwd=NA),
+           dict(cmd=["python", "tip.py", "{OUT}/fb/eq_fb.h5", "{OUT}/fb/coils.h5", "{OUT}/fb/tip.png", "--device", "gpu"], cwd=SS)])
+ss_b12("lv005_q15", "{ROOT}/fb_lv005_b12/fb", 0.15, 0.30, a_band=(6.5, 7.5), hinge=("--horizontal-hinges",))
+GROUPS["level_hinges"] = ["fb_lv005_b12", "ss12_lv005_q15"]   # NOT parallel-safe: the second reads the first's output

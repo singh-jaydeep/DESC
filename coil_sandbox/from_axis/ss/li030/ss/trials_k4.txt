@@ -1,0 +1,56 @@
+# k=4 started 2026-10-13 01:47:39: nfev elapsed_s cost | accepted iteration
+    1      51.7 1.9885900748e+01
+    2     134.1 1.7121531269e+01
+      accepted iteration 1 at nfev 2 cost 1.7121531269e+01
+    3     148.3 1.6846845848e+01
+      accepted iteration 2 at nfev 3 cost 1.6846845848e+01
+    4     157.4 1.6603524681e+01
+      accepted iteration 3 at nfev 4 cost 1.6603524681e+01
+    5     167.1 1.6481723428e+01
+      accepted iteration 4 at nfev 5 cost 1.6481723428e+01
+    6     175.9 1.6326064154e+01
+      accepted iteration 5 at nfev 6 cost 1.6326064154e+01
+    7     184.4 1.6173582681e+01
+      accepted iteration 6 at nfev 7 cost 1.6173582681e+01
+    8     192.1 1.6024006148e+01
+      accepted iteration 7 at nfev 8 cost 1.6024006148e+01
+    9     200.2 1.5876323309e+01
+      accepted iteration 8 at nfev 9 cost 1.5876323309e+01
+   10     208.2 1.5759886472e+01
+      accepted iteration 9 at nfev 10 cost 1.5759886472e+01
+   11     216.7 1.5655768123e+01
+      accepted iteration 10 at nfev 11 cost 1.5655768123e+01
+   12     224.1 1.5577211024e+01
+      accepted iteration 11 at nfev 12 cost 1.5577211024e+01
+   13     232.6 1.5519453689e+01
+      accepted iteration 12 at nfev 13 cost 1.5519453689e+01
+   14     239.8 1.5497276984e+01
+      accepted iteration 13 at nfev 14 cost 1.5497276984e+01
+   15     247.6 1.5495610821e+01
+      accepted iteration 14 at nfev 15 cost 1.5495610821e+01
+   16     256.1 1.5493167133e+01
+      accepted iteration 15 at nfev 16 cost 1.5493167133e+01
+   17     263.2 1.5470653361e+01
+      accepted iteration 16 at nfev 17 cost 1.5470653361e+01
+   18     269.7 1.5464154563e+01
+      accepted iteration 17 at nfev 18 cost 1.5464154563e+01
+   19     277.5 1.5456998531e+01
+      accepted iteration 18 at nfev 19 cost 1.5456998531e+01
+   20     285.3 1.5459370593e+01
+   21     290.3 1.5460095066e+01
+   22     295.0 1.5455879866e+01
+      accepted iteration 19 at nfev 22 cost 1.5455879866e+01
+   23     302.6 1.5448982942e+01
+      accepted iteration 20 at nfev 23 cost 1.5448982942e+01
+   24     310.2 1.5457129400e+01
+   25     315.8 1.5457407592e+01
+   26     321.3 1.5452685560e+01
+   27     326.5 1.5448655274e+01
+      accepted iteration 21 at nfev 27 cost 1.5448655274e+01
+   28     333.5 1.5452690891e+01
+   29     338.6 1.5451909594e+01
+   30     343.1 1.5452296602e+01
+   31     347.8 1.5451462136e+01
+   32     352.3 1.5451248536e+01
+   33     356.8 1.5448650908e+01
+      accepted iteration 22 at nfev 33 cost 1.5448650908e+01

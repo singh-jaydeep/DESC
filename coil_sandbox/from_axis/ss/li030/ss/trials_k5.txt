@@ -1,0 +1,43 @@
+# k=5 started 2026-10-13 01:54:54: nfev elapsed_s cost | accepted iteration
+    1      49.5 1.8441156962e+01
+    2     129.7 1.5042565784e+01
+      accepted iteration 1 at nfev 2 cost 1.5042565784e+01
+    3     140.7 1.4522060251e+01
+      accepted iteration 2 at nfev 3 cost 1.4522060251e+01
+    4     152.4 1.4315359777e+01
+      accepted iteration 3 at nfev 4 cost 1.4315359777e+01
+    5     160.8 1.4188052789e+01
+      accepted iteration 4 at nfev 5 cost 1.4188052789e+01
+    6     169.3 1.4097834066e+01
+      accepted iteration 5 at nfev 6 cost 1.4097834066e+01
+    7     177.8 1.4001695358e+01
+      accepted iteration 6 at nfev 7 cost 1.4001695358e+01
+    8     187.3 1.3966803104e+01
+      accepted iteration 7 at nfev 8 cost 1.3966803104e+01
+    9     196.5 1.3860400914e+01
+      accepted iteration 8 at nfev 9 cost 1.3860400914e+01
+   10     206.9 1.3786268777e+01
+      accepted iteration 9 at nfev 10 cost 1.3786268777e+01
+   11     215.7 1.3732285998e+01
+      accepted iteration 10 at nfev 11 cost 1.3732285998e+01
+   12     225.1 1.3692968140e+01
+      accepted iteration 11 at nfev 12 cost 1.3692968140e+01
+   13     233.3 1.3679924102e+01
+      accepted iteration 12 at nfev 13 cost 1.3679924102e+01
+   14     242.1 1.3658790602e+01
+      accepted iteration 13 at nfev 14 cost 1.3658790602e+01
+   15     248.5 1.3653747800e+01
+      accepted iteration 14 at nfev 15 cost 1.3653747800e+01
+   16     257.3 1.3668799946e+01
+   17     264.1 1.3657801944e+01
+   18     270.6 1.3648326058e+01
+      accepted iteration 15 at nfev 18 cost 1.3648326058e+01
+   19     278.8 1.3644334885e+01
+      accepted iteration 16 at nfev 19 cost 1.3644334885e+01
+   20     285.4 1.3645733070e+01
+   21     290.3 1.3647483438e+01
+   22     294.9 1.3644472569e+01
+   23     299.9 1.3645160166e+01
+   24     305.0 1.3645294021e+01
+   25     309.4 1.3643690890e+01
+      accepted iteration 17 at nfev 25 cost 1.3643690890e+01

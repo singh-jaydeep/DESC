@@ -1,0 +1,1 @@
+[{"k": 4, "bn_rms": 0.0022288846059544945, "nit": 6, "message": "A bad approximation caused failure to predict improvement.", "repair": null}, {"k": 8, "bn_rms": 0.0014137237271032363, "nit": 37, "message": "A bad approximation caused failure to predict improvement.", "repair": null}]

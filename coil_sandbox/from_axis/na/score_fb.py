@@ -49,8 +49,8 @@ ap.add_argument("--out", default=None)
 ap.add_argument("--device", default="gpu")
 ap.add_argument("--resume", default=None, help="eq_fb.h5 to continue the free boundary from")
 ap.add_argument("--chunk", type=int, default=200, help="ForceBalance jac_chunk_size (raise on a large-memory GPU)")
-ap.add_argument("--repair", action="store_true", help="after every shell: equal-arclength boundary angle + interior "
-                "re-solved by continuation (ss/repair_lib.py); stops the boundary creasing")
+ap.add_argument("--repair", action="store_true", help="before every shell after the first: equal-arclength boundary angle + "
+                "interior re-solved by continuation (ss/repair_lib.py)")
 ap.add_argument("--shells", default=None, help="comma list of k (default kstep, 2 kstep, ..., LMN)")
 a = ap.parse_args()
 
@@ -153,6 +153,13 @@ if done and not a.resume:
 for k in shells:
     if any(d["k"] == k for d in done):
         continue
+    rinfo = None
+    if a.repair and k != shells[0]:  # BEFORE each shell after the first (the NAE start is clean); see fb_rescore.py
+        try:
+            eq, rinfo = repair(eq, chunk=a.chunk, say=stamp)
+        except Exception as e:
+            rinfo = dict(failed=repr(e)[:300])
+            stamp(f"REPAIR FAILED before shell k={k}: {e!r}")
     # optimize(copy=True) returns a new eq: build the objective and constraints for THIS eq every shell
     constraints = (ForceBalance(eq=eq, jac_chunk_size=a.chunk), FixCurrent(eq=eq), FixPressure(eq=eq), FixPsi(eq=eq))
     objective = ObjectiveFunction(VacuumBoundaryError(eq=eq, field=cs, field_fixed=True, field_grid=src))
@@ -167,13 +174,6 @@ for k in shells:
         log["shell_failed"] = dict(k=k, error=repr(e)[:300])
         stamp(f"free boundary shell k={k} FAILED ({type(e).__name__}); scoring the previous shell")
         break
-    rinfo = None
-    if a.repair:
-        try:
-            eq, rinfo = repair(eq, chunk=a.chunk, say=stamp)
-        except Exception as e:  # keep the shell's equilibrium if the repair itself fails
-            rinfo = dict(failed=repr(e)[:300])
-            stamp(f"REPAIR FAILED after shell k={k}: {e!r}")
     bn, bnmax = bn_rms(eq)
     log["shells"].append(dict(k=k, bn_rms=bn, bn_max=bnmax, nit=int(res.get("nit", -1)),
                               message=str(res.get("message", "")), repair=rinfo))

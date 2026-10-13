@@ -1,10 +1,77 @@
-# Best z = 0 two-face-coil QA so far (reference for anyone trying to beat it), 2026-10-12
+# Best z = 0 two-face-coil QA designs so far (reference for anyone trying to beat them), 2026-10-12
 
 QA, nfp 2, 16 coils (4 per half period), each coil two planar faces, **every hinge on z = 0**, all scaled engineering
 bounds met. The coils' own vacuum field has nested surfaces at aspect ratio 6.9 with the largest symmetry-breaking Boozer
 mode at 0.2-0.7% of B00. This file says where it is, how it was made, how it scores, what is not yet trustworthy,
 and what a better result has to show. Details and every dead end: `ss/NOTES.md` (single stage), `REPORT.md` sections
 10-11 and `NAE_HANDOFF.md` (near-axis stage).
+
+## 0. Update 2026-10-12 (late): a second design, lower iota, better QS
+
+There are now TWO reference designs. They are two points on a QS-versus-transform trade, not a winner and a loser.
+Sections 1-6 below describe design A; this section describes design B and compares them.
+
+| | **A: `ss4`** (sections 1-6) | **B: `li030` k=6** (new) |
+|---|---|---|
+| near-axis parent | `o2w1_qa2s2_gg1e-1_w1e-2_w1x10` (iota target 0.42) | `li_qa2_iota0.30` (iota target 0.30) |
+| iota, axis -> edge (coils' own surface) | 0.356 -> 0.313 | **0.228 -> 0.221** (flat) |
+| aspect ratio, a, R0 | 6.89, 0.122, 0.843 | 7.26, 0.121, 0.877 |
+| largest breaking Boozer mode / B00, rho .25/.5/.75/1 | 0.36% / 0.20% / 0.37% / 0.69% | **0.14% / 0.14% / 0.22% / 0.38%** |
+| L2 of breaking modes / B00 | 0.42% / 0.43% / 0.84% / 1.74% | **0.25% / 0.28% / 0.46% / 0.88%** |
+| two-term rms(f_C / B^3), rho .25/.5/.75 | 2.4e-2 / 3.2e-2 / 5.9e-2 | 1.6e-2 / 2.2e-2 / 3.4e-2 |
+| eps_eff (one resolution, not converged), rho .25/.5/.75 | 1.0e-3 / 1.0e-3 / 2.7e-3 | 7.0e-4 / 7.0e-4 / 1.1e-3 |
+| B.n of the coils on that surface, rms | 0.040-0.046% | 0.14% |
+| coils: L / kappa / d_cc / d_pc over their bounds | 0.999 / 0.999 / 1.024 / 1.109 | 1.0003 / 0.9996 / 1.025 / 1.201 |
+| hinges | all on z = 0 | all on z = 0 |
+| free-boundary score | basis 12 and basis 14, shells to 8-12, agree to 1-5% | basis 12, shells 4 and 8 |
+
+B is 35-50% better than A on every QS measure at every radius, and better than DESC's `reactor_QA` example on the
+largest mode (0.27% / 0.18% / 0.29% / 0.51%). It has two thirds of A's transform.
+
+**What is weaker about B's numbers than A's (do not skip):**
+* B's free-boundary equilibrium sits on the coils' surface to 0.14% rms, A's to 0.04%. Its boundary is creased again
+  after the two shells (area element min/median < 0, B.n 23% at the crease, 1.5% away from it; 0.13% of the area above
+  1%). A second re-score WITH repairs after each shell (`li030/fb_repair_modal/`) has a clean boundary but sits 0.39%
+  off the coils' surface and gives L2 0.28% / 0.38% / 0.55% / 1.22%, iota 0.19 -> 0.28. Quote B as
+  **L2 0.25-0.28% / 0.28-0.38% / 0.46-0.55% / 0.9-1.2%**; even the pessimistic end beats A at every radius.
+* B's coil length is 1.1 mm (0.03%) over its bound (3.9423 vs 3.9412 m): not feasible to the letter. A is feasible.
+* No basis-14 score, no traced-field check, no Poincare plot of the final coils yet for B.
+* In the last single-stage step (k=6, all boundary modes free) the plasma shrank 2.3% (a 0.1236 -> 0.1207, A 7.04 -> 7.26)
+  and the edge gain did not survive the independent re-solve; k=5 (`li030/ss/eq_k5.h5`, `coils_k5.h5`: re-solved L2
+  0.25% / 0.27% / 0.50% / 0.98%, iota 0.217-0.245, A 7.04) may be the better design and has NOT been free-boundary scored.
+
+**Files (B)**, under `ss/li030/` (harvested from the Modal Volume `from-axis-runs:/ss12_li030_q15`, VERIFIED):
+`ss/coils_k6.h5` + `fb_norepair_local/eq_fb.h5` (the pair to quote), `fb_norepair_local/score.json`, `tip.png`;
+`ss/eq_kK.h5`, `raw_eq_kK.h5` (before each repair), `coils_kK.h5`, `trials_kK.txt` (every evaluation), `result.json`;
+`fb_repair_modal/` (the repaired re-score); `qs_metrics.json`; `run.log`, `meta.json` (commit 6993369dc, A100).
+Start: `na/runs2/li_qa2_iota0.30_fb_a0.12_L12_rep/` (L2 0.19% / 0.43% / 0.89% / 1.67%, iota 0.28 -> 0.25, before any
+single stage). Viewer: `ss/viewer_ss.html` now has both designs and both starts.
+
+**How B was made** (job `ss12_li030_q15` in `cloud/jobs.py`; one hour on a Modal A100):
+near-axis stage with the vacuum iota target lowered to 0.30 -> free-boundary solve at basis 12 (laptop) ->
+single stage at basis 12, the SAME recipe as A (Boozer QS, tau_bn 5e-4, tau_qs 0.15 x start, distance rows, hinges on
+z = 0, same bounds), iota >= 0.22, A in 6.6-7.6, k = 1..6, with the boundary repaired before k=1 and after every k step.
+Single stage by step, each re-solved independently (L2, rho .25/.5/.75/1; iota range):
+start 0.17 / 0.43 / 0.92 / 1.60% (0.25-0.29); k1 0.36 / 0.37 / 0.70 / 1.62% (0.25-0.28); k2 0.34 / 0.36 / 0.64 / 1.59%
+(0.22-0.25); k3 0.28 / 0.28 / 0.54 / 1.27% (0.22-0.23); k4 0.27 / 0.28 / 0.51 / 1.18% (0.21-0.24); k5 0.25 / 0.27 / 0.50 /
+0.98% (0.22-0.25); k6 0.25 / 0.27 / 0.46 / 1.05% (0.21-0.26).
+
+**What changed in the method, and matters for anyone repeating A or B:**
+* **The free-boundary solve and the single stage crease the boundary.** B.n (and QS) cannot see a re-parametrization
+  of the boundary, so the solver drifts along it until the poloidal angle stalls at a point: a mm-scale kink, a 10-20%
+  B.n spike, a negative Jacobian at the edge. The coils' field lines are smooth there (`ss/tip.py`, `ss/tip_trace.py`,
+  `na/runs2/li_qa2_iota0.30_fb_a0.12_L12/tip_trace_k6.png`). A's "9.6% B.n spot" (section 3) is very likely the same
+  thing; it has not been re-checked.
+* **`ss/repair_lib.py`** removes it: same surface, equal-arclength poloidal angle, interior re-solved by continuation.
+  With it (`single_stage.py --repair-steps`) the single stage took 12-30 accepted iterations per k step, nearly all on
+  the first trial, and converged at every step; A's runs stalled after 0-7.
+* **The repair is not free:** the refit moves the surface 0.5-1.7 mm, i.e. 0.2-0.4% of B.n. In a free-boundary score it
+  must therefore come BEFORE a shell, never after the last one (`--repair` now does that). Open: a re-parametrization
+  that slides points along the existing surface instead of refitting it.
+* **The re-solve after each step is an honesty check:** gains that existed only in one solve path disappeared (the
+  edge at k=1, k=2, k=6); at basis 12 the edge value depends on the path by ~15%.
+* It is NOT yet known how much of B's gain over A is the lower iota and how much is the solver now working: A was never
+  run with repairs. Job `ss12_ref042_q15` (the same pipeline on A's parent, iota >= 0.30) answers that.
 
 ## 1. The files
 
