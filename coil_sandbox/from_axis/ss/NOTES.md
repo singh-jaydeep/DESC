@@ -163,3 +163,21 @@ Full account and comparison with ss4: `../BEST_QA_Z0.md` section 0. Short log:
 * `ss12_li030_q15` (Modal, 1 h): design B. Steps, repairs and both re-scores in BEST_QA_Z0.md section 0.
 * Re-score WITH repair after each shell is not faithful (B.n 0.39% rms): `--repair` now repairs BEFORE each shell.
 * Defined, not yet run: `ss12_ref042_q15` (ss4 redux), `fb_lv005_b12` + `ss12_lv005_q15` (level hinges).
+* `ss12_ref042_q15` (ss4 redux, Modal) STOPPED after k=1: the equal-arclength refit is too blunt for this boundary
+  (elongation ~5). Start repair: curvature 106601 -> 49 /m, sqrt(g) min/median at rho .8/.95/1 -0.03/-0.06/-0.10 ->
+  +0.42/+0.52/+0.35, but the surface moved <= 4.17 mm and QS went 0.35/0.67/1.31/2.37% -> 0.90/1.09/1.78/3.62%.
+  k=1: B.n 0.71% (max 5.2%), QS 0.74/0.99/2.05/3.77%, iota 0.31-0.49, precision loss after 19 its. Repair after k=1
+  on an UNcreased boundary still moved the surface <= 2.60 mm (li030: 0.4-1.2 mm). So this run cannot answer "lower
+  iota or working solver?". Needed first: a repair that re-parametrizes WITHOUT moving the surface (slide the sample
+  points along the existing surface / spectral condensation), or a refit at higher M, N than the equilibrium.
+  Partial outputs on the Volume: from-axis-runs:/ss12_ref042_q15.
+
+## 2026-10-13: boundary repair rebuilt (coil_sandbox/sandbox/bdry_repair, README there)
+
+The old repair (fixed equal-arclength labels) moved the surface by that angle's truncation error; too much for the
+elongation-5 iota 0.42 design. New: same start, then DESC PR 2337's joint label fit taken one guarded step at a time
+(unguarded it returns to the creased angle), a gate that leaves healthy boundaries alone, and a parametrization-
+independent displacement measure. iota 0.42 start: surface moved 0.12 mm rms / 1.5 mm max (was 0.67 / 5.2), QS
+0.35/0.67/1.31/2.37% -> 0.29/0.71/1.34/2.37% (old repair: 0.90/1.09/1.78/3.62%). Design B: QS unchanged to 7% at the
+edge, B.n 0.14% -> 0.10% rms, max 22.6% -> 0.44%, sqrt(g) positive everywhere (li030/repaired/). The ss4 redux can
+now be rerun fairly. `repair_lib.py` is a shim; all callers get the new repair with no change.

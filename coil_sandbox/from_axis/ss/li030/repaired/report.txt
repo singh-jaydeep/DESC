@@ -1,0 +1,5 @@
+boundary before: {"area_min_over_median": 0.004182272724309031, "kappa_max": 59093.186937756305, "bn_mean": 0.0008053656472906042, "bn_rms": 0.0014032755531671597, "bn_max": 0.22607976896516513, "bn_99": 0.014850586551335278}
+equilibrium before: sqrt(g) min/median 0.5:+0.571 0.8:+0.287 0.9:+0.138 0.95:+0.043 1.0:-0.096 | QS ['2.51e-03', '2.83e-03', '4.66e-03', '8.91e-03'] | iota 0.2279 -> 0.2211 | <|F|>_vol -3.828e+04
+REPAIR (chordal, 3 label steps): surface moved rms 0.091 / p99 0.36 / max 1.20 mm (fixed-label refit: 0.224 / 1.01 / 1.68); area element min/median 0.004 -> 0.643; max curvature 59093 -> 41 /m; sqrt(g) min/median at rho .8/.95/1 ['+0.29', '+0.04', '-0.10'] -> ['+0.76', '+0.73', '+0.65']
+boundary after:  {"area_min_over_median": 0.6432954576189639, "kappa_max": 41.477069244860836, "bn_mean": 0.0007725547436716331, "bn_rms": 0.001037892274251505, "bn_max": 0.0044314056875337324, "bn_99": 0.0031156755079260723}
+equilibrium after:  sqrt(g) min/median 0.5:+0.809 0.8:+0.763 0.9:+0.756 0.95:+0.727 1.0:+0.646 | QS ['2.47e-03', '2.80e-03', '4.71e-03', '9.46e-03'] | iota 0.2306 -> 0.2322 | <|F|>_vol 1.448e+04

@@ -5,6 +5,8 @@ produce, by the near-axis single-stage method of Giuliani et al. JCP 2022 (`sing
 `REPORT.md` (findings), `PLAN.md` (agreed rules, decisions, phases, status), `NAE_HANDOFF.md` (near-axis scans after
 REPORT section 11: level hinges, low iota, planar coils; open items), `ss/NOTES.md` (single stage, free boundary). Results to look at: `viewer.html`.
 
+**Boundary creased / negative edge Jacobian / B.n spike at a point? `../sandbox/bdry_repair/README.md`** (drop-in `repair(eq)`).
+
 **Best result so far and how to beat it: `BEST_QA_Z0.md`** (files, metrics, how it was made, what is not yet trustworthy).
 
 ## Where things are

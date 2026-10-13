@@ -1,12 +1,12 @@
-"""Repair a free-boundary equilibrium whose BOUNDARY parametrization has creased (|e_theta x e_zeta| -> 0 at a point:
-a kink of a few mm with a 10-20% B.n spike that the coils' field lines do not have; see tip.py / tip_trace.py).
+"""Repair one equilibrium from the command line and report what it cost (thin wrapper over the bdry_repair package).
 
-  1. re-parametrize the same boundary by equal poloidal arclength in each zeta plane (origin: the old theta = 0 curve,
-     which keeps stellarator symmetry) and refit it as a FourierRZToroidalSurface;
-  2. solve the interior again from scratch on that boundary by DESC's continuation (solve_continuation_automatic),
-     instead of inheriting flux surfaces from a chain of perturbations.
+Prints, before and after: the boundary's angle health and the coils' B.n on it, the edge Jacobian, QS (Boozer, / <B>),
+iota and force error; and how far the surface moved.
 
-    python repair_eq.py EQ.h5 COILS.h5 OUT.h5 [--MN 12] [--L 12] [--no-solve]      (GPU)
+    python repair_eq.py EQ.h5 COILS.h5 OUT.h5 [--rule chordal|curvature] [--max-steps 8] [--force]      (GPU)
+
+--max-steps 0 is the old repair (linear fit at fixed equal-arclength labels). Without --force a healthy boundary is
+left alone (OUT is then a copy of EQ).
 """
 import sys, argparse, json
 sys.path.insert(0, "../../sandbox")
@@ -14,22 +14,18 @@ import boot; boot.setup(default="gpu")
 import numpy as np
 from desc.io import load
 from desc.grid import LinearGrid
-from desc.geometry import FourierRZToroidalSurface
-from desc.equilibrium import Equilibrium
-from desc.continuation import solve_continuation_automatic
 from desc.objectives import QuasisymmetryBoozer
 import common as S
+from repair_lib import repair
 
 ap = argparse.ArgumentParser()
 ap.add_argument("eq"); ap.add_argument("coils"); ap.add_argument("out")
-ap.add_argument("--MN", type=int, default=None); ap.add_argument("--L", type=int, default=None)
-ap.add_argument("--nt", type=int, default=96); ap.add_argument("--nz", type=int, default=96)
-ap.add_argument("--no-solve", action="store_true"); ap.add_argument("--chunk", type=int, default=200)
+ap.add_argument("--rule", default="chordal"); ap.add_argument("--max-steps", type=int, default=8)
+ap.add_argument("--force", action="store_true"); ap.add_argument("--chunk", type=int, default=200)
 ap.add_argument("--device", default="gpu")
 a = ap.parse_args()
 eq, cs = load(a.eq), load(a.coils)
 src = S.source_grid(cs, gl_m=64)[0]
-MN, L = a.MN or eq.M, a.L or eq.L
 
 
 def surf_report(obj, tag):
@@ -66,42 +62,10 @@ def eq_report(e, tag):
 surf_report(eq, "boundary before:")
 eq_report(eq, "equilibrium before:")
 
-# ---- 1. equal-arclength poloidal angle in every zeta plane
-zeta = np.linspace(0, 2 * np.pi / eq.NFP, a.nz, endpoint=False)
-tf = np.linspace(0, 2 * np.pi, 4001)
-tn = np.linspace(0, 2 * np.pi, a.nt, endpoint=False)
-pts, th, ze = [], [], []
-for z in zeta:
-    d = eq.compute(["R", "Z"], grid=LinearGrid(rho=np.array([1.0]), theta=tf, zeta=np.array([z]), NFP=eq.NFP))
-    R, Z = np.asarray(d["R"]), np.asarray(d["Z"])
-    s = np.concatenate([[0], np.cumsum(np.hypot(np.diff(R), np.diff(Z)))])
-    s = 2 * np.pi * s / s[-1]
-    pts.append(np.column_stack([np.interp(tn, s, R), np.full(a.nt, z), np.interp(tn, s, Z)]))
-    th.append(tn); ze.append(np.full(a.nt, z))
-pts, th, ze = np.concatenate(pts), np.concatenate(th), np.concatenate(ze)
-surf = FourierRZToroidalSurface.from_values(pts, th, M=MN, N=MN, NFP=eq.NFP, sym=eq.sym)
-gchk = LinearGrid(rho=np.array([1.0]), theta=tn, zeta=zeta, NFP=eq.NFP)
-dc = surf.compute(["R", "Z"], grid=gchk)
-nodes = gchk.nodes
-# distance of each fitted node to the ORIGINAL curve in its plane (parametrization independent)
-err = []
-for z in zeta[:: max(1, a.nz // 16)]:
-    d = eq.compute(["R", "Z"], grid=LinearGrid(rho=np.array([1.0]), theta=tf, zeta=np.array([z]), NFP=eq.NFP))
-    m = np.isclose(nodes[:, 2], z)
-    dd = np.hypot(np.asarray(dc["R"])[m][:, None] - np.asarray(d["R"])[None], np.asarray(dc["Z"])[m][:, None] - np.asarray(d["Z"])[None])
-    err.append(dd.min(1))
-err = np.concatenate(err)
-print(f"refit M = N = {MN}: distance of the new surface from the old one: mean {err.mean() * 1e3:.3f} mm, max {err.max() * 1e3:.3f} mm", flush=True)
-surf_report(surf, "boundary after: ")
-
-# ---- 2. interior from scratch by continuation
-new = Equilibrium(Psi=float(eq.Psi), NFP=eq.NFP, sym=eq.sym, L=L, M=MN, N=MN, L_grid=2 * L, M_grid=2 * MN, N_grid=2 * MN,
-                  surface=surf, pressure=eq.pressure, current=eq.current, iota=eq.iota)
-if a.no_solve:
-    new.save(a.out); raise SystemExit(0)
-fam = solve_continuation_automatic(new, verbose=1, jac_chunk_size=a.chunk)
-new = fam[-1]
-eq_report(new, "equilibrium after: ")
-surf_report(new, "boundary of the solved equilibrium:")
+new, info = repair(eq, chunk=a.chunk, verbose=1, force=a.force, rule=a.rule, max_steps=a.max_steps)
+if new is not eq:
+    surf_report(new, "boundary after: ")
+    eq_report(new, "equilibrium after: ")
 new.save(a.out)
+json.dump(info, open(a.out.replace(".h5", "") + "_repair.json", "w"), indent=1)
 print("wrote", a.out)
