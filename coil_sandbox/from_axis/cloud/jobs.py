@@ -108,6 +108,9 @@ ss_b12("li030_q15", LI030, 0.15, 0.22)
 #     that converges because the boundary is kept clean. iota floor 0.30 as in ss4.
 REF042 = "../na/runs2/o2w1_qa2s2_gg1e-1_w1e-2_w1x10_fb_a0.12_L10"   # Phase 2 free-boundary state (basis 10 -> 12 in prep)
 ss_b12("ref042_q15", REF042, 0.15, 0.30, a_band=(6.5, 7.0))
+# 2026-10-13: the run above was stopped after k=1 (the old fixed-label repair moved this boundary 2.6-4.2 mm and cost
+# 2-3x in QS at the start). Same job under a new name, so it starts fresh with the bdry_repair package (guarded label fit).
+ss_b12("ref042_q15r", REF042, 0.15, 0.30, a_band=(6.5, 7.0))
 
 # (2) per-coil level hinges, H = 0.05 (leaves the single joint plane): free-boundary score at basis 12 with repairs,
 #     then the single stage with each coil's hinges held level at its own height.
