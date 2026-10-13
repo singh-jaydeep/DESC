@@ -1,0 +1,66 @@
+/home/jay/Documents/desc_dev/DESC/desc/__init__.py:94: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  from pynvml import (
+DESC /home/jay/Documents/desc_dev/DESC/desc
+DEVICE requested=gpu obtained=gpu (1x NVIDIA GeForce RTX 5070 Ti)
+[    1.0s] NAE: iota 0.2805 helicity 0.0 max elong 3.97
+[   60.8s] NAE fixed-boundary initial guess solved
+[   68.3s] cos(B_eq, B_coils) on the initial boundary: mean 0.9998
+[   81.8s] NAE fixed boundary: {"R0": 0.878377035758341, "a": 0.12249551604720406, "A": 7.170687255359253, "helicity": [1, 0], "qs_booz_rho.25,.5,.75,1": [0.003107556483887391, 0.003928214468960208, 0.008449227949558049, 0.01581253925130685], "iota_axis": 0.2752539046676545, "iota_edge": 0.28365431402556873, "iota_min": 0.2752539046676545, "iota_max": 0.28365431402556873, "bn_rms": 0.012943417619357253, "bn_max": 0.05490630715004118, "axis_R0n": [0.87818, 0.15721, 0.01657, 0.00113, -3e-05, -1e-05, 0.0, 0.0, -0.0, -0.0, 0.0, -0.0, -0.0], "axis_Z0n": [-0.0, -0.0, 0.0, -0.0, 0.0, 0.0, -0.0, 1e-05, 1e-05, -0.00078, -0.00997, -0.08368]}
+[   82.4s] resumed from runs2/li_qa2_iota0.30_fb_a0.12_L12/eq_fb_k6_repaired.h5
+Building objective: Vacuum boundary error
+Precomputing transforms
+Building objective: force
+Precomputing transforms
+Building objective: fixed current
+Building objective: fixed pressure
+Building objective: fixed Psi
+Building objective: lcfs R
+Building objective: lcfs Z
+Number of parameters: 289
+Number of objectives: 4802
+
+Starting optimization
+Using method: proximal-lsq-exact
+Warning: A bad approximation caused failure to predict improvement.
+         Current function value: 3.676e-05
+         Total delta_x: 3.951e-02
+         Iterations: 38
+         Function evaluations: 73
+         Jacobian evaluations: 38
+==============================================================================================================
+                                                                 Start  -->   End
+Total (sum of squares):                                      2.114e-04  -->   3.676e-05, 
+Maximum absolute Boundary normal field error:                9.291e-04  -->   3.817e-04 (T*m^2)
+Minimum absolute Boundary normal field error:                1.944e-17  -->   2.501e-17 (T*m^2)
+Average absolute Boundary normal field error:                1.416e-04  -->   6.774e-05 (T*m^2)
+Maximum absolute Boundary normal field error:                8.529e-03  -->   3.504e-03 (normalized)
+Minimum absolute Boundary normal field error:                1.785e-16  -->   2.296e-16 (normalized)
+Average absolute Boundary normal field error:                1.300e-03  -->   6.219e-04 (normalized)
+Maximum absolute Boundary magnetic pressure error:           1.122e-03  -->   4.493e-04 (T^2*m^2)
+Minimum absolute Boundary magnetic pressure error:           5.918e-07  -->   2.006e-08 (T^2*m^2)
+Average absolute Boundary magnetic pressure error:           1.883e-04  -->   7.710e-05 (T^2*m^2)
+Maximum absolute Boundary magnetic pressure error:           1.187e-02  -->   4.753e-03 (normalized)
+Minimum absolute Boundary magnetic pressure error:           6.260e-06  -->   2.122e-07 (normalized)
+Average absolute Boundary magnetic pressure error:           1.992e-03  -->   8.156e-04 (normalized)
+Maximum absolute Force error:                                2.681e+03  -->   2.343e+03 (N)
+Minimum absolute Force error:                                3.335e-03  -->   5.263e-04 (N)
+Average absolute Force error:                                4.195e+01  -->   3.843e+01 (N)
+Maximum absolute Force error:                                3.611e-03  -->   3.155e-03 (normalized)
+Minimum absolute Force error:                                4.492e-09  -->   7.089e-10 (normalized)
+Average absolute Force error:                                5.651e-05  -->   5.176e-05 (normalized)
+Fixed current profile error:                                 0.000e+00  -->   0.000e+00 (A)
+Fixed pressure profile error:                                0.000e+00  -->   0.000e+00 (Pa)
+Fixed Psi error:                                             0.000e+00  -->   0.000e+00 (Wb)
+R boundary error:                                            6.056e-20  -->   5.634e-20 (m)
+Z boundary error:                                            7.928e-20  -->   7.678e-20 (m)
+==============================================================================================================
+
+[ 1223.9s] free boundary shell k=8: B.n rms 7.508e-04 max 1.471e-02 (A bad approximation caused failure to predict improvement.)
+[ 1228.8s] FREE BOUNDARY: {"R0": 0.8717006081529847, "a": 0.12223231816565922, "A": 7.1315067997940185, "helicity": [1, 0], "qs_booz_rho.25,.5,.75,1": [0.001850896951815413, 0.004308156113727865, 0.008880393156395269, 0.01667901590979462], "iota_axis": 0.28144090937065436, "iota_edge": 0.25403345527691806, "iota_min": 0.2528986286488993, "iota_max": 0.28144090937065436, "bn_rms": 0.0007508192140098926, "bn_max": 0.014714425153416423, "axis_R0n": [0.87035, 0.15891, 0.01682, 0.00114, -2e-05, 4e-05, -6e-05, -1e-05, 3e-05, 2e-05, 1e-05, 0.0, 0.0], "axis_Z0n": [-0.0, -0.0, -1e-05, -2e-05, -2e-05, 1e-05, 0.0, 2e-05, 2e-05, -0.00084, -0.01039, -0.08399]}
+/home/jay/Documents/desc_dev/DESC/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+/home/jay/Documents/desc_dev/DESC/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+[ 1246.7s] coil check vs the free-boundary surface: {"L": 3.946037788722482, "kappa": 10.314032486450674, "d_cc": 0.039999450061205075, "d_pc": 0.17933553896511098, "linked": 0}
+[ 1267.6s] Poincare plot written
+[ 1267.6s] wrote runs2/li_qa2_iota0.30_fb_a0.12_L12_rep/score.json

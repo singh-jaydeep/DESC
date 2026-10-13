@@ -31,10 +31,11 @@ JOBS["accept_b14"] = dict(
 def screen(run, tag, lmn=14, shells="2,4,6,8,10,14"):
     """Rule-2 score of a near-axis state (na/runs2/<run>) at a = 0.12, then the Jacobian-fold check."""
     JOBS[f"fb_{tag}_b{lmn}"] = dict(
-        what=f"free-boundary score of {run} at basis {lmn}, shells {shells} (a failed last shell is scored at the previous one)",
+        what=f"free-boundary score of {run} at basis {lmn}, shells {shells} (boundary repaired after every shell; a failed last shell is scored at the previous one)",
         steps=[dict(cmd=["python", "score_fb.py", f"runs2/{run}", "--LMN", str(lmn), "--a", "0.12", "--shells", shells,
-                         "--maxiter", "60", "--out", "{OUT}/fb"], cwd=NA),
-               dict(cmd=["python", "jac.py", "{OUT}/fb/eq_fb.h5"], cwd=SS)])
+                         "--maxiter", "60", "--repair", "--out", "{OUT}/fb"], cwd=NA),
+               dict(cmd=["python", "jac.py", "{OUT}/fb/eq_fb.h5"], cwd=SS),
+               dict(cmd=["python", "tip.py", "{OUT}/fb/eq_fb.h5", "{OUT}/fb/coils.h5", "{OUT}/fb/tip.png", "--device", "gpu"], cwd=SS)])
     return f"fb_{tag}_b{lmn}"
 
 
@@ -62,7 +63,7 @@ def single_stage(src, tag, tau_qs_rel, iota_min, a_band=(6.5, 7.5), hinge=("--fi
                       "--kmin", "1", "--kmax", str(kmax), "--maxiter", "50", "--track-steps", "--ckpt-every", "1",
                       "--auto-resume"], cwd=SS),
             dict(cmd=["bash", "-c", "k=$(ls {OUT}/ss/eq_k*.h5 | sed 's/.*eq_k\\([0-9]*\\).h5/\\1/' | sort -n | tail -1) && "
-                      "python fb_rescore.py {OUT}/ss/eq_k$k.h5 {OUT}/ss/coils_k$k.h5 {OUT}/fb --shells 4,8"], cwd=SS)])
+                      "python fb_rescore.py {OUT}/ss/eq_k$k.h5 {OUT}/ss/coils_k$k.h5 {OUT}/fb --shells 4,8 --repair"], cwd=SS)])
     return name
 
 

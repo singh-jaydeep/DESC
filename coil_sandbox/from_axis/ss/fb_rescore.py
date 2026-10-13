@@ -13,12 +13,14 @@ from desc.objectives import (VacuumBoundaryError, ObjectiveFunction, ForceBalanc
                              FixBoundaryR, FixBoundaryZ, QuasisymmetryBoozer)
 from desc.plotting import poincare_plot, plot_surfaces
 import common as S
+from repair_lib import repair
 
 ap = argparse.ArgumentParser()
 ap.add_argument("eq"); ap.add_argument("coils"); ap.add_argument("out")
 ap.add_argument("--shells", default="4,8,12")
 ap.add_argument("--maxiter", type=int, default=60)
 ap.add_argument("--no-poincare", action="store_true")
+ap.add_argument("--repair", action="store_true", help="after every shell: equal-arclength boundary angle + interior re-solved by continuation (repair_lib.py)")
 ap.add_argument("--chunk", type=int, default=200, help="ForceBalance jac_chunk_size (raise on a large-memory GPU)")
 ap.add_argument("--helicity", default="1,0")
 ap.add_argument("--bounds", default="../../bounds/fa_qa2_a0167.json")
@@ -86,8 +88,15 @@ for k in ([] if a.shells == "none" else [int(v) for v in a.shells.split(",")]): 
         log["shells"].append(dict(k=k, failed=repr(e)[:300]))
         print(f"[{time.time() - t0:.0f}s] shell k={k} FAILED ({type(e).__name__}); scoring the previous shell", flush=True)
         break
+    rinfo = None
+    if a.repair:
+        try:
+            eq, rinfo = repair(eq, chunk=a.chunk)
+        except Exception as e:  # keep the shell's equilibrium if the repair itself fails
+            rinfo = dict(failed=repr(e)[:300])
+            print(f"REPAIR FAILED after shell k={k}: {e!r}", flush=True)
     b = bn_rms(eq)
-    log["shells"].append(dict(k=k, bn_rms=b, nit=int(res.get("nit", -1)), message=str(res.get("message", ""))))
+    log["shells"].append(dict(k=k, bn_rms=b, nit=int(res.get("nit", -1)), message=str(res.get("message", "")), repair=rinfo))
     print(f"[{time.time() - t0:.0f}s] shell k={k}: B.n rms {b:.3e} ({res.get('message', '')})", flush=True)
     eq.save(os.path.join(a.out, "tmp_eq_fb.h5"))
     os.replace(os.path.join(a.out, "tmp_eq_fb.h5"), os.path.join(a.out, "eq_fb.h5"))

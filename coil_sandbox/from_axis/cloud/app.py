@@ -147,7 +147,8 @@ if modal is not None:
     SKIP = ["**/*.log", "**/*.png", "**/*.html", "**/__pycache__/**", "**/*.pyc", "**/trace.npz", "**/cloud_runs/**"]
     image = (
         modal.Image.debian_slim(python_version="3.13")
-        .apt_install("git")
+        .apt_install("git", "tk", "libtk8.6")  # something in the import chain loads tkinter
+        .env({"MPLBACKEND": "Agg"})
         .pip_install_from_requirements(os.path.join(HERE, "requirements.txt"))
         .add_local_dir(os.path.join(REPO, "desc"), f"{REMOTE_REPO}/desc", ignore=["**/__pycache__/**"])
         .add_local_dir(os.path.join(REPO, "coil_sandbox", "sandbox"), f"{REMOTE_REPO}/coil_sandbox/sandbox",

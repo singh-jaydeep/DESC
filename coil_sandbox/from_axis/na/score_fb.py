@@ -34,6 +34,8 @@ from desc.plotting import poincare_plot, plot_surfaces
 import common as S
 from folded import Layout
 from convert import to_desc_coils
+sys.path.insert(0, os.path.join(HERE, "..", "ss"))
+from repair_lib import repair
 
 ap = argparse.ArgumentParser()
 ap.add_argument("run")
@@ -47,6 +49,8 @@ ap.add_argument("--out", default=None)
 ap.add_argument("--device", default="gpu")
 ap.add_argument("--resume", default=None, help="eq_fb.h5 to continue the free boundary from")
 ap.add_argument("--chunk", type=int, default=200, help="ForceBalance jac_chunk_size (raise on a large-memory GPU)")
+ap.add_argument("--repair", action="store_true", help="after every shell: equal-arclength boundary angle + interior "
+                "re-solved by continuation (ss/repair_lib.py); stops the boundary creasing")
 ap.add_argument("--shells", default=None, help="comma list of k (default kstep, 2 kstep, ..., LMN)")
 a = ap.parse_args()
 
@@ -163,9 +167,16 @@ for k in shells:
         log["shell_failed"] = dict(k=k, error=repr(e)[:300])
         stamp(f"free boundary shell k={k} FAILED ({type(e).__name__}); scoring the previous shell")
         break
+    rinfo = None
+    if a.repair:
+        try:
+            eq, rinfo = repair(eq, chunk=a.chunk, say=stamp)
+        except Exception as e:  # keep the shell's equilibrium if the repair itself fails
+            rinfo = dict(failed=repr(e)[:300])
+            stamp(f"REPAIR FAILED after shell k={k}: {e!r}")
     bn, bnmax = bn_rms(eq)
     log["shells"].append(dict(k=k, bn_rms=bn, bn_max=bnmax, nit=int(res.get("nit", -1)),
-                              message=str(res.get("message", ""))))
+                              message=str(res.get("message", "")), repair=rinfo))
     stamp(f"free boundary shell k={k}: B.n rms {bn:.3e} max {bnmax:.3e} ({res.get('message', '')})")
     eq.save(os.path.join(out, f"eq_fb_k{k}.h5"))
     eq.save(os.path.join(out, "tmp_eq_fb.h5"))
