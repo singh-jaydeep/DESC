@@ -1,10 +1,64 @@
-# Best z = 0 two-face-coil QA designs so far (reference for anyone trying to beat them), 2026-10-12
+# Best z = 0 two-face-coil QA designs so far (reference for anyone trying to beat them), 2026-10-13
 
 QA, nfp 2, 16 coils (4 per half period), each coil two planar faces, **every hinge on z = 0**, all scaled engineering
 bounds met. The coils' own vacuum field has nested surfaces at aspect ratio 6.9 with the largest symmetry-breaking Boozer
 mode at 0.2-0.7% of B00. This file says where it is, how it was made, how it scores, what is not yet trustworthy,
 and what a better result has to show. Details and every dead end: `ss/NOTES.md` (single stage), `REPORT.md` sections
 10-11 and `NAE_HANDOFF.md` (near-axis stage).
+
+## 00. Update 2026-10-13: the "ss4 redux" (design C) and a literature-style comparison of all three
+
+Design C answers one question: was B better than A because of its lower iota, or because its single stage ran on a
+clean boundary? C is A's near-axis parent (iota target 0.42) put through B's exact pipeline, with the new boundary
+repair (`../sandbox/bdry_repair/README.md`). **C lands near A, not near B: most of B's gain came from the lower iota.**
+
+All numbers below are on vacuum free-boundary equilibria of the final coils (no QS term), in the literature's
+conventions. B and C are quoted on their repaired surfaces (positive Jacobian everywhere, no crease); the repair moved
+them 0.09 and 0.07 mm rms and changed QS by under 7%.
+
+| | **A: `ss4`** | **C: redux** (new) | **B: `li030` k=6** | precise_QA | reactor_QA | NCSX | ARIES-CS |
+|---|---|---|---|---|---|---|---|
+| iota at rho .25 / .5 / .75 / 1 | .352 / .340 / .325 / .313 | .304 / .293 / .307 / .349 | .226 / .218 / .220 / .232 | 0.42 | .49 - .63 | .39 - .66 | .45 - .67 |
+| aspect ratio | 6.89 | 6.90 | 7.26 | 6.0 | 6.0 | 4.5 | 4.5 |
+| largest breaking Boozer mode / B00, rho .25 | 0.36% | 0.24% | **0.13%** | 0.006% | 0.27% | 0.69% | 0.97% |
+| ... rho .5 | 0.20% | 0.25% | **0.14%** | 0.003% | 0.18% | 0.66% | 1.05% |
+| ... rho .75 | 0.37% | 0.32% | **0.22%** | 0.003% | 0.29% | 1.30% | 1.43% |
+| ... rho 1 | 0.69% | 0.85% | **0.45%** | 0.02% | 0.51% | 2.70% | 2.15% |
+| L2 of breaking modes / B00, rho .25/.5/.75/1 | 0.42 / 0.43 / 0.84 / 1.74% | 0.36 / 0.47 / 0.74 / 1.47% | **0.25 / 0.28 / 0.47 / 0.94%** | 0.008 / 0.004 / 0.006 / 0.03% | 0.29 / 0.29 / 0.41 / 0.73% | 0.97 / 1.28 / 1.95 / 3.88% | 1.08 / 1.36 / 1.92 / 3.60% |
+| two-term rms(f_C / B^3), rho .25/.5/.75 | 2.4e-2 / 3.2e-2 / 5.9e-2 | 2.4e-2 / 3.2e-2 / 5.4e-2 | 1.6e-2 / 2.2e-2 / 3.5e-2 | 2e-4 / 1e-4 / 1e-4 | 4.4e-3 / 4.5e-3 / 6.5e-3 | 4.6e-2 / 5.3e-2 / 7.6e-2 | 2.3e-2 / 2.9e-2 / 5.1e-2 |
+| eps_eff, rho .25/.5/.75 | 1.1e-3 / 1.1e-3 / 2.8e-3 | 8.6e-4 / 1.1e-3 / 2.0e-3 | **6.9e-4 / 7.4e-4 / 1.3e-3** | 4.5e-7 / 3.2e-7 / 1.2e-6 | 2.2e-4 / 8.1e-4 / 2.8e-3 | 2.0e-3 / 1.9e-3 / 3.8e-3 | 6.3e-4 / 2.3e-4 / 8.0e-4 |
+| eps_eff^(3/2), rho .25/.5/.75 | 3.7e-5 / 3.4e-5 / 1.4e-4 | 2.5e-5 / 3.6e-5 / 9.1e-5 | 1.8e-5 / 2.0e-5 / 4.6e-5 | 3e-10 / 2e-10 / 1e-9 | 3e-6 / 2e-5 / 1.5e-4 | 9e-5 / 8e-5 / 2.3e-4 | 1.6e-5 / 3e-6 / 2.3e-5 |
+| coils' B.n on the surface, rms / max | 0.04% / 9.6% (crease) | 0.23% / 1.5% | 0.10% / 0.44% | (fixed boundary, no coils) | | | |
+| coils feasible | yes | yes | length 0.03% over | | | | |
+
+Reference columns are DESC's example equilibria (fixed boundary, no coils), computed with the same scripts.
+
+**Reading it against the literature.**
+* QS: B is better than `reactor_QA` on the largest mode at every radius and level with it on the L2; A and C are about
+  1.3x worse than `reactor_QA` and 2-4x better than NCSX and ARIES-CS. All three are 20-100x worse than `precise_QA`.
+  The two-term measure tells the same ranking, but ours is 4-5x worse than `reactor_QA`'s there (it weights many small
+  modes that the largest-mode measure ignores).
+* eps_eff: B is 7e-4 - 1.3e-3, between ARIES-CS and NCSX, and level with `reactor_QA` at mid radius. The values are
+  converged: doubling the bounce-integral resolution changes them by 0-6% (`ss/ref042r/eps_conv.json`, `ss/eps_conv.py`).
+  This supersedes the "not converged" eps_eff row in section 0.
+* Poincare (coil field, 6 planes): nested surfaces from the axis to beyond the equilibrium boundary in both B and C,
+  no island chains visible inside the boundary. `ss/li030/fb_norepair_local/poincare.png`, `ss/ref042r/fb/poincare.png`.
+* C's iota profile is not monotonic (minimum 0.29 near mid radius, 0.35 at the edge); A's and B's are.
+
+**C in detail** (Modal job `ss12_ref042_q15r`, commit d97172432, 77 min on an A100; files in `ss/ref042r/`):
+start repair moved the surface 0.12 mm rms and kept QS (0.35/0.67/1.31/2.37% -> 0.29/0.71/1.34/2.37%); the gate then
+found no repair needed after any of the six k steps. Single stage k=6: L2 0.39 / 0.42 / 0.69 / 1.42%, iota 0.299-0.352.
+Viewer: entry 6 of `ss/viewer_ss.html`.
+
+**What is weak about C (do not skip):** its free-boundary rescore did not converge. Both shells stopped with "a bad
+approximation caused failure to predict improvement" and left B.n where it started (0.185% -> 0.187% rms; A reached
+0.04%), and the boundary creased inside the last shell (repaired afterwards). So C's score sits close to its
+single-stage numbers partly because the surface barely moved, and it is softer than A's. Why the shells stall here is
+open; it also bears on B's 0.10-0.14%.
+
+**B's new numbers** come from `ss/li030/repaired/eq.h5` (the section-0 state repaired with the new package): they
+replace the "0.25-0.28% / ... / 0.9-1.2%" range quoted in section 0 with one clean state, and B.n on it is 0.10% rms,
+0.44% max.
 
 ## 0. Update 2026-10-12 (late): a second design, lower iota, better QS
 
