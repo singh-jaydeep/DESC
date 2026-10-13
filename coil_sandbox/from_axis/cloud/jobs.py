@@ -72,3 +72,31 @@ GROUPS["ss_li030"] = [single_stage("fb_li030_b14", "li030_q10", 0.10, 0.22), sin
 GROUPS["ss_li020"] = [single_stage("fb_li020_b14", "li020_q10", 0.10, 0.14), single_stage("fb_li020_b14", "li020_q20", 0.20, 0.14)]
 GROUPS["ss_lv005"] = [single_stage("fb_lv005_b14", "lv005_q10", 0.10, 0.30, hinge=("--horizontal-hinges",)),
                       single_stage("fb_lv005_b14", "lv005_q20", 0.20, 0.30, hinge=("--horizontal-hinges",))]
+
+
+# ---- 2026-10-12: basis 14 dropped as too slow (basis 12 and 14 scores agreed to 1-5% on the reference design).
+# Single stage at basis 12 from the LOCAL basis-12 free-boundary state of the iota 0.30 candidate
+# (na/runs2/li_qa2_iota0.30_fb_a0.12_L12_rep: shells 2-8, B.n 0.075% rms, QS 0.19 / 0.43 / 0.89 / 1.67%, iota 0.28 -> 0.25),
+# with the boundary repaired at the start and after every k step, then the rule-2 rescore with repairs.
+def ss_b12(tag, src, tau_qs_rel, iota_min, a_band=(6.6, 7.6), kmax=6, maxiter=50, hinge=("--fix-hinge-z", "0")):
+    name = f"ss12_{tag}"
+    JOBS[name] = dict(
+        what=f"single stage at basis 12 from {src} (tau_qs {tau_qs_rel} x start, iota >= {iota_min}), repairs, then free-boundary rescore",
+        steps=[
+            dict(cmd=["python", "prep.py", src, "{OUT}/start", "--LMN", "12"], cwd=SS),
+            dict(cmd=["python", "../../single_stage.py", "--eq", "{OUT}/start/eq0_b12.h5", "--start", "{OUT}/start/coils0.h5",
+                      "--out", "{OUT}/ss", "--bounds", BOUNDS_QA2, *hinge, "--dist", "rows", "--rows-select", "1.6",
+                      "--cc-rows", "12000", "--pc-rows", "12000", "--pc-gap", "0.005", "--plasma-m", "40", "--plasma-n", "40",
+                      "--helicity", "1,0", "--qs-form", "boozer", "--qs-rho", "0.25,0.5,0.75,1.0", "--A-min", str(a_band[0]),
+                      "--A-max", str(a_band[1]), "--iota-min", str(iota_min), "--tau-bn", "5e-4", "--tau-qs-rel", str(tau_qs_rel),
+                      "--length-mult", "0.999", "--src-gl", "64", "--force-chunk", "400", "--method", "lsq-composite",
+                      "--hessian", "secant", "--solve-tol", "1e-6", "--kmin", "1", "--kmax", str(kmax), "--maxiter", str(maxiter),
+                      "--track-steps", "--ckpt-every", "1", "--auto-resume", "--repair-steps"], cwd=SS),
+            dict(cmd=["bash", "-c", "k=$(ls {OUT}/ss/eq_k*.h5 | sed 's/.*eq_k\\([0-9]*\\).h5/\\1/' | sort -n | tail -1) && "
+                      "python fb_rescore.py {OUT}/ss/eq_k$k.h5 {OUT}/ss/coils_k$k.h5 {OUT}/fb --shells 4,8 --repair"], cwd=SS),
+            dict(cmd=["python", "tip.py", "{OUT}/fb/eq_fb.h5", "{OUT}/ss/coils_k" + str(kmax) + ".h5", "{OUT}/fb/tip.png", "--device", "gpu"], cwd=SS)])
+    return name
+
+
+LI030 = "../na/runs2/li_qa2_iota0.30_fb_a0.12_L12_rep"
+ss_b12("li030_q15", LI030, 0.15, 0.22)

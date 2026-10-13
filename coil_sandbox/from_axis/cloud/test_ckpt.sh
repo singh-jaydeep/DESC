@@ -14,9 +14,9 @@ else
   run() { "$@"; }
 fi
 run python prep.py ../na/runs2/o2w1_qa2s2_gg1e-1_w1e-2_w1x10_fb_a0.12_L10 $T/start --LMN 6 --device $DEV > $T/prep.log 2>&1 || { echo "PREP FAILED"; tail -3 $T/prep.log; exit 1; }
-SS="python ../../single_stage.py --device $DEV --eq $T/start/eq0_b6.h5 --start $T/start/coils0.h5 --out $T/ss --bounds ../../bounds/fa_qa2_a0167.json --fix-hinge-z 0 --dist rows --rows-select 1.6 --cc-rows 3000 --pc-rows 3000 --coil-grid-n 60 --pc-gap 0.005 --plasma-m 16 --plasma-n 16 --eval-m 12 --eval-n 12 --helicity 1,0 --qs-form boozer --qs-rho 0.5,1.0 --A-min 6.5 --A-max 7.5 --iota-min 0.25 --tau-bn 2e-3 --tau-qs-rel 0.3 --src-gl 24 --force-chunk 200 --method lsq-composite --hessian secant --solve-tol 1e-6 --track-steps --ckpt-every 1 --auto-resume"
+SS="python ../../single_stage.py --device $DEV --eq $T/start/eq0_b6.h5 --start $T/start/coils0.h5 --out $T/ss --bounds ../../bounds/fa_qa2_a0167.json --fix-hinge-z 0 --dist rows --rows-select 1.6 --cc-rows 3000 --pc-rows 3000 --coil-grid-n 60 --pc-gap 0.005 --plasma-m 16 --plasma-n 16 --eval-m 12 --eval-n 12 --helicity 1,0 --qs-form boozer --qs-rho 0.5,1.0 --A-min 6.5 --A-max 7.5 --iota-min 0.25 --tau-bn 2e-3 --tau-qs-rel 0.3 --src-gl 24 --force-chunk 200 --method lsq-composite --hessian secant --solve-tol 1e-6 --track-steps --ckpt-every 1 --auto-resume --repair-steps"
 run $SS --kmin 1 --kmax 1 --maxiter 2 > $T/A.log 2>&1; echo "A rc $?"
-ls $T/ss; cat $T/ss/anchors.json; echo; cat $T/ss/trials_k1.txt; grep -E "\[ckpt\]|AUTO-RESUME|^k=1 solver" $T/A.log
+ls $T/ss; cat $T/ss/anchors.json; echo; cat $T/ss/trials_k1.txt; grep -E "\[ckpt\]|AUTO-RESUME|^k=1 solver|REPAIR|after repair" $T/A.log | cut -c1-330
 run $SS --kmin 1 --kmax 2 --maxiter 6 > $T/B.log 2>&1 &
 for i in $(seq 1 240); do [ -f $T/ss/ckpt.json ] && grep -q '"k": 2' $T/ss/ckpt.json && break; sleep 5; done
 cat $T/ss/ckpt.json; echo

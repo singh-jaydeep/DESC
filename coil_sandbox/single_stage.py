@@ -142,6 +142,11 @@ def parse():
                    help="continue whatever is in --out: a mid-step checkpoint (same k) if there is one, else the "
                         "last finished eq_kK/coils_kK (k = K + 1); exits 0 if kmax is already done. The anchors "
                         "(tau_qs, V0, bn_norm) are read back from --out/anchors.json so nothing re-anchors")
+    g.add_argument("--repair-steps", action="store_true",
+                   help="after every k step (and before the first): re-parametrize the boundary to equal poloidal "
+                        "arclength and re-solve the interior by continuation (from_axis/ss/repair_lib.py). B.n and "
+                        "QS cannot see a re-parametrization of the boundary, so the solve drifts along it until the "
+                        "angle stalls at a point (a mm-scale crease, negative edge Jacobian)")
     g.add_argument("--track-steps", action="store_true",
                    help="record every attempted step (predicted/actual reduction, ratio) in result.json")
     g.add_argument("--perturb-order", type=int, default=2)
@@ -720,6 +725,23 @@ def main():
         print(f"\n--dry: wrote {a.out}/result.json; no optimization run")
         return
 
+    def do_repair(eq, tag):
+        """Equal-arclength boundary + continuation interior; keeps `eq` if the repair fails."""
+        sys.path.insert(0, os.path.join(HERE, "from_axis", "ss"))
+        from repair_lib import repair
+
+        try:
+            new, info = repair(eq, chunk=a.force_chunk or 200)
+        except Exception as e:  # noqa: BLE001
+            print(f"REPAIR FAILED ({tag}): {e!r}; continuing with the unrepaired equilibrium", flush=True)
+            return eq, dict(failed=repr(e)[:300])
+        phys.eq = new
+        print(f"{tag} physics after repair  {fmt_phys(phys())}", flush=True)
+        return new, info
+
+    if a.repair_steps and not os.path.basename(a.eq).startswith("ckpt_"):
+        eq, rinfo = do_repair(eq, "start")
+        rec.setdefault("repairs", []).append(dict(at="start", **rinfo))
     for k in range(a.kmin, a.kmax + 1):
         cons, n_free = proximal_constraints(eq, k, a.fix_current_sum, cs, a.fix_hinge_z, a.horizontal_hinges,
                                             a.lambda_pin, a.force_chunk)
@@ -771,6 +793,11 @@ def main():
         if a.horizontal_hinges:
             zc = [round(float(np.mean(np.asarray(c.hinges).reshape(-1, 3)[:, 2])), 3) for c in S.iter_unique(cs)]
             print(f"k={k} joint    max hinge-height spread {max_hinge_dz(cs, None):.1e} m, coil z {zc}", flush=True)
+        if a.repair_steps:
+            eq.save(os.path.join(a.out, f"raw_eq_k{k}.h5"))  # the step's own equilibrium, before the repair
+            eq, rinfo = do_repair(eq, f"k={k}")
+            rec.setdefault("repairs", []).append(dict(at=f"k={k}", **rinfo))
+            p = phys()
         eq.save(os.path.join(a.out, f"eq_k{k}.h5"))
         cs.save(os.path.join(a.out, f"coils_k{k}.h5"))
         rec["steps"].append(dict(k=k, n_free=n_free, wall_s=wall, nit=int(res["nit"]), message=str(res["message"]),
