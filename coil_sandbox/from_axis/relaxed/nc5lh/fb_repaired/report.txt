@@ -1,0 +1,408 @@
+/home/jay/Documents/desc_dev/DESC/desc/__init__.py:94: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  from pynvml import (
+DESC /home/jay/Documents/desc_dev/DESC/desc
+DEVICE requested=gpu obtained=gpu (1x NVIDIA GeForce RTX 5070 Ti)
+boundary before: {"area_min_over_median": 0.0033400220761175205, "kappa_max": 60625.217045244724, "bn_mean": 0.0011324790528244814, "bn_rms": 0.0016391369448747989, "bn_max": 0.1206620653815404, "bn_99": 0.008729847974323256}
+equilibrium before: sqrt(g) min/median 0.5:+0.497 0.8:+0.164 0.9:+0.062 0.95:+0.021 1.0:-0.077 | QS ['8.82e-04', '3.08e-03', '6.81e-03', '1.28e-02'] | iota 0.3994 -> 0.3809 | <|F|>_vol 1.946e+04
+  refit step 0: moved rms 0.2467 p99 0.877 max 1.227 mm, area min/median 0.616, max curvature 48 /m
+  refit step 1: moved rms 0.1221 p99 0.427 max 0.937 mm, area min/median 0.615, max curvature 58 /m
+  refit step 2: moved rms 0.1173 p99 0.417 max 0.938 mm, area min/median 0.616, max curvature 59 /m
+  refit step 3: moved rms 0.1138 p99 0.408 max 0.930 mm, area min/median 0.617, max curvature 59 /m
+  refit step 4: moved rms 0.1106 p99 0.399 max 0.920 mm, area min/median 0.620, max curvature 59 /m
+================
+Step 1
+================
+Spectral indexing: ansi
+Spectral resolution (L,M,N)=(6,6,0)
+Node resolution (L,M,N)=(12,12,0)
+Boundary ratio = 0
+Pressure ratio = 0
+Current ratio = 1
+Perturbation Order = 2
+Objective: force
+Optimizer: lsq-exact
+================
+Building objective: force
+Precomputing transforms
+Building objective: lcfs R
+Building objective: lcfs Z
+Building objective: fixed Psi
+Building objective: fixed pressure
+Building objective: fixed current
+Building objective: fixed sheet current
+Building objective: self_consistency R
+Building objective: self_consistency Z
+Building objective: lambda gauge
+Building objective: axis R self consistency
+Building objective: axis Z self consistency
+Number of parameters: 27
+Number of objectives: 98
+
+Starting optimization
+Using method: lsq-exact
+Optimization terminated successfully.
+`ftol` condition satisfied. (ftol=1.00e-02)
+         Current function value: 3.467e-07
+         Total delta_x: 2.775e-01
+         Iterations: 9
+         Function evaluations: 12
+         Jacobian evaluations: 10
+==============================================================================================================
+                                                                 Start  -->   End
+Total (sum of squares):                                      2.008e-01  -->   3.467e-07, 
+Maximum absolute Force error:                                8.497e+04  -->   2.103e+02 (N)
+Minimum absolute Force error:                                1.626e+02  -->   9.767e-02 (N)
+Average absolute Force error:                                1.383e+04  -->   1.610e+01 (N)
+Maximum absolute Force error:                                5.658e-02  -->   1.400e-04 (normalized)
+Minimum absolute Force error:                                1.083e-04  -->   6.503e-08 (normalized)
+Average absolute Force error:                                9.208e-03  -->   1.072e-05 (normalized)
+R boundary error:                                            0.000e+00  -->   8.678e-19 (m)
+Z boundary error:                                            0.000e+00  -->   0.000e+00 (m)
+Fixed Psi error:                                             0.000e+00  -->   0.000e+00 (Wb)
+Fixed pressure profile error:                                0.000e+00  -->   0.000e+00 (Pa)
+Fixed current profile error:                                 0.000e+00  -->   0.000e+00 (A)
+Fixed sheet current error:                                   0.000e+00  -->   0.000e+00 (~)
+==============================================================================================================
+
+================
+Step 2
+================
+Spectral indexing: ansi
+Spectral resolution (L,M,N)=(12,12,0)
+Node resolution (L,M,N)=(24,24,0)
+Boundary ratio = 0
+Pressure ratio = 0
+Current ratio = 1
+Perturbation Order = 2
+Objective: force
+Optimizer: lsq-exact
+================
+Perturbing equilibrium
+Building objective: force
+Precomputing transforms
+Building objective: lcfs R
+Building objective: lcfs Z
+Building objective: fixed Psi
+Building objective: fixed pressure
+Building objective: fixed current
+Building objective: fixed sheet current
+Building objective: self_consistency R
+Building objective: self_consistency Z
+Building objective: lambda gauge
+Building objective: axis R self consistency
+Building objective: axis Z self consistency
+Perturbing Rb_lmn, Zb_lmn
+Factorizing linear constraints
+Computing df
+Factoring df
+Computing d^2f
+||dx||/||x|| =  2.364e-02
+Building objective: self_consistency R
+Building objective: self_consistency Z
+Building objective: lambda gauge
+Building objective: axis R self consistency
+Building objective: axis Z self consistency
+Number of parameters: 108
+Number of objectives: 338
+
+Starting optimization
+Using method: lsq-exact
+Optimization terminated successfully.
+`ftol` condition satisfied. (ftol=1.00e-02)
+         Current function value: 1.133e-11
+         Total delta_x: 4.309e-02
+         Iterations: 98
+         Function evaluations: 116
+         Jacobian evaluations: 99
+==============================================================================================================
+                                                                 Start  -->   End
+Total (sum of squares):                                      5.402e-04  -->   1.133e-11, 
+Maximum absolute Force error:                                3.513e+04  -->   2.345e+00 (N)
+Minimum absolute Force error:                                4.010e-01  -->   1.986e-04 (N)
+Average absolute Force error:                                4.800e+02  -->   1.007e-01 (N)
+Maximum absolute Force error:                                2.339e-02  -->   1.561e-06 (normalized)
+Minimum absolute Force error:                                2.670e-07  -->   1.323e-10 (normalized)
+Average absolute Force error:                                3.196e-04  -->   6.707e-08 (normalized)
+R boundary error:                                            0.000e+00  -->   8.678e-19 (m)
+Z boundary error:                                            0.000e+00  -->   2.711e-20 (m)
+Fixed Psi error:                                             0.000e+00  -->   0.000e+00 (Wb)
+Fixed pressure profile error:                                0.000e+00  -->   0.000e+00 (Pa)
+Fixed current profile error:                                 0.000e+00  -->   0.000e+00 (A)
+Fixed sheet current error:                                   0.000e+00  -->   0.000e+00 (~)
+==============================================================================================================
+
+================
+Step 3
+================
+Spectral indexing: ansi
+Spectral resolution (L,M,N)=(12,12,12)
+Node resolution (L,M,N)=(24,24,24)
+Boundary ratio = 0.25
+Pressure ratio = 1
+Current ratio = 1
+Perturbation Order = 2
+Objective: force
+Optimizer: lsq-exact
+================
+Perturbing equilibrium
+Building objective: force
+Precomputing transforms
+Building objective: lcfs R
+Building objective: lcfs Z
+Building objective: fixed Psi
+Building objective: fixed pressure
+Building objective: fixed current
+Building objective: fixed sheet current
+Building objective: self_consistency R
+Building objective: self_consistency Z
+Building objective: lambda gauge
+Building objective: axis R self consistency
+Building objective: axis Z self consistency
+Perturbing Rb_lmn, Zb_lmn
+Factorizing linear constraints
+Computing df
+Factoring df
+Computing d^2f
+||dx||/||x|| =  1.009e-01
+Building objective: self_consistency R
+Building objective: self_consistency Z
+Building objective: lambda gauge
+Building objective: axis R self consistency
+Building objective: axis Z self consistency
+Number of parameters: 2784
+Number of objectives: 16562
+
+Starting optimization
+Using method: lsq-exact
+Optimization terminated successfully.
+`ftol` condition satisfied. (ftol=1.00e-02)
+         Current function value: 1.614e-07
+         Total delta_x: 1.520e-01
+         Iterations: 10
+         Function evaluations: 13
+         Jacobian evaluations: 11
+==============================================================================================================
+                                                                 Start  -->   End
+Total (sum of squares):                                      6.871e-01  -->   1.614e-07, 
+Maximum absolute Force error:                                2.943e+06  -->   5.918e+02 (N)
+Minimum absolute Force error:                                5.965e-01  -->   1.519e-04 (N)
+Average absolute Force error:                                1.653e+04  -->   1.050e+01 (N)
+Maximum absolute Force error:                                1.960e+00  -->   3.940e-04 (normalized)
+Minimum absolute Force error:                                3.972e-07  -->   1.012e-10 (normalized)
+Average absolute Force error:                                1.101e-02  -->   6.989e-06 (normalized)
+R boundary error:                                            0.000e+00  -->   1.370e-19 (m)
+Z boundary error:                                            0.000e+00  -->   1.946e-20 (m)
+Fixed Psi error:                                             0.000e+00  -->   0.000e+00 (Wb)
+Fixed pressure profile error:                                0.000e+00  -->   0.000e+00 (Pa)
+Fixed current profile error:                                 0.000e+00  -->   0.000e+00 (A)
+Fixed sheet current error:                                   0.000e+00  -->   0.000e+00 (~)
+==============================================================================================================
+
+================
+Step 4
+================
+Spectral indexing: ansi
+Spectral resolution (L,M,N)=(12,12,12)
+Node resolution (L,M,N)=(24,24,24)
+Boundary ratio = 0.5
+Pressure ratio = 1
+Current ratio = 1
+Perturbation Order = 2
+Objective: force
+Optimizer: lsq-exact
+================
+Perturbing equilibrium
+Building objective: force
+Precomputing transforms
+Building objective: lcfs R
+Building objective: lcfs Z
+Building objective: fixed Psi
+Building objective: fixed pressure
+Building objective: fixed current
+Building objective: fixed sheet current
+Building objective: self_consistency R
+Building objective: self_consistency Z
+Building objective: lambda gauge
+Building objective: axis R self consistency
+Building objective: axis Z self consistency
+Perturbing Rb_lmn, Zb_lmn
+Factorizing linear constraints
+Computing df
+Factoring df
+Computing d^2f
+||dx||/||x|| =  1.005e-01
+Building objective: self_consistency R
+Building objective: self_consistency Z
+Building objective: lambda gauge
+Building objective: axis R self consistency
+Building objective: axis Z self consistency
+Number of parameters: 2784
+Number of objectives: 16562
+
+Starting optimization
+Using method: lsq-exact
+Optimization terminated successfully.
+`ftol` condition satisfied. (ftol=1.00e-02)
+         Current function value: 1.468e-06
+         Total delta_x: 9.373e-02
+         Iterations: 9
+         Function evaluations: 13
+         Jacobian evaluations: 10
+==============================================================================================================
+                                                                 Start  -->   End
+Total (sum of squares):                                      8.367e-01  -->   1.468e-06, 
+Maximum absolute Force error:                                1.357e+06  -->   2.157e+03 (N)
+Minimum absolute Force error:                                1.149e+00  -->   6.333e-04 (N)
+Average absolute Force error:                                1.739e+04  -->   3.148e+01 (N)
+Maximum absolute Force error:                                9.038e-01  -->   1.436e-03 (normalized)
+Minimum absolute Force error:                                7.648e-07  -->   4.217e-10 (normalized)
+Average absolute Force error:                                1.158e-02  -->   2.096e-05 (normalized)
+R boundary error:                                            0.000e+00  -->   2.662e-19 (m)
+Z boundary error:                                            0.000e+00  -->   3.311e-20 (m)
+Fixed Psi error:                                             0.000e+00  -->   0.000e+00 (Wb)
+Fixed pressure profile error:                                0.000e+00  -->   0.000e+00 (Pa)
+Fixed current profile error:                                 0.000e+00  -->   0.000e+00 (A)
+Fixed sheet current error:                                   0.000e+00  -->   0.000e+00 (~)
+==============================================================================================================
+
+================
+Step 5
+================
+Spectral indexing: ansi
+Spectral resolution (L,M,N)=(12,12,12)
+Node resolution (L,M,N)=(24,24,24)
+Boundary ratio = 0.75
+Pressure ratio = 1
+Current ratio = 1
+Perturbation Order = 2
+Objective: force
+Optimizer: lsq-exact
+================
+Perturbing equilibrium
+Building objective: force
+Precomputing transforms
+Building objective: lcfs R
+Building objective: lcfs Z
+Building objective: fixed Psi
+Building objective: fixed pressure
+Building objective: fixed current
+Building objective: fixed sheet current
+Building objective: self_consistency R
+Building objective: self_consistency Z
+Building objective: lambda gauge
+Building objective: axis R self consistency
+Building objective: axis Z self consistency
+Perturbing Rb_lmn, Zb_lmn
+Factorizing linear constraints
+Computing df
+Factoring df
+Computing d^2f
+||dx||/||x|| =  9.962e-02
+Building objective: self_consistency R
+Building objective: self_consistency Z
+Building objective: lambda gauge
+Building objective: axis R self consistency
+Building objective: axis Z self consistency
+Number of parameters: 2784
+Number of objectives: 16562
+
+Starting optimization
+Using method: lsq-exact
+Optimization terminated successfully.
+`ftol` condition satisfied. (ftol=1.00e-02)
+         Current function value: 5.068e-06
+         Total delta_x: 1.330e-01
+         Iterations: 9
+         Function evaluations: 12
+         Jacobian evaluations: 10
+==============================================================================================================
+                                                                 Start  -->   End
+Total (sum of squares):                                      1.489e+00  -->   5.068e-06, 
+Maximum absolute Force error:                                2.245e+06  -->   4.640e+03 (N)
+Minimum absolute Force error:                                2.794e-01  -->   3.812e-04 (N)
+Average absolute Force error:                                2.125e+04  -->   5.833e+01 (N)
+Maximum absolute Force error:                                1.495e+00  -->   3.089e-03 (normalized)
+Minimum absolute Force error:                                1.860e-07  -->   2.538e-10 (normalized)
+Average absolute Force error:                                1.415e-02  -->   3.883e-05 (normalized)
+R boundary error:                                            0.000e+00  -->   6.263e-19 (m)
+Z boundary error:                                            0.000e+00  -->   1.488e-19 (m)
+Fixed Psi error:                                             0.000e+00  -->   0.000e+00 (Wb)
+Fixed pressure profile error:                                0.000e+00  -->   0.000e+00 (Pa)
+Fixed current profile error:                                 0.000e+00  -->   0.000e+00 (A)
+Fixed sheet current error:                                   0.000e+00  -->   0.000e+00 (~)
+==============================================================================================================
+
+================
+Step 6
+================
+Spectral indexing: ansi
+Spectral resolution (L,M,N)=(12,12,12)
+Node resolution (L,M,N)=(24,24,24)
+Boundary ratio = 1.0
+Pressure ratio = 1
+Current ratio = 1
+Perturbation Order = 2
+Objective: force
+Optimizer: lsq-exact
+================
+Perturbing equilibrium
+Building objective: force
+Precomputing transforms
+Building objective: lcfs R
+Building objective: lcfs Z
+Building objective: fixed Psi
+Building objective: fixed pressure
+Building objective: fixed current
+Building objective: fixed sheet current
+Building objective: self_consistency R
+Building objective: self_consistency Z
+Building objective: lambda gauge
+Building objective: axis R self consistency
+Building objective: axis Z self consistency
+Perturbing Rb_lmn, Zb_lmn
+Factorizing linear constraints
+Computing df
+Factoring df
+Computing d^2f
+||dx||/||x|| =  1.004e-01
+Building objective: self_consistency R
+Building objective: self_consistency Z
+Building objective: lambda gauge
+Building objective: axis R self consistency
+Building objective: axis Z self consistency
+Number of parameters: 2784
+Number of objectives: 16562
+
+Starting optimization
+Using method: lsq-exact
+Optimization terminated successfully.
+`ftol` condition satisfied. (ftol=1.00e-02)
+         Current function value: 2.163e-05
+         Total delta_x: 8.673e-02
+         Iterations: 10
+         Function evaluations: 11
+         Jacobian evaluations: 11
+==============================================================================================================
+                                                                 Start  -->   End
+Total (sum of squares):                                      5.274e+00  -->   2.163e-05, 
+Maximum absolute Force error:                                3.860e+06  -->   7.302e+03 (N)
+Minimum absolute Force error:                                4.220e-01  -->   2.019e-03 (N)
+Average absolute Force error:                                2.526e+04  -->   9.311e+01 (N)
+Maximum absolute Force error:                                3.344e+00  -->   6.326e-03 (normalized)
+Minimum absolute Force error:                                3.656e-07  -->   1.749e-09 (normalized)
+Average absolute Force error:                                2.188e-02  -->   8.066e-05 (normalized)
+R boundary error:                                            0.000e+00  -->   1.000e-18 (m)
+Z boundary error:                                            0.000e+00  -->   3.414e-19 (m)
+Fixed Psi error:                                             0.000e+00  -->   0.000e+00 (Wb)
+Fixed pressure profile error:                                0.000e+00  -->   0.000e+00 (Pa)
+Fixed current profile error:                                 0.000e+00  -->   0.000e+00 (A)
+Fixed sheet current error:                                   0.000e+00  -->   0.000e+00 (~)
+==============================================================================================================
+
+====================
+Done
+====================
+REPAIR (chordal, 4 label steps): surface moved rms 0.111 / p99 0.40 / max 0.92 mm (fixed-label refit: 0.247 / 0.88 / 1.23); area element min/median 0.003 -> 0.620; max curvature 60625 -> 59 /m; sqrt(g) min/median at rho .8/.95/1 ['+0.16', '+0.02', '-0.08'] -> ['+0.66', '+0.63', '+0.56']
+boundary after:  {"area_min_over_median": 0.6197211136469443, "kappa_max": 58.970342055582975, "bn_mean": 0.00102664430618966, "bn_rms": 0.0013547520794619957, "bn_max": 0.006029217911385686, "bn_99": 0.004074308127548325}
+equilibrium after:  sqrt(g) min/median 0.5:+0.740 0.8:+0.663 0.9:+0.653 0.95:+0.626 1.0:+0.557 | QS ['2.25e-03', '5.42e-03', '7.39e-03', '1.33e-02'] | iota 0.3429 -> 0.4275 | <|F|>_vol 1.956e+04
+wrote ../relaxed/nc5lh/fb_repaired/eq.h5
