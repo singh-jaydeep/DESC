@@ -55,7 +55,7 @@ def single_stage(src, tag, tau_qs_rel, iota_min, a_band=(6.5, 7.5), hinge=("--fi
             dict(cmd=["python", "prep.py", "{ROOT}/" + src + "/fb", "{OUT}/start", "--LMN", str(lmn)], cwd=SS),
             dict(cmd=["python", "../../single_stage.py", "--eq", "{OUT}/start/eq0_b" + str(lmn) + ".h5", "--start",
                       "{OUT}/start/coils0.h5", "--out", "{OUT}/ss", "--bounds", BOUNDS_QA2, *hinge,
-                      "--dist", "rows", "--rows-select", "1.6", "--cc-rows", str(cc_rows), "--pc-rows", "12000", "--pc-gap", "0.005",
+                      "--dist", "rows", "--rows-select", "1.6", "--cc-rows", "12000", "--pc-rows", "12000", "--pc-gap", "0.005",
                       "--plasma-m", "40", "--plasma-n", "40", "--helicity", "1,0", "--qs-form", "boozer", "--qs-rho",
                       "0.25,0.5,0.75,1.0", "--A-min", str(a_band[0]), "--A-max", str(a_band[1]), "--iota-min", str(iota_min),
                       "--tau-bn", "5e-4", "--tau-qs-rel", str(tau_qs_rel), "--length-mult", "0.999", "--src-gl", "64",
