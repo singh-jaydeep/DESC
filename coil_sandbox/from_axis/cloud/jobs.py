@@ -55,7 +55,7 @@ def single_stage(src, tag, tau_qs_rel, iota_min, a_band=(6.5, 7.5), hinge=("--fi
             dict(cmd=["python", "prep.py", "{ROOT}/" + src + "/fb", "{OUT}/start", "--LMN", str(lmn)], cwd=SS),
             dict(cmd=["python", "../../single_stage.py", "--eq", "{OUT}/start/eq0_b" + str(lmn) + ".h5", "--start",
                       "{OUT}/start/coils0.h5", "--out", "{OUT}/ss", "--bounds", BOUNDS_QA2, *hinge,
-                      "--dist", "rows", "--rows-select", "1.6", "--cc-rows", "12000", "--pc-rows", "12000", "--pc-gap", "0.005",
+                      "--dist", "rows", "--rows-select", "1.6", "--cc-rows", str(cc_rows), "--pc-rows", "12000", "--pc-gap", "0.005",
                       "--plasma-m", "40", "--plasma-n", "40", "--helicity", "1,0", "--qs-form", "boozer", "--qs-rho",
                       "0.25,0.5,0.75,1.0", "--A-min", str(a_band[0]), "--A-max", str(a_band[1]), "--iota-min", str(iota_min),
                       "--tau-bn", "5e-4", "--tau-qs-rel", str(tau_qs_rel), "--length-mult", "0.999", "--src-gl", "64",
@@ -78,7 +78,7 @@ GROUPS["ss_lv005"] = [single_stage("fb_lv005_b14", "lv005_q10", 0.10, 0.30, hing
 # Single stage at basis 12 from the LOCAL basis-12 free-boundary state of the iota 0.30 candidate
 # (na/runs2/li_qa2_iota0.30_fb_a0.12_L12_rep: shells 2-8, B.n 0.075% rms, QS 0.19 / 0.43 / 0.89 / 1.67%, iota 0.28 -> 0.25),
 # with the boundary repaired at the start and after every k step, then the rule-2 rescore with repairs.
-def ss_b12(tag, src, tau_qs_rel, iota_min, a_band=(6.6, 7.6), kmax=6, maxiter=50, hinge=("--fix-hinge-z", "0")):
+def ss_b12(tag, src, tau_qs_rel, iota_min, a_band=(6.6, 7.6), kmax=6, maxiter=50, hinge=("--fix-hinge-z", "0"), cc_rows=12000):
     name = f"ss12_{tag}"
     JOBS[name] = dict(
         what=f"single stage at basis 12 from {src} (tau_qs {tau_qs_rel} x start, iota >= {iota_min}), repairs, then free-boundary rescore",
@@ -86,7 +86,7 @@ def ss_b12(tag, src, tau_qs_rel, iota_min, a_band=(6.6, 7.6), kmax=6, maxiter=50
             dict(cmd=["python", "prep.py", src, "{OUT}/start", "--LMN", "12"], cwd=SS),
             dict(cmd=["python", "../../single_stage.py", "--eq", "{OUT}/start/eq0_b12.h5", "--start", "{OUT}/start/coils0.h5",
                       "--out", "{OUT}/ss", "--bounds", BOUNDS_QA2, *hinge, "--dist", "rows", "--rows-select", "1.6",
-                      "--cc-rows", "12000", "--pc-rows", "12000", "--pc-gap", "0.005", "--plasma-m", "40", "--plasma-n", "40",
+                      "--cc-rows", str(cc_rows), "--pc-rows", "12000", "--pc-gap", "0.005", "--plasma-m", "40", "--plasma-n", "40",
                       "--helicity", "1,0", "--qs-form", "boozer", "--qs-rho", "0.25,0.5,0.75,1.0", "--A-min", str(a_band[0]),
                       "--A-max", str(a_band[1]), "--iota-min", str(iota_min), "--tau-bn", "5e-4", "--tau-qs-rel", str(tau_qs_rel),
                       "--length-mult", "0.999", "--src-gl", "64", "--force-chunk", "400", "--method", "lsq-composite",
@@ -142,3 +142,8 @@ GROUPS["score_relaxed"] = [score_b12("nc6_s3", "nc6z0"), score_b12("nc5_s4", "nc
 # (start 0.38-0.40). The start violates d_cc (0.029 vs 0.04), so the first k steps must also separate the coils.
 ss_b12("nc5lh_q15", "{ROOT}/fb_nc5lh_b12/fb", 0.15, 0.35, a_band=(6.8, 7.6),
        hinge=("--hinge-zmax", "0.0334", "--hinge-tilt-max", "2.0"))
+# The run above was STOPPED after k=5: with 5 coils 13-16.5 thousand coil-coil rows fall inside the select distance but
+# only 12000 slots existed, so the rest (violating ones included) were dropped and d_cc ended at 0.49 of the bound.
+# Same job with 24000 slots, under a new name.
+ss_b12("nc5lh_q15b", "{ROOT}/fb_nc5lh_b12/fb", 0.15, 0.35, a_band=(6.8, 7.6),
+       hinge=("--hinge-zmax", "0.0334", "--hinge-tilt-max", "2.0"), cc_rows=24000)
