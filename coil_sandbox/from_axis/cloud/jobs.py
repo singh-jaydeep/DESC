@@ -121,3 +121,17 @@ JOBS["fb_lv005_b12"] = dict(
            dict(cmd=["python", "tip.py", "{OUT}/fb/eq_fb.h5", "{OUT}/fb/coils.h5", "{OUT}/fb/tip.png", "--device", "gpu"], cwd=SS)])
 ss_b12("lv005_q15", "{ROOT}/fb_lv005_b12/fb", 0.15, 0.30, a_band=(6.5, 7.5), hinge=("--horizontal-hinges",))
 GROUPS["level_hinges"] = ["fb_lv005_b12", "ss12_lv005_q15"]   # NOT parallel-safe: the second reads the first's output
+
+
+# ---- 2026-10-13 (evening): rule-2 scores of the two best relaxed near-axis states (RESULTS_2026-10-13.md section 6).
+#   nc6_s3: 6 coils per half period, every hinge on z = 0.   nc5_s4: 5 coils, hinges within 0.2 a of z = 0, tilt <= 2 deg.
+def score_b12(run, tag):
+    JOBS[f"fb_{tag}_b12"] = dict(
+        what=f"free-boundary score of {run} at basis 12, shells 2,4,6,8, repairs",
+        steps=[dict(cmd=["python", "score_fb.py", f"runs2/{run}", "--LMN", "12", "--a", "0.12", "--shells", "2,4,6,8",
+                         "--maxiter", "60", "--repair", "--out", "{OUT}/fb"], cwd=NA),
+               dict(cmd=["python", "tip.py", "{OUT}/fb/eq_fb.h5", "{OUT}/fb/coils.h5", "{OUT}/fb/tip.png", "--device", "gpu"], cwd=SS)])
+    return f"fb_{tag}_b12"
+
+
+GROUPS["score_relaxed"] = [score_b12("nc6_s3", "nc6z0"), score_b12("nc5_s4", "nc5lh")]
