@@ -193,3 +193,10 @@ QS 0.37/0.48/0.74/1.49%, B.n 0.23% rms / 1.5% max, sqrt(g) > 0 (`ref042r/fb_repa
 Reading: against ss4 (0.42/0.43/0.84/1.74%) a 10-15% gain at mid radius and edge, none inside; design B
 (0.25/0.28/0.47/0.89%) is still 35-40% better. So most of design B's gain came from the lower iota, not from the
 cleaner solve. Open: why the rescore cannot lower B.n below 0.19% here (ss4 reached 0.04%).
+
+## 2026-10-13 (night): design D, 5 coils with a thin hinge band (`nc5lh/`, Modal `ss12_nc5lh_q15b`)
+
+Full account: `../RESULTS_2026-10-13.md` section 8. Rescore QS (L2) 0.30 / 0.28 / 0.47 / 0.95%, ι 0.415 → 0.365,
+ε_eff 2.6e-4 / 2.8e-4 / 6.8e-4, coils feasible. New flags `--hinge-zmax`, `--hinge-tilt-max` (demount.HingeBand).
+**Trap:** with 5 coils per half period `--cc-rows 12000` overflows (13-16.5k rows within select distance) and drops
+violating rows silently except for a UserWarning in the log; use 24000.
