@@ -9,6 +9,8 @@ REPORT section 11: level hinges, low iota, planar coils; open items), `ss/NOTES.
 
 **Best result so far and how to beat it: `BEST_QA_Z0.md`** (files, metrics, how it was made, what is not yet trustworthy).
 
+**Finalizing designs B and D (packages, metrics, figures, tolerances, stage 2 family): `FINALIZE_HANDOFF.md`.**
+
 ## Where things are
 
 | path | what |
