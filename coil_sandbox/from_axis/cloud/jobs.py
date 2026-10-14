@@ -135,3 +135,10 @@ def score_b12(run, tag):
 
 
 GROUPS["score_relaxed"] = [score_b12("nc6_s3", "nc6z0"), score_b12("nc5_s4", "nc5lh")]
+
+# ---- 2026-10-13 (overnight): single stage on the 5-coil thin-band state. Start = the Volume's fb_nc5lh_b12 score
+# (creased shell-8 boundary; --repair-steps repairs it at the start). Hinges: |z| <= 0.0334 (0.2 a), tilt <= 2 degrees,
+# as bounded terms (single_stage.py --hinge-zmax / --hinge-tilt-max, sandbox/demount.HingeBand). iota floor 0.35
+# (start 0.38-0.40). The start violates d_cc (0.029 vs 0.04), so the first k steps must also separate the coils.
+ss_b12("nc5lh_q15", "{ROOT}/fb_nc5lh_b12/fb", 0.15, 0.35, a_band=(6.8, 7.6),
+       hinge=("--hinge-zmax", "0.0334", "--hinge-tilt-max", "2.0"))

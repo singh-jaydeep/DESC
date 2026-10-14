@@ -612,3 +612,59 @@ class HingeLevel(_Objective):
             z = jnp.asarray(p["hinges"]).reshape(-1, 3)[:, 2]
             out.append(z[1:] - z[0])
         return jnp.concatenate(out)
+
+
+class HingeBand(_Objective):
+    """Approximately level hinges: a thin joint REGION instead of a joint plane. Use with ``bounds``.
+
+    kind="height": the lab height z of every hinge, B residuals per coil, in metres. Bounds (-H, H) keep every
+        hinge within H of the midplane.
+    kind="tilt": tan of the angle between each coil's hinge line and the horizontal,
+        (z_b - z_0) / |horizontal offset of hinge b from hinge 0|, B-1 residuals per coil. Bounds +/- tan(angle).
+
+    The loosened forms of `--fix-hinge-z 0` (H = 0) and `HingeLevel` (tilt = 0). Inequalities, so these are ordinary
+    bounded objective terms, not factorized linear constraints. Leaf coils must carry no rigid transform (as HingeLevel).
+    """
+
+    _scalar = False
+    _coordinates = ""
+    _units = "(m or ~)"
+    _print_value_fmt = "Hinge band: "
+    _static_attrs = _Objective._static_attrs + ["_B", "_kind"]
+
+    def __init__(self, coil, kind="height", target=None, bounds=None, weight=1, normalize=False,
+                 normalize_target=False, loss_function=None, deriv_mode="auto", name=None, jac_chunk_size=None):
+        if kind not in ("height", "tilt"):
+            raise ValueError(f"kind must be 'height' or 'tilt', got {kind}")
+        self._kind = kind
+        if target is None and bounds is None:
+            target = 0.0
+        super().__init__(things=[coil], target=target, bounds=bounds, weight=weight, normalize=normalize,
+                         normalize_target=normalize_target, loss_function=loss_function, deriv_mode=deriv_mode,
+                         name=name or f"hinge {kind}", jac_chunk_size=jac_chunk_size)
+
+    def build(self, use_jit=True, verbose=1):
+        coils = _leaf_coils(self.things[0])
+        nb = {int(c.B) for c in coils}
+        if len(nb) != 1:
+            raise ValueError(f"HingeBand needs one B for all coils; got {nb}")
+        for c in coils:
+            rot = np.asarray(c.params_dict["rotmat"]).reshape(3, 3)
+            if not (np.allclose(rot, np.eye(3)) and np.allclose(np.asarray(c.params_dict["shift"]), 0.0)):
+                raise NotImplementedError("HingeBand reads hinge coordinates directly: no rigid transform on leaf coils")
+        self._B = nb.pop()
+        self._dim_f = len(coils) * (self._B if self._kind == "height" else self._B - 1)
+        self._normalization = 1.0
+        self._constants = {"quad_weights": jnp.ones(self._dim_f)}
+        super().build(use_jit=use_jit, verbose=verbose)
+
+    def compute(self, params, constants=None):
+        out = []
+        for p in _leaf_params(params):
+            h = jnp.asarray(p["hinges"]).reshape(-1, 3)
+            if self._kind == "height":
+                out.append(h[:, 2])
+            else:
+                d = h[1:] - h[0]
+                out.append(d[:, 2] / jnp.hypot(d[:, 0], d[:, 1]))
+        return jnp.concatenate(out)

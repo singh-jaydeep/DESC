@@ -91,6 +91,11 @@ def parse():
                    help="arc coils: snap every hinge to this height and hold its z there (one joint plane at 0)")
     g.add_argument("--horizontal-hinges", action="store_true",
                    help="arc coils: each coil's hinges level at its own (free) height; sandbox/demount.HingeLevel")
+    g.add_argument("--hinge-zmax", type=float, default=None,
+                   help="arc coils: every hinge within this height of z = 0 (m); bounded term, sandbox/demount.HingeBand")
+    g.add_argument("--hinge-tilt-max", type=float, default=None,
+                   help="arc coils: each coil's hinge line within this angle of horizontal (degrees); demount.HingeBand")
+    g.add_argument("--tau-hinge", type=float, default=0.01, help="fractional excursion of a hinge past its band or tilt bound")
     g.add_argument("--dry", action="store_true", help="build, print the term table at the start, and exit")
     g.add_argument("--field-term", choices=["bn", "vbe"], default="bn",
                    help="bn: B.n rows only (sandbox/bnormal.py; quadratic flux on the moving boundary; the "
@@ -314,6 +319,15 @@ def build_terms(eq, cs, a, E):
                                   weight=1 / (a.tau_L * E["L"])))
     terms.append(O.CoilCurvature(cs, bounds=(0.0, E["kappa"]), normalize=False, grid=cg,
                                  weight=1 / (a.tau_kappa * E["kappa"] * s_kappa)))
+    if a.hinge_zmax is not None or a.hinge_tilt_max is not None:
+        import demount
+
+        if a.hinge_zmax is not None:
+            terms.append(demount.HingeBand(cs, "height", bounds=(-a.hinge_zmax, a.hinge_zmax),
+                                           weight=1 / (a.tau_hinge * a.hinge_zmax)))
+        if a.hinge_tilt_max is not None:
+            tmax = float(np.tan(np.radians(a.hinge_tilt_max)))
+            terms.append(demount.HingeBand(cs, "tilt", bounds=(-tmax, tmax), weight=1 / (a.tau_hinge * tmax)))
     if E["kms"] is not None:
         terms.append(O.CoilMeanSquaredCurvature(cs, bounds=(0.0, E["kms"]), normalize=False, grid=cg,
                                                 weight=1 / (a.tau_kms * E["kms"])))
@@ -793,6 +807,15 @@ def main():
         if a.horizontal_hinges:
             zc = [round(float(np.mean(np.asarray(c.hinges).reshape(-1, 3)[:, 2])), 3) for c in S.iter_unique(cs)]
             print(f"k={k} joint    max hinge-height spread {max_hinge_dz(cs, None):.1e} m, coil z {zc}", flush=True)
+        if a.hinge_zmax is not None or a.hinge_tilt_max is not None:
+            hz, ht = [], []
+            for c in S.iter_unique(cs):
+                h = np.asarray(c.hinges).reshape(-1, 3)
+                d = h[1:] - h[0]
+                hz.append(float(np.abs(h[:, 2]).max()))
+                ht.append(float(np.degrees(np.arctan(np.abs(d[:, 2] / np.hypot(d[:, 0], d[:, 1])).max()))))
+            print(f"k={k} joint    max |hinge z| {max(hz):.4f} m (cap {a.hinge_zmax}), max hinge tilt {max(ht):.2f} deg "
+                  f"(cap {a.hinge_tilt_max}); per coil z {np.round(hz, 4).tolist()} tilt {np.round(ht, 2).tolist()}", flush=True)
         if a.repair_steps:
             eq.save(os.path.join(a.out, f"raw_eq_k{k}.h5"))  # the step's own equilibrium, before the repair
             eq, rinfo = do_repair(eq, f"k={k}")
