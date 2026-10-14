@@ -25,6 +25,9 @@ ap.add_argument("--chunk", type=int, default=200, help="ForceBalance jac_chunk_s
 ap.add_argument("--helicity", default="1,0")
 ap.add_argument("--bounds", default="../../bounds/fa_qa2_a0167.json")
 ap.add_argument("--device", default="gpu")
+ap.add_argument("--LMN", type=int, default=None, help="raise the equilibrium to basis L = M = N = LMN (grids 2x) and re-solve it, fixed boundary, before the shells")
+ap.add_argument("--solve-tol", type=float, default=None, help="ftol = xtol = gtol of the proximal's inner force-balance solve (default: DESC's)")
+ap.add_argument("--solve-maxiter", type=int, default=None, help="maxiter of the inner force-balance solve (default: DESC's)")
 a = ap.parse_args()
 os.makedirs(a.out, exist_ok=True)
 t0 = time.time()
@@ -64,7 +67,12 @@ def physics(eq):
                 neg_jac_frac_rho08_1=fold)
 
 
-log = {"eq": a.eq, "coils": a.coils, "start": physics(eq), "shells": []}
+if a.LMN is not None and (eq.L, eq.M, eq.N) != (a.LMN,) * 3:
+    eq.change_resolution(L=a.LMN, M=a.LMN, N=a.LMN, L_grid=2 * a.LMN, M_grid=2 * a.LMN, N_grid=2 * a.LMN)
+    eq.solve(objective=ObjectiveFunction(ForceBalance(eq, jac_chunk_size=a.chunk)), verbose=1, maxiter=300,
+             ftol=1e-12, xtol=1e-14, gtol=1e-12)
+    print(f"[{time.time() - t0:.0f}s] raised to basis {a.LMN} and re-solved (fixed boundary)", flush=True)
+log = {"eq": a.eq, "coils": a.coils, "argv": sys.argv, "start": physics(eq), "shells": []}
 print("START (single-stage state)", json.dumps(log["start"]), flush=True)
 done_f = os.path.join(a.out, "shells_done.json")  # resume: shells already finished in this OUT are skipped
 done = json.load(open(done_f)) if os.path.exists(done_f) and os.path.exists(os.path.join(a.out, "eq_fb.h5")) else []
@@ -89,8 +97,13 @@ for k in ([] if a.shells == "none" else [int(v) for v in a.shells.split(",")]): 
     bc = tuple(c for c in (FixBoundaryR(eq=eq, modes=Rm) if len(Rm) else None,
                            FixBoundaryZ(eq=eq, modes=Zm) if len(Zm) else None) if c is not None)
     try:
+        solve = {"verbose": 0}
+        if a.solve_tol is not None:
+            solve.update(ftol=a.solve_tol, xtol=a.solve_tol, gtol=a.solve_tol)
+        if a.solve_maxiter is not None:
+            solve["maxiter"] = a.solve_maxiter
         eq, res = eq.optimize(obj, cons + bc, optimizer="proximal-lsq-exact", verbose=1, maxiter=a.maxiter,
-                              ftol=1e-8, xtol=1e-10, gtol=1e-8, copy=True)
+                              ftol=1e-8, xtol=1e-10, gtol=1e-8, copy=True, options={"solve_options": solve})
     except Exception as e:  # e.g. GPU out of memory at the full-boundary shell: score the last completed shell
         log["shells"].append(dict(k=k, failed=repr(e)[:300]))
         print(f"[{time.time() - t0:.0f}s] shell k={k} FAILED ({type(e).__name__}); scoring the previous shell", flush=True)

@@ -147,3 +147,21 @@ ss_b12("nc5lh_q15", "{ROOT}/fb_nc5lh_b12/fb", 0.15, 0.35, a_band=(6.8, 7.6),
 # Same job with 24000 slots, under a new name.
 ss_b12("nc5lh_q15b", "{ROOT}/fb_nc5lh_b12/fb", 0.15, 0.35, a_band=(6.8, 7.6),
        hinge=("--hinge-zmax", "0.0334", "--hinge-tilt-max", "2.0"), cc_rows=24000)
+
+
+# ---- 2026-10-14: finalizing B and D (final_work/NOTES.md). Basis-12 interiors do not reproduce the coils' field
+# (iota off 0.01-0.07, axis 1.5-6 mm off the traced axis); basis 14-16 do. Free-boundary shell at basis 14 from each
+# design's state (raised and re-solved in fb_rescore --LMN), inner force-balance solve at 1e-8 (the "bad approximation"
+# stall test). No repair: the starting boundaries are already clean. Time-boxed by watchdog to 40 min each.
+def fb14(tag, eq, coils, shells):
+    JOBS[f"fb14_{tag}"] = dict(
+        what=f"free-boundary rescore of {tag} at basis 14 (shells {shells}, solve-tol 1e-8)",
+        steps=[dict(cmd=["python", "fb_rescore.py", eq, coils, "{OUT}/fb", "--LMN", "14", "--shells", shells,
+                         "--maxiter", "60", "--solve-tol", "1e-8", "--chunk", "400"], cwd=SS),
+               dict(cmd=["python", "tip.py", "{OUT}/fb/eq_fb.h5", coils, "{OUT}/fb/tip.png", "--device", "gpu"], cwd=SS)])
+    return f"fb14_{tag}"
+
+
+GROUPS["final_fb14"] = [fb14("D", "nc5lh/fb/eq_fb.h5", "nc5lh/ss/coils_k6.h5", "14"),
+                        fb14("Bk6", "li030/repaired/eq.h5", "li030/ss/coils_k6.h5", "14"),
+                        fb14("Bk5", "li030/ss/eq_k5.h5", "li030/ss/coils_k5.h5", "4,8,14")]
