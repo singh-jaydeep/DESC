@@ -1,0 +1,86 @@
+{
+ "name": "fb_nc5lh_b12",
+ "attempts": [
+  {
+   "started": "2026-10-14 00:00:23",
+   "commit": "da44eb5ecf2379069f87a25323389274c29569df",
+   "gpu": "NVIDIA A100-SXM4-40GB, 40960 MiB",
+   "steps": [
+    {
+     "i": 0,
+     "cmd": [
+      "python",
+      "score_fb.py",
+      "runs2/nc5_s4",
+      "--LMN",
+      "12",
+      "--a",
+      "0.12",
+      "--shells",
+      "2,4,6,8",
+      "--maxiter",
+      "60",
+      "--repair",
+      "--out",
+      "/vol/fb_nc5lh_b12/fb"
+     ],
+     "rc": 0,
+     "minutes": 44.7
+    },
+    {
+     "i": 1,
+     "cmd": [
+      "python",
+      "tip.py",
+      "/vol/fb_nc5lh_b12/fb/eq_fb.h5",
+      "/vol/fb_nc5lh_b12/fb/coils.h5",
+      "/vol/fb_nc5lh_b12/fb/tip.png",
+      "--device",
+      "gpu"
+     ],
+     "rc": 0,
+     "minutes": 0.5
+    }
+   ],
+   "finished": "2026-10-14 00:45:30",
+   "rc": 0
+  }
+ ],
+ "job": {
+  "what": "free-boundary score of nc5_s4 at basis 12, shells 2,4,6,8, repairs",
+  "steps": [
+   {
+    "cmd": [
+     "python",
+     "score_fb.py",
+     "runs2/nc5_s4",
+     "--LMN",
+     "12",
+     "--a",
+     "0.12",
+     "--shells",
+     "2,4,6,8",
+     "--maxiter",
+     "60",
+     "--repair",
+     "--out",
+     "{OUT}/fb"
+    ],
+    "cwd": "coil_sandbox/from_axis/na"
+   },
+   {
+    "cmd": [
+     "python",
+     "tip.py",
+     "{OUT}/fb/eq_fb.h5",
+     "{OUT}/fb/coils.h5",
+     "{OUT}/fb/tip.png",
+     "--device",
+     "gpu"
+    ],
+    "cwd": "coil_sandbox/from_axis/ss"
+   }
+  ],
+  "name": "fb_nc5lh_b12"
+ }
+}

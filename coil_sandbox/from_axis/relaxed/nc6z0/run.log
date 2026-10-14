@@ -1,0 +1,244 @@
+
+===== attempt 1 2026-10-14 00:00:22 commit da44eb5ecf2379069f87a25323389274c29569df gpu NVIDIA A100-SXM4-40GB, 40960 MiB
+--- step 0: python score_fb.py runs2/nc6_s3 --LMN 12 --a 0.12 --shells 2,4,6,8 --maxiter 60 --repair --out /vol/fb_nc6z0_b12/fb
+/repo/desc/__init__.py:94: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  from pynvml import (
+DESC /repo/desc
+DEVICE requested=gpu obtained=gpu (1x NVIDIA A100-SXM4-40GB)
+[    1.8s] NAE: iota 0.4168 helicity 0.0 max elong 4.59
+[   85.9s] NAE fixed-boundary initial guess solved
+[  103.6s] cos(B_eq, B_coils) on the initial boundary: mean 0.9996
+[  130.8s] NAE fixed boundary: {"R0": 0.9438999290981006, "a": 0.12391970797227955, "A": 7.617028352820586, "helicity": [1, 0], "qs_booz_rho.25,.5,.75,1": [0.00457631506238911, 0.004584449333972902, 0.007909223516548396, 0.014500065863860151], "iota_axis": 0.4100526393778068, "iota_edge": 0.4210056162646959, "iota_min": 0.4100526393778068, "iota_max": 0.4210056162646959, "bn_rms": 0.018323984645028504, "bn_max": 0.0721261129839215, "axis_R0n": [0.94337, 0.19471, 0.02732, 0.00346, 0.00033, 2e-05, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, 0.0], "axis_Z0n": [-0.0, 0.0, 0.0, 0.0, 0.0, -0.0, 0.0, -2e-05, -0.00031, -0.00297, -0.02181, -0.14085]}
+Building objective: Vacuum boundary error
+Precomputing transforms
+Building objective: force
+Precomputing transforms
+Building objective: fixed current
+Building objective: fixed pressure
+Building objective: fixed Psi
+Building objective: lcfs R
+Building objective: lcfs Z
+Number of parameters: 25
+Number of objectives: 4802
+
+Starting optimization
+Using method: proximal-lsq-exact
+Optimization terminated successfully.
+`ftol` condition satisfied. (ftol=1.00e-08)
+`xtol` condition satisfied. (xtol=1.00e-10)
+         Current function value: 3.464e-03
+         Total delta_x: 4.193e-02
+         Iterations: 17
+         Function evaluations: 28
+         Jacobian evaluations: 18
+==============================================================================================================
+                                                                 Start  -->   End
+Total (sum of squares):                                      4.822e-02  -->   3.464e-03, 
+Maximum absolute Boundary normal field error:                8.601e-03  -->   2.406e-03 (T*m^2)
+Minimum absolute Boundary normal field error:                3.173e-17  -->   2.626e-17 (T*m^2)
+Average absolute Boundary normal field error:                1.905e-03  -->   6.256e-04 (T*m^2)
+Maximum absolute Boundary normal field error:                8.390e-02  -->   2.347e-02 (normalized)
+Minimum absolute Boundary normal field error:                3.096e-16  -->   2.562e-16 (normalized)
+Average absolute Boundary normal field error:                1.858e-02  -->   6.103e-03 (normalized)
+Maximum absolute Boundary magnetic pressure error:           1.210e-02  -->   3.501e-03 (T^2*m^2)
+Minimum absolute Boundary magnetic pressure error:           4.147e-07  -->   6.811e-07 (T^2*m^2)
+Average absolute Boundary magnetic pressure error:           1.739e-03  -->   5.152e-04 (T^2*m^2)
+Maximum absolute Boundary magnetic pressure error:           1.796e-01  -->   5.196e-02 (normalized)
+Minimum absolute Boundary magnetic pressure error:           6.154e-06  -->   1.011e-05 (normalized)
+Average absolute Boundary magnetic pressure error:           2.581e-02  -->   7.645e-03 (normalized)
+Maximum absolute Force error:                                2.186e-01  -->   2.349e-01 (N)
+Minimum absolute Force error:                                1.413e-07  -->   1.146e-07 (N)
+Average absolute Force error:                                4.750e-03  -->   5.394e-03 (N)
+Maximum absolute Force error:                                4.131e-07  -->   4.438e-07 (normalized)
+Minimum absolute Force error:                                2.669e-13  -->   2.165e-13 (normalized)
+Average absolute Force error:                                8.974e-09  -->   1.019e-08 (normalized)
+Fixed current profile error:                                 0.000e+00  -->   0.000e+00 (A)
+Fixed pressure profile error:                                0.000e+00  -->   0.000e+00 (Pa)
+Fixed Psi error:                                             0.000e+00  -->   0.000e+00 (Wb)
+R boundary error:                                            1.746e-21  -->   0.000e+00 (m)
+Z boundary error:                                            1.812e-23  -->   0.000e+00 (m)
+==============================================================================================================
+
+[  389.6s] free boundary shell k=2: B.n rms 5.779e-03 max 3.037e-02 (Optimization terminated successfully.
+`ftol` condition satisfied. (ftol=1.00e-08)
+`xtol` condition satisfied. (xtol=1.00e-10))
+[  394.0s] REPAIR: not needed (area element min/median 0.407, max curvature 53 /m, sqrt(g) min/median at rho .8/.95/1 ['+0.55', '+0.51', '+0.49'])
+Building objective: Vacuum boundary error
+Precomputing transforms
+Building objective: force
+Precomputing transforms
+Building objective: fixed current
+Building objective: fixed pressure
+Building objective: fixed Psi
+Building objective: lcfs R
+Building objective: lcfs Z
+Number of parameters: 81
+Number of objectives: 4802
+
+Starting optimization
+Using method: proximal-lsq-exact
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 1.485e-03
+         Total delta_x: 4.387e-02
+         Iterations: 60
+         Function evaluations: 74
+         Jacobian evaluations: 61
+==============================================================================================================
+                                                                 Start  -->   End
+Total (sum of squares):                                      2.698e-03  -->   1.485e-03, 
+Maximum absolute Boundary normal field error:                2.406e-03  -->   1.495e-03 (T*m^2)
+Minimum absolute Boundary normal field error:                2.584e-17  -->   3.382e-17 (T*m^2)
+Average absolute Boundary normal field error:                6.256e-04  -->   3.693e-04 (T*m^2)
+Maximum absolute Boundary normal field error:                2.236e-02  -->   1.390e-02 (normalized)
+Minimum absolute Boundary normal field error:                2.401e-16  -->   3.143e-16 (normalized)
+Average absolute Boundary normal field error:                5.814e-03  -->   3.432e-03 (normalized)
+Maximum absolute Boundary magnetic pressure error:           3.501e-03  -->   2.604e-03 (T^2*m^2)
+Minimum absolute Boundary magnetic pressure error:           6.811e-07  -->   4.546e-07 (T^2*m^2)
+Average absolute Boundary magnetic pressure error:           5.152e-04  -->   4.062e-04 (T^2*m^2)
+Maximum absolute Boundary magnetic pressure error:           4.404e-02  -->   3.275e-02 (normalized)
+Minimum absolute Boundary magnetic pressure error:           8.567e-06  -->   5.718e-06 (normalized)
+Average absolute Boundary magnetic pressure error:           6.480e-03  -->   5.110e-03 (normalized)
+Maximum absolute Force error:                                2.349e-01  -->   3.998e+02 (N)
+Minimum absolute Force error:                                1.146e-07  -->   4.265e-05 (N)
+Average absolute Force error:                                5.394e-03  -->   7.997e-01 (N)
+Maximum absolute Force error:                                3.762e-07  -->   6.403e-04 (normalized)
+Minimum absolute Force error:                                1.835e-13  -->   6.831e-11 (normalized)
+Average absolute Force error:                                8.639e-09  -->   1.281e-06 (normalized)
+Fixed current profile error:                                 0.000e+00  -->   0.000e+00 (A)
+Fixed pressure profile error:                                0.000e+00  -->   0.000e+00 (Pa)
+Fixed Psi error:                                             0.000e+00  -->   0.000e+00 (Wb)
+R boundary error:                                            1.814e-20  -->   2.801e-20 (m)
+Z boundary error:                                            3.108e-20  -->   2.712e-20 (m)
+==============================================================================================================
+
+[  895.2s] free boundary shell k=4: B.n rms 3.580e-03 max 3.240e-02 (Maximum number of iterations has been exceeded.)
+[ 1173.1s] REPAIR (chordal, 3 label steps): surface moved rms 0.114 / p99 0.37 / max 2.09 mm (fixed-label refit: 0.199 / 0.81 / 2.28); area element min/median 0.019 -> 0.541; max curvature 3783 -> 42 /m; sqrt(g) min/median at rho .8/.95/1 ['+0.21', '+0.05', '+0.01'] -> ['+0.72', '+0.67', '+0.62']
+Building objective: Vacuum boundary error
+Precomputing transforms
+Building objective: force
+Precomputing transforms
+Building objective: fixed current
+Building objective: fixed pressure
+Building objective: fixed Psi
+Building objective: lcfs R
+Building objective: lcfs Z
+Number of parameters: 169
+Number of objectives: 4802
+
+Starting optimization
+Using method: proximal-lsq-exact
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 1.018e-03
+         Total delta_x: 7.084e-02
+         Iterations: 60
+         Function evaluations: 86
+         Jacobian evaluations: 61
+==============================================================================================================
+                                                                 Start  -->   End
+Total (sum of squares):                                      1.990e-03  -->   1.018e-03, 
+Maximum absolute Boundary normal field error:                3.429e-03  -->   1.750e-03 (T*m^2)
+Minimum absolute Boundary normal field error:                2.032e-17  -->   3.679e-17 (T*m^2)
+Average absolute Boundary normal field error:                3.684e-04  -->   3.145e-04 (T*m^2)
+Maximum absolute Boundary normal field error:                3.131e-02  -->   1.598e-02 (normalized)
+Minimum absolute Boundary normal field error:                1.856e-16  -->   3.360e-16 (normalized)
+Average absolute Boundary normal field error:                3.364e-03  -->   2.872e-03 (normalized)
+Maximum absolute Boundary magnetic pressure error:           5.022e-03  -->   2.241e-03 (T^2*m^2)
+Minimum absolute Boundary magnetic pressure error:           7.841e-07  -->   7.562e-07 (T^2*m^2)
+Average absolute Boundary magnetic pressure error:           4.082e-04  -->   3.408e-04 (T^2*m^2)
+Maximum absolute Boundary magnetic pressure error:           6.165e-02  -->   2.751e-02 (normalized)
+Minimum absolute Boundary magnetic pressure error:           9.626e-06  -->   9.283e-06 (normalized)
+Average absolute Boundary magnetic pressure error:           5.011e-03  -->   4.184e-03 (normalized)
+Maximum absolute Force error:                                9.087e+02  -->   2.211e+03 (N)
+Minimum absolute Force error:                                5.263e-04  -->   2.608e-03 (N)
+Average absolute Force error:                                1.658e+01  -->   3.524e+01 (N)
+Maximum absolute Force error:                                1.420e-03  -->   3.455e-03 (normalized)
+Minimum absolute Force error:                                8.227e-10  -->   4.077e-09 (normalized)
+Average absolute Force error:                                2.591e-05  -->   5.509e-05 (normalized)
+Fixed current profile error:                                 0.000e+00  -->   0.000e+00 (A)
+Fixed pressure profile error:                                0.000e+00  -->   0.000e+00 (Pa)
+Fixed Psi error:                                             0.000e+00  -->   0.000e+00 (Wb)
+R boundary error:                                            2.012e-19  -->   1.487e-19 (m)
+Z boundary error:                                            1.231e-19  -->   1.034e-19 (m)
+==============================================================================================================
+
+[ 1688.7s] free boundary shell k=6: B.n rms 3.107e-03 max 5.118e-02 (Maximum number of iterations has been exceeded.)
+[ 1951.7s] REPAIR (chordal, 2 label steps): surface moved rms 0.244 / p99 1.18 / max 2.58 mm (fixed-label refit: 0.312 / 1.35 / 2.65); area element min/median 0.073 -> 0.612; max curvature 272 -> 46 /m; sqrt(g) min/median at rho .8/.95/1 ['+0.43', '+0.16', '+0.05'] -> ['+0.67', '+0.62', '+0.57']
+Building objective: Vacuum boundary error
+Precomputing transforms
+Building objective: force
+Precomputing transforms
+Building objective: fixed current
+Building objective: fixed pressure
+Building objective: fixed Psi
+Building objective: lcfs R
+Building objective: lcfs Z
+Number of parameters: 289
+Number of objectives: 4802
+
+Starting optimization
+Using method: proximal-lsq-exact
+Warning: A bad approximation caused failure to predict improvement.
+         Current function value: 3.070e-04
+         Total delta_x: 3.820e-02
+         Iterations: 47
+         Function evaluations: 78
+         Jacobian evaluations: 47
+==============================================================================================================
+                                                                 Start  -->   End
+Total (sum of squares):                                      1.383e-03  -->   3.070e-04, 
+Maximum absolute Boundary normal field error:                2.079e-03  -->   1.441e-03 (T*m^2)
+Minimum absolute Boundary normal field error:                2.286e-17  -->   2.682e-17 (T*m^2)
+Average absolute Boundary normal field error:                2.998e-04  -->   1.922e-04 (T*m^2)
+Maximum absolute Boundary normal field error:                1.894e-02  -->   1.312e-02 (normalized)
+Minimum absolute Boundary normal field error:                2.082e-16  -->   2.443e-16 (normalized)
+Average absolute Boundary normal field error:                2.731e-03  -->   1.751e-03 (normalized)
+Maximum absolute Boundary magnetic pressure error:           4.042e-03  -->   1.274e-03 (T^2*m^2)
+Minimum absolute Boundary magnetic pressure error:           1.771e-07  -->   5.438e-07 (T^2*m^2)
+Average absolute Boundary magnetic pressure error:           3.477e-04  -->   1.759e-04 (T^2*m^2)
+Maximum absolute Boundary magnetic pressure error:           4.932e-02  -->   1.554e-02 (normalized)
+Minimum absolute Boundary magnetic pressure error:           2.161e-06  -->   6.636e-06 (normalized)
+Average absolute Boundary magnetic pressure error:           4.242e-03  -->   2.146e-03 (normalized)
+Maximum absolute Force error:                                1.951e+03  -->   3.917e+03 (N)
+Minimum absolute Force error:                                7.622e-04  -->   1.744e-03 (N)
+Average absolute Force error:                                4.289e+01  -->   8.412e+01 (N)
+Maximum absolute Force error:                                3.032e-03  -->   6.085e-03 (normalized)
+Minimum absolute Force error:                                1.184e-09  -->   2.709e-09 (normalized)
+Average absolute Force error:                                6.664e-05  -->   1.307e-04 (normalized)
+Fixed current profile error:                                 0.000e+00  -->   0.000e+00 (A)
+Fixed pressure profile error:                                0.000e+00  -->   0.000e+00 (Pa)
+Fixed Psi error:                                             0.000e+00  -->   0.000e+00 (Wb)
+R boundary error:                                            4.103e-20  -->   0.000e+00 (m)
+Z boundary error:                                            8.431e-20  -->   0.000e+00 (m)
+==============================================================================================================
+
+[ 2391.5s] free boundary shell k=8: B.n rms 1.921e-03 max 4.393e-02 (A bad approximation caused failure to predict improvement.)
+[ 2412.8s] FREE BOUNDARY: {"R0": 0.9461474138184448, "a": 0.12382835188893039, "A": 7.640797922168142, "helicity": [1, 0], "qs_booz_rho.25,.5,.75,1": [0.0007680736708466437, 0.0030651048590303607, 0.006006405435515562, 0.012069301954715691], "iota_axis": 0.3707687685238324, "iota_edge": 0.3799025831774027, "iota_min": 0.3707687685238324, "iota_max": 0.381036904200996, "bn_rms": 0.0019207049322990408, "bn_max": 0.04392566538516302, "axis_R0n": [0.94912, 0.19128, 0.02652, 0.00332, 0.00033, 4e-05, 1e-05, 1e-05, -0.0, 1e-05, 1e-05, 1e-05, 0.0], "axis_Z0n": [0.0, -0.0, -0.0, 1e-05, -0.0, 0.0, -2e-05, -5e-05, -0.00035, -0.00285, -0.02093, -0.14014]}
+/repo/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+/repo/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+[ 2455.2s] coil check vs the free-boundary surface: {"L": 3.942177405247394, "kappa": 10.320608425333836, "d_cc": 0.03424462312150618, "d_pc": 0.15627245001166057, "linked": 0}
+[ 2491.8s] Poincare plot written
+[ 2491.8s] wrote /vol/fb_nc6z0_b12/fb/score.json
+--- step 1: python tip.py /vol/fb_nc6z0_b12/fb/eq_fb.h5 /vol/fb_nc6z0_b12/fb/coils.h5 /vol/fb_nc6z0_b12/fb/tip.png --device gpu
+/repo/desc/__init__.py:94: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  from pynvml import (
+DESC /repo/desc
+DEVICE requested=gpu obtained=gpu (1x NVIDIA A100-SXM4-40GB)
+B.n/<B>: mean 1.33e-03 rms 1.92e-03 max 4.22e-02; area above 1%: 0.153%
+sqrt(g) at rho=1: min/median -0.059; negative on 0.22% of points; below 20% of median on 1.96%
+  rho 0.8: sqrt(g) min/median +0.316, negative on 0.00%
+  rho 0.9: sqrt(g) min/median +0.174, negative on 0.00%
+  rho 0.95: sqrt(g) min/median +0.067, negative on 0.00%
+largest B.n points (theta, zeta, R, Z, B.n/<B>, sqrt(g)/median, max principal curvature 1/m):
+   5.114 2.411  R 0.9862 Z +0.0154  4.216e-02  +0.080  130.9
+   1.169 0.731  R 0.9862 Z -0.0154  4.216e-02  +0.080  130.9
+   5.114 2.435  R 0.9983 Z +0.0119  4.167e-02  +0.071  150.2
+   1.169 0.706  R 0.9983 Z -0.0119  4.167e-02  +0.071  150.2
+   1.218 0.706  R 0.9987 Z -0.0115  3.340e-02  +0.137  332.9
+   5.066 2.435  R 0.9987 Z +0.0115  3.340e-02  +0.137  332.9
+   1.218 0.731  R 0.9866 Z -0.0150  3.120e-02  +0.147  293.2
+   5.066 2.411  R 0.9866 Z +0.0150  3.120e-02  +0.147  293.2
+max principal curvature of the boundary: 37060.2 /m (1/a = 8.1); at the B.n max: 130.9
+B.n max away from sqrt(g) < 20% median: 1.89e-02
+wrote /vol/fb_nc6z0_b12/fb/tip.png
