@@ -156,3 +156,36 @@ Rationals n/m with n a multiple of NFP = 2 inside: 3/8 (= 6/16, 0.375, rho ~0.65
 * 3/8 and 6/17: no island resolved at this line spacing (~0.013 in rho; lines next to them show error ~1e-6 and
   baseline wobble). Bound: narrower than ~0.013 in rho.
 * The first equilibrium-free check of D's interior: every other line is a clean invariant circle to 1e-7 or better.
+
+## Open question for discussion (2026-10-14 late): why do these equilibria work where precise_QA did not?
+
+precise_QA with the same coil class (arcB2 = two-face hinged coils) and essentially the same bounds: z = 0 fit on the
+fixed boundary B.n 2.4e-2 (5.4x free; `../../work/ss_qh/joint/results/REPORT.md` section 4), never single-staged or
+free-boundary scored. B and D reach ~1e-3 in single stage and self-consistent free-boundary pairs. Not yet explained.
+Remaining differences: fixed boundary vs plasma co-optimized with the coils (single stage); B's lower iota; D's 5th
+coil per half period and +-0.2 a hinge band. Geometry (screen metrics, `../ss/z0geom.py`):
+
+| | precise_QA | B | D |
+|---|---|---|---|
+| iota | 0.42 | 0.23 | 0.40 -> 0.35 |
+| A | 6.0 | 7.3 | 7.6 |
+| axis max abs(Z) / a | 0.93 | 0.63 | 1.10 |
+| z = 0 chord / R extent, min / median | 0.36 / 0.51 | 0.64 / 0.79 | 0.00 / 0.51 |
+| R-extreme height / a, median | 1.64 | 1.05 | 1.51 |
+
+B is z = 0-friendly by these metrics; D is not (it relies on the band). Clean control: our exact pipeline (single
+stage + free-boundary score) started from precise_QA with z = 0 coils, 4 coils/hp.
+
+## 1g. Overnight (laptop): B on basis-14 free-boundary states (`res/overnight_B.out`, `res/replan_B.sh`)
+
+* try 1 (20:53) ran out of GPU memory in the full-mode shell (6.25 GB under JAX's default 75% pool); rerun with
+  XLA_PYTHON_CLIENT_MEM_FRACTION=0.93 from the basis-14 ladder state fits (15.7 GB). Speed: ~2.3 h per 20-iteration
+  full-mode shell on the RTX 5070 Ti (likely FP64 throughput; the A100 does 60 iterations in 36 min).
+* Replan 23:41: one full-mode shell each for k6 and k5 (equal effort for the decision), no basis-16 re-solves
+  (agreed: D showed basis 14 vs 16 agree to 1-4%).
+* **B k6, one shell of 20 iterations** (`res/fb14_Bk6/eq_fb.h5`): B.n rms 1.04e-3 -> **1.06e-5**. Traced iota within
+  2e-4 of the equilibrium everywhere, axis 0.009 mm from the traced axis; interior |B_coil - B_eq| / |B| 0.001-0.007%
+  (rho <= 0.9), vacuum residual < 1.3e-3. A 7.260; iota 0.238 -> 0.218 (crosses 2/9 = 0.2222 near rho ~0.88; one
+  traced line at rho 0.84 has error 6e-5 and rho spread 1.8e-3: probably the 2/9 chain; dense trace to do).
+  QS (literature) L2 0.227 / 0.271 / 0.480 / 0.893 %, largest mode 0.117 / 0.137 / 0.221 / 0.434 %,
+  eps_eff 6.27e-4 / 6.24e-4 / 1.31e-3. Coils: unchanged (length 1.1 mm over its bound).
