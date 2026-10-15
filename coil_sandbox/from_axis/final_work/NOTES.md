@@ -207,3 +207,43 @@ inside is 2/9 (0.2222; n = 2 = NFP).
   (~2 mm at a = 0.121); bound 0.04.**
 * k5: 2/9 crossed between rho 0.934 and 0.961 (closer to the edge); no traced line falls inside the island, but the
   neighbours distort the same way (spread 0.021 at rho 0.934). **Island at rho ~0.95, similar size; bound 0.027.**
+
+## 1h. B coil-length polish (`res/polish_B.sh`, started ~03:30)
+
+Length check first: devtools/coil_auglag/check.py prints lengths from a uniform LinearGrid(N=200), which cuts the
+corners of the C0 coils (3.9331 m for B k6's longest coil). Converged values (uniform N=20000, 200000-point polyline)
+agree with common.evaluate's per-segment quadrature: **coil 2 = 3.94228 m, 1.08 mm over 3.9412**. The drivers'
+CoilLength constraints use S.quad_grid (per segment), so they are accurate; the overrun came from the single stage's
+soft (tolerance-weighted) length term. Polish = run_al.py (hard length bound, lsq-auglag-composite) with the
+equilibrium fixed at fb14_Bk6, hinges on z = 0; then one basis-14 free-boundary shell with the polished coils
+(`res/fb14_Bk6p/`) and the usual checks.
+* Polish run 1 (bounds as given): length exactly at the bound, but curvature 0.07% over in the dense check (the
+  constraint rows sit on a coarser node grid). Run 2 (`res/polish_Bk6/run2/`, from run 1, bounds backed off to
+  L x 0.9999 and kappa x 0.995 for enforcement, `bounds_backoff.json`), 17 min: **feasible against the original
+  bounds**: L 3.94081 (0.9999), kappa 10.1295 (0.9957), d_cc 0.0452 (1.13), d_pc 0.1768 (1.20); hinges on z = 0,
+  removable. B.n on the fixed fb14_Bk6 boundary 8.0e-5 -> 1.4e-4. Free-boundary shell with these coils:
+  `res/fb14_Bk6p/` (started 03:48).
+* **B final = k6 with polished coils** (`res/polish_Bk6/run2/result.h5` + `res/fb14_Bk6p/eq_fb.h5`; one basis-14
+  free-boundary shell of 20 iterations, 85 min): B.n rms **8.7e-6**, coils **FEASIBLE** (L 1.000 [0.9999], kappa 0.996,
+  d_cc 1.130, d_pc 1.196). Traced iota within 3.3e-4 of the equilibrium, axis 0.12 mm from the traced one; interior
+  field error 0.003-0.006% (rho <= 0.9). A 7.260; iota 0.237 -> 0.218.
+  QS L2 0.228 / 0.275 / 0.488 / 0.901 %, largest mode 0.115 / 0.141 / 0.224 / 0.436 % (polish cost <= 2%);
+  eps_eff 6.41e-4 / 6.86e-4 / 1.36e-3; Gamma_c (Nemov, hi) 1.33e-2 / 1.04e-2 / 2.21e-2, (Velasco, hi) 2.7e-3 / 6.1e-3 / 1.76e-2.
+
+## Status 2026-10-15 05:20: step 1 (settle each design) DONE for both
+
+| | D | B (k6, polished) |
+|---|---|---|
+| files | coils `../ss/nc5lh/ss/coils_k6.h5`, eq `../ss/cloud_runs/fb14_D/fb/eq_fb.h5` | coils `res/polish_Bk6/run2/result.h5`, eq `res/fb14_Bk6p/eq_fb.h5` |
+| coils | 5/hp, hinges within 0.2 a of z = 0, tilt <= 2 deg, feasible | 4/hp, every hinge on z = 0, feasible |
+| B.n rms | 1.6e-5 | 8.7e-6 |
+| A | 7.56 | 7.26 |
+| iota (traced) | 0.399 -> 0.350 | 0.237 -> 0.218 |
+| QS L2 % rho .25/.5/.75/1 | 0.240 / 0.213 / 0.354 / 0.777 | 0.228 / 0.275 / 0.488 / 0.901 |
+| largest mode % | 0.175 / 0.091 / 0.188 / 0.319 | 0.115 / 0.141 / 0.224 / 0.436 |
+| eps_eff .25/.5/.75 | 2.7e-4 / 2.0e-4 / 7.2e-4 | 6.4e-4 / 6.9e-4 / 1.4e-3 |
+| Gamma_c Nemov / Velasco (rho .5) | 7.6e-3 / 3.5e-3 | 1.0e-2 / 6.1e-3 |
+| islands | 4/11 at rho ~0.815, ~1.7 mm | 2/9 at rho ~0.88, ~2 mm |
+
+Next: step 2 (freeze the packages: data, drivers, REPRODUCE.md, METRICS.md, make_figures.py), then the precise_QA
+discussion.
