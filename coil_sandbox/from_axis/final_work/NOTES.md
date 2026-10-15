@@ -189,3 +189,21 @@ stage + free-boundary score) started from precise_QA with z = 0 coils, 4 coils/h
   traced line at rho 0.84 has error 6e-5 and rho spread 1.8e-3: probably the 2/9 chain; dense trace to do).
   QS (literature) L2 0.227 / 0.271 / 0.480 / 0.893 %, largest mode 0.117 / 0.137 / 0.221 / 0.434 %,
   eps_eff 6.27e-4 / 6.24e-4 / 1.31e-3. Coils: unchanged (length 1.1 mm over its bound).
+* **B k5, shells 8 + 14 of 20 iterations** (`res/fb14_Bk5/eq_fb.h5`, from the Modal shell-4 state): B.n 1.87e-3 ->
+  8.7e-4 (k=8) -> **6.6e-6** (k=14). Traced iota within 1e-4 everywhere, axis 0.010 mm off; interior field error
+  0.0005-0.003%. A 7.223, a 0.1204; iota 0.240 -> 0.220. QS L2 0.246 / 0.279 / 0.502 / 0.961 %, largest mode
+  0.148 / 0.142 / 0.244 / 0.469 %, eps_eff 6.52e-4 / 6.20e-4 / 1.52e-3. Coils: L 3.94186 vs 3.9412 (0.66 mm over).
+
+**k5 vs k6 on equal footing: k6 is better by 4-8% in QS at every radius (largest mode 3-21%) and level or better in
+eps_eff; A 7.26 vs 7.22 (k6's plasma 0.5% smaller in a).** The earlier worry (k6's edge gain did not survive the
+re-solve) came from the basis-12 interiors. Both coil sets are slightly over the length bound (k6 1.1 mm, k5 0.66 mm).
+**Recommendation: B = k6.**
+
+**B resonances** (`iota/fb14_Bk{6,5}_dense/`, 80 lines x 2000 periods, ~7 min each). The only low-order rational
+inside is 2/9 (0.2222; n = 2 = NFP).
+* k6: 2/9 crossed between the lines at rho 0.861 (iota 0.22278) and 0.901 (0.22151). The line between them
+  (rho 0.889) has half-vs-half error 1.5e-4 and spreads over 0.0205 in rho; the lines on either side spread
+  0.012 against a baseline of 0.005-0.008 further away. **2/9 island chain at rho ~0.88-0.89, full width ~0.015-0.02
+  (~2 mm at a = 0.121); bound 0.04.**
+* k5: 2/9 crossed between rho 0.934 and 0.961 (closer to the edge); no traced line falls inside the island, but the
+  neighbours distort the same way (spread 0.021 at rho 0.934). **Island at rho ~0.95, similar size; bound 0.027.**
