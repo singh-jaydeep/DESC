@@ -118,3 +118,28 @@ Converged to 1-4% (vacuum residual 1e-4 - 1e-3 at basis 16). **These are D's num
 * B: NOT settled. Needs a free-boundary shell at basis 14 (as D got) for k=6 and for k=5, then the k5/k6 decision and
   the coil length polish. Laptop estimate several hours per state; use short repeated shells (maxiter ~20).
 * All quoted QS must come from qs_metrics + qs_booz_fix (literature convention); fold the fix into qs_metrics.
+
+## 3a. Gamma_c (energetic-particle proxy) for D, B and the references (`res/gamma_c.json`, `../ss/gamma_c.py`)
+
+DESC "Gamma_c" (Nemov et al. 2008) and "Gamma_c Velasco" (Velasco et al. 2021), Bounce2D, two resolutions
+(lo X=Y=32, Y_B 128, 20 transits, 45 pitches; hi X 48, Y 64, Y_B 256, 40 transits, 90 pitches); values below = hi.
+Needs XLA_PYTHON_CLIENT_MEM_FRACTION=0.5 on the laptop (cuFFT plan memory) for the Velasco variant.
+
+| rho .25 / .5 / .75 | Gamma_c (Nemov) | Gamma_c (Velasco) | eps_eff |
+|---|---|---|---|
+| **D fb14** | 7.5e-3 / 7.6e-3 / 1.46e-2 | 8.8e-4 / 3.5e-3 / 1.20e-2 | 2.6e-4 / 2.2e-4 / 7.2e-4 |
+| D fb14 boundary, basis 16 | 7.1e-3 / 7.9e-3 / 1.53e-2 | 7.3e-4 / 3.2e-3 / 1.28e-2 | 2.5e-4 / 2.2e-4 / 7.1e-4 |
+| B basis 16 (old boundary) | 1.09e-2 / 1.32e-2 / 1.83e-2 | 1.6e-3 / 7.4e-3 / 1.80e-2 | 6.0e-4 / 6.5e-4 / 1.3e-3 |
+| B basis 12 (quoted state) | 1.37e-2 / 1.49e-2 / 2.53e-2 | 2.5e-3 / 9.6e-3 / 2.42e-2 | 6.9e-4 / 7.4e-4 / 1.3e-3 |
+| precise_QA | 4e-5 / 5e-6 / 3e-6 | 6e-7 / 2e-6 / 3e-6 | 4.5e-7 / 3.2e-7 / 1.2e-6 |
+| reactor_QA | 3.1e-3 / 3.4e-3 / 1.70e-2 | 2.2e-3 / 2.0e-3 / 8.6e-3 | 2.2e-4 / 8.0e-4 / 2.9e-3 |
+| NCSX | 1.74e-2 / 3.24e-2 / 2.36e-2 | 4.7e-3 / 3.0e-3 / 1.09e-2 | 2.0e-3 / 1.9e-3 / 3.7e-3 |
+| ARIES-CS | 1.64e-2 / 1.52e-2 / 1.45e-2 | 4.5e-3 / 4.1e-3 / 5.2e-3 | 5.9e-4 / 2.1e-4 / 8.4e-4 |
+
+lo -> hi changes: D 5-10% (Nemov), up to 20% in the core (Velasco, the smallest values); B up to 25-30% at mid
+radius (Velasco); references mostly < 15%. Treat Gamma_c as +-20%.
+Reading: D beats B by 1.3-2x everywhere (2x on Velasco at mid radius). Against reactor_QA: Nemov 2.2x worse in the
+core/mid, 15% better at rho .75; Velasco 2.5x better in the core, 1.7x worse at mid radius, 1.4x worse at .75.
+D is ~2x better than NCSX/ARIES-CS on Nemov in the core and mid radius; on Velasco better in the core, level at mid
+radius, 2.3x worse than ARIES-CS at rho .75. Not computed: rho > 0.75 (alpha losses are dominated by the outer
+region) and finite beta (vacuum states only).
