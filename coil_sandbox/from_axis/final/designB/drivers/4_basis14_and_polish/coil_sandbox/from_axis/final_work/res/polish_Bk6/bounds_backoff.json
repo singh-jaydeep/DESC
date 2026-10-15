@@ -1,0 +1,11 @@
+{
+ "_note": "fa_qa2_a0167 with arc backoffs for enforcement only (L x 0.9999, kappa x 0.995; CLAUDE.md 'Backoffs'); judge against fa_qa2_a0167.json",
+ "scale": "absolute",
+ "L": 3.940806,
+ "kappa": 10.122784431137724,
+ "kappa_MS": null,
+ "d_cc": 0.04,
+ "d_pc": 0.147795,
+ "convex_excess": null,
+ "planar_max": null
+}

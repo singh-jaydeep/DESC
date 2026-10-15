@@ -1,0 +1,10 @@
+{
+ "name": "Design B",
+ "one_line": "QA, NFP 2, 4 two-face hinged coils per half period, every hinge on z = 0 (one demountable joint plane); vacuum.",
+ "helicity": [
+  1,
+  0
+ ],
+ "coil_class": "Each coil: two planar arc faces (PiecewisePlanarArcCoil, B = 2) joined at two hinges, every hinge held exactly at z = 0 (`--fix-hinge-z 0`).",
+ "islands": "2/9 chain (9 islands) at rho ~0.87-0.88. Polished coils (this package's trace): no line falls inside it; the lines bracketing 2/9 sit at rho 0.861 and 0.888 (a gap of 0.027 against the 0.013 spacing elsewhere) with raised half-vs-half error (6e-6, 7e-5) and rho spread (4-6e-3), so full width <= ~0.027 in rho (3.3 mm). Unpolished k6 coils (same trace settings): a line inside the chain, width ~0.015-0.02 in rho (~2 mm). 4/17 not resolved (narrower than the line spacing)."
+}

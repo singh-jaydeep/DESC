@@ -1,0 +1,7 @@
+{
+ "name": "Design D",
+ "one_line": "QA, NFP 2, 5 two-face hinged coils per half period, hinges within +-0.2a of z = 0 (tilt <= 2 deg); vacuum.",
+ "helicity": [1, 0],
+ "coil_class": "Each coil: two planar arc faces (PiecewisePlanarArcCoil, B = 2) joined at two hinges; hinge heights bounded to |z| <= 0.0334 m (0.2 a of the near-axis surface) and hinge-line tilt <= 2 deg (HingeBand).",
+ "islands": "4/11 chain at rho ~0.815, full width ~0.014 in rho (~1.7 mm), upper bound 0.021 (2.6 mm); 3/8 and 6/17 narrower than ~0.013 in rho (not resolved); 2/5 is not in the plasma (iota < 0.4 everywhere)."
+}
