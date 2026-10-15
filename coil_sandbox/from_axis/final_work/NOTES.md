@@ -143,3 +143,16 @@ core/mid, 15% better at rho .75; Velasco 2.5x better in the core, 1.7x worse at 
 D is ~2x better than NCSX/ARIES-CS on Nemov in the core and mid radius; on Velasco better in the core, level at mid
 radius, 2.3x worse than ARIES-CS at rho .75. Not computed: rho > 0.75 (alpha losses are dominated by the outer
 region) and finite beta (vacuum states only).
+
+## 1f. D: resonances (`iota/D_fb14_dense/`, 80 lines x 2000 field periods, 4.2 min; `iota_vs_start.png`)
+
+Traced iota 0.3992 (axis) -> 0.3494 (rho 1), monotonic: **2/5 is not in the plasma** (iota never reaches 0.4).
+Rationals n/m with n a multiple of NFP = 2 inside: 3/8 (= 6/16, 0.375, rho ~0.65), 4/11 (0.3636, rho ~0.815),
+6/17 (0.3529, rho ~0.95).
+* **4/11: an island chain.** Two adjacent lines lock to iota 0.36364 (half-vs-half error 3e-4 vs < 1e-7 elsewhere)
+  and wander over rho 0.804-0.825 (0.021), against 0.007 for neighbouring non-island lines (the surfaces' own
+  wobble in the equilibrium's rho). **Full width ~0.014 in rho (~1.7 mm at a = 0.123), upper bound 0.021 (2.6 mm)**,
+  between the non-island lines at s 0.801 and 0.841.
+* 3/8 and 6/17: no island resolved at this line spacing (~0.013 in rho; lines next to them show error ~1e-6 and
+  baseline wobble). Bound: narrower than ~0.013 in rho.
+* The first equilibrium-free check of D's interior: every other line is a clean invariant circle to 1e-7 or better.

@@ -13,7 +13,8 @@ and the equilibria it is compared with mapped onto the same traced lines.
 The coil current scale does not move field lines, so it is not touched.
 
 Usage (from ss/): python iota_trace.py NAME COILS.h5 OUTDIR EQ1.h5[=LABEL] [EQ2.h5[=LABEL] ...]
-env: NLINES (30), NPER (500), SPP (16)"""
+env: NLINES (30), NPER (500), SPP (16), SMIN (0.03), SMAX (1.08): starts at s = SMIN..SMAX of the way from the traced
+axis to the first equilibrium's outboard boundary"""
 import json
 import os
 import sys
@@ -92,7 +93,7 @@ ra, za = ra[:-1, 0], za[:-1, 0]  # axis at phi = k TP / SPP, periodic in k mod S
 # ---- 2. lines -------------------------------------------------------------------------------------------------------
 db = eq0.compute(["R"], grid=LinearGrid(rho=np.array([1.0]), theta=np.array([0.0]), zeta=np.array([0.0]), NFP=NFP))
 Rb = float(db["R"][0])
-s = np.linspace(0.03, 1.08, NLINES)
+s = np.linspace(float(os.environ.get("SMIN", 0.03)), float(os.environ.get("SMAX", 1.08)), NLINES)
 R0 = x[0] + s * (Rb - x[0])
 Z0 = np.full_like(R0, x[1])
 phis = np.arange(NPER * SPP + 1) * TP / SPP
@@ -196,4 +197,22 @@ axs[1].set_title("does each traced surface coincide with an equilibrium surface?
 axs[1].legend(fontsize=7)
 fig.tight_layout()
 fig.savefig(f"{out}/iota_trace.png", dpi=140)
+# iota vs start position (islands: plateaus at rationals; chaos: large half-vs-half error)
+fig, ax = plt.subplots(figsize=(8, 5))
+ok = [r_ for r_ in rows if "iota" in r_]
+ax.plot([r_["s"] for r_ in ok], [abs(r_["iota"]) for r_ in ok], "k.-", ms=3)
+bad = [r_ for r_ in ok if r_["iota_err"] > 1e-4]
+ax.plot([r_["s"] for r_ in bad], [abs(r_["iota"]) for r_ in bad], "ro", mfc="none", label="half-vs-half error > 1e-4")
+lo_, hi_ = ax.get_ylim()
+for q in range(1, 41):
+    for p_ in range(1, q):
+        if p_ % NFP == 0 and lo_ <= p_ / q <= hi_ and np.gcd(p_ // NFP, q) >= 1:
+            ax.axhline(p_ / q, color="C0", lw=0.5, ls=":")
+            ax.text(ax.get_xlim()[1], p_ / q, f" {p_}/{q}", va="center", fontsize=6, color="C0")
+ax.set_xlabel("start: fraction of the way from the traced axis to the outboard boundary")
+ax.set_ylabel("|iota| (traced)")
+ax.set_title(f"{name}: traced iota; dotted = rationals n/m with n a multiple of NFP, m <= 40")
+ax.legend(fontsize=7)
+fig.tight_layout()
+fig.savefig(f"{out}/iota_vs_start.png", dpi=140)
 say("done")
