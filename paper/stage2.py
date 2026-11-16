@@ -48,11 +48,13 @@ ap.add_argument("--eval-mn", default="25,25", help="QuadraticFlux eval grid M,N"
 ap.add_argument(
     "--curv-grid",
     choices=["linear", "arc"],
-    default="linear",
+    default="arc",
     help="curvature nodes: LinearGrid(N=curv-n) (as the poster runs) or "
     "coil_curvature_grid with curv-n nodes per arc",
 )
-ap.add_argument("--curv-n", type=int, default=300)
+ap.add_argument(
+    "--curv-n", type=int, default=1000, help="curvature nodes per arc (or N)"
+)
 ap.add_argument("--row-n", type=int, default=256, help="cc rows: ~2 N + 1 nodes/coil")
 ap.add_argument("--cc-k", type=int, default=10000, help="cc row slots")
 ap.add_argument("--cc-sel", type=float, default=0.1, help="cc select distance (m)")
