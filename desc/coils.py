@@ -4366,7 +4366,10 @@ def coil_curvature_grid(coilset, n=1000):
         return LinearGrid(N=n)
     edges = np.append(corners, corners[0] + 2 * np.pi)
     t = (np.arange(n) + 0.5) / n
-    s = (edges[:-1, None] + np.diff(edges)[:, None] * t[None]).ravel()
+    width = np.diff(edges)
+    s = (edges[:-1, None] + width[:, None] * t[None]).ravel()
     nodes = np.zeros((s.size, 3))
     nodes[:, 2] = np.mod(s, 2 * np.pi)
-    return Grid(nodes, sort=False, jitable=False)
+    spacing = np.ones((s.size, 3))
+    spacing[:, 2] = np.repeat(width / n, n)  # midpoint rule weights
+    return Grid(nodes, spacing=spacing, sort=False, jitable=False)

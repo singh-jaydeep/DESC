@@ -344,6 +344,13 @@ print(
 )
 for c in nonlinear:
     print(f"  {c.name:32s} rows {getattr(c, 'num_row_ids', c.dim_f)}", flush=True)
+if float(np.max(pc._constants["gap"])) > 0.05 * P["dpc"]:
+    print(
+        "WARNING: the plasma-coil gap exceeds 5% of d_pc, so the constraint is that "
+        "much conservative; refine --pc-plasma-mn (the gap goes as cell size^2 x "
+        "surface curvature)",
+        flush=True,
+    )
 info.update(
     cc_gap=float(np.max(cc._constants["gap"])),
     pc_gap=float(np.max(pc._constants["gap"])),

@@ -248,3 +248,11 @@ def test_coil_curvature_grid():
     np.testing.assert_array_equal(np.bincount(arc.astype(int)), [50] * 4)
     hinge_dist = np.abs(s[:, None] - np.pi / 2 * np.arange(5)[None]).min(axis=1)
     assert hinge_dist.min() > 0.9 * (np.pi / 2) / 100  # half a spacing
+    np.testing.assert_allclose(np.sum(grid.spacing[:, 2]), 2 * np.pi)
+    # usable as an objective grid: the constraint reads its node values
+    from desc.objectives import CoilCurvature
+
+    obj = CoilCurvature(CoilSet(coil), grid=grid, normalize=False)
+    obj.build(verbose=0)
+    f = obj.compute(CoilSet(coil).params_dict)
+    np.testing.assert_allclose(f, coil.compute("|curvature|", grid=grid)["|curvature|"])
