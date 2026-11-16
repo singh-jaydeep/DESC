@@ -1106,6 +1106,24 @@ class TestObjectiveFunction:
         test(mixed_coils)
         test(nested_coils, grid=grid)
 
+        # a non-LinearGrid quadrature is used as given, not replaced by a default grid
+        xyz = FourierXYZCoil(
+            1e6, X_n=[0, 10, 2], Y_n=[1, 0, 0], Z_n=[-2, 0, 0], modes=[-1, 0, 1]
+        )
+        x, w = np.polynomial.legendre.leggauss(3)  # deliberately coarse
+        z = np.zeros(3)
+        grid = Grid(
+            np.column_stack([z, z, np.pi * (x + 1)]),
+            spacing=np.column_stack([z + 1, z + 1, np.pi * w]),
+            weights=np.pi * w,
+        )
+        on_grid = xyz.compute("length", grid=grid, override_grid=False)["length"]
+        dense = xyz.compute("length", grid=LinearGrid(N=200))["length"]
+        assert abs(on_grid - dense) > 1e-2 * dense  # the two are distinguishable
+        obj = CoilLength(xyz, grid=grid)
+        obj.build()
+        np.testing.assert_allclose(obj.compute(params=xyz.params_dict), on_grid)
+
     @pytest.mark.unit
     def test_coil_current_length(self):
         """Tests coil current length."""

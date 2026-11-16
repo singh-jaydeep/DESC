@@ -298,6 +298,11 @@ class _CoilObjective(_Objective):
             params=params,
             transforms=constants["transforms"],
             grid=self._grid,
+            # evaluate 0d quantities (length) on the grid this objective was built on.
+            # Otherwise Curve.compute recomputes them on its own LinearGrid whenever the
+            # given grid is not a fine enough LinearGrid, discarding e.g. a composite
+            # Gauss-Legendre grid aligned to the corners of a C0 coil.
+            override_grid=False,
         )
         return data
 
