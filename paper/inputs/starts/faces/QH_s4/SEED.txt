@@ -1,0 +1,1 @@
+circles = QH_s0/planar1.h5 (copied); hinge rotation f = 0.5 of a face (--phase f/B)

@@ -1,0 +1,11 @@
+{
+  "_note": "from_axis QA nfp2 Phase 1 bounds (Gil set scaled by the NAE a = 0.167, as run_na2.py --dpc/--kmax/--Lmax/--dcc), ABSOLUTE",
+  "scale": "absolute",
+  "L": 3.9412,
+  "kappa": 10.173652694610778,
+  "kappa_MS": null,
+  "d_cc": 0.04,
+  "d_pc": 0.147795,
+  "convex_excess": null,
+  "planar_max": null
+}

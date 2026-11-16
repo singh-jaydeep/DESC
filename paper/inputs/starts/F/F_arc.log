@@ -1,0 +1,15 @@
+DESC /home/singh/Documents/DESC2-poster/desc
+DEVICE requested=cpu obtained=cpu (1x cpu)
+equilibrium from_axis/final/designF/data/eq.h5 (h5): NFP 2 sym True M 14 N 14
+bounds (reactor, a = 0.12217 m, f = 0.07186): L 2.3  Ltot -  kappa 13.92  kms 19.36  convex -  planar -  dcc 0.05749  dpc 0.1078
+  (5 unique coils in paper_min/starts/F_planar_r3.4.h5; bounds for them: L 2.3  Ltot -  kappa 13.92  kms 19.36  convex -  planar -  dcc 0.05749  dpc 0.1078)
+/home/singh/Documents/DESC2-poster/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2-poster/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+arcs B=2 M=5 chord at 90.0 deg from vertical, fit to paper_min/starts/F_planar_r3.4.h5: 20 coils (expected 20), 5 unique
+  fit max deviation from the source coil: 21.9 mm, 21.9 mm, 21.9 mm, 21.9 mm, 21.9 mm
+  L 2.6702 m  kappa 12.145  kappa_MS 24.820  d_cc 129.2 mm  d_pc 188.6 mm  convexity excess 4.20e+00  corner 32 deg  linked 0
+  B.n (vacuum): <|B.n|>/<|B|> 7.173e-02  <|B.n|/|B|> 7.063e-02  max|B.n| 0.200 T
+  value / bound: L 1.161  kappa 0.873  kMS 1.282  d_cc 2.248  d_pc 1.749  -> FAILS L,kMS
+wrote paper_min/starts/F_arc_r3.4_mixed.h5

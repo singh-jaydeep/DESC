@@ -1,0 +1,34 @@
+DESC /home/singh/Documents/DESC2-poster/desc
+DEVICE requested=cpu obtained=cpu (1x cpu)
+/home/singh/Documents/DESC2-poster/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2-poster/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+coil 0: phi   9.0  chord R [0.628, 1.535]  up 0.479 m  down 0.664 m  chord z +0.000 m  hinge z spread 0.0e+00  fit dev 12.17 mm  in-plane gap 0.278 m
+/home/singh/Documents/DESC2-poster/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2-poster/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+coil 1: phi  27.0  chord R [0.494, 1.495]  up 0.396 m  down 0.741 m  chord z +0.000 m  hinge z spread 0.0e+00  fit dev 13.57 mm  in-plane gap 0.279 m
+/home/singh/Documents/DESC2-poster/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2-poster/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+coil 2: phi  45.0  chord R [0.369, 1.430]  up 0.328 m  down 0.672 m  chord z +0.000 m  hinge z spread 0.0e+00  fit dev 12.48 mm  in-plane gap 0.279 m
+/home/singh/Documents/DESC2-poster/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2-poster/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+coil 3: phi  63.0  chord R [0.286, 1.369]  up 0.321 m  down 0.549 m  chord z +0.000 m  hinge z spread 0.0e+00  fit dev 11.73 mm  in-plane gap 0.278 m
+/home/singh/Documents/DESC2-poster/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2-poster/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+coil 4: phi  81.0  chord R [0.245, 1.338]  up 0.358 m  down 0.429 m  chord z +0.000 m  hinge z spread 0.0e+00  fit dev 11.16 mm  in-plane gap 0.280 m
+/home/singh/Documents/DESC2-poster/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+/home/singh/Documents/DESC2-poster/desc/utils.py:590: UserWarning: Unequal number of field periods for grid 1 and basis 2.
+  warnings.warn(msg, err)
+  L 3.2438 m  kappa 9.227  kappa_MS 5.619  d_cc 76.7 mm  d_pc 247.5 mm  linked 0
+  B.n: <|B.n|>/<|B|> 1.335e-01   value / bound: L 0.823  kappa 0.907  d_cc 1.916  d_pc 1.675  -> FEASIBLE
+wrote paper_min/starts/F_z0_c25_p07_mixed.h5

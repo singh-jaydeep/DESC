@@ -1,0 +1,12 @@
+{
+  "_note": "RR-02 bounds for desc.examples precise_QH, 4 coils per half period: sandbox default paper_bounds (Gil et al. PRE 114, 025202, Table III, reactor a = 1.7 m, scaled by a/1.7 with a = DESC's 0.124334 m; half-period length 160 m x f split over 4 coils), written out ABSOLUTE",
+  "scale": "absolute",
+  "L": 2.9255111576633253,
+  "L_total": null,
+  "kappa": 13.672824284132604,
+  "kappa_MS": 18.694612390476625,
+  "d_cc": 0.05851022315326651,
+  "d_pc": 0.1097066684123747,
+  "convex_excess": null,
+  "planar_max": null
+}

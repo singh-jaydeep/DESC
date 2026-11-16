@@ -1,0 +1,323 @@
+{
+ "equilibrium": "precise_QH",
+ "nc": 4,
+ "bounds_true": {
+  "L": 2.9255111576633253,
+  "kappa": 13.672824284132604,
+  "kms": 18.694612390476625,
+  "dcc": 0.05851022315326651,
+  "dpc": 0.1097066684123747
+ },
+ "bounds_source": "Gil et al. PRE 114 025202 (2026) Table III stated set, scaled to DESC precise_QH (a=1.7 m reactor)",
+ "starts": [
+  {
+   "rep": "arcB2",
+   "file": "start_arcB2.h5",
+   "source": "qh_feas_al/b2blg_m25_result.h5",
+   "quantities": {
+    "length": 2.1637940190782676,
+    "kappa": 6.870597033212668,
+    "kappa_MS": 7.338470255022086,
+    "d_cc": 0.09351047932622722,
+    "d_pc": 0.13962271793448974,
+    "max_corner_deg": 79.94189757715922,
+    "normalized_BdotN": 0.11193478453551847
+   },
+   "margins": {
+    "length": 0.7396293852478556,
+    "kappa": 0.502500207011805,
+    "kappa_MS": 0.39254465948491324,
+    "d_cc": 1.598190440690649,
+    "d_pc": 1.2726912589275254
+   },
+   "n_linked_pairs": 0,
+   "verdict": "FEASIBLE",
+   "provenance": {
+    "solve_key": "b2blg_m25",
+    "margin": 0.25,
+    "solver": {
+     "wall_s": 134.4523150920868,
+     "message": "User supplied callback triggered termination",
+     "success": false,
+     "nit": 40,
+     "n_outer": 1,
+     "constr_violation": 0.0,
+     "mu_mean_final": 10.0,
+     "outer_reasons": {
+      "gtolk": 1
+     },
+     "first_dense_feasible_check": 30,
+     "stopped_early": true
+    },
+    "start_title": "arcB2, M=3, arc-bulge 0"
+   },
+   "params_sha256": "a442a626f1a2b991593b39fe1602f2fef0e81d62374df45385cd008cf3748b15",
+   "file_sha256": "04743515394107d21f8b9501dc2dd80d2c39c76f9735ea40aaafe5d7993d87ac"
+  },
+  {
+   "rep": "arcB3",
+   "file": "start_arcB3.h5",
+   "source": "qh_feas_al/b3blg_m25_result.h5",
+   "quantities": {
+    "length": 1.9709279416515788,
+    "kappa": 10.242562663040822,
+    "kappa_MS": 12.085325426115036,
+    "d_cc": 0.10652355718816031,
+    "d_pc": 0.13971738635066389,
+    "max_corner_deg": 64.72655779120885,
+    "normalized_BdotN": 0.09753853006726136
+   },
+   "margins": {
+    "length": 0.6737037855722299,
+    "kappa": 0.7491182838447926,
+    "kappa_MS": 0.6464603370044474,
+    "d_cc": 1.820597349443083,
+    "d_pc": 1.273554182007263
+   },
+   "n_linked_pairs": 0,
+   "verdict": "FEASIBLE",
+   "provenance": {
+    "solve_key": "b3blg_m25",
+    "margin": 0.25,
+    "solver": {
+     "wall_s": 108.76416087150574,
+     "message": "User supplied callback triggered termination",
+     "success": false,
+     "nit": 30,
+     "n_outer": 1,
+     "constr_violation": 0.0002649098628036972,
+     "mu_mean_final": 10.0,
+     "outer_reasons": {
+      "gtolk": 1
+     },
+     "first_dense_feasible_check": 20,
+     "stopped_early": true
+    },
+    "start_title": "arcB3, M=3, arc-bulge 0, hinge phase 0.5"
+   },
+   "params_sha256": "d74d6c6f0a5566dfd77bd1efb93e7da675fb176a5523e4531ead946868cee007",
+   "file_sha256": "ce9e0a7528671d59488bec0fcaa84fc6cb564d52e5ac3e6c6ab69a7a05b62094"
+  },
+  {
+   "rep": "arcB5",
+   "file": "start_arcB5.h5",
+   "source": "qh_feas_al/b5fit_m25_result.h5",
+   "quantities": {
+    "length": 1.9361605064073228,
+    "kappa": 10.090477243384827,
+    "kappa_MS": 13.893101323184746,
+    "d_cc": 0.11568848595051942,
+    "d_pc": 0.14933577667526535,
+    "max_corner_deg": 22.878412202645844,
+    "normalized_BdotN": 0.0869626568411004
+   },
+   "margins": {
+    "length": 0.661819559749613,
+    "kappa": 0.7379950940417546,
+    "kappa_MS": 0.7431607049666429,
+    "d_cc": 1.9772354251234943,
+    "d_pc": 1.3612278892102476
+   },
+   "n_linked_pairs": 0,
+   "verdict": "FEASIBLE",
+   "provenance": {
+    "solve_key": "b5fit_m25",
+    "margin": 0.25,
+    "solver": {
+     "wall_s": 86.18272638320923,
+     "message": "User supplied callback triggered termination",
+     "success": false,
+     "nit": 20,
+     "n_outer": 8,
+     "constr_violation": 0.0,
+     "mu_mean_final": 10.0,
+     "outer_reasons": {
+      "gtolk": 7,
+      "stall": 1
+     },
+     "first_dense_feasible_check": 10,
+     "stopped_early": true
+    },
+    "start_title": "arcB5, M=3, fitted modes"
+   },
+   "params_sha256": "8f94d7d0cf7eb3da72914eafebf3185d1ba745778914cb82d8c796f119835bf8",
+   "file_sha256": "6dad080e3b2078325fd32ed7792fdfd080350058b0dd35004cefb23ba22a8819"
+  },
+  {
+   "rep": "arcB7",
+   "file": "start_arcB7.h5",
+   "source": "qh_feas_al/b7fit_m25_result.h5",
+   "quantities": {
+    "length": 1.9354718850215336,
+    "kappa": 8.959754334819499,
+    "kappa_MS": 12.874827130197515,
+    "d_cc": 0.11536148609417236,
+    "d_pc": 0.14896798810239878,
+    "max_corner_deg": 15.746759453333365,
+    "normalized_BdotN": 0.08674123911569515
+   },
+   "margins": {
+    "length": 0.6615841747694583,
+    "kappa": 0.6552965319109196,
+    "kappa_MS": 0.6886918466817844,
+    "d_cc": 1.9716466606525318,
+    "d_pc": 1.3578754168565699
+   },
+   "n_linked_pairs": 0,
+   "verdict": "FEASIBLE",
+   "provenance": {
+    "solve_key": "b7fit_m25",
+    "margin": 0.25,
+    "solver": {
+     "wall_s": 21.035401344299316,
+     "message": "`gtol` condition satisfied.",
+     "success": true,
+     "nit": 0,
+     "n_outer": 0,
+     "constr_violation": 0.0,
+     "mu_mean_final": 10.0,
+     "outer_reasons": {},
+     "first_dense_feasible_check": null,
+     "stopped_early": false
+    },
+    "start_title": "arcB7, M=3, fitted modes"
+   },
+   "params_sha256": "6caced79b612d52ac8e1b651a0feb6566e4e0f3fa5648e2c7cb5326a6b8d6c2b",
+   "file_sha256": "6ecee4ba42fefd8c5b181659bd171115835d97cda6dec901100e001dc9bde980"
+  },
+  {
+   "rep": "planarN7",
+   "file": "start_planarN7.h5",
+   "source": "qh_feas_al/planarN7_m25_result.h5",
+   "quantities": {
+    "length": 1.9391004398167015,
+    "kappa": 6.302044035484695,
+    "kappa_MS": 13.880756947688631,
+    "d_cc": 0.11632233337072356,
+    "d_pc": 0.14940254284986537,
+    "max_corner_deg": 0.0,
+    "normalized_BdotN": 0.08660597511078096
+   },
+   "margins": {
+    "length": 0.6628244895724502,
+    "kappa": 0.4609175035474021,
+    "kappa_MS": 0.7425003876924318,
+    "d_cc": 1.9880685306227466,
+    "d_pc": 1.3618364773258675
+   },
+   "n_linked_pairs": 0,
+   "verdict": "FEASIBLE",
+   "provenance": {
+    "solve_key": "planarN7_m25",
+    "margin": 0.25,
+    "solver": {
+     "wall_s": 81.34843111038208,
+     "message": "User supplied callback triggered termination",
+     "success": false,
+     "nit": 20,
+     "n_outer": 15,
+     "constr_violation": 6.557375651361497e-07,
+     "mu_mean_final": 10.0,
+     "outer_reasons": {
+      "gtolk": 6,
+      "stall": 9
+     },
+     "first_dense_feasible_check": 10,
+     "stopped_early": true
+    },
+    "start_title": "planarN7, shaped parent"
+   },
+   "params_sha256": "ed65a1cea48b9ac5781366cd5c1efa0a1be122e0adda2f15f9b86cd08ae73fbd",
+   "file_sha256": "58dcd3dd10153e07a6ba993b22e3edc262e4abb3a3a2aa48fe30cc2d10e71167"
+  },
+  {
+   "rep": "xyzN4",
+   "file": "start_xyzN4.h5",
+   "source": "qh_feas_al/xyzN4_m25_result.h5",
+   "quantities": {
+    "length": 1.9465489481690452,
+    "kappa": 6.049653009712722,
+    "kappa_MS": 13.88073510827396,
+    "d_cc": 0.11638542181046253,
+    "d_pc": 0.14916651433981445,
+    "max_corner_deg": 0.0,
+    "normalized_BdotN": 0.08968645033036468
+   },
+   "margins": {
+    "length": 0.6653705432194624,
+    "kappa": 0.4424581844976522,
+    "kappa_MS": 0.7424992194727214,
+    "d_cc": 1.9891467770613855,
+    "d_pc": 1.3596850264298863
+   },
+   "n_linked_pairs": 0,
+   "verdict": "FEASIBLE",
+   "provenance": {
+    "solve_key": "xyzN4_m25",
+    "margin": 0.25,
+    "solver": {
+     "wall_s": 78.94488501548767,
+     "message": "User supplied callback triggered termination",
+     "success": false,
+     "nit": 20,
+     "n_outer": 13,
+     "constr_violation": 0.0,
+     "mu_mean_final": 10.0,
+     "outer_reasons": {
+      "gtolk": 8,
+      "stall": 5
+     },
+     "first_dense_feasible_check": 10,
+     "stopped_early": true
+    },
+    "start_title": "xyzN4, parent converted"
+   },
+   "params_sha256": "440da50152cef2e55456a9a5c42ad3a663cd87b5c38469cf48026d7e56aee1a3",
+   "file_sha256": "49da8c2cff8af037e378fc8780cf521bffce8ebd4d193addffe45eb688bab30f"
+  },
+  {
+   "rep": "xyzN6",
+   "file": "start_xyzN6.h5",
+   "source": "qh_feas_al/xyzN6_m25_result.h5",
+   "quantities": {
+    "length": 1.936511636694821,
+    "kappa": 6.329500506053376,
+    "kappa_MS": 13.880778508578434,
+    "d_cc": 0.11440257538338662,
+    "d_pc": 0.14878603492801687,
+    "max_corner_deg": 0.0,
+    "normalized_BdotN": 0.08705795926140183
+   },
+   "margins": {
+    "length": 0.661939583317658,
+    "kappa": 0.4629256088223704,
+    "kappa_MS": 0.7425015410134717,
+    "d_cc": 1.955257888586599,
+    "d_pc": 1.3562168743357272
+   },
+   "n_linked_pairs": 0,
+   "verdict": "FEASIBLE",
+   "provenance": {
+    "solve_key": "xyzN6_m25",
+    "margin": 0.25,
+    "solver": {
+     "wall_s": 76.80127048492432,
+     "message": "User supplied callback triggered termination",
+     "success": false,
+     "nit": 20,
+     "n_outer": 5,
+     "constr_violation": 2.606379031044881e-06,
+     "mu_mean_final": 10.0,
+     "outer_reasons": {
+      "gtolk": 5
+     },
+     "first_dense_feasible_check": 10,
+     "stopped_early": true
+    },
+    "start_title": "xyzN6, parent converted"
+   },
+   "params_sha256": "569005bf3ec799339b80d6cc99d6f360ba9932381f944db6633b9cc226bcb969",
+   "file_sha256": "2d77f36a61337b91dc06afeda9c0b1dffdfaf8ccef4b54f0f4782334422168f5"
+  }
+ ]
+}

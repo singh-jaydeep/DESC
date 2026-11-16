@@ -1,0 +1,11 @@
+{
+ "_note": "1012_QI stage 2 on Jorge 2022 one-period QI (a = 0.1250): same recipe as the near-axis fits (L 23.6 a, kappa 1.699/a, d_pc 0.885 a), d_cc 0.04, ABSOLUTE",
+ "scale": "absolute",
+ "L": 2.9495405649618376,
+ "kappa": 13.594117157198273,
+ "kappa_MS": null,
+ "d_cc": 0.04,
+ "d_pc": 0.1106077711860689,
+ "convex_excess": null,
+ "planar_max": null
+}

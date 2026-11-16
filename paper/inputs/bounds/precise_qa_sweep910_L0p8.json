@@ -1,0 +1,11 @@
+{
+  "_note": "sweep_910 bounds with the length at 0.8x (4.12268 m per coil), as used by the single-stage precise_QA arcB2 runs (run_one/single_stage --length-mult 0.8). Absolute.",
+  "scale": "absolute",
+  "L": 4.122680045959868,
+  "kappa": 11.642911762468422,
+  "kappa_MS": 5.648224762859397,
+  "d_cc": 0.08554561095366726,
+  "d_pc": 0.17109122190733453,
+  "convex_excess": null,
+  "planar_max": null
+}

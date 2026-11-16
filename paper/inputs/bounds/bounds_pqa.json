@@ -1,0 +1,11 @@
+{
+ "_note": "fa_qa2_a0167 (D/E's Gil set at a = 0.167) rescaled to precise_QA's a = 0.1718 (x1.0286); ABSOLUTE",
+ "scale": "absolute",
+ "L": 4.053960799999999,
+ "kappa": 9.890672845183902,
+ "kappa_MS": null,
+ "d_cc": 0.04114443113772454,
+ "d_pc": 0.15202353,
+ "convex_excess": null,
+ "planar_max": null
+}

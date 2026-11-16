@@ -1,0 +1,11 @@
+{
+  "_note": "The precise_QA sweep_910 bounds, copied from sweep_910_copy/initial starts/starts.json (paper_bounds there). ABSOLUTE, so single-stage runs keep them fixed while the boundary's a and R0 move. They differ from this sandbox's a/1.7 default paper_bounds (L 4.04, kappa 9.90, kappa_MS 9.79, d_cc 0.081, d_pc 0.152) and from precise_qa_planar.json.",
+  "scale": "absolute",
+  "L": 5.153350057449835,
+  "kappa": 11.642911762468422,
+  "kappa_MS": 5.648224762859397,
+  "d_cc": 0.08554561095366726,
+  "d_pc": 0.17109122190733453,
+  "convex_excess": null,
+  "planar_max": null
+}

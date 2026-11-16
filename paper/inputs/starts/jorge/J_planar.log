@@ -1,0 +1,9 @@
+DESC /home/singh/Documents/DESC2-poster/desc
+DEVICE requested=cpu obtained=cpu (1x cpu)
+equilibrium 1012_QI/cloud/jorge_vac.h5 (h5): NFP 1 sym True M 10 N 14
+bounds (absolute, a = 0.12498 m, f = 0.07352): L 2.95  Ltot -  kappa 13.59  kms -  convex -  planar -  dcc 0.04  dpc 0.1106
+planar N=8, r/a 3.6: 24 coils (expected 24), 12 unique
+  L 2.8270 m  kappa 2.223  kappa_MS 4.940  d_cc 120.7 mm  d_pc 180.3 mm  convexity excess 0.00e+00  corner 0 deg  linked 0
+  B.n (vacuum): <|B.n|>/<|B|> 9.485e-02  <|B.n|/|B|> 9.026e-02  max|B.n| 0.365 T
+  value / bound: L 0.958  kappa 0.163  d_cc 3.019  d_pc 1.630  -> FEASIBLE
+wrote paper_min/jorge/starts/J_planar_r3.6.h5
