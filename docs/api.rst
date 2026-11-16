@@ -219,6 +219,7 @@ Objective Functions
     desc.objectives.CoilCurvature
     desc.objectives.CoilIntegratedCurvature
     desc.objectives.CoilLength
+    desc.objectives.CoilSetDistanceRows
     desc.objectives.CoilSetLinkingNumber
     desc.objectives.CoilSetMinDistance
     desc.objectives.CoilTorsion
@@ -280,6 +281,7 @@ Objective Functions
     desc.objectives.ObjectiveFunction
     desc.objectives.Omnigenity
     desc.objectives.PlasmaCoilSetDistanceBound
+    desc.objectives.PlasmaCoilSetDistanceRows
     desc.objectives.PlasmaCoilSetMinDistance
     desc.objectives.PlasmaVesselDistance
     desc.objectives.Pressure
@@ -298,6 +300,7 @@ Objective Functions
     desc.objectives.ToroidalFlux
     desc.objectives.VacuumBoundaryError
     desc.objectives.Volume
+    desc.objectives.node_gap_estimate
 
 
 Optimize

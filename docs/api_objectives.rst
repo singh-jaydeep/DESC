@@ -131,8 +131,11 @@ Coil Optimization
     desc.objectives.CoilTorsion
     desc.objectives.CoilSetLinkingNumber
     desc.objectives.CoilSetMinDistance
+    desc.objectives.CoilSetDistanceRows
     desc.objectives.PlasmaCoilSetDistanceBound
     desc.objectives.PlasmaCoilSetMinDistance
+    desc.objectives.PlasmaCoilSetDistanceRows
+    desc.objectives.node_gap_estimate
     desc.objectives.CoilIntegratedCurvature
     desc.objectives.CoilCurrentLength
     desc.objectives.CoilArclengthVariance

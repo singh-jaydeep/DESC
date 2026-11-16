@@ -1477,6 +1477,921 @@ class PlasmaCoilSetMinDistance(PlasmaCoilSetDistanceBound):
         )
 
 
+# ---------------------------------------------------------------------------------
+# Distance rows: one smooth row per close node pair, re-selected at every evaluation.
+
+
+def _coilset_symmetry_perms(centroids, NFP, sym):
+    """Permutations of the physical coil rows induced by the coilset symmetry group.
+
+    Generators are rotation by ``2*pi/NFP`` about z and, if ``sym``, the stellarator
+    reflection (x, y, z) -> (x, -y, -z). Each is turned into a row permutation by
+    matching coil centroids, then the group is closed under composition. If any
+    generator fails to map the centroids onto themselves (a coilset that is not
+    actually symmetric), only the identity is returned.
+    """
+    n = centroids.shape[0]
+    tol = 1e-6 * max(float(np.max(np.linalg.norm(centroids, axis=-1))), 1e-12)
+
+    def as_perm(mapped):
+        d = np.linalg.norm(mapped[:, None, :] - centroids[None, :, :], axis=-1)
+        p = np.argmin(d, axis=1)
+        ok = np.all(d[np.arange(n), p] <= tol) and np.unique(p).size == n
+        return p if ok else None
+
+    gens = []
+    if NFP > 1:
+        a = 2 * np.pi / NFP
+        rot = np.array(
+            [[np.cos(a), -np.sin(a), 0], [np.sin(a), np.cos(a), 0], [0, 0, 1]]
+        )
+        gens.append(as_perm(centroids @ rot.T))
+    if sym:
+        gens.append(as_perm(centroids * np.array([1.0, -1.0, -1.0])))
+    if any(g is None for g in gens):
+        return [np.arange(n)]
+    group = {tuple(range(n))}
+    frontier = [np.arange(n)]
+    while frontier:
+        new = []
+        for p in frontier:
+            for g in gens:
+                q = g[p]
+                if tuple(q) not in group:
+                    group.add(tuple(q))
+                    new.append(q)
+        frontier = new
+    return [np.array(t) for t in sorted(group)]
+
+
+def _unique_neighbour_pairs(centroids, indices, n_neighbors, NFP, sym):
+    """Fixed, symmetry-deduplicated (coil, neighbour) pairs.
+
+    Each independent coil ``i`` in ``indices`` gets its ``n_neighbors`` nearest
+    physical coils by centroid. The candidate rows are the pairs (i, j) with j in that
+    set. Two candidates describe the same distance if one maps to the other (in either
+    order) under the symmetry group; of each such orbit, the lexicographically smallest
+    candidate is kept.
+
+    Returns
+    -------
+    pairs : list of (int, int)
+        Physical row indices into ``_compute_position``, first entry independent.
+    """
+    n = centroids.shape[0]
+    cd = np.linalg.norm(centroids[:, None, :] - centroids[None, :, :], axis=-1)
+    np.fill_diagonal(cd, np.inf)
+    nbrs = {
+        int(i): sorted(int(j) for j in np.argsort(cd[i])[: min(n_neighbors, n - 1)])
+        for i in indices
+    }
+    group = _coilset_symmetry_perms(centroids, NFP, sym)
+    pairs = []
+    for i in nbrs:
+        for j in nbrs[i]:
+            orbit = set()
+            for g in group:
+                orbit.add((int(g[i]), int(g[j])))
+                orbit.add((int(g[j]), int(g[i])))
+            canonical = min((a, b) for a, b in orbit if a in nbrs and b in nbrs[a])
+            if canonical == (i, j):
+                pairs.append((i, j))
+    return pairs
+
+
+def _physical_coil_sources(coilset):
+    """Independent coil of each row of ``_compute_position``.
+
+    The rows are the independent coils, then their stellarator reflections in reverse
+    order, all repeated over the field periods.
+    """
+    nu, NFP, sym = len(coilset), coilset.NFP, coilset.sym
+    block = list(range(nu)) + (list(range(nu - 1, -1, -1)) if sym else [])
+    return np.array(block * NFP)
+
+
+def _field_period_independent_indices(coilset, target_nfp=None):
+    """Rows of ``_compute_position`` that are not field-period copies of another row.
+
+    ``CoilSet._compute_position`` tiles a base block -- the independent coils plus,
+    if ``sym``, their stellarator reflections -- over ``NFP`` field periods. A target
+    invariant under rotation by ``2*pi/NFP`` sees identical distances from every tile,
+    so only the base block carries information. The reflections are kept: they are
+    redundant only if the target is reflection symmetric too.
+
+    Parameters
+    ----------
+    coilset : CoilSet or MixedCoilSet or _Coil
+        Coilset whose position rows are being indexed.
+    target_nfp : int, optional
+        Field periodicity of the target the coils are measured against. The tiles are
+        equivalent only if this is a multiple of the coilset ``NFP``; when it is not,
+        every row is returned.
+
+    Returns
+    -------
+    idx : ndarray of int
+        Indices into the ``num_coils`` rows of ``_compute_position``.
+
+    """
+    from desc.coils import CoilSet, MixedCoilSet
+
+    if isinstance(coilset, MixedCoilSet):  # checked first: subclasses CoilSet
+        idx, offset = [], 0
+        for coil in coilset:
+            idx.append(_field_period_independent_indices(coil, target_nfp) + offset)
+            offset += coil.num_coils
+        return np.concatenate(idx) if idx else np.array([], dtype=int)
+    if isinstance(coilset, CoilSet):
+        if target_nfp is not None and coilset.NFP > 1 and target_nfp % coilset.NFP:
+            return np.arange(coilset.num_coils)  # tiles are not equivalent
+        return np.arange(len(coilset) * (int(coilset.sym) + 1))
+    return np.array([0])  # a single coil
+
+
+def _warn_rows_overflow(name, count, cap):
+    count = int(np.asarray(count))
+    warnif(
+        count > cap,
+        UserWarning,
+        f"{name}: {count} rows are within select_distance but only {cap} slots; "
+        "the rest are dropped. Raise max_active_rows.",
+    )
+
+
+def _coil_breaks(coilset):
+    """Curve parameters where some coil of the set may have a corner."""
+    from desc.coils import PiecewisePlanarArcCoil, PolarPlanarArcCoil, SplineXYZCoil
+
+    breaks = []
+    for coil in coilset:
+        if isinstance(coil, (PiecewisePlanarArcCoil, PolarPlanarArcCoil)):
+            breaks.append(2 * np.pi * np.arange(coil._B) / coil._B)
+        elif isinstance(coil, SplineXYZCoil):  # every knot, for linear splines
+            breaks.append(np.asarray(coil.knots) % (2 * np.pi))
+    return np.unique(np.concatenate(breaks)) if breaks else np.array([])
+
+
+def _coil_node_grid(coilset, n):
+    """Grid of about ``n`` nodes along each coil, with a node on every corner.
+
+    Uniform without corners; otherwise every interval between corners is split
+    evenly into pieces no longer than ``2 pi / n``.
+    """
+    breaks = _coil_breaks(coilset)
+    if breaks.size == 0:
+        return LinearGrid(N=max(1, (n - 1) // 2 + 1))
+    ends = np.append(breaks[1:], breaks[0] + 2 * np.pi)
+    s = [
+        a + (b - a) * np.arange(m) / m
+        for a, b in zip(breaks, ends)
+        for m in [int(np.ceil((b - a) * n / (2 * np.pi)))]
+    ]
+    return LinearGrid(zeta=np.sort(np.concatenate(s) % (2 * np.pi)))
+
+
+def _coil_gap_data(coilset, s_nodes, n_sub=16):
+    """Largest arclength between consecutive nodes and largest curvature per coil.
+
+    Both from ``n_sub`` samples inside each node interval, so corners on nodes are
+    excluded. For Fourier coils on uniform nodes, the largest ``|x_s|`` is certified
+    between samples by Bernstein's inequality (``|x_s|^2`` is a trigonometric
+    polynomial of degree ``2M``); otherwise ``gap_backoff`` has to cover it.
+    """
+    from desc.coils import FourierPlanarCoil, FourierXYCoil, FourierXYZCoil
+
+    s_nodes = np.sort(np.asarray(s_nodes))
+    ds = np.diff(np.append(s_nodes, s_nodes[0] + 2 * np.pi))
+    sub = (np.arange(n_sub) + 0.5) / n_sub
+    s = (s_nodes[:, None] + ds[:, None] * sub[None]).ravel() % (2 * np.pi)
+    grid = LinearGrid(zeta=s)
+    order = np.argsort(s)  # LinearGrid sorts zeta
+    uniform = np.allclose(ds, ds[0])
+    h, kmax = [], []
+    for coil in coilset:
+        data = coil.compute(["x_s", "|curvature|"], grid=grid, basis="xyz")
+        speed = np.empty(s.size)
+        speed[order] = np.linalg.norm(np.asarray(data["x_s"]), axis=-1)
+        speed = speed.reshape(s_nodes.size, n_sub).max(axis=1)
+        M = 0
+        if isinstance(coil, FourierPlanarCoil):  # r(s) times cos s, sin s
+            M = np.max(np.abs(coil.r_basis.modes[:, 2])) + 1
+        elif isinstance(coil, (FourierXYCoil, FourierXYZCoil)):
+            M = np.max(np.abs(coil.X_basis.modes[:, 2]))
+        if uniform and M:
+            speed = speed / np.sqrt(1 - M * ds[0] / n_sub)
+        h.append(np.max(speed * ds))
+        # curvature is 0/0 on straight pieces (linear splines)
+        kmax.append(np.max(np.nan_to_num(np.asarray(data["|curvature|"]))))
+    return np.array(h), np.array(kmax)
+
+
+def _default_node_grid(coilset, gap_of, target, n=64, its=6):
+    """Node grid with ``max(gap_of(grid)) <= target``, refining by the 1/n^2 law."""
+    for _ in range(its):
+        grid = _coil_node_grid(coilset, n)
+        gap = np.max(gap_of(grid))
+        if gap <= target:
+            return grid
+        n = int(np.ceil(n * np.sqrt(gap / target) * 1.05))
+    return grid
+
+
+def _node_gap(h_a, h_b, k_a, k_b, d):
+    """Overshoot of the closest node pair over the true distance ``d`` of two curves.
+
+    ``h`` is the largest arclength between consecutive nodes and ``k`` the largest
+    curvature of each curve; at the true closest points the connector is normal to
+    both curves.
+    """
+    return (h_a + h_b) ** 2 / (8 * d) + (k_a * h_a**2 + k_b * h_b**2) / 8
+
+
+def node_gap_estimate(
+    num_nodes,
+    max_length,
+    max_curvature,
+    min_distance,
+    speed_ratio=2.0,
+    backoff=1.5,
+):
+    """Coil-coil gap for node rows, from the engineering bounds instead of the coils.
+
+    The default gap of ``CoilSetDistanceRows`` is computed from the coils at build,
+    which can be far from where the optimizer ends up: node spacing grows as coils
+    lengthen and their parameterization speeds up unevenly. This estimates it from
+    the bounds instead, with the largest node spacing taken as
+    ``speed_ratio * max_length / num_nodes``. Pass the result as ``gap=``.
+
+    Parameters
+    ----------
+    num_nodes : int
+        Nodes per coil of the distance-row grid.
+    max_length : float
+        Upper bound on coil length (m).
+    max_curvature : float
+        Upper bound on coil curvature (1/m).
+    min_distance : float
+        Lower bound on coil-coil distance (m).
+    speed_ratio : float, optional
+        Largest node spacing over the mean spacing. 1 for uniform arclength.
+    backoff : float, optional
+        Safety factor on the gap.
+
+    Returns
+    -------
+    gap : float
+        Gap (m) to subtract from every node row.
+
+    """
+    h = speed_ratio * max_length / num_nodes
+    return backoff * _node_gap(h, h, max_curvature, max_curvature, min_distance)
+
+
+def _lower_bound_meters(obj):
+    """Smallest lower bound of a distance objective in meters, or None."""
+    if obj.bounds is None:
+        return None
+    lo = np.min(np.atleast_1d(obj.bounds[0]))
+    # _normalization: called mid-build, before .normalization is readable
+    return lo if obj._normalize_target else lo * obj._normalization
+
+
+def _keep_array(ids, size):
+    """Sorted candidate ids padded with -1 to a fixed size, for ``_select_rows``."""
+    ids = np.unique(np.asarray(ids, dtype=int))
+    ids = ids[ids >= 0]
+    warnif(
+        ids.size > size,
+        UserWarning,
+        f"{ids.size} rows to keep but only {size} slots; keeping the first {size}.",
+    )
+    ids = ids[:size]
+    return np.concatenate([np.full(size - ids.size, -1), ids])
+
+
+def _select_rows(dist, n_units, n_rows, n_cols, block_rows, select, keep, K):
+    """Candidates within ``select`` (or kept), the first ``K`` in id order.
+
+    Candidate ``(u, r, c)`` has id ``(u * n_rows + r) * n_cols + c`` and distance
+    ``dist(u, r)[., c]``, where ``dist(u, r)`` returns the ``(len(r), n_cols)``
+    distances of rows ``r`` of unit ``u`` (no derivative needed). Units are scanned
+    ``block_rows`` rows at a time, so at most ``block_rows * n_cols`` distances exist
+    at once; each block keeps its first ``K`` selected ids, and since blocks are in id
+    order the result equals ``jnp.nonzero`` over every candidate with ``size=K``.
+
+    Returns
+    -------
+    ids : ndarray of int, shape(K,)
+        Selected candidate ids, -1 in unused slots.
+    count : int
+        Number of selected candidates (may exceed K).
+
+    """
+    nb = -(-n_rows // block_rows)  # blocks per unit
+    size = min(K, block_rows * n_cols)
+    keep = jnp.asarray(keep)
+
+    def scan(b):
+        u, rb = b // nb, b % nb
+        r = rb * block_rows + jnp.arange(block_rows)
+        valid = jnp.broadcast_to((r < n_rows)[:, None], (block_rows, n_cols))
+        r = jnp.minimum(r, n_rows - 1)
+        ids = (u * n_rows + r)[:, None] * n_cols + jnp.arange(n_cols)[None]
+        pos = jnp.clip(jnp.searchsorted(keep, ids), 0, keep.size - 1)
+        mask = valid & ((dist(u, r) < select) | (keep[pos] == ids))
+        (sel,) = jnp.nonzero(mask.reshape(-1), size=size, fill_value=0)
+        return jnp.sum(mask), ids.reshape(-1)[sel]
+
+    counts, ids = jax.lax.map(scan, jnp.arange(n_units * nb))
+    valid = jnp.arange(size)[None, :] < counts[:, None]
+    (pos,) = jnp.nonzero(valid.reshape(-1), size=K, fill_value=0)
+    count = jnp.sum(counts)
+    return jnp.where(jnp.arange(K) < count, ids.reshape(-1)[pos], -1), count
+
+
+def _block_rows(n_rows, n_cols, block_size):
+    """Rows per scanned block for about ``block_size`` candidates per block."""
+    return int(max(1, min(n_rows, block_size // max(n_cols, 1))))
+
+
+class CoilSetDistanceRows(_Objective):
+    """Coil-coil distance as one smooth row per close pair of coil nodes.
+
+    For every coil pair (one per symmetry orbit, independent coil first) a row is
+    ``|x_a(s_i) - x_b(s_j)| - gap`` for each node pair (i, j). Node positions are smooth
+    in the parameters of every coil type, so unlike a hard minimum the rows have no
+    kink where the closest pair changes. ``gap`` bounds how far the closest node pair
+    can exceed the true distance between the curves (from node spacing and curvature,
+    see ``gap``), so every row is a lower bound on the true distance once that distance
+    exceeds the objective's lower bound. The default node grid puts a node on every
+    corner of piecewise-planar and spline coils.
+
+    Each evaluation re-selects the rows whose node distance is below
+    ``select_distance`` into ``max_active_rows`` slots; unused slots read
+    ``select_distance``, inactive under bounds whose lower value is below it. Rows have
+    fixed identities (pair, i, j), returned by ``compute_row_ids``, so an optimizer can
+    pair rows between iterates and keep multipliers per row (``keep_rows`` keeps given
+    rows selected). The candidate scan runs over blocks of about ``scan_block_size``
+    node pairs, so memory does not grow with the number of node pairs.
+
+    Parameters
+    ----------
+    coil : CoilSet
+        Coils to optimize.
+    select_distance : float
+        Rows whose node distance is below this (in m) are evaluated. Must exceed the
+        lower bound plus the gap (in m) with margin for one optimizer step.
+    max_active_rows : int, optional
+        Slots for selected rows; a warning is raised when they overflow.
+        ``active_row_count`` gives the count at a given state.
+    grid : Grid, optional
+        Nodes along each coil, ordered. Default: enough nodes, with one on every
+        corner, that the gap is at most 2% of the lower bound at the coils given at
+        build.
+    gap : float, optional
+        Gap (in m) subtracted from every row. Default computed at build per pair as
+        ``gap_backoff * ((h_a + h_b)^2 / (8 d) + (k_a h_a^2 + k_b h_b^2) / 8)``, with
+        ``h`` the largest arclength between nodes and ``k`` the largest curvature of
+        each coil at build, and ``d`` the lower bound. Coils whose curvature or node
+        spacing grows past the build values by more than the backoff can then
+        overshoot the bound by up to the shortfall; ``node_gap_estimate`` gives a gap
+        from the engineering bounds instead.
+    gap_backoff : float, optional
+        Safety factor on the computed gap. Default 1.5.
+    scan_block_size : int, optional
+        Node pairs per block of the candidate scan. Default 2**22.
+
+    """
+
+    __doc__ = __doc__.rstrip() + collect_docs(
+        target_default="``bounds=(1,np.inf)``.",
+        bounds_default="``bounds=(1,np.inf)``.",
+        coil=True,
+    )
+
+    _static_attrs = _Objective._static_attrs + [
+        "_pairs",
+        "_n_nodes",
+        "_max_active_rows",
+        "_select_distance",
+        "_num_candidates",
+        "_block_rows",
+    ]
+
+    _scalar = False
+    _units = "(m)"
+    _print_value_fmt = "Coil-coil distance rows: "
+
+    def __init__(
+        self,
+        coil,
+        select_distance,
+        target=None,
+        bounds=None,
+        weight=1,
+        normalize=True,
+        normalize_target=True,
+        loss_function=None,
+        deriv_mode="auto",
+        grid=None,
+        name="coil-coil distance rows",
+        jac_chunk_size=None,
+        max_active_rows=3000,
+        gap=None,
+        gap_backoff=1.5,
+        scan_block_size=2**22,
+    ):
+        if target is None and bounds is None:
+            bounds = (1, np.inf)
+        errorif(not select_distance > 0, ValueError, "select_distance must be > 0")
+        self._select_distance = float(select_distance)
+        self._max_active_rows = int(max_active_rows)
+        self._grid = grid
+        self._gap = gap
+        self._gap_backoff = gap_backoff
+        self._scan_block_size = int(scan_block_size)
+        super().__init__(
+            things=coil,
+            target=target,
+            bounds=bounds,
+            weight=weight,
+            normalize=normalize,
+            normalize_target=normalize_target,
+            loss_function=loss_function,
+            deriv_mode=deriv_mode,
+            name=name,
+            jac_chunk_size=jac_chunk_size,
+        )
+
+    def build(self, use_jit=True, verbose=1):
+        """Build constant arrays.
+
+        Parameters
+        ----------
+        use_jit : bool, optional
+            Whether to just-in-time compile the objective and derivatives.
+        verbose : int, optional
+            Level of output.
+
+        """
+        coilset = self.things[0]
+        if self._normalize:
+            coils = tree_leaves(coilset, is_leaf=lambda x: not hasattr(x, "__len__"))
+            scales = [compute_scaling_factors(c)["a"] for c in coils]
+            self._normalization = np.mean(scales)
+        U = _physical_coil_sources(coilset)
+        pts = np.asarray(coilset._compute_position(grid=LinearGrid(N=64), basis="xyz"))
+        self._pairs = tuple(
+            _unique_neighbour_pairs(
+                pts.mean(axis=1),
+                np.arange(len(coilset)),
+                pts.shape[0] - 1,
+                coilset.NFP,
+                coilset.sym,
+            )
+        )
+        a, b = (U[np.array(v)] for v in zip(*self._pairs))  # independent coils
+        lo = _lower_bound_meters(self)
+        grid, gap = self._grid, np.zeros(len(self._pairs))
+        if self._gap is not None:
+            gap[:] = self._gap
+        else:
+            errorif(
+                lo is None or not lo > 0,
+                ValueError,
+                "The gap needs a positive lower bound; pass gap explicitly.",
+            )
+
+            def gap_of(grid):
+                h, k = _coil_gap_data(coilset, grid.nodes[:, 2])
+                return self._gap_backoff * _node_gap(h[a], h[b], k[a], k[b], lo)
+
+            if grid is None:
+                grid = _default_node_grid(coilset, gap_of, 0.02 * lo)
+            gap = gap_of(grid)
+        grid = grid or _coil_node_grid(coilset, 64)
+        self._n_nodes = grid.num_nodes
+        self._dim_f = self._max_active_rows
+        N = self._n_nodes
+        self._num_candidates = len(self._pairs) * N * N
+        self._block_rows = _block_rows(N, N, self._scan_block_size)
+        self._constants = {
+            "coilset": coilset,
+            "grid": grid,
+            "gap": gap,
+            "keep": _keep_array([], self._max_active_rows),
+            "quad_weights": 1.0,
+        }
+        super().build(use_jit=use_jit, verbose=verbose)
+        lo = -np.inf if lo is None else lo
+        warnif(
+            lo + gap.max() >= self._select_distance,
+            UserWarning,
+            f"select_distance {self._select_distance} does not exceed the lower bound "
+            f"{lo} plus the gap {gap.max()} (m); unselected rows would read as "
+            "violated.",
+        )
+
+    def _rows(self, params, constants):
+        """Slot rows, the number of selected rows and the slot row ids."""
+        pts = constants["coilset"]._compute_position(
+            params=params, grid=constants["grid"], basis="xyz"
+        )
+        pts0 = jax.lax.stop_gradient(pts)
+        a, b = (jnp.array(v) for v in zip(*self._pairs))
+        N, K = self._n_nodes, self._max_active_rows
+
+        def dist(p, i):  # nodes i of coil a against every node of coil b
+            return jnp.linalg.norm(pts0[a[p], i, None] - pts0[b[p], None], axis=-1)
+
+        ids, count = _select_rows(
+            dist,
+            len(self._pairs),
+            N,
+            N,
+            self._block_rows,
+            self._select_distance,
+            constants["keep"],
+            K,
+        )
+        jax.debug.callback(lambda n: _warn_rows_overflow(self.name, n, K), count)
+        used = ids >= 0
+        idx = jnp.where(used, ids, 0)
+        p, i, j = idx // (N * N), (idx // N) % N, idx % N
+        rows = (
+            safenorm(pts[a[p], i] - pts[b[p], j], axis=-1)
+            - jnp.asarray(constants["gap"])[p]
+        )
+        return jnp.where(used, rows, self._select_distance), count, ids
+
+    def compute(self, params, constants=None):
+        """Compute coil-coil distance rows.
+
+        Parameters
+        ----------
+        params : dict
+            Dictionary of coilset degrees of freedom, eg CoilSet.params_dict
+        constants : dict
+            Dictionary of constant data, eg transforms, profiles etc.
+            Defaults to self._constants. (Deprecated)
+
+        Returns
+        -------
+        f : array of floats
+            ``max_active_rows`` slot rows.
+
+        """
+        constants = self._get_deprecated_constants(constants)
+        return self._rows(params, constants)[0]
+
+    def active_row_count(self, params=None):
+        """Rows within ``select_distance`` at params (to size ``max_active_rows``)."""
+        params = self.things[0].params_dict if params is None else params
+        return int(self._rows(params, self._constants)[1])
+
+    @property
+    def num_row_ids(self):
+        """int: Number of distinct row ids (candidate node pairs)."""
+        return self._num_candidates
+
+    def compute_row_ids(self, params, constants=None):
+        """Id of the candidate (pair, i, j) in each row, row-major; -1 for unused."""
+        constants = self._get_deprecated_constants(constants)
+        return self._rows(params, constants)[2]
+
+    def keep_rows(self, ids):
+        """Select the candidates ``ids`` at every evaluation, whatever their distance.
+
+        Used to keep rows that carry a multiplier from dropping out of the slots.
+        Replaces the previous set; negative ids are ignored.
+        """
+        self._constants["keep"] = _keep_array(ids, self._max_active_rows)
+
+
+class PlasmaCoilSetDistanceRows(_Objective):
+    """Plasma-coil distance as one smooth row per close plasma point and coil node.
+
+    A row is ``|q_j - x(s_i)| - gap`` for each plasma point j and coil node i, where
+    ``gap`` bounds how far the closest point-node pair can exceed the true
+    surface-curve distance (see ``gap``). Rows within ``select_distance`` are
+    re-selected each evaluation into ``max_active_rows`` slots; unused slots read
+    ``select_distance``. ``compute_row_ids`` gives each slot's (coil, point, node)
+    identity; see ``CoilSetDistanceRows``.
+
+    The coils are the independent coils and their stellarator reflections, with the
+    plasma points copied over all field periods: a ``sym=True`` plasma grid covers
+    theta in [0, pi] only, and a coil and its reflection together see the whole surface.
+
+    With ``eq_fixed=False`` (default) the plasma points move with the equilibrium or
+    surface, which is then optimized too. The gap is computed from the surface at
+    build in either case.
+
+    Parameters
+    ----------
+    eq : Equilibrium or FourierRZToroidalSurface
+        Plasma boundary.
+    coil : CoilSet
+        Coils to optimize.
+    select_distance : float
+        Rows whose node distance is below this (in m) are evaluated. Must exceed the
+        lower bound plus the gap (in m) with margin for one optimizer step.
+    plasma_grid : Grid, optional
+        Surface grid (rho=1). Default
+        ``LinearGrid(M=2 * eq.M, N=2 * eq.N, NFP=eq.NFP)``.
+    coil_grid : Grid, optional
+        Nodes along each coil, ordered. Default: enough nodes, with one on every
+        corner, that the gap is at most 2% of the lower bound, or that the coil spacing
+        is at most the plasma grid's if the plasma grid alone exceeds that.
+    eq_fixed : bool, optional
+        Whether the plasma boundary is fixed. If True, the plasma points are computed
+        once at build and ``things = [coil]``; otherwise ``things = [eq, coil]``.
+    max_active_rows : int, optional
+        Slots for selected rows; a warning is raised when they overflow.
+    gap : float, optional
+        Gap (in m) subtracted from every row. Default computed at build per coil as in
+        ``CoilSetDistanceRows``, with the plasma grid's largest cell diagonal and the
+        surface's largest principal curvature in place of the second curve's.
+    gap_backoff : float, optional
+        Safety factor on the computed gap. Default 1.5.
+    scan_block_size : int, optional
+        Point-node pairs per block of the candidate scan. Default 2**22.
+
+    """
+
+    __doc__ = __doc__.rstrip() + collect_docs(
+        target_default="``bounds=(1,np.inf)``.",
+        bounds_default="``bounds=(1,np.inf)``.",
+        coil=True,
+    )
+
+    _static_attrs = _Objective._static_attrs + [
+        "_coil_indices",
+        "_max_active_rows",
+        "_select_distance",
+        "_n_nodes",
+        "_n_points",
+        "_num_candidates",
+        "_block_rows",
+        "_eq_fixed",
+        "_data_keys",
+    ]
+
+    _scalar = False
+    _units = "(m)"
+    _print_value_fmt = "Plasma-coil distance rows: "
+
+    def __init__(
+        self,
+        eq,
+        coil,
+        select_distance,
+        target=None,
+        bounds=None,
+        weight=1,
+        normalize=True,
+        normalize_target=True,
+        loss_function=None,
+        deriv_mode="auto",
+        plasma_grid=None,
+        coil_grid=None,
+        eq_fixed=False,
+        name="plasma-coil distance rows",
+        jac_chunk_size=None,
+        max_active_rows=6000,
+        gap=None,
+        gap_backoff=1.5,
+        scan_block_size=2**22,
+    ):
+        if target is None and bounds is None:
+            bounds = (1, np.inf)
+        errorif(not select_distance > 0, ValueError, "select_distance must be > 0")
+        self._gap = gap
+        self._gap_backoff = gap_backoff
+        self._eq = eq
+        self._eq_fixed = bool(eq_fixed)
+        self._select_distance = float(select_distance)
+        self._max_active_rows = int(max_active_rows)
+        self._plasma_grid = plasma_grid
+        self._coil_grid = coil_grid
+        self._scan_block_size = int(scan_block_size)
+        super().__init__(
+            things=[coil] if eq_fixed else [eq, coil],
+            target=target,
+            bounds=bounds,
+            weight=weight,
+            normalize=normalize,
+            normalize_target=normalize_target,
+            loss_function=loss_function,
+            deriv_mode=deriv_mode,
+            name=name,
+            jac_chunk_size=jac_chunk_size,
+        )
+
+    def build(self, use_jit=True, verbose=1):
+        """Build constant arrays.
+
+        Parameters
+        ----------
+        use_jit : bool, optional
+            Whether to just-in-time compile the objective and derivatives.
+        verbose : int, optional
+            Level of output.
+
+        """
+        eq = self._eq if self._eq_fixed else self.things[0]
+        coilset = self.things[-1]
+        plasma_grid = self._plasma_grid or LinearGrid(
+            M=2 * eq.M, N=2 * eq.N, NFP=eq.NFP
+        )
+        warnif(
+            not np.allclose(plasma_grid.nodes[:, 0], 1),
+            UserWarning,
+            "Plasma/Surface grid includes interior points, should be rho=1.",
+        )
+        if self._normalize:
+            self._normalization = compute_scaling_factors(eq)["a"]
+        self._data_keys = ["R", "phi", "Z"]
+        keys = list(self._data_keys)
+        if self._gap is None:
+            keys += ["e_theta", "e_zeta", "curvature_k1_rho", "curvature_k2_rho"]
+        eq_transforms = get_transforms(self._data_keys, obj=eq, grid=plasma_grid)
+        eq_profiles = get_profiles(self._data_keys, obj=eq, grid=plasma_grid)
+        data = compute_fun(
+            eq,
+            keys,
+            params=eq.params_dict,
+            transforms=get_transforms(keys, obj=eq, grid=plasma_grid),
+            profiles=get_profiles(keys, obj=eq, grid=plasma_grid),
+        )
+        rpz = jnp.array([data["R"], data["phi"], data["Z"]]).T
+        U = _physical_coil_sources(coilset)
+        self._coil_indices = tuple(
+            int(k) for k in _field_period_independent_indices(coilset, plasma_grid.NFP)
+        )
+        u = U[np.array(self._coil_indices)]  # independent coil of each row coil
+        lo = _lower_bound_meters(self)
+        coil_grid, gap = self._coil_grid, np.zeros(len(self._coil_indices))
+        if self._gap is not None:
+            gap[:] = self._gap
+        else:
+            errorif(
+                lo is None or not lo > 0,
+                ValueError,
+                "The gap needs a positive lower bound; pass gap explicitly.",
+            )
+            # largest cell diagonal and principal curvature of the plasma surface
+            dt, dz = (
+                2 * np.pi / plasma_grid.num_theta,
+                2 * np.pi / plasma_grid.NFP / plasma_grid.num_zeta,
+            )
+            if plasma_grid.sym:  # theta in [0, pi] with num_theta nodes
+                dt = np.pi / max(plasma_grid.num_theta - 1, 1)
+            et = np.linalg.norm(np.asarray(data["e_theta"]), axis=-1)
+            ez = np.linalg.norm(np.asarray(data["e_zeta"]), axis=-1)
+            h_p = np.max(np.hypot(et * dt, ez * dz))
+            k_p = np.max(np.abs([data["curvature_k1_rho"], data["curvature_k2_rho"]]))
+
+            def gap_of(grid):
+                h, k = _coil_gap_data(coilset, grid.nodes[:, 2])
+                return self._gap_backoff * _node_gap(h[u], h_p, k[u], k_p, lo)
+
+            if coil_grid is None:
+                # 2%, or coil spacing down to the plasma grid's if that cannot reach it
+                floor = self._gap_backoff * _node_gap(0, h_p, 0, k_p, lo)
+                target = max(0.02 * lo, 4 * floor)
+                coil_grid = _default_node_grid(coilset, gap_of, target)
+            gap = gap_of(coil_grid)
+        coil_grid = coil_grid or _coil_node_grid(coilset, 64)
+        self._n_nodes = coil_grid.num_nodes
+        self._dim_f = self._max_active_rows
+        self._n_points = plasma_grid.num_nodes * plasma_grid.NFP
+        self._num_candidates = len(self._coil_indices) * self._n_points * self._n_nodes
+        self._block_rows = _block_rows(
+            self._n_points, self._n_nodes, self._scan_block_size
+        )
+        self._constants = {
+            "eq": eq,
+            "coilset": coilset,
+            "coil_grid": coil_grid,
+            "eq_transforms": eq_transforms,
+            "eq_profiles": eq_profiles,
+            "gap": gap,
+            "keep": _keep_array([], self._max_active_rows),
+            "quad_weights": 1.0,
+        }
+        if self._eq_fixed:
+            self._constants["plasma_coords"] = rpz2xyz(
+                copy_rpz_periods(rpz, plasma_grid.NFP)
+            )
+        super().build(use_jit=use_jit, verbose=verbose)
+        lo = -np.inf if lo is None else lo
+        warnif(
+            lo + gap.max() >= self._select_distance,
+            UserWarning,
+            f"select_distance {self._select_distance} does not exceed the lower bound "
+            f"{lo} plus the gap {gap.max()} (m); unselected rows would read as "
+            "violated.",
+        )
+
+    def _split(self, params):
+        """(eq params or None, coil params) from the compute arguments."""
+        return (None, params[0]) if self._eq_fixed else (params[0], params[1])
+
+    def _rows(self, eq_params, coil_params, constants):
+        """Slot rows, the number of selected rows and the slot row ids."""
+        if self._eq_fixed:
+            Q = jnp.asarray(constants["plasma_coords"])
+        else:
+            data = compute_fun(
+                constants["eq"],
+                self._data_keys,
+                params=eq_params,
+                transforms=constants["eq_transforms"],
+                profiles=constants["eq_profiles"],
+            )
+            rpz = jnp.array([data["R"], data["phi"], data["Z"]]).T
+            nfp = constants["eq_transforms"]["grid"].NFP
+            Q = rpz2xyz(copy_rpz_periods(rpz, nfp))
+        cidx = np.array(self._coil_indices)
+        pts = constants["coilset"]._compute_position(
+            params=coil_params, grid=constants["coil_grid"], basis="xyz"
+        )[cidx]
+        pts0, Q0 = jax.lax.stop_gradient(pts), jax.lax.stop_gradient(Q)
+        nq, N, K = self._n_points, self._n_nodes, self._max_active_rows
+
+        def dist(c, j):  # plasma points j against every node of coil c
+            return jnp.linalg.norm(Q0[j, None] - pts0[c][None], axis=-1)
+
+        ids, count = _select_rows(
+            dist,
+            cidx.size,
+            nq,
+            N,
+            self._block_rows,
+            self._select_distance,
+            constants["keep"],
+            K,
+        )
+        jax.debug.callback(lambda n: _warn_rows_overflow(self.name, n, K), count)
+        used = ids >= 0
+        idx = jnp.where(used, ids, 0)
+        c, j, i = idx // (nq * N), (idx // N) % nq, idx % N
+        rows = safenorm(Q[j] - pts[c, i], axis=-1) - jnp.asarray(constants["gap"])[c]
+        return jnp.where(used, rows, self._select_distance), count, ids
+
+    def compute(self, params_1, params_2=None, constants=None):
+        """Compute plasma-coil distance rows.
+
+        Parameters
+        ----------
+        params_1 : dict
+            Equilibrium or surface degrees of freedom, or the coilset's if
+            ``eq_fixed=True``.
+        params_2 : dict, optional
+            Coilset degrees of freedom, eg ``CoilSet.params_dict``, if
+            ``eq_fixed=False``.
+        constants : dict
+            Dictionary of constant data, eg transforms, profiles etc.
+            Defaults to self._constants. (Deprecated)
+
+        Returns
+        -------
+        f : array of floats
+            ``max_active_rows`` slot rows.
+
+        """
+        constants = self._get_deprecated_constants(constants)
+        eq_params, coil_params = self._split((params_1, params_2))
+        return self._rows(eq_params, coil_params, constants)[0]
+
+    def active_row_count(self, *params):
+        """Rows within ``select_distance`` (to size ``max_active_rows``).
+
+        Parameters are as in ``compute``; defaults to the current state of ``things``.
+        """
+        params = params or tuple(t.params_dict for t in self.things)
+        return int(self._rows(*self._split(params), self._constants)[1])
+
+    @property
+    def num_row_ids(self):
+        """int: Number of distinct row ids (candidate point-node pairs)."""
+        return self._num_candidates
+
+    def compute_row_ids(self, params_1, params_2=None, constants=None):
+        """Id of the candidate (coil, point, node) in each row; -1 for unused."""
+        constants = self._get_deprecated_constants(constants)
+        return self._rows(*self._split((params_1, params_2)), constants)[2]
+
+    def keep_rows(self, ids):
+        """Select the candidates ``ids`` at every evaluation, whatever their distance.
+
+        Used to keep rows that carry a multiplier from dropping out of the slots.
+        Replaces the previous set; negative ids are ignored.
+        """
+        self._constants["keep"] = _keep_array(ids, self._max_active_rows)
+
+
 class CoilArclengthVariance(_CoilObjective):
     """Variance of ||dx/ds|| along the curve.
 
