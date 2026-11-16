@@ -2840,6 +2840,63 @@ class FixCurveShift(FixParameters):
         )
 
 
+def _arc_ref_param_tree(thing):
+    """Params tree marking `arc_ref` only on the sub-things that actually have it.
+
+    A MixedCoilSet may hold arc coils alongside coils that have no `arc_ref`, and
+    `{"arc_ref": True}` broadcast over the whole set would then name a parameter that
+    does not exist on some members.
+    """
+    if hasattr(thing, "arc_ref"):
+        return {"arc_ref": True}
+    if hasattr(thing, "__len__"):
+        return [_arc_ref_param_tree(t) for t in thing]
+    return {}
+
+
+class FixCurveArcReference(FixParameters):
+    """Fixes the frozen in-plane frame reference of a planar-arc curve.
+
+    `arc_ref` is a constant of the parameterization, not a shape degree of freedom. It
+    is carried as an optimizable parameter only so that it travels with `params`
+    through `CoilSet._compute_A_or_B`, which scans one coil object over every coil's
+    stacked params; this objective pins it so it costs no degrees of freedom, exactly
+    as `FixCurveShift` and `FixCurveRotation` do for `shift` and `rotmat`.
+
+    Parameters
+    ----------
+    curve : Curve
+        Curve that will be optimized to satisfy the Objective.
+    target, bounds, weight, normalize, normalize_target, name
+        See `FixParameters`.
+
+    """
+
+    _units = "(~)"
+    _print_value_fmt = "Fixed arc reference error: "
+
+    def __init__(
+        self,
+        curve,
+        target=None,
+        bounds=None,
+        weight=1,
+        normalize=True,
+        normalize_target=True,
+        name="fixed arc reference",
+    ):
+        super().__init__(
+            thing=curve,
+            params=_arc_ref_param_tree(curve),
+            target=target,
+            bounds=bounds,
+            weight=weight,
+            normalize=normalize,
+            normalize_target=normalize_target,
+            name=name,
+        )
+
+
 class FixCurveRotation(FixParameters):
     """Fixes Curve.rotmat attribute, which is redundant with other Curve params.
 

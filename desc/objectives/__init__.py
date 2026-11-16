@@ -78,6 +78,7 @@ from .linear_objectives import (
     FixBoundaryZ,
     FixCoilCurrent,
     FixCurrent,
+    FixCurveArcReference,
     FixCurveRotation,
     FixCurveShift,
     FixElectronDensity,

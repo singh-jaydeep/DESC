@@ -34,6 +34,8 @@ Coils
     desc.coils.FourierXYCoil
     desc.coils.FourierXYZCoil
     desc.coils.MixedCoilSet
+    desc.coils.PiecewisePlanarArcCoil
+    desc.coils.PolarPlanarArcCoil
     desc.coils.SplineXYZCoil
     desc.coils.initialize_helical_coils
     desc.coils.initialize_modular_coils
@@ -133,6 +135,8 @@ Geometry
     desc.geometry.FourierRZToroidalSurface
     desc.geometry.FourierXYCurve
     desc.geometry.FourierXYZCurve
+    desc.geometry.PiecewisePlanarArcCurve
+    desc.geometry.PolarPlanarArcCurve
     desc.geometry.SplineXYZCurve
     desc.geometry.ZernikeRZToroidalSection
 

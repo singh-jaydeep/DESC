@@ -6,6 +6,8 @@ from .curve import (
     FourierRZCurve,
     FourierXYCurve,
     FourierXYZCurve,
+    PiecewisePlanarArcCurve,
+    PolarPlanarArcCurve,
     SplineXYZCurve,
 )
 from .surface import FourierRZToroidalSurface, ZernikeRZToroidalSection
@@ -16,6 +18,8 @@ __all__ = [
     "FourierRZToroidalSurface",
     "FourierXYCurve",
     "FourierXYZCurve",
+    "PiecewisePlanarArcCurve",
+    "PolarPlanarArcCurve",
     "SplineXYZCurve",
     "ZernikeRZToroidalSection",
 ]

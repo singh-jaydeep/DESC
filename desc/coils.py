@@ -31,6 +31,8 @@ from desc.geometry import (
     FourierRZCurve,
     FourierXYCurve,
     FourierXYZCurve,
+    PiecewisePlanarArcCurve,
+    PolarPlanarArcCurve,
     SplineXYZCurve,
 )
 from desc.grid import Grid, LinearGrid, _Grid
@@ -62,6 +64,8 @@ __all__ = [
     "FourierXYCoil",
     "FourierXYZCoil",
     "MixedCoilSet",
+    "PiecewisePlanarArcCoil",
+    "PolarPlanarArcCoil",
     "SplineXYZCoil",
     "initialize_helical_coils",
     "initialize_modular_coils",
@@ -759,7 +763,15 @@ class _Coil(_MagneticField, Optimizable, ABC):
             self.current, coords, N=N, s=s, basis="xyz", name=name
         )
 
-    def to_SplineXYZ(self, knots=None, grid=None, method="cubic", name="", **kwargs):
+    def to_SplineXYZ(
+        self,
+        knots=None,
+        grid=None,
+        method="cubic",
+        name="",
+        break_indices=None,
+        **kwargs,
+    ):
         """Convert coil to SplineXYZCoil.
 
         Parameters
@@ -785,6 +797,18 @@ class _Coil(_MagneticField, Optimizable, ABC):
             - `'catmull-rom'`: C1 cubic centripetal "tension" splines
         name : str
             Name for this coil
+        break_indices : ndarray or None
+            If supplied, the spline will be a piecewise set of splines.
+            Indices of knots at which the curve breaks and is only C0 continuous (e.g.
+            continuous but with "corners" where the derivative jumps). In between each
+            set of break points, there is an unbroken spline whose start and endpoints
+            are given by `break_indices[i-1, i]`, where `i` indicates the ith spline.
+            Each (the ith) spline is interpolated independently of all other unbroken
+            splines (i+1th, i-1th, etc.) and does not consider their query points
+            (knots) when interpolating. The boundary conditions are evaluated using
+            Interpax's default where non-periodicity is assumed.
+            If None (the default), the spline will be the usual periodic spline with
+            the continuity dictated by the spline method.
 
         Returns
         -------
@@ -796,7 +820,13 @@ class _Coil(_MagneticField, Optimizable, ABC):
             grid = LinearGrid(zeta=knots)
         coords = self.compute("x", grid=grid, basis="xyz")["x"]
         return SplineXYZCoil.from_values(
-            self.current, coords, knots=knots, method=method, name=name, basis="xyz"
+            self.current,
+            coords,
+            knots=knots,
+            method=method,
+            name=name,
+            basis="xyz",
+            break_indices=break_indices,
         )
 
     def to_FourierRZ(self, N=10, grid=None, NFP=None, sym=False, name="", **kwargs):
@@ -1317,6 +1347,89 @@ class FourierXYCoil(_Coil, FourierXYCurve):
         )
 
 
+class PolarPlanarArcCoil(_Coil, PolarPlanarArcCurve):
+    """Coil of B planar arcs, each a polar graph r(theta) about its chord midpoint.
+
+    Structurally planar per arc with C0 corners and closure at no DOF cost, exactly like
+    PiecewisePlanarArcCoil -- but the in-plane shape basis is polar rather than a
+    transverse graph over the chord, which lets an arc leave its hinge at any angle
+    up to perpendicular with FINITE coefficients. See PolarPlanarArcCurve for the
+    geometry and for the conditioning caveat at shallow arcs.
+
+    The zero of the shape basis is the exact circular arc of radius |chord|/2, so a
+    2-arc coil with shape = 0 is a circle split at a diameter.
+
+    Parameters
+    ----------
+    current : float
+        Current through the coil, in Amperes.
+    hinges : array-like, shape (B, 3)
+        Hinge (breakpoint) coordinates in xyz, B >= 2.
+    tilts : array-like, shape (B,)
+        Plane tilt of each arc about its chord axis, radians. Default zeros.
+    shape : array-like, shape (B, M)
+        Per-arc polar radial sine coefficients. Default zeros = circular arcs.
+    name : str
+        Name for this coil.
+    """
+
+    _io_attrs_ = _Coil._io_attrs_ + PolarPlanarArcCurve._io_attrs_
+    _static_attrs = _Coil._static_attrs + PolarPlanarArcCurve._static_attrs
+
+    def _set_up(self):
+        """Freeze the arc frame reference after loading.
+
+        `_Coil._set_up` fills every missing `_io_attrs_` entry with None and does not
+        chain, so the mixin's hook on the Curve side never runs for a coil. Restore it
+        here: the reference must be a concrete array before anything is jit-traced,
+        because inside a solve `self.hinges` is a tracer.
+        """
+        super()._set_up()
+        if getattr(self, "_arc_ref", None) is None:
+            self._arc_ref = self._compute_arc_ref()
+
+    def __init__(
+        self, current=1, hinges=None, tilts=None, shape=None, B=None, M=None, name=""
+    ):
+        super().__init__(current, hinges, tilts, shape, B, M, name)
+
+    @classmethod
+    def from_values(cls, current, coords, B=3, M=1, knots=None, basis="xyz", name=""):
+        """Fit sampled coordinates to a PolarPlanarArcCoil.
+
+        Parameters
+        ----------
+        current : float
+            Current through the coil, in Amperes.
+        coords : ndarray, shape (num_coords, 3)
+            Sampled coordinates of the closed curve (xyz or rpz per basis).
+        B : int
+            Number of planar arcs.
+        M : int
+            Number of polar radial sine modes per arc.
+        knots : ndarray or None
+            Parameter values in [0, 2pi) at which coords are sampled.
+        basis : {"xyz", "rpz"}
+            Basis for input coordinates.
+        name : str
+            Name for this coil.
+
+        Returns
+        -------
+        coil : PolarPlanarArcCoil
+        """
+        curve = PolarPlanarArcCurve.from_values(
+            coords, B=B, M=M, knots=knots, basis=basis, name=name
+        )
+        return cls(
+            current=current,
+            hinges=curve.hinges,
+            tilts=curve.tilts,
+            shape=curve.shape,
+            name=name,
+        )
+
+
 class SplineXYZCoil(_Coil, SplineXYZCurve):
     """Coil parameterized by spline points in X,Y,Z.
 
@@ -1347,15 +1460,36 @@ class SplineXYZCoil(_Coil, SplineXYZCurve):
         - ``'monotonic-0'``: same as `'monotonic'` but with 0 first derivatives at both
           endpoints
     name : str
-        Name for this coil
-
+        Name for this curve
+    break_indices : ndarray or None
+        If supplied, the spline will be a piecewise set of splines.
+        Indices are of knots at which the curve breaks and is only C0 continuous (e.g.
+        continuous but with "corners" where the derivative jumps). In between each set
+        of break points, there is an unbroken spline whose start and endpoints are
+        given by `break_indices[i-1, i]`, where `i` indicates the ith spline.
+        Each (the ith) spline is interpolated independently of all other unbroken
+        splines (i+1th, i-1th, etc.) and does not consider their query points
+        (knots) when interpolating. The boundary conditions are evaluated using
+        interpax's default where non-periodicity is assumed.
+        If None (the default), the spline will be the usual periodic spline with
+        the continuity dictated by the spline method.
     """
 
     _io_attrs_ = _Coil._io_attrs_ + SplineXYZCurve._io_attrs_
     _static_attrs = _Coil._static_attrs + SplineXYZCurve._static_attrs
 
-    def __init__(self, current, X, Y, Z, knots=None, method="cubic", name=""):
-        super().__init__(current, X, Y, Z, knots, method, name)
+    def __init__(
+        self,
+        current,
+        X,
+        Y,
+        Z,
+        knots=None,
+        method="cubic",
+        name="",
+        break_indices=None,
+    ):
+        super().__init__(current, X, Y, Z, knots, method, name, break_indices)
 
     def _compute_A_or_B(
         self,
@@ -1553,7 +1687,14 @@ class SplineXYZCoil(_Coil, SplineXYZCurve):
 
     @classmethod
     def from_values(
-        cls, current, coords, knots=None, method="cubic", name="", basis="xyz"
+        cls,
+        current,
+        coords,
+        knots=None,
+        method="cubic",
+        name="",
+        basis="xyz",
+        break_indices=None,
     ):
         """Create SplineXYZCoil from coordinate values.
 
@@ -1586,6 +1727,18 @@ class SplineXYZCoil(_Coil, SplineXYZCurve):
 
         basis : {"rpz", "xyz"}
             basis for input coordinates. Defaults to "xyz"
+        break_indices : ndarray or None
+            If supplied, the spline will be a piecewise set of splines.
+            Indices of knots at which the curve breaks and is only C0 continuous (e.g.
+            continuous but with "corners" where the derivative jumps). In between each
+            set of break points, there is an unbroken spline whose start and endpoints
+            are given by `break_indices[i-1, i]`, where `i` indicates the ith spline.
+            Each (the ith) spline is interpolated independently of all other unbroken
+            splines (i+1th, i-1th, etc.) and does not consider their query points
+            (knots) when interpolating. The boundary conditions are evaluated using
+            Interpax's default where non-periodicity is assumed.
+            If None (the default), the spline will be the usual periodic spline with
+            the continuity dictated by the spline method.
 
         Returns
         -------
@@ -1604,6 +1757,7 @@ class SplineXYZCoil(_Coil, SplineXYZCurve):
             knots=curve.knots,
             method=curve.method,
             name=name,
+            break_indices=break_indices,
         )
 
 
@@ -1630,6 +1784,8 @@ def _check_type(coil0, coil):
         FourierXYCoil: ["X_basis", "Y_basis"],
         FourierXYZCoil: ["X_basis", "Y_basis", "Z_basis"],
         SplineXYZCoil: ["method", "N", "knots"],
+        PiecewisePlanarArcCoil: ["B", "M"],
+        PolarPlanarArcCoil: ["B", "M"],
     }
 
     for attr in attrs[coil0.__class__]:
@@ -1643,6 +1799,119 @@ def _check_type(coil0, coil):
                 + f"mismatch between attr {attr}, with values {a0} and {a1}."
                 + " Consider using a MixedCoilSet"
             ),
+        )
+
+
+class PiecewisePlanarArcCoil(_Coil, PiecewisePlanarArcCurve):
+    """Coil made of B planar arcs joined at shared hinges (C0 corners).
+
+    Piecewise-planar coil: each member arc lies in its own plane, so the
+    coil is planar *by construction* (structural planarity, no objective/projection)
+    and C0 continuity + closure cost no DOF. See PiecewisePlanarArcCurve for the
+    "hinge + tilt + transverse-Fourier" parameterization.
+
+    Parameters
+    ----------
+    current : float
+        Current through the coil, in Amperes.
+    hinges : array-like, shape (B, 3)
+        Hinge (breakpoint) coordinates in xyz, B >= 2.
+    tilts : array-like, shape (B,)
+        Plane tilt of each arc about its chord axis, radians. Default zeros.
+    shape : array-like, shape (B, M)
+        Transverse in-plane sine coefficients per arc. Default zeros with M=1.
+    name : str
+        Name for this coil.
+    """
+
+    _io_attrs_ = _Coil._io_attrs_ + PiecewisePlanarArcCurve._io_attrs_
+    _static_attrs = _Coil._static_attrs + PiecewisePlanarArcCurve._static_attrs
+
+    def _set_up(self):
+        """Freeze the arc frame reference after loading.
+
+        `_Coil._set_up` fills every missing `_io_attrs_` entry with None and does not
+        chain, so the mixin's hook on the Curve side never runs for a coil. Restore it
+        here: the reference must be a concrete array before anything is jit-traced,
+        because inside a solve `self.hinges` is a tracer.
+        """
+        super()._set_up()
+        if getattr(self, "_arc_ref", None) is None:
+            self._arc_ref = self._compute_arc_ref()
+
+    def __init__(
+        self,
+        current=1,
+        hinges=None,
+        tilts=None,
+        shape=None,
+        B=None,
+        M=None,
+        name="",
+    ):
+        super().__init__(current, hinges, tilts, shape, B, M, name)
+
+    @classmethod
+    def from_values(
+        cls,
+        current,
+        coords,
+        B=3,
+        M=1,
+        knots=None,
+        basis="xyz",
+        name="",
+        fit_method="parameter",
+    ):
+        """Fit sampled coordinates to a PiecewisePlanarArcCoil.
+
+        Splits the closed curve into B equal-parameter arcs, sets each arc's hinges
+        to the sampled break points, fits the per-arc plane tilt by least squares to
+        the best-fit plane, and fits the transverse sine coefficients to the in-plane
+        deviation from the chord.
+
+        Parameters
+        ----------
+        current : float
+            Current through the coil, in Amperes.
+        coords : ndarray, shape (num_coords, 3)
+            Sampled coordinates of the closed curve (xyz or rpz per basis).
+        B : int
+            Number of planar arcs.
+        M : int
+            Number of transverse sine modes per arc.
+        knots : ndarray or None
+            Parameter values in [0, 2pi) at which coords are sampled. If None,
+            assumes uniform sampling.
+        basis : {"xyz", "rpz"}
+            Basis for input coordinates.
+        name : str
+            Name for this coil.
+        fit_method : {"parameter", "chord"}
+            Abscissa the transverse deviation is fit against. Default "parameter"
+            reproduces every fit made before this option existed; "chord" is the one
+            consistent with the parameterization. See
+            ``PiecewisePlanarArcCurve.from_values`` for the measurements.
+
+        Returns
+        -------
+        coil : PiecewisePlanarArcCoil
+        """
+        curve = PiecewisePlanarArcCurve.from_values(
+            coords,
+            B=B,
+            M=M,
+            knots=knots,
+            basis=basis,
+            name=name,
+            fit_method=fit_method,
+        )
+        return cls(
+            current=current,
+            hinges=curve.hinges,
+            tilts=curve.tilts,
+            shape=curve.shape,
+            name=name,
         )
 
 
@@ -2772,7 +3041,13 @@ class CoilSet(OptimizableCollection, _Coil, MutableSequence[_CoilT]):
         )
 
     def to_SplineXYZ(
-        self, knots=None, grid=None, method="cubic", name="", check_intersection=False
+        self,
+        knots=None,
+        grid=None,
+        method="cubic",
+        name="",
+        check_intersection=False,
+        break_indices=None,
     ) -> CoilSet[SplineXYZCoil]:
         """Convert all coils to SplineXYZCoil representation.
 
@@ -2800,6 +3075,18 @@ class CoilSet(OptimizableCollection, _Coil, MutableSequence[_CoilT]):
         check_intersection: bool
             Whether or not to check the coils in the new coilset for intersections.
             Defaults to False.
+        break_indices : ndarray or None
+            If supplied, the spline will be a piecewise set of splines.
+            Indices of knots at which the curve breaks and is only C0 continuous (e.g.
+            continuous but with "corners" where the derivative jumps). In between each
+            set of break points, there is an unbroken spline whose start and endpoints
+            are given by `break_indices[i-1, i]`, where `i` indicates the ith spline.
+            Each (the ith) spline is interpolated independently of all other unbroken
+            splines (i+1th, i-1th, etc.) and does not consider their query points
+            (knots) when interpolating. The boundary conditions are evaluated using
+            Interpax's default where non-periodicity is assumed.
+            If None (the default), the spline will be the usual periodic spline with
+            the continuity dictated by the spline method.
 
         Returns
         -------
@@ -2807,7 +3094,10 @@ class CoilSet(OptimizableCollection, _Coil, MutableSequence[_CoilT]):
             New representation of the coilset parameterized by a spline for X,Y,Z.
 
         """
-        coils = [coil.to_SplineXYZ(knots, grid, method) for coil in self]
+        coils = [
+            coil.to_SplineXYZ(knots, grid, method, break_indices=break_indices)
+            for coil in self
+        ]
         return self.__class__(
             *coils,
             NFP=self.NFP,
@@ -3439,7 +3729,13 @@ class MixedCoilSet(CoilSet[_Coil]):
         return self.__class__(*coils, name=name, check_intersection=check_intersection)
 
     def to_SplineXYZ(
-        self, knots=None, grid=None, method="cubic", name="", check_intersection=False
+        self,
+        knots=None,
+        grid=None,
+        method="cubic",
+        name="",
+        check_intersection=False,
+        break_indices=None,
     ):
         """Convert all coils to SplineXYZCoil representation.
 
@@ -3467,6 +3763,18 @@ class MixedCoilSet(CoilSet[_Coil]):
         check_intersection: bool
             Whether or not to check the coils in the new coilset for intersections.
             Defaults to False.
+        break_indices : ndarray or None
+            If supplied, the spline will be a piecewise set of splines.
+            Indices of knots at which the curve breaks and is only C0 continuous (e.g.
+            continuous but with "corners" where the derivative jumps). In between each
+            set of break points, there is an unbroken spline whose start and endpoints
+            are given by `break_indices[i-1, i]`, where `i` indicates the ith spline.
+            Each (the ith) spline is interpolated independently of all other unbroken
+            splines (i+1th, i-1th, etc.) and does not consider their query points
+            (knots) when interpolating. The boundary conditions are evaluated using
+            Interpax's default where non-periodicity is assumed.
+            If None (the default), the spline will be the usual periodic spline with
+            the continuity dictated by the spline method.
 
         Returns
         -------
@@ -3476,7 +3784,11 @@ class MixedCoilSet(CoilSet[_Coil]):
         """
         coils = [
             coil.to_SplineXYZ(
-                knots, grid, method, check_intersection=check_intersection
+                knots,
+                grid,
+                method,
+                check_intersection=check_intersection,
+                break_indices=break_indices,
             )
             for coil in self
         ]
@@ -3533,6 +3845,7 @@ class MixedCoilSet(CoilSet[_Coil]):
               the data, and will not introduce new extrema in the interpolated points
             - ``'monotonic-0'``: same as `'monotonic'` but with 0 first derivatives at
               both endpoints
+
         ignore_groups : bool
             If False, return the coils in a nested MixedCoilSet, with a sub coilset per
             single coilgroup. If there is only a single group, however, this will not

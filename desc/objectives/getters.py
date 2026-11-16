@@ -15,6 +15,7 @@ from .linear_objectives import (
     FixBoundaryR,
     FixBoundaryZ,
     FixCurrent,
+    FixCurveArcReference,
     FixCurveRotation,
     FixCurveShift,
     FixElectronDensity,
@@ -367,5 +368,7 @@ def maybe_add_self_consistency(thing, constraints):
         constraints = add_if_multiple(constraints, FixCurveShift)
     if {"rotmat"} <= params:
         constraints = add_if_multiple(constraints, FixCurveRotation)
+    if {"arc_ref"} <= params:
+        constraints = add_if_multiple(constraints, FixCurveArcReference)
 
     return constraints

@@ -13,6 +13,8 @@ from desc.coils import (
     FourierRZCoil,
     FourierXYCoil,
     FourierXYZCoil,
+    PiecewisePlanarArcCoil,
+    PolarPlanarArcCoil,
     SplineXYZCoil,
 )
 from desc.compute import data_index
@@ -24,6 +26,8 @@ from desc.geometry import (
     FourierRZToroidalSurface,
     FourierXYCurve,
     FourierXYZCurve,
+    PiecewisePlanarArcCurve,
+    PolarPlanarArcCurve,
     ZernikeRZToroidalSection,
 )
 from desc.grid import Grid, LinearGrid
@@ -145,6 +149,16 @@ def test_compute_everything():
         "desc.geometry.curve.SplineXYZCurve": FourierXYZCurve(
             X_n=[5, 10, 2], Y_n=[1, 2, 3], Z_n=[-4, -5, -6]
         ).to_SplineXYZ(grid=LinearGrid(N=50)),
+        "desc.geometry.curve.PiecewisePlanarArcCurve": PiecewisePlanarArcCurve(
+            hinges=[[6, 1, 1], [4, 1.5, -1], [4.5, -1, 0.5]],
+            tilts=[0.3, -0.2, 0.5],
+            shape=[[0.4, 0.1], [0.3, -0.1], [0.5, 0.05]],
+        ),
+        "desc.geometry.curve.PolarPlanarArcCurve": PolarPlanarArcCurve(
+            hinges=[[6, 1, 1], [4, 1.5, -1], [4.5, -1, 0.5]],
+            tilts=[0.3, -0.2, 0.5],
+            shape=[[0.1, 0.02], [0.05, -0.03], [0.08, 0.01]],
+        ),
         # surfaces
         "desc.geometry.surface.FourierRZToroidalSurface": FourierRZToroidalSurface(
             **elliptic_cross_section_with_torsion
@@ -201,6 +215,18 @@ def test_compute_everything():
         "desc.coils.SplineXYZCoil": SplineXYZCoil(
             current=5, X=[5, 10, 2, 5], Y=[1, 2, 3, 1], Z=[-4, -5, -6, -4]
         ),
+        "desc.coils.PiecewisePlanarArcCoil": PiecewisePlanarArcCoil(
+            current=5,
+            hinges=[[6, 1, 1], [4, 1.5, -1], [4.5, -1, 0.5]],
+            tilts=[0.3, -0.2, 0.5],
+            shape=[[0.4, 0.1], [0.3, -0.1], [0.5, 0.05]],
+        ),
+        "desc.coils.PolarPlanarArcCoil": PolarPlanarArcCoil(
+            current=5,
+            hinges=[[6, 1, 1], [4, 1.5, -1], [4.5, -1, 0.5]],
+            tilts=[0.3, -0.2, 0.5],
+            shape=[[0.1, 0.02], [0.05, -0.03], [0.08, 0.01]],
+        ),
     }
     assert things.keys() == data_index.keys(), (
         f"Missing the parameterization {data_index.keys() - things.keys()}"
@@ -232,6 +258,8 @@ def test_compute_everything():
         "desc.geometry.curve.FourierPlanarCurve": {"grid": curvegrid1},
         "desc.geometry.curve.FourierXYCurve": {"grid": curvegrid1},
         "desc.geometry.curve.SplineXYZCurve": {"grid": curvegrid1},
+        "desc.geometry.curve.PiecewisePlanarArcCurve": {"grid": curvegrid1},
+        "desc.geometry.curve.PolarPlanarArcCurve": {"grid": curvegrid1},
         "desc.magnetic_fields._core.OmnigenousField": {"grid": fieldgrid},
     }
 
