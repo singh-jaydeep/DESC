@@ -114,6 +114,7 @@ Free boundary / Single stage optimization
 
     desc.objectives.BoundaryError
     desc.objectives.VacuumBoundaryError
+    desc.objectives.VacuumBoundaryBn
 
 
 Coil Optimization
@@ -142,6 +143,13 @@ Coil Optimization
     desc.objectives.ToroidalFlux
     desc.objectives.SurfaceCurrentRegularization
     desc.objectives.LinkingCurrentConsistency
+    desc.objectives.CoilCurrentBand
+    desc.objectives.PointwiseBn
+    desc.objectives.ArcFold
+    desc.objectives.HingeLevel
+    desc.objectives.HingeMidHeightRelative
+    desc.objectives.HingeTilt
+    desc.objectives.PolarArcRadius
 
 
 Profiles
@@ -203,6 +211,7 @@ Fixing degrees of freedom
     desc.objectives.FixOmniBmax
     desc.objectives.FixCoilCurrent
     desc.objectives.FixSumCoilCurrent
+    desc.objectives.FixHingeHeight
     desc.objectives.FixParameters
     desc.objectives.ShareParameters
 

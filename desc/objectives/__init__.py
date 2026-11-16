@@ -30,7 +30,7 @@ from ._equilibrium import (
     RadialForceBalance,
 )
 from ._fast_ion import GammaC
-from ._free_boundary import BoundaryError, VacuumBoundaryError
+from ._free_boundary import BoundaryError, VacuumBoundaryBn, VacuumBoundaryError
 from ._generic import (
     DeflationOperator,
     ExternalObjective,
@@ -57,6 +57,16 @@ from ._omnigenity import (
     QuasisymmetryBoozer,
     QuasisymmetryTripleProduct,
     QuasisymmetryTwoTerm,
+)
+from ._piecewise_planar import (
+    ArcFold,
+    CoilCurrentBand,
+    FixHingeHeight,
+    HingeLevel,
+    HingeMidHeightRelative,
+    HingeTilt,
+    PointwiseBn,
+    PolarArcRadius,
 )
 from ._power_balance import FusionPower, HeatingPowerISS04
 from ._profiles import Pressure, RotationalTransform, Shear, ToroidalCurrent
@@ -113,12 +123,14 @@ from .linear_objectives import (
 from .objective_funs import ObjectiveFunction
 
 __all__ = [
+    "ArcFold",
     "AspectRatio",
     "BScaleLength",
     "BallooningStability",
     "BootstrapRedlConsistency",
     "BoundaryError",
     "CoilArclengthVariance",
+    "CoilCurrentBand",
     "CoilCurrentLength",
     "CoilCurvature",
     "CoilIntegratedCurvature",
@@ -143,6 +155,7 @@ __all__ = [
     "FixCurrent",
     "FixElectronDensity",
     "FixElectronTemperature",
+    "FixHingeHeight",
     "FixIonTemperature",
     "FixIota",
     "FixModeR",
@@ -169,6 +182,9 @@ __all__ = [
     "GoodCoordinates",
     "HeatingPowerISS04",
     "HelicalForceBalance",
+    "HingeLevel",
+    "HingeMidHeightRelative",
+    "HingeTilt",
     "Isodynamicity",
     "LinearObjectiveFromUser",
     "LinkingCurrentConsistency",
@@ -184,6 +200,8 @@ __all__ = [
     "PlasmaCoilSetDistanceRows",
     "PlasmaCoilSetMinDistance",
     "PlasmaVesselDistance",
+    "PointwiseBn",
+    "PolarArcRadius",
     "Pressure",
     "PrincipalCurvature",
     "QuadraticFlux",
@@ -198,6 +216,7 @@ __all__ = [
     "SurfaceQuadraticFlux",
     "ToroidalCurrent",
     "ToroidalFlux",
+    "VacuumBoundaryBn",
     "VacuumBoundaryError",
     "Volume",
     "get_NAE_constraints",

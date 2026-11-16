@@ -209,12 +209,14 @@ Objective Functions
     :recursive:
     :template: class.rst
 
+    desc.objectives.ArcFold
     desc.objectives.AspectRatio
     desc.objectives.BallooningStability
     desc.objectives.BootstrapRedlConsistency
     desc.objectives.BoundaryError
     desc.objectives.BScaleLength
     desc.objectives.CoilArclengthVariance
+    desc.objectives.CoilCurrentBand
     desc.objectives.CoilCurrentLength
     desc.objectives.CoilCurvature
     desc.objectives.CoilIntegratedCurvature
@@ -239,6 +241,7 @@ Objective Functions
     desc.objectives.FixCurrent
     desc.objectives.FixElectronDensity
     desc.objectives.FixElectronTemperature
+    desc.objectives.FixHingeHeight
     desc.objectives.FixIonTemperature
     desc.objectives.FixIota
     desc.objectives.FixModeR
@@ -269,6 +272,9 @@ Objective Functions
     desc.objectives.GoodCoordinates
     desc.objectives.HeatingPowerISS04
     desc.objectives.HelicalForceBalance
+    desc.objectives.HingeLevel
+    desc.objectives.HingeMidHeightRelative
+    desc.objectives.HingeTilt
     desc.objectives.Isodynamicity
     desc.objectives.LinearObjectiveFromUser
     desc.objectives.LinkingCurrentConsistency
@@ -284,6 +290,8 @@ Objective Functions
     desc.objectives.PlasmaCoilSetDistanceRows
     desc.objectives.PlasmaCoilSetMinDistance
     desc.objectives.PlasmaVesselDistance
+    desc.objectives.PointwiseBn
+    desc.objectives.PolarArcRadius
     desc.objectives.Pressure
     desc.objectives.PrincipalCurvature
     desc.objectives.QuadraticFlux
@@ -298,6 +306,7 @@ Objective Functions
     desc.objectives.SurfaceQuadraticFlux
     desc.objectives.ToroidalCurrent
     desc.objectives.ToroidalFlux
+    desc.objectives.VacuumBoundaryBn
     desc.objectives.VacuumBoundaryError
     desc.objectives.Volume
     desc.objectives.node_gap_estimate

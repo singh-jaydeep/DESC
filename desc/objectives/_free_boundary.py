@@ -1186,3 +1186,112 @@ class BoundaryErrorNESTOR(_Objective):
         bp = data["|B|^2"]
         g = data["|e_theta x e_zeta|"]
         return (bv - bp - data["p"] * (2 * mu_0)) * g
+
+
+class VacuumBoundaryBn(VacuumBoundaryError):
+    """B.n of an external field on a moving plasma boundary, area weighted.
+
+    The B.n block of ``VacuumBoundaryError``, with the boundary and the field both
+    optimized, for single-stage optimization in vacuum. ``QuadraticFlux`` holds the
+    equilibrium fixed; ``VacuumBoundaryError`` also carries the B^2 jump rows, which
+    measure the tangential mismatch, and weights its rows by ``g`` (surface Jacobian)
+    rather than by area.
+
+    The rows are ``B_ext.n sqrt(g)``, normalized by ``<|B|> sqrt(mean g)`` of the
+    equilibrium at build, with quadrature weights ``sqrt(dtheta dzeta)``: the
+    weighted rms of the rows is the area-weighted rms of ``B.n / <|B|>``. Vacuum only.
+    The rows are blind to the overall current scale, so hold the sum of the coil
+    currents fixed.
+
+    Parameters
+    ----------
+    eq : Equilibrium
+        Equilibrium whose boundary is optimized.
+    field : MagneticField
+        External field, e.g. a CoilSet.
+    norm : float, optional
+        Normalization to use instead of the value at build, e.g. the value at the
+        start of a continuation, so the scale stays fixed across rebuilds.
+
+    Other parameters are as in ``VacuumBoundaryError``.
+
+    """
+
+    _units = "(T*m)"
+    _print_value_fmt = "Boundary normal field error: "
+
+    def __init__(self, *args, name="vacuum B.n error", norm=None, **kwargs):
+        self._fixed_norm = norm
+        super().__init__(*args, name=name, **kwargs)
+
+    def build(self, use_jit=True, verbose=1):
+        """Build constant arrays.
+
+        Parameters
+        ----------
+        use_jit : bool, optional
+            Whether to just-in-time compile the objective and derivatives.
+        verbose : int, optional
+            Level of output.
+
+        """
+        super().build(use_jit=use_jit, verbose=verbose)
+        n = self._dim_f // 2
+        self._dim_f = n
+        self._constants["quad_weights"] = self._constants["quad_weights"][:n]
+        if self._normalize and self._fixed_norm is not None:
+            self._normalization = float(self._fixed_norm)
+        elif self._normalize:
+            grid = self._constants["transforms"]["grid"]
+            d = self.things[0].compute(["|B|", "|e_theta x e_zeta|"], grid=grid)
+            w = np.asarray(grid.weights)
+            g = np.asarray(d["|e_theta x e_zeta|"])
+            Bmean = np.sum(w * g * np.asarray(d["|B|"])) / np.sum(w * g)
+            self._normalization = float(Bmean * np.sqrt(np.sum(w * g) / np.sum(w)))
+        if self._target is not None and jnp.size(self._target) > 1:
+            self._target = self._target[:n]
+
+    def compute(self, eq_params, *field_params, constants=None):
+        """Compute B.n sqrt(g) on the boundary.
+
+        Parameters
+        ----------
+        eq_params : dict
+            Dictionary of equilibrium degrees of freedom, eg Equilibrium.params_dict
+        field_params : dict
+            Dictionary of field parameters, if field is not fixed.
+        constants : dict
+            Dictionary of constant data, eg transforms, profiles etc. Defaults to
+            self.constants. (Deprecated)
+
+        Returns
+        -------
+        f : ndarray
+            B.n sqrt(|e_theta x e_zeta|) in T*m.
+
+        """
+        if field_params == ():
+            field_params = None
+        constants = self._get_deprecated_constants(constants)
+        data = compute_fun(
+            "desc.equilibrium.equilibrium.Equilibrium",
+            ["R", "phi", "Z", "n_rho", "|e_theta x e_zeta|"],
+            params=eq_params,
+            transforms=constants["transforms"],
+            profiles=constants["profiles"],
+        )
+        x = jnp.array([data["R"], data["phi"], data["Z"]]).T
+        B = constants["field"].compute_magnetic_field(
+            x,
+            source_grid=self._field_grid,
+            basis="rpz",
+            params=field_params,
+            chunk_size=self._bs_chunk_size,
+        )
+        return jnp.sum(B * data["n_rho"], axis=-1) * jnp.sqrt(
+            data["|e_theta x e_zeta|"]
+        )
+
+    def print_value(self, args, args0=None, **kwargs):
+        """Print the value of the objective."""
+        return _Objective.print_value(self, args, args0, **kwargs)
