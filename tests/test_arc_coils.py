@@ -201,3 +201,50 @@ def test_polar_planar_arc_from_values_round_trip():
     np.testing.assert_allclose(
         fit.compute("x", grid=grid, basis="xyz")["x"], x, atol=0.1
     )
+
+
+@pytest.mark.unit
+def test_coil_quad_grid_length():
+    """Composite Gauss-Legendre per arc gives arc lengths to quadrature accuracy."""
+    from scipy.integrate import quad
+
+    from desc.coils import coil_quad_grid, coil_source_grid
+
+    # straight arcs: the length is the perimeter of the hinge polygon
+    poly = PiecewisePlanarArcCoil(1e5, HINGES + [5, 0, 0], shape=np.zeros((4, 1)))
+    perimeter = np.sum(np.linalg.norm(np.roll(HINGES, -1, 0) - HINGES, axis=1))
+    for n in (4, 24):
+        L = poly.compute("length", grid=coil_quad_grid(poly, n=n), override_grid=False)
+        np.testing.assert_allclose(L["length"], perimeter, rtol=1e-13)
+    # curved arcs: against adaptive quadrature of |x_s| arc by arc
+    coil = PiecewisePlanarArcCoil(1e5, HINGES + [5, 0, 0], tilts=TILTS, shape=SHAPE)
+
+    def speed(s):
+        return np.linalg.norm(_at(coil, "x_s", s)[0])
+
+    ref = sum(
+        quad(speed, 2 * np.pi * i / 4, 2 * np.pi * (i + 1) / 4, epsabs=1e-13)[0]
+        for i in range(4)
+    )
+    grid = coil_quad_grid(CoilSet(coil), n=24)
+    L = coil.compute("length", grid=grid, override_grid=False)["length"]
+    np.testing.assert_allclose(L, ref, rtol=1e-9)
+    assert grid.num_nodes == 4 * 24
+    assert coil_source_grid(coil).num_nodes == 4 * 24
+    # smooth coils and splines
+    assert coil_quad_grid(FourierPlanarCurve()).num_nodes == LinearGrid(N=400).num_nodes
+
+
+@pytest.mark.unit
+def test_coil_curvature_grid():
+    """The curvature grid has n nodes strictly inside every arc, none on a hinge."""
+    from desc.coils import coil_curvature_grid
+
+    coil = PiecewisePlanarArcCoil(1e5, HINGES + [5, 0, 0], tilts=TILTS, shape=SHAPE)
+    grid = coil_curvature_grid(CoilSet(coil), n=50)
+    s = np.asarray(grid.nodes[:, 2])
+    assert s.size == 4 * 50
+    arc = np.floor(s / (np.pi / 2))
+    np.testing.assert_array_equal(np.bincount(arc.astype(int)), [50] * 4)
+    hinge_dist = np.abs(s[:, None] - np.pi / 2 * np.arange(5)[None]).min(axis=1)
+    assert hinge_dist.min() > 0.9 * (np.pi / 2) / 100  # half a spacing

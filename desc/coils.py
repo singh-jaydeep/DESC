@@ -67,6 +67,10 @@ __all__ = [
     "PiecewisePlanarArcCoil",
     "PolarPlanarArcCoil",
     "SplineXYZCoil",
+    "coil_curvature_grid",
+    "coil_quad_grid",
+    "coil_source_grid",
+    "composite_gauss_legendre_grid",
     "initialize_helical_coils",
     "initialize_modular_coils",
     "initialize_saddle_coils",
@@ -4229,3 +4233,140 @@ def initialize_helical_coils(
         )
         coils.append(coil)
     return CoilSet(*coils, check_intersection=check_intersection)
+
+
+def _coil_corners(coil):
+    """Curve parameters of a coil's C0 corners: arc hinges or spline breaks."""
+    if hasattr(coil, "B"):  # piecewise-planar arcs
+        return 2 * np.pi * np.arange(int(coil.B)) / int(coil.B)
+    intervals = np.asarray(getattr(coil, "intervals", [[]]))
+    if intervals.size == 0:
+        return np.zeros(0)
+    return np.sort(np.asarray(coil.knots)[intervals[:, 0].astype(int)])
+
+
+def _first_coil(coilset):
+    while isinstance(coilset, CoilSet):
+        coilset = coilset[0]
+    return coilset
+
+
+def composite_gauss_legendre_grid(breaks, n):
+    """Grid of n Gauss-Legendre nodes in each interval between consecutive breaks.
+
+    ``spacing[:, 2]`` holds the quadrature weights, so sums with DESC's ``ds`` (e.g.
+    coil length) are a composite Gauss-Legendre rule, exact to high order on a curve
+    that is smooth between the breaks but only C0 across them.
+
+    Parameters
+    ----------
+    breaks : array-like
+        Curve parameters in [0, 2pi) of the interval ends (e.g. arc hinges).
+    n : int
+        Nodes per interval.
+
+    Returns
+    -------
+    grid : Grid
+
+    """
+    xg, wg = np.polynomial.legendre.leggauss(int(n))
+    e = np.sort(np.mod(np.asarray(breaks, dtype=float), 2 * np.pi))
+    edges = np.append(e, e[0] + 2 * np.pi)
+    half = 0.5 * np.diff(edges)
+    s = (edges[:-1, None] + half[:, None] * (xg[None] + 1)).ravel()
+    nodes = np.zeros((s.size, 3))
+    nodes[:, 2] = np.mod(s, 2 * np.pi)
+    spacing = np.ones((s.size, 3))
+    spacing[:, 2] = (half[:, None] * wg[None]).ravel()
+    return Grid(nodes, spacing=spacing, sort=False, jitable=False)
+
+
+def coil_quad_grid(coilset, n=24, spline_n=8, N=400):
+    """Grid for coil length and other arclength integrals, composite across corners.
+
+    Composite Gauss-Legendre with ``n`` nodes per arc for piecewise-planar coils and
+    ``spline_n`` per span for splines (which are only C2 at their knots), so the rule
+    does not straddle a corner, where a uniform grid converges only O(h) and moves
+    with the corners. ``LinearGrid(N=N)`` for smooth coils.
+
+    Parameters
+    ----------
+    coilset : CoilSet or Coil
+        Coils whose first leaf decides the type.
+    n, spline_n : int
+        Gauss-Legendre nodes per arc and per spline span.
+    N : int
+        Resolution of the uniform grid for smooth coils.
+
+    Returns
+    -------
+    grid : Grid
+
+    """
+    c = _first_coil(coilset)
+    if hasattr(c, "B"):
+        return composite_gauss_legendre_grid(_coil_corners(c), n)
+    if isinstance(c, SplineXYZCoil):
+        return composite_gauss_legendre_grid(np.asarray(c.knots), spline_n)
+    return LinearGrid(N=N)
+
+
+def coil_source_grid(coilset, n=24, N=400):
+    """Biot-Savart source grid: composite Gauss-Legendre per arc, else uniform.
+
+    Splines take the uniform grid: ``SplineXYZCoil`` evaluates the field with the
+    straight-segment formula through the grid points, so the grid supplies polyline
+    vertices and Gauss-Legendre clustering would leave long chords mid-span.
+
+    Parameters
+    ----------
+    coilset : CoilSet or Coil
+        Coils whose first leaf decides the type.
+    n : int
+        Gauss-Legendre nodes per arc.
+    N : int
+        Resolution of the uniform grid otherwise.
+
+    Returns
+    -------
+    grid : Grid
+
+    """
+    c = _first_coil(coilset)
+    if hasattr(c, "B"):
+        return composite_gauss_legendre_grid(_coil_corners(c), n)
+    return LinearGrid(N=N)
+
+
+def coil_curvature_grid(coilset, n=1000):
+    """Grid of n midpoint nodes in each arc (or interval between spline breaks).
+
+    For bounding curvature node by node on C0 coils. Each node lies inside one arc, so
+    no node sits on a corner, where only one side's curvature would be seen. The
+    sampled maximum misses a smooth interior peak by about ``kappa'' h^2 / 8`` with
+    ``h`` the node spacing: on the paper's arc coils, 0.08% at 300 nodes per arc and
+    under 0.01% at 1000. Smooth coils get ``LinearGrid(N=n)``.
+
+    Parameters
+    ----------
+    coilset : CoilSet or Coil
+        Coils whose first leaf decides the type.
+    n : int
+        Nodes per arc.
+
+    Returns
+    -------
+    grid : Grid
+
+    """
+    c = _first_coil(coilset)
+    corners = _coil_corners(c)
+    if corners.size == 0:
+        return LinearGrid(N=n)
+    edges = np.append(corners, corners[0] + 2 * np.pi)
+    t = (np.arange(n) + 0.5) / n
+    s = (edges[:-1, None] + np.diff(edges)[:, None] * t[None]).ravel()
+    nodes = np.zeros((s.size, 3))
+    nodes[:, 2] = np.mod(s, 2 * np.pi)
+    return Grid(nodes, sort=False, jitable=False)

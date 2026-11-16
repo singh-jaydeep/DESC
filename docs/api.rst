@@ -37,6 +37,10 @@ Coils
     desc.coils.PiecewisePlanarArcCoil
     desc.coils.PolarPlanarArcCoil
     desc.coils.SplineXYZCoil
+    desc.coils.coil_curvature_grid
+    desc.coils.coil_quad_grid
+    desc.coils.coil_source_grid
+    desc.coils.composite_gauss_legendre_grid
     desc.coils.initialize_helical_coils
     desc.coils.initialize_modular_coils
     desc.coils.initialize_saddle_coils

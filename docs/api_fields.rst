@@ -132,3 +132,17 @@ saddle coils:
     desc.coils.initialize_modular_coils
     desc.coils.initialize_helical_coils
     desc.coils.initialize_saddle_coils
+
+There are also helpers for coil grids that respect the corners of piecewise-planar
+arc coils and splines with breaks: composite Gauss-Legendre quadrature for lengths and
+Biot-Savart, and a curvature grid with nodes inside every arc:
+
+.. autosummary::
+    :toctree: _api/coils/
+    :recursive:
+    :template: class.rst
+
+    desc.coils.composite_gauss_legendre_grid
+    desc.coils.coil_quad_grid
+    desc.coils.coil_source_grid
+    desc.coils.coil_curvature_grid
