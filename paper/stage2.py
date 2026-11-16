@@ -1,0 +1,511 @@
+"""Stage-2 coil optimization for the piecewise-planar coil paper.
+
+    python paper/stage2.py --eq EQ --start COILS.h5 --bounds BOUNDS.json --out DIR \
+        [--vacuum] [--fold-max 60] [--fix-hinge-z 0] [--current-band 0.5] ...
+
+Minimize QuadraticFlux on a fixed equilibrium subject to the engineering bounds, all as
+hard constraints of the slack-free augmented Lagrangian ``lsq-auglag-composite``:
+
+* coil length (composite Gauss-Legendre per arc) and |curvature| at their bounds;
+* coil-coil distance: ``CoilSetDistanceRows`` (unsigned top-k node-pair rows, gap from
+  the bounds by ``node_gap_estimate`` or from the coils at build);
+* plasma-coil distance: ``PlasmaCoilSetDistanceRows`` with the boundary held fixed;
+* the sum of the coil currents fixed; optionally each current within a band;
+* arc coils: optional fold cap, joint plane (``FixHingeHeight`` at z, or level hinges
+  per coil), hinge height above the axis, hinge tilt, polar radius floor;
+* optionally a pointwise cap on B.n/|B| (vacuum only).
+
+Every run writes to DIR: cmd.txt, commit.txt, run.log, outer.json (one record per outer
+iteration: per-group penalties, multipliers, violations, and a dense check), x_last.npy,
+result.h5 and result.json (settings, bounds, dense check at start and end).
+
+Device: ``--device gpu|cpu`` (default gpu). On an 8 GB GPU with a pointwise B.n cap set
+``XLA_PYTHON_CLIENT_MEM_FRACTION=0.92`` (the default 0.75 runs out of memory).
+"""
+
+import argparse
+import json
+import os
+import subprocess
+import sys
+import time
+
+ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
+ap.add_argument("--eq", required=True, help="DESC .h5 or desc.examples name")
+ap.add_argument("--start", required=True, help="start coilset (.h5)")
+ap.add_argument("--bounds", required=True, help="bounds file (json)")
+ap.add_argument("--out", required=True)
+ap.add_argument("--device", default="gpu", choices=["gpu", "cpu"])
+ap.add_argument("--vacuum", action="store_true", help="no plasma field (vacuum eq)")
+ap.add_argument("--a", type=float, default=None, help="minor radius for the bounds")
+ap.add_argument("--maxiter", type=int, default=800)
+ap.add_argument("--gtol", type=float, default=1e-6)
+ap.add_argument("--ctol", type=float, default=1e-6)
+ap.add_argument("--options", default="{}", help="JSON options for the solver")
+# grids and row selection
+ap.add_argument("--field-n", type=int, default=50, help="smooth coils: Biot-Savart N")
+ap.add_argument("--eval-mn", default="25,25", help="QuadraticFlux eval grid M,N")
+ap.add_argument(
+    "--curv-grid",
+    choices=["linear", "arc"],
+    default="linear",
+    help="curvature nodes: LinearGrid(N=curv-n) (as the poster runs) or "
+    "coil_curvature_grid with curv-n nodes per arc",
+)
+ap.add_argument("--curv-n", type=int, default=300)
+ap.add_argument("--row-n", type=int, default=256, help="cc rows: ~2 N + 1 nodes/coil")
+ap.add_argument("--cc-k", type=int, default=10000, help="cc row slots")
+ap.add_argument("--cc-sel", type=float, default=0.1, help="cc select distance (m)")
+ap.add_argument(
+    "--cc-gap",
+    choices=["bounds", "coils"],
+    default="bounds",
+    help="cc gap from the bounds (node_gap_estimate) or the coils at build",
+)
+ap.add_argument("--speed-ratio", type=float, default=2.0, help="for the bounds gap")
+ap.add_argument(
+    "--pc-row-n", type=int, default=256, help="pc rows: ~2 N + 1 nodes/coil"
+)
+ap.add_argument(
+    "--pc-plasma-mn",
+    default="128,128",
+    help="pc plasma grid M,N; the gap grows as (cell size)^2 x surface curvature "
+    "(design F: 47 mm at 32,32, 5 mm at 128,128)",
+)
+ap.add_argument(
+    "--pc-plasma-full",
+    action="store_true",
+    help="full plasma grid (default: stellarator-symmetric half, valid for "
+    "symmetric coilsets only)",
+)
+ap.add_argument("--pc-k", type=int, default=20000, help="pc row slots")
+ap.add_argument(
+    "--pc-sel", type=float, default=1.2, help="pc select distance / d_pc bound"
+)
+ap.add_argument("--jac-chunk", type=int, default=16, help="jac_chunk_size")
+# piecewise-planar constraints
+ap.add_argument("--fold-max", type=float, default=None, help="fold cap (deg)")
+ap.add_argument(
+    "--fold-sides-from",
+    default=None,
+    help="result.json of an earlier run: reuse its arc orientation for the fold",
+)
+ap.add_argument("--fix-hinge-z", type=float, default=None, help="joint plane z (m)")
+ap.add_argument(
+    "--horizontal-hinges", action="store_true", help="each coil's hinges level"
+)
+ap.add_argument(
+    "--hinge-zmax-rel", type=float, default=None, help="|hinge mid z - axis z| (m)"
+)
+ap.add_argument("--hinge-tilt-max", type=float, default=None, help="chord tilt (deg)")
+ap.add_argument("--polar-rmin", type=float, default=None, help="polar radius floor")
+ap.add_argument("--current-band", type=float, default=None, help="I / I_avg in 1 -+ f")
+ap.add_argument("--bn-max", type=float, default=None, help="cap on |B.n|/|B|")
+ap.add_argument("--bn-max-grid", default="32,64", help="B.n cap grid M,N")
+a = ap.parse_args()
+
+if a.horizontal_hinges and a.fix_hinge_z is not None:
+    raise SystemExit("--horizontal-hinges and --fix-hinge-z are exclusive")
+if a.fix_hinge_z is not None and (a.hinge_zmax_rel or a.hinge_tilt_max):
+    raise SystemExit("--fix-hinge-z fixes the hinges; drop --hinge-zmax-rel/-tilt-max")
+if a.bn_max is not None and not a.vacuum:
+    raise SystemExit("--bn-max is vacuum only")
+
+os.makedirs(a.out, exist_ok=True)
+
+
+class _Tee:
+    def __init__(self, *streams):
+        self.streams = streams
+
+    def write(self, s):
+        for st in self.streams:
+            st.write(s)
+            st.flush()
+
+    def flush(self):
+        for st in self.streams:
+            st.flush()
+
+
+sys.stdout = _Tee(sys.__stdout__, open(os.path.join(a.out, "run.log"), "a"))
+open(os.path.join(a.out, "cmd.txt"), "w").write(" ".join(sys.argv) + "\n")
+
+from desc import set_device  # noqa: E402
+
+set_device(a.device)
+
+import numpy as np  # noqa: E402
+
+import desc  # noqa: E402
+from desc.coils import (  # noqa: E402
+    FourierPlanarCoil,
+    PolarPlanarArcCoil,
+    coil_curvature_grid,
+    coil_quad_grid,
+    coil_source_grid,
+)
+from desc.grid import LinearGrid  # noqa: E402
+from desc.io import load  # noqa: E402
+from desc.objectives import (  # noqa: E402
+    ArcFold,
+    CoilCurrentBand,
+    CoilCurvature,
+    CoilLength,
+    CoilSetDistanceRows,
+    FixHingeHeight,
+    FixParameters,
+    FixSumCoilCurrent,
+    HingeLevel,
+    HingeMidHeightRelative,
+    HingeTilt,
+    ObjectiveFunction,
+    PlasmaCoilSetDistanceRows,
+    PointwiseBn,
+    PolarArcRadius,
+    QuadraticFlux,
+    node_gap_estimate,
+)
+from desc.objectives._coils import _coil_node_grid  # noqa: E402
+from desc.objectives._piecewise_planar import fold_angles, side_signs  # noqa: E402
+from desc.optimize import Optimizer  # noqa: E402
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "lib"))
+import dense_check as D  # noqa: E402
+
+root = os.path.dirname(os.path.dirname(os.path.abspath(desc.__file__)))
+commit = subprocess.run(
+    ["git", "-C", root, "describe", "--always", "--dirty"],
+    capture_output=True,
+    text=True,
+).stdout.strip()
+open(os.path.join(a.out, "commit.txt"), "w").write(commit + "\n")
+print(f"DESC {desc.__file__} at {commit}; device {a.device}", flush=True)
+
+# ------------------------------------------------------------------ inputs
+eq = D.load_equilibrium(a.eq)
+cs0 = load(a.start)
+coils = D.leaf_coils(cs0)
+P = D.load_bounds(a.bounds, eq, len(coils), a.a)
+arc = hasattr(coils[0], "B")
+polar = isinstance(coils[0], PolarPlanarArcCoil)
+kind = type(coils[0]).__name__
+if not arc and not isinstance(coils[0], FourierPlanarCoil):
+    raise SystemExit(f"arc or FourierPlanar coils only, got {kind}")
+if (a.fold_max or a.fix_hinge_z is not None or a.horizontal_hinges) and not arc:
+    raise SystemExit("fold and hinge options need arc coils")
+if not a.pc_plasma_full and not getattr(cs0, "sym", False):
+    raise SystemExit("the half plasma grid needs a symmetric coilset: --pc-plasma-full")
+if a.polar_rmin is not None and not polar:
+    raise SystemExit("--polar-rmin needs polar arc coils")
+print(
+    f"eq {a.eq} NFP {eq.NFP}; start {a.start}: {len(coils)} {kind}; "
+    f"{'vacuum' if a.vacuum else 'finite beta'}\nBOUNDS {P}",
+    flush=True,
+)
+
+if a.fix_hinge_z is not None or a.horizontal_hinges:
+    moved = 0.0
+    for c in coils:  # snap the start onto the joint plane(s)
+        h = np.array(c.hinges).reshape(-1, 3)
+        zt = a.fix_hinge_z if a.fix_hinge_z is not None else h[:, 2].mean()
+        moved = max(moved, float(np.abs(h[:, 2] - zt).max()))
+        h[:, 2] = zt
+        c.hinges = h.reshape(-1)
+    print(f"JOINT PLANE: hinges snapped (largest move {moved:.2e} m)", flush=True)
+
+sides = None
+if arc:
+    B0 = int(coils[0].B)
+    if a.fold_sides_from:
+        info0 = json.load(open(a.fold_sides_from))["info"]
+        sides = np.asarray(info0["fold_sides"], dtype=float)
+    else:
+        sides = np.array([side_signs(c.params_dict, B0, polar) for c in coils])
+
+# --------------------------------------------------------------- problem
+jcs = a.jac_chunk
+eM, eN = (int(v) for v in a.eval_mn.split(","))
+field_grid = coil_source_grid(cs0, N=a.field_n)
+obj = ObjectiveFunction(
+    QuadraticFlux(
+        eq,
+        field=cs0,
+        eval_grid=LinearGrid(M=eM, N=eN, NFP=eq.NFP, sym=eq.sym),
+        field_grid=field_grid,
+        vacuum=a.vacuum,
+        bs_chunk_size=10,
+        jac_chunk_size=jcs,
+    ),
+    deriv_mode="blocked",
+)
+cons = [FixSumCoilCurrent(cs0)]
+info = dict(kind=kind, field_grid=field_grid.num_nodes)
+if isinstance(coils[0], FourierPlanarCoil):  # scaling the normal is an exact gauge
+    pins = [{"normal": np.array([np.argmax(np.abs(c.normal))])} for c in coils]
+    cons.append(FixParameters(cs0, pins))
+    info["gauge"] = "largest normal component pinned"
+if P["L"] is not None:
+    cons.append(
+        CoilLength(
+            cs0, bounds=(0, P["L"]), grid=coil_quad_grid(cs0), jac_chunk_size=jcs
+        )
+    )
+if P["kappa"] is not None:
+    cg = (
+        coil_curvature_grid(cs0, n=a.curv_n)
+        if a.curv_grid == "arc"
+        else LinearGrid(N=a.curv_n)
+    )
+    cons.append(CoilCurvature(cs0, bounds=(0, P["kappa"]), grid=cg, jac_chunk_size=jcs))
+    info["curvature_nodes"] = cg.num_nodes
+
+# distances
+arc_nodes = 2 * a.row_n + 1
+row_grid = _coil_node_grid(cs0, arc_nodes) if arc else LinearGrid(N=a.row_n)
+n_nodes = row_grid.num_nodes
+gap = node_gap_estimate(n_nodes, P["L"], P["kappa"], P["dcc"], a.speed_ratio)
+cc = CoilSetDistanceRows(
+    cs0,
+    select_distance=a.cc_sel,
+    bounds=(P["dcc"], np.inf),
+    grid=row_grid if a.cc_gap == "bounds" else None,
+    gap=gap if a.cc_gap == "bounds" else None,
+    max_active_rows=a.cc_k,
+    jac_chunk_size=jcs,
+)
+pM, pN = (int(v) for v in a.pc_plasma_mn.split(","))
+pc_grid = _coil_node_grid(cs0, 2 * a.pc_row_n + 1) if arc else LinearGrid(N=a.pc_row_n)
+pc = PlasmaCoilSetDistanceRows(
+    eq,
+    cs0,
+    select_distance=a.pc_sel * P["dpc"],
+    bounds=(P["dpc"], np.inf),
+    plasma_grid=LinearGrid(M=pM, N=pN, NFP=eq.NFP, sym=not a.pc_plasma_full),
+    coil_grid=pc_grid,
+    eq_fixed=True,
+    max_active_rows=a.pc_k,
+    jac_chunk_size=jcs,
+)
+cons += [cc, pc]
+
+# piecewise-planar constraints
+if a.fix_hinge_z is not None:
+    cons.append(FixHingeHeight(cs0, height=a.fix_hinge_z))
+    info["joint_plane"] = f"every hinge at z = {a.fix_hinge_z}"
+if a.horizontal_hinges:
+    cons.append(HingeLevel(cs0))
+    info["joint_plane"] = "hinges level per coil, heights free"
+if a.hinge_zmax_rel is not None:
+    cons.append(HingeMidHeightRelative(cs0, eq, a.hinge_zmax_rel))
+if a.hinge_tilt_max is not None:
+    st = float(np.sin(np.radians(a.hinge_tilt_max)))
+    cons.append(HingeTilt(cs0, bounds=(-st, st)))
+if a.polar_rmin is not None:
+    cons.append(PolarArcRadius(cs0, bounds=(a.polar_rmin, np.inf)))
+if a.fold_max is not None:
+    cmin = float(np.cos(np.radians(a.fold_max)))
+    cons.append(ArcFold(cs0, bounds=(cmin, np.inf), sides=sides))
+if arc:
+    info["fold_sides"] = sides.tolist()
+if a.current_band is not None:
+    f = a.current_band
+    cons.append(CoilCurrentBand(cs0, bounds=(1 - f, 1 + f)))
+if a.bn_max is not None:
+    bM, bN = (int(v) for v in a.bn_max_grid.split(","))
+    cons.append(
+        PointwiseBn(
+            eq,
+            cs0,
+            LinearGrid(M=bM, N=bN, NFP=eq.NFP, sym=eq.sym),
+            field_grid=field_grid,
+            bounds=(-a.bn_max, a.bn_max),
+            jac_chunk_size=jcs,
+        )
+    )
+cons = tuple(cons)
+
+t0 = time.time()
+obj.build(verbose=0)
+nonlinear = [c for c in cons if not c.linear]
+for c in nonlinear:
+    c.build(verbose=0)
+params0 = cs0.params_dict
+print(
+    f"BUILD {time.time() - t0:.1f} s; "
+    f"cc gap {1e3 * float(np.max(cc._constants['gap'])):.3f}"
+    f" mm on {cc._n_nodes} nodes/coil, active {cc.active_row_count(params0)} of "
+    f"{a.cc_k}; pc gap {1e3 * float(np.max(pc._constants['gap'])):.3f} mm on "
+    f"{pc._n_nodes} nodes/coil x {pc._n_points} plasma points, active "
+    f"{pc.active_row_count(params0)} of {a.pc_k}",
+    flush=True,
+)
+for c in nonlinear:
+    print(f"  {c.name:32s} rows {getattr(c, 'num_row_ids', c.dim_f)}", flush=True)
+info.update(
+    cc_gap=float(np.max(cc._constants["gap"])),
+    pc_gap=float(np.max(pc._constants["gap"])),
+    cc_nodes=cc._n_nodes,
+    pc_nodes=pc._n_nodes,
+)
+print(f"INFO {info}", flush=True)
+
+tree = D.surface_tree(eq)
+
+
+def shape(cs_or_params):
+    """Per-coil folds, currents over their mean, as a dict for the logs."""
+    cur = np.array([float(np.ravel(c.current)[0]) for c in D.leaf_coils(cs_or_params)])
+    out = dict(I_over_avg=np.round(cur / cur.mean(), 4).tolist())
+    if arc:
+        fold = fold_angles(cs_or_params, sides=sides)
+        out["fold_deg"] = np.round(fold, 2).tolist()
+    return out
+
+
+m0 = D.evaluate(cs0, eq, tree, vacuum=a.vacuum)
+print(
+    f"START  bn {m0['bn']:.4e} max {m0['bn_max']:.3e}  {D.report(m0, P)}  "
+    f"linked {m0['linked']} -> {D.verdict(m0, P)}  {shape(cs0)}",
+    flush=True,
+)
+if a.maxiter == 0:
+    print("maxiter 0: build check only", flush=True)
+    raise SystemExit(0)
+
+# ----------------------------------------------------------------- solve
+sizes = [getattr(c, "num_row_ids", c.dim_f) for c in nonlinear]
+offsets = np.concatenate([[0], np.cumsum(sizes)])
+outer_log = []
+check_cs = cs0.copy()
+t_run = time.time()
+
+
+def report(h):
+    """Log one outer iteration: groups, a dense check, outer.json."""
+    k = h["outer"]
+    check_cs.params_dict = obj.unpack_state(np.asarray(h["x"]), False)[0]
+    ids, y, mu, viol = (np.asarray(h[q]) for q in ("ids", "y", "mu", "violation"))
+    grp = np.where(ids >= 0, np.searchsorted(offsets, ids, side="right") - 1, -1)
+    groups = {}
+    for j, c in enumerate(nonlinear):
+        m = grp == j
+        if np.any(m):
+            groups[c.name] = dict(
+                rows=int(m.sum()),
+                mu=[
+                    float(np.min(mu[m])),
+                    float(np.median(mu[m])),
+                    float(np.max(mu[m])),
+                ],
+                max_y=float(np.abs(y[m]).max()),
+                nonzero_y=int(np.sum(y[m] != 0)),
+                max_violation=float(viol[m].max()),
+            )
+    m = D.evaluate(check_cs, eq, tree, vacuum=a.vacuum)
+    rec = dict(
+        outer=k,
+        inner_iterations=h["inner_iterations"],
+        optimality=h["optimality"],
+        gtolk=h["gtolk"],
+        inner_converged=bool(h["inner_converged"]),
+        constr_violation=h["constr_violation"],
+        ctolk=h["ctolk"],
+        message=str(h.get("message", "")),
+        groups=groups,
+        dense=m,
+        shape=shape(check_cs),
+        t=time.time() - t_run,
+    )
+    outer_log.append(rec)
+    json.dump(
+        outer_log,
+        open(os.path.join(a.out, "outer.json"), "w"),
+        indent=1,
+        default=float,
+    )
+    met = "met" if h["inner_converged"] else "NOT met"
+    print(
+        f"[outer {k}] {h['inner_iterations']} inner its, opt {h['optimality']:.2e} "
+        f"(gtolk {h['gtolk']:.1e}, {met}), violation {h['constr_violation']:.2e} "
+        f"(ctolk {h['ctolk']:.1e}), {time.time() - t_run:.0f} s",
+        flush=True,
+    )
+    for name, g in groups.items():
+        print(
+            f"   {name[:30]:30s} rows {g['rows']:6d} mu {g['mu'][0]:.1e}/"
+            f"{g['mu'][1]:.1e}/{g['mu'][2]:.1e} max|y| {g['max_y']:.2e} "
+            f"(nonzero {g['nonzero_y']}) max viol {g['max_violation']:.2e}",
+            flush=True,
+        )
+    print(
+        f"   dense: bn {m['bn']:.4e}  {D.report(m, P)}  linked {m['linked']}  "
+        f"{rec['shape']}",
+        flush=True,
+    )
+
+
+def save_x(x):
+    """Keep the latest accepted state, for a restart."""
+    np.save(os.path.join(a.out, "x_last.npy"), np.asarray(x))
+    return False
+
+
+options = {"outer_callback": report, "callback": save_x, **json.loads(a.options)}
+(cs1,), res = Optimizer("lsq-auglag-composite").optimize(
+    cs0,
+    objective=obj,
+    constraints=cons,
+    maxiter=a.maxiter,
+    verbose=1,
+    ftol=0,
+    xtol=0,
+    gtol=a.gtol,
+    ctol=a.ctol,
+    options=options,
+    copy=True,
+)
+wall = time.time() - t_run
+cs1.save(os.path.join(a.out, "result.h5"))
+m1 = D.evaluate(cs1, eq, tree, vacuum=a.vacuum)
+active = [k for k, v in D.margins(m1, P).items() if abs(v - 1) <= 0.01]
+print(
+    f"SOLVER {res['message']} | {len(res['outer_history'])} outer / {res['nit']} "
+    f"inner its, opt {res['optimality']:.2e}, violation "
+    f"{res['constr_violation']:.2e}, {wall:.0f} s",
+    flush=True,
+)
+print(f"START  bn {m0['bn']:.4e}  {D.report(m0, P)}  -> {D.verdict(m0, P)}")
+print(
+    f"RESULT bn {m1['bn']:.4e} max {m1['bn_max']:.3e}  {D.report(m1, P)}  linked "
+    f"{m1['linked']} -> {D.verdict(m1, P)}  active {active}  {shape(cs1)}",
+    flush=True,
+)
+solver = dict(
+    message=str(res["message"]),
+    success=bool(res["success"]),
+    nit=int(res["nit"]),
+    n_outer=len(res["outer_history"]),
+    optimality=float(res["optimality"]),
+    constr_violation=float(res["constr_violation"]),
+    wall_s=wall,
+)
+json.dump(
+    dict(
+        settings=vars(a),
+        commit=commit,
+        bounds=P,
+        info=info,
+        solver=solver,
+        start=m0,
+        result=m1,
+        margins=D.margins(m1, P),
+        active=active,
+        shape_start=shape(cs0),
+        shape_result=shape(cs1),
+    ),
+    open(os.path.join(a.out, "result.json"), "w"),
+    indent=1,
+    default=lambda o: o.tolist() if hasattr(o, "tolist") else str(o),
+)
+print(f"wrote {a.out}/result.h5, result.json, outer.json", flush=True)
