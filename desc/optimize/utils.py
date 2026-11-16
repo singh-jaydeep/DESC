@@ -450,6 +450,11 @@ STATUS_MESSAGES = {
     "err": "A linalg error occurred, such as a non-psd Hessian.",
     "approx": "A bad approximation caused failure to predict improvement.",
     "callback": "User supplied callback triggered termination",
+    "stall": "Augmented Lagrangian subproblems repeatedly stalled before reaching "
+    "`gtol`/`ctol`; the result is not a KKT point.",
+    "precision": "Augmented Lagrangian subproblems stalled at a feasible point: "
+    "`ctol` is satisfied and no further progress is available at this precision, "
+    "but `gtol` was not reached.",
     None: None,
 }
 
