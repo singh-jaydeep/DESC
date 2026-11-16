@@ -352,9 +352,10 @@ def lsq_auglag_composite(  # noqa: C901
                 outer_callback({**history[-1], "x": x})
 
         if verbose > 0:
+            mu_mean = np.mean(mu) if mu.size else MU.default
             print(
                 f"{outer:5d} {res.nit:9d} {g_norm:11.3e} {gtolk:9.2e} "
-                f"{constr_violation:10.3e} {ctolk:9.2e} {np.mean(mu):9.2e} "
+                f"{constr_violation:10.3e} {ctolk:9.2e} {mu_mean:9.2e} "
                 f"{np.abs(Y.get(ic)).max(initial=0):9.2e}"
                 + ("" if converged else "  (stalled)")
             )

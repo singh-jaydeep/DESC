@@ -5,8 +5,14 @@ import pytest
 
 from desc.backend import jax, jnp
 from desc.coils import CoilSet, FourierPlanarCoil
-from desc.objectives import CoilCurvature, CoilLength, FixCoilCurrent, ObjectiveFunction
-from desc.optimize import LinearConstraintProjection
+from desc.objectives import (
+    CoilCurvature,
+    CoilLength,
+    FixCoilCurrent,
+    FixParameters,
+    ObjectiveFunction,
+)
+from desc.optimize import LinearConstraintProjection, Optimizer
 from desc.optimize.aug_lagrangian_composite import _RowValues, lsq_auglag_composite
 from desc.optimize.least_squares_composite import lsq_composite, paired_decrease
 
@@ -220,3 +226,69 @@ def test_row_values():
     np.testing.assert_array_equal(mu.get([1, 2]), [100.0, 10.0])
     mu.default = 200.0
     np.testing.assert_array_equal(mu.get([1, 2]), [200.0, 200.0])
+
+
+# ---------------------------------------------------------------- registration
+
+
+@pytest.mark.unit
+def test_composite_optimizers_registered():
+    """Both solvers run through Optimizer; the callback gets the full state.
+
+    Circular coils want length 8 pi (radius 4) but their curvature must stay above
+    0.4 (radius at most 2.5), so the optimum is radius 2.5 with the bound active.
+    """
+
+    def circles():
+        return CoilSet.linspaced_linear(
+            FourierPlanarCoil(r_n=2, basis="rpz"),
+            n=2,
+            displacement=[0, 20, 0],
+            check_intersection=False,
+        )
+
+    def fixed(coils):
+        return (
+            FixCoilCurrent(coils),
+            FixParameters(coils, [{"center": True, "normal": True}] * 2),
+        )
+
+    seen = []
+
+    def callback(x):
+        seen.append(np.size(x))
+
+    # as an inequality constraint
+    coils = circles()
+    obj = ObjectiveFunction(CoilLength(coils, target=8 * np.pi))
+    con = (CoilCurvature(coils, bounds=(0.4, np.inf)),) + fixed(coils)
+    (out,), res = Optimizer("lsq-auglag-composite").optimize(
+        coils,
+        obj,
+        con,
+        maxiter=200,
+        gtol=1e-8,
+        ctol=1e-8,
+        verbose=0,
+        copy=True,
+        options={"callback": callback},
+    )
+    assert res.success
+    np.testing.assert_allclose(out.compute("length")[0]["length"], 5 * np.pi, rtol=1e-6)
+    np.testing.assert_allclose(out.compute("length")[1]["length"], 5 * np.pi, rtol=1e-6)
+    assert seen and all(n == obj.dim_x for n in seen)  # full state, not reduced
+
+    # as a bound row of the objective, kept exact in the composite model
+    coils = circles()
+    obj = ObjectiveFunction(
+        (
+            CoilLength(coils, target=8 * np.pi, weight=1e-3),
+            CoilCurvature(coils, bounds=(0.4, np.inf)),
+        )
+    )
+    (out,), res = Optimizer("lsq-composite").optimize(
+        coils, obj, fixed(coils), maxiter=100, gtol=1e-12, verbose=0, copy=True
+    )
+    assert res.success
+    for c in out:  # a weighted hinge settles just past the bound
+        assert 2.5 < c.r_n[0] < 2.6

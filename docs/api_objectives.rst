@@ -255,6 +255,8 @@ with a direct interface similar to ``scipy.optimize.minimize``:
    desc.optimize.fmintr
    desc.optimize.fmin_auglag
    desc.optimize.lsq_auglag
+   desc.optimize.lsq_composite
+   desc.optimize.lsq_auglag_composite
    desc.optimize.sgd
 
 DESC also allows you to use custom optimizers by creating a wrapper function and
