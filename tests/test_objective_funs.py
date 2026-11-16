@@ -1160,6 +1160,18 @@ class TestObjectiveFunction:
         test(mixed_coils)
         test(nested_coils, grid=grid)
 
+        # a peanut-shaped (partly concave) coil: the signed curvature changes sign, the
+        # objective is its magnitude everywhere
+        bean = FourierPlanarCoil(r_n=[2, 1.2], modes=[0, 2], basis="rpz")
+        grid = LinearGrid(N=40)
+        signed = bean.compute("curvature", grid=grid)["curvature"]
+        assert np.any(signed < 0) and np.any(signed > 0)
+        obj = ObjectiveFunction(CoilCurvature(bean, grid=grid))
+        obj.build()
+        x = obj.x(bean)
+        np.testing.assert_allclose(obj.compute_unscaled(x), np.abs(signed), rtol=1e-10)
+        assert np.all(np.isfinite(obj.jac_unscaled(x)))
+
     @pytest.mark.unit
     def test_coil_torsion(self):
         """Tests coil torsion."""

@@ -8,6 +8,7 @@ from ..utils import (
     rotation_matrix,
     rpz2xyz,
     rpz2xyz_vec,
+    safenorm,
     xyz2rpz,
     xyz2rpz_vec,
 )
@@ -1085,6 +1086,31 @@ def _frenet_binormal(params, transforms, profiles, data, **kwargs):
 
 
 @register_compute_fun(
+    name="|curvature|",
+    label="|\\kappa|",
+    units="m^{-1}",
+    units_long="Inverse meters",
+    description="Magnitude of the curvature of the curve, the reciprocal of the local "
+    + "radius of curvature. Unlike ``curvature`` it carries no sign, so it is a smooth "
+    + "function of the curve parameters wherever the curve is regular.",
+    dim=1,
+    params=[],
+    transforms={},
+    profiles=[],
+    coordinates="s",
+    data=["x_s", "x_ss"],
+    parameterization="desc.geometry.core.Curve",
+)
+def _curvature_magnitude(params, transforms, profiles, data, **kwargs):
+    dxn = jnp.linalg.norm(data["x_s"], axis=-1)[:, jnp.newaxis]
+    # safenorm: the gradient of ||v|| is v/||v||, which is 0/0 (NaN under AD) where the
+    # curve is momentarily straight. Piecewise-planar arcs are straight exactly at each
+    # hinge, so a grid with a node on a hinge would otherwise give NaN Jacobian entries.
+    data["|curvature|"] = safenorm(cross(data["x_s"], data["x_ss"]) / dxn**3, axis=-1)
+    return data
+
+
+@register_compute_fun(
     name="curvature",
     label="\\kappa",
     units="m^{-1}",
@@ -1096,17 +1122,16 @@ def _frenet_binormal(params, transforms, profiles, data, **kwargs):
     transforms={},
     profiles=[],
     coordinates="s",
-    data=["center", "x", "x_s", "x_ss", "frenet_normal", "phi"],
+    data=["center", "x", "|curvature|", "frenet_normal", "phi"],
     parameterization="desc.geometry.core.Curve",
 )
 def _curvature(params, transforms, profiles, data, **kwargs):
-    # magnitude of curvature
-    dxn = jnp.linalg.norm(data["x_s"], axis=-1)[:, jnp.newaxis]
-    curvature = jnp.linalg.norm(cross(data["x_s"], data["x_ss"]) / dxn**3, axis=-1)
-    # sign of curvature (positive = "convex", negative = "concave")
+    # sign of curvature (positive = "convex", negative = "concave"). The sign is a step
+    # function: it jumps by 2|curvature| where dot(r, frenet_normal) crosses zero, which
+    # is unrelated to where the curvature vanishes. Use "|curvature|" in bounds/targets.
     r = rpz2xyz(data["center"]) - rpz2xyz(data["x"])
     r = xyz2rpz_vec(r, phi=data["phi"])
-    data["curvature"] = curvature * sign(dot(r, data["frenet_normal"]))
+    data["curvature"] = data["|curvature|"] * sign(dot(r, data["frenet_normal"]))
     return data
 
 
