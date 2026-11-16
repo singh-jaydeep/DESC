@@ -140,6 +140,7 @@ Coil Optimization
     desc.objectives.CoilIntegratedCurvature
     desc.objectives.CoilCurrentLength
     desc.objectives.CoilArclengthVariance
+    desc.objectives.CoilArclengthResidual
     desc.objectives.ToroidalFlux
     desc.objectives.SurfaceCurrentRegularization
     desc.objectives.LinkingCurrentConsistency

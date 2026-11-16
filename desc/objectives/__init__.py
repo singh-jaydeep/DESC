@@ -2,6 +2,7 @@
 
 from ._bootstrap import BootstrapRedlConsistency
 from ._coils import (
+    CoilArclengthResidual,
     CoilArclengthVariance,
     CoilCurrentLength,
     CoilCurvature,
@@ -129,6 +130,7 @@ __all__ = [
     "BallooningStability",
     "BootstrapRedlConsistency",
     "BoundaryError",
+    "CoilArclengthResidual",
     "CoilArclengthVariance",
     "CoilCurrentBand",
     "CoilCurrentLength",

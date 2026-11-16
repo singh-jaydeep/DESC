@@ -219,6 +219,7 @@ Objective Functions
     desc.objectives.BootstrapRedlConsistency
     desc.objectives.BoundaryError
     desc.objectives.BScaleLength
+    desc.objectives.CoilArclengthResidual
     desc.objectives.CoilArclengthVariance
     desc.objectives.CoilCurrentBand
     desc.objectives.CoilCurrentLength

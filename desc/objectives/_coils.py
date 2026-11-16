@@ -2519,6 +2519,123 @@ class CoilArclengthVariance(_CoilObjective):
         return (out * constants["mask"])[self._coilset_tree["objective_mask"]]
 
 
+class CoilArclengthResidual(CoilArclengthVariance):
+    """Coil arclength residuals, one per grid node.
+
+    Each node of each coil gives ``|x_s|_i - mean(|x_s|)``, with quadrature weight
+    ``sqrt(ds / 2 pi)``, so the weighted sum of squares over a coil is that coil's
+    arclength variance (``CoilArclengthVariance``) at any grid resolution.
+    Prefer this form with least-squares optimizers: passing the variance as a single
+    residual squares it again, so the cost is quartic in the deviation and its
+    Gauss-Newton Jacobian vanishes at the target.
+
+    As for ``CoilArclengthVariance``, only coils without a unique parameterization
+    (FourierXYZ, SplineXYZ, FourierXY) contribute; the rows of other coils are zero.
+
+    Parameters
+    ----------
+    coil : CoilSet or Coil
+        Coil(s) that are to be optimized.
+    grid : Grid, optional
+        Collocation grid containing the nodes to evaluate at.
+        Defaults to ``LinearGrid(N=2 * coil.N + 5)``
+    relative : bool, optional
+        Return ``|x_s|_i / mean(|x_s|) - 1`` instead, dimensionless, so bounds
+        ``(-delta, delta)`` cap the largest node spacing at ``1 + delta`` times the
+        mean. Default False.
+
+    """
+
+    __doc__ = __doc__.rstrip() + collect_docs(
+        target_default="``target=0``.",
+        bounds_default="``target=0``.",
+        coil=True,
+    )
+
+    _static_attrs = CoilArclengthVariance._static_attrs + ["_relative"]
+    _units = "(m)"
+    _print_value_fmt = "Coil arclength residual: "
+    _broadcast_input = "node"
+
+    def __init__(
+        self,
+        coils,
+        target=None,
+        bounds=None,
+        weight=1,
+        normalize=True,
+        normalize_target=True,
+        loss_function=None,
+        deriv_mode="auto",
+        grid=None,
+        name="coil arclength residual",
+        relative=False,
+    ):
+        self._relative = relative
+        if relative:
+            self._units = "(dimensionless)"
+        super().__init__(
+            coils,
+            target=target,
+            bounds=bounds,
+            weight=weight,
+            normalize=normalize,
+            normalize_target=normalize_target,
+            loss_function=loss_function,
+            deriv_mode=deriv_mode,
+            grid=grid,
+            name=name,
+        )
+
+    def build(self, use_jit=True, verbose=1):
+        """Build constant arrays.
+
+        Parameters
+        ----------
+        use_jit : bool, optional
+            Whether to just-in-time compile the objective and derivatives.
+        verbose : int, optional
+            Level of output.
+
+        """
+        # the variance build replaces the per-node quadrature weights with 1
+        _CoilObjective.build(self, use_jit=use_jit, verbose=verbose)
+        quad_weights = self._constants["quad_weights"] / np.sqrt(2 * np.pi)
+        super().build(use_jit=use_jit, verbose=verbose)
+        self._constants["quad_weights"] = quad_weights
+        if self._normalize:  # residuals have units of length, not length^2
+            self._normalization = np.mean([scale["a"] for scale in self._scales])
+            if self._relative:
+                self._normalization = 1
+        _Objective.build(self, use_jit=use_jit, verbose=verbose)
+
+    def compute(self, params, constants=None):
+        """Compute coil arclength residuals.
+
+        Parameters
+        ----------
+        params : dict
+            Dictionary of the coil's degrees of freedom.
+        constants : dict
+            Dictionary of constant data, eg transforms, profiles etc. Defaults to
+            self._constants. (Deprecated)
+
+        Returns
+        -------
+        f : array of floats
+            Arclength residuals at each node of each coil.
+        """
+        data = _CoilObjective.compute(self, params, constants=constants)
+        constants = self._get_deprecated_constants(constants)
+        data = tree_leaves(data, is_leaf=lambda x: isinstance(x, dict))
+        out = []
+        for k, dat in enumerate(data):
+            sp = jnp.linalg.norm(dat["x_s"], axis=1)
+            dev = sp / jnp.mean(sp) - 1 if self._relative else sp - jnp.mean(sp)
+            out.append(constants["mask"][k] * dev)
+        return jnp.concatenate(out)[self._coilset_tree["objective_mask"]]
+
+
 class QuadraticFlux(_Objective):
     """Target B*n = 0 on LCFS.
 
