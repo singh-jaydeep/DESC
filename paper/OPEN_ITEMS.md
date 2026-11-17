@@ -15,6 +15,9 @@ confirm run settings with the user before launching, look at every coilset befor
 | 8d | memory | 8b's C steps and an 8c cap step on the 8 GB GPU | must fit at `row_n 512` with the chunked scan; the poster OOMed |
 | 8e | field lines | `bash paper/jorge/chain.sh trace`, then `paper/jorge/zoom_poincare.py` on C_bn002 | nested to start offset ~0.18 m |
 
+**8a done (2026-11-17): `findings/8a_basins.md`.** The port is correct; the problem has two KKT optima 15x apart
+in B.n (6.0e-5 poster, 9.3e-4 port), chosen by the variable scaling and separated by a coil-coil clearance barrier.
+
 ## 2. Questions the runs must answer
 
 1. **Plasma-coil gap is conservative.** The gap uses the boundary's global maximum principal curvature
