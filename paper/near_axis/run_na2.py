@@ -1,20 +1,65 @@
-"""Giuliani et al. (JCP 2022) near-axis single stage with two-face folded coils, solved with the branch's
-composite least squares (desc.optimize.least_squares_composite.lsq_composite: hinges kept exact in the model).
+"""Near-axis stage: a quasisymmetric near-axis field and two-face coils that reproduce it, optimized together.
 
-Rows (pre-hinge values s, each scaled by its weight):
-  targets : (B_coils - B_QS) and (gradB_coils - gradB_QS) on the axis (sqrt-dl quadrature), (iota - iota0)/iota0,
-            axis length - 2 pi
-  bounds  : coil node -> NAE surface at r = a     >= d_pc          (one row per coil node)
-            coil node -> any other coil          >= d_cc
-            arc curvature                        <= kappa_max     (per node)
-            coil length                          <= L_max
-            current                              in [0, imax x uniform]
-            NAE elongation                       <= e_max         (per axis node), optional
-Nearest-point distances: the nearest node is chosen without derivatives, the distance to it is differentiated
-(the derivative of a min at its argmin).
+    python run_na2.py --nfp 2 --nc 5 --iota 0.42 --a 0.12 --dpc ... --dcc ... --Lmax ... --kmax ... --out runs/NAME
+    (run from paper/near_axis; CPU; writes NAME.npz (the state) and NAME.json (arguments, start and final report))
 
-python run_na2.py --nfp 4 --nc 5 --iota 1.25 --a 0.124 --dpc 0.11 --dcc 0.04 --seed 0 --out runs/qh_z0_nc5_s0
-(run from na/; CPU)
+After Giuliani et al., JCP 2022: the coils are fitted to the near-axis field and its gradient ON THE AXIS, not to
+B.n on a surface. Units: lengths in m with the axis length fixed to 2 pi (major radius ~ 1 m), B0 = 1 T, currents in
+units of mu0 / (4 pi) (so B = sum_i I_i oint dl x r / |r|^3).
+
+UNKNOWNS p (layout in folded.Layout)
+  axis     R(phi) = sum_{k=0..Kax} rc_k cos(k nfp phi),  Z(phi) = sum_{k=1..Kax} zs_k sin(k nfp phi)
+  eta_bar  first-order near-axis parameter (B = B0 (1 + r eta_bar cos theta) to first order)
+  coils    nc unique coils per half period, each (folded.coil_arcs): two hinges Ha, Hb ((R, phi) at z = 0 for
+           --mode z0, so z = 0 holds by construction; (R, phi, z) for --mode free), the tilts alpha_u, alpha_l of
+           the two arc planes about the chord, the sine coefficients a_u[1..K], a_l[1..K] of each arc
+           (w(t) = |c| sum_k a_k sin(k pi t)), and the current I. The full set is these coils, their stellarator
+           images and the nfp rotations.
+  B2c      (--order 2 only) the second-order near-axis parameter
+  iota is not an unknown: it follows from the sigma equation (nae.NearAxis.solve) at each evaluation.
+
+OBJECTIVE  min 1/2 sum r^2. Axis quantities are sampled at nphi points phi_j on one field period, with
+dl_j = |dx/dphi| and dphi = 2 pi / (nfp nphi), so sum_j f_j^2 dl_j dphi ~ int f^2 dl over one period.
+Target rows (r = the expression below; nothing is normalized unless written):
+  B        sqrt(w1) (B_coils(x_j) - B0 t_j) sqrt(dl_j dphi)                3 nphi rows   (T)
+  G        sqrt(w1) (gradB_coils(x_j) - gradB_QS(x_j)) sqrt(dl_j dphi)     9 nphi rows   (T/m), gradB_QS from
+           Giuliani eq. (3) (nae.py)
+  iota     (iota - iota0) / iota0                                         1 row (weight 1; iota0 = --iota)
+  Lax      (axis length - 2 pi) / (2 pi)                                  1 row (weight 1): fixes the size
+  B20      (--order 2) sqrt(w2) (B20_j - <B20>) sqrt(dl_j / sum dl) / B0   nphi rows: second-order QS breaking
+  GG       (--order 2) sqrt(wgg) (a / 2) (gradgradB_coils - gradgradB_QS) sqrt(dl_j dphi)   27 nphi rows; the a/2
+           factor makes it the field error at r = a
+  hlevel   (--mode free, --wlevel > 0) sqrt(wlevel) (z_a - z_b) / a       nc rows: each coil's hinges level
+  planar   (--wplanar > 0) sqrt(wplanar) (alpha_u + alpha_l)              nc rows: no fold
+  reg_len  (--wlen > 0) sqrt(wlen) L_i / L_max                            nc rows: length regularizer
+  reg_bend (--wbend > 0) sqrt(wbend) (kappa / kappa_max) sqrt(ds / L_i)   per arc node: squares sum to
+           wbend int (kappa / kappa_max)^2 ds / L_i
+Bound rows: PENALTIES, not hard constraints. Each value s with bounds [lo, hi] gives the row
+  r = (sqrt(wpen) / scale) (max(0, s - hi) - max(0, lo - s)),
+so a violation by a fraction f of the bound costs wpen f^2 / 2 (scale = the bound itself unless noted).
+  dpc      every coil node (both arcs, 2 NPT per coil) to the first-order near-axis surface at r = a
+           (x + a (X1c cos th n + (Y1s sin th + Y1c cos th) b), ntheta x nphi points on periods -1, 0, 1)  >= dpc
+  dcc      every coil node to every node of every other coil of the full set (its own stellarator image
+           included)                                                                                       >= dcc
+  kappa    curvature at every arc node, 2 (NPT + 1) per coil (hinge corners not counted)                   <= kmax
+  Lcoil    polyline length of each coil                                                                     <= Lmax
+  I        each current, in [0, imax Iref] with Iref = 0.5 / (2 nfp nc) the uniform current giving B ~ 1
+           at R ~ 1 (scale Iref; --imax <= 0: no upper bound)
+  elong    (--emax > 0) first-order elongation of the near-axis cross-section, per axis node              <= emax
+  zaxis    (--zmax > 0) |Z(phi_j)| of the axis                                                            <= zmax
+  hz       (--mode free, --hzmax > 0) |z| of every hinge                                                  <= hzmax
+  htilt    (--mode free, --tiltmax > 0) |tan(tilt)| of each coil's hinge line from horizontal      <= tan(tiltmax)
+  Distances are smooth: soft-min over the 8 nearest nodes (picked without derivatives) with tau = 2 mm, which
+  under-reads a distance by at most tau log 8 = 4.2 mm (`nearest`).
+
+SOLVER  lsq_composite (desc/optimize/least_squares_composite.py): trust-region least squares whose model keeps the
+bound rows' max(0, .) kinks exact; x_scale "jac", ftol 1e-10, xtol 1e-12, gtol 1e-8, --maxiter, --hessian
+(secant: quasi-Newton second-order term; gn: Gauss-Newton).
+
+START  --init NAME continues a saved state (any argument may change: that is how cont.py continues a run under new
+bounds or weights). Otherwise: axis from --axis0, eta_bar from --eta0, helicity counted from the start axis
+(fixed afterwards), coils sized to clear the r = a surface by 1.6 dpc, currents uniform, oriented so B is along
++phi; --seed >= 0 randomizes the axis, eta_bar and coils.
 """
 import os, sys, json, time, argparse
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -214,7 +259,8 @@ def pieces(p):
     return rc, zs, eta, C, q, X, I, BG
 
 
-# row layout: (name, size, kind, lo, hi, scale)  scale normalizes s before the weight
+# Row layout: (name, number of rows, kind) with kind "t" = target row (residual = the value, already weighted
+# in fun_raw) or "b" = bound row (penalty; bounds and scale in BOUNDS). Order = the order fun_raw emits them.
 def rows_spec():
     nn = 2 * NPT  # nodes per coil (both arcs, hinges once)
     spec = [("B", a.nphi * 3, "t"), ("G", a.nphi * 9, "t"), ("iota", 1, "t"), ("Lax", 1, "t"),
@@ -244,12 +290,14 @@ def rows_spec():
 SPEC = rows_spec()
 TILT = float(np.tan(np.radians(max(a.tiltmax, 0.0))))
 wb = np.sqrt(a.wpen)
+# name: (lo, hi, row weight sqrt(wpen) / scale); see the module docstring
 BOUNDS = dict(dpc=(a.dpc, np.inf, wb / a.dpc), dcc=(a.dcc, np.inf, wb / a.dcc), kappa=(-np.inf, a.kmax, wb / a.kmax),
               Lcoil=(-np.inf, a.Lmax, wb / a.Lmax), I=(0.0, a.imax * Iref if a.imax > 0 else np.inf, wb / Iref),
               elong=(-np.inf, a.emax, wb / max(a.emax, 1)),
               zaxis=(-a.zmax, a.zmax, wb / max(a.zmax, 1e-3)),
               hz=(-a.hzmax, a.hzmax, wb / max(a.hzmax, 1e-3)),
               htilt=(-TILT, TILT, wb / max(TILT, 1e-3)))
+# Every row is multiplied by wrow (1 for targets); bounds are passed to the solver pre-multiplied (lo_s, hi_s)
 lo, hi, tgt, isb, wrow = [], [], [], [], []
 for name, n, kind in SPEC:
     if kind == "t":
@@ -270,17 +318,20 @@ def hinge_tilt(C):
 
 
 def fun_raw(p):
+    """Unweighted bound values and weighted target rows, in rows_spec order (module docstring)."""
     rc, zs, eta, C, q, X, I, (Bc, Gc) = pieces(p)
-    w = jnp.sqrt(q["dl"] * 2 * jnp.pi / a.nfp / a.nphi)
+    w = jnp.sqrt(q["dl"] * 2 * jnp.pi / a.nfp / a.nphi)  # sqrt(dl_j dphi): arclength quadrature on one period
     out = [jnp.sqrt(a.w1) * ((Bc - q["B"]) * w[:, None]).ravel(), jnp.sqrt(a.w1) * ((Gc - q["G"]) * w[:, None, None]).ravel(),
            jnp.atleast_1d((q["iota"] - a.iota) / a.iota),
+           # full axis length = nfp x one period = sum dl_j (2 pi / nphi)
            jnp.atleast_1d((jnp.sum(q["dl"]) * 2 * jnp.pi / a.nphi - 2 * jnp.pi) / (2 * jnp.pi))]
     S = nae_surface(q)
     dpc, dcc, kap, Ls, bend = [], [], [], [], []
     for i in range(a.nc):
         (xu, x1u, x2u), (xl, x1l, x2l), _ = coil_arcs(C[i], L)
-        pts = jnp.concatenate([xu, xl[1:-1]])
+        pts = jnp.concatenate([xu, xl[1:-1]])  # coil i's nodes, each hinge once (2 NPT points)
         dpc.append(nearest(pts, S))
+        # every node of every other coil of the full set (X[i] is coil i itself; its image is X[nc + i])
         others = jnp.concatenate([X[:i], X[i + 1:]])[:, :-1].reshape(-1, 3)
         dcc.append(nearest(pts, others))
         kap.append(jnp.concatenate([arc_curvature(x1u, x2u), arc_curvature(x1l, x2l)]))
@@ -288,6 +339,7 @@ def fun_raw(p):
         if a.wbend > 0:  # (kappa / kappa_max) sqrt(ds / L): squares sum to int (kappa/kappa_max)^2 ds / L
             ds = jnp.concatenate([jnp.linalg.norm(x1u, axis=-1), jnp.linalg.norm(x1l, axis=-1)]) / NPT
             bend.append(kap[-1] / a.kmax * jnp.sqrt(ds / Ls[-1]))
+    # bound values (penalized against BOUNDS after the wrow scaling); C[:, -1] = the currents
     out += [jnp.concatenate(dpc), jnp.concatenate(dcc), jnp.concatenate(kap), jnp.stack(Ls), C[:, -1]]
     if a.emax > 0:
         out.append(elongation(q["X1c"], q["Y1s"], q["Y1c"]))
@@ -312,11 +364,12 @@ def fun_raw(p):
     return jnp.concatenate(out)
 
 
-fun = jax.jit(lambda p: fun_raw(p) * wrow)
+fun = jax.jit(lambda p: fun_raw(p) * wrow)  # the rows the solver sees (bound rows still before max(0, .))
 jac = jax.jit(jax.jacfwd(lambda p: fun_raw(p) * wrow))
 
 
 def reg_slices():
+    """Row slices of the regularizers, to separate them from the field cost in the report."""
     out, k = [], 0
     for name, n, kind in SPEC:
         if name.startswith("reg_"):
@@ -326,6 +379,7 @@ def reg_slices():
 
 
 def blocks(s):
+    """Split a row vector into its rows_spec blocks."""
     out, k = {}, 0
     for name, n, kind in SPEC:
         out[name] = np.asarray(s[k:k + n]); k += n
@@ -333,6 +387,7 @@ def blocks(s):
 
 
 def report(p, tag, extra=None):
+    """Print and return the cost split (field / bounds / regularizers) and the coil and axis diagnostics."""
     rc, zs, eta, C, q, X, I, (Bc, Gc) = pieces(p)
     sraw = blocks(np.asarray(fun_raw(p)))
     r = np.where(isb, np.maximum(0, np.asarray(fun(p)) - hi_s) - np.maximum(0, lo_s - np.asarray(fun(p))),

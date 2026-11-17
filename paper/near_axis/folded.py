@@ -1,14 +1,24 @@
-"""Two-face folded coils (transverse arcB2) + Giuliani-style near-axis single-stage objective, in JAX.
+"""Two-face folded coils for the near-axis stage (run_na2.py), in JAX: geometry, polylines, Biot-Savart.
 
-Coil i (one of nc unique coils in the half period): two hinges Ha (inboard), Hb (outboard).
-  z0 mode : hinges at z = 0, given by (R, phi) each.
-  free    : hinges at (R, phi, z) each (any chord; the arcB2 baseline).
-Upper arc  x(t) = Ha + t c + w_u(t) u_u,  lower arc x(t) = Hb - t c + w_l(t) u_l,  t in [0, 1],
-w(t) = |c| sum_k a_k sin(k pi t); u_u, u_l are unit vectors perpendicular to the chord c, at tilt
-angles alpha_u, alpha_l from the "vertical" (the component of z perpendicular to c). Each arc is planar
-(it lies in span(c, u)), so each coil is exactly two planar faces joined at the two hinges.
-Full coil set: stellarator image (x, -y, -z) with current -I, then rotations by 2 pi j / nfp.
-Currents are in units of mu0 / (4 pi) (so B = sum I dl x r / |r|^3).
+Coil i (one of nc unique coils in the half period): two hinges Ha (inboard), Hb (outboard), chord c = Hb - Ha.
+  z0 mode : hinges at z = 0, given by (R, phi) each (z = 0 exactly, by construction).
+  free    : hinges at (R, phi, z) each.
+Upper arc  x(t) = Ha + t c + w_u(t) u_u,  lower arc  x(t) = Hb - t c + w_l(t) u_l,  t in [0, 1],
+with w(t) = |c| sum_{k=1..K} a_k sin(k pi t) (so the a_k are relative to the chord length, and both arcs end
+exactly on the hinges). With v = the unit component of +z perpendicular to c and h = c/|c| x v:
+  u_u = cos(alpha_u) v + sin(alpha_u) h,    u_l = -cos(alpha_l) v + sin(alpha_l) h.
+alpha_u = alpha_l = 0 is a planar coil in the vertical plane through the chord, upper arc above it, lower arc
+below. Each arc lies in span(c, u), so each coil is exactly two planar faces joined at the hinges; the two faces
+are coplanar when alpha_u + alpha_l = 0, and alpha_u + alpha_l is the signed fold.
+
+Per-coil parameter row (Layout.per entries, in this order):
+  hinges (R_a, phi_a, R_b, phi_b) [z0] or (R_a, phi_a, z_a, R_b, phi_b, z_b) [free], alpha_u, alpha_l,
+  a_u[1..K], a_l[1..K], I.
+Discretization: each arc is a polyline of NPT = 80 straight segments (NPT + 1 nodes, uniform in t); the field is
+the exact Biot-Savart field of those segments, the length is the polyline length, and the curvature is evaluated
+from the analytic t-derivatives at the nodes (inside each arc: the hinge corner is not a curvature).
+Full coil set: the nc coils, their stellarator images (x, y, z) -> (x, -y, -z) with current -I, then the nfp
+rotations by 2 pi j / nfp. Currents are in units of mu0 / (4 pi) (so B = sum I dl x r / |r|^3).
 """
 import jax
 import jax.numpy as jnp

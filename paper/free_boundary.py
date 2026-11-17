@@ -1,14 +1,34 @@
 """Vacuum free-boundary solve with fixed coils, then physics and coil scores.
 
-    python paper/free_boundary.py EQ.h5 COILS.h5 OUT [--shells 4,8,12] [--repair] [--LMN 14]
+    python paper/free_boundary.py EQ.h5 COILS.h5 OUT [--LMN 14] [--shells 14]
+        [--maxiter 60] [--solve-tol 1e-8] [--chunk 400] [--repair] [--bounds B.json]
 
-Stock DESC: ``VacuumBoundaryError(field_fixed=True)`` with ForceBalance, FixCurrent,
-FixPressure and FixPsi as proximal constraints, ``proximal-lsq-exact``, the boundary
-modes released in shells (|m|, |n| <= k free). ``--repair`` re-labels a creased
-boundary poloidal angle and re-solves the interior before every shell
-(``paper/lib/bdry_repair``); every repair is logged (repair log rule, PORT_PLAN 9.3).
-Writes OUT/eq_fb.h5, OUT/score.json and OUT/poincare.png. Ported from
-coil_sandbox/from_axis/ss/fb_rescore.py (js/qa-poster).
+Finds the vacuum equilibrium whose boundary is a flux surface of the given (fixed)
+coils, starting from EQ (stock DESC recipe):
+  0. --LMN n: raise EQ to basis L = M = N = n (grids 2n) and re-solve force balance
+     (maxiter 300, ftol 1e-12, xtol 1e-14, gtol 1e-12) before the free boundary.
+  1. One shell per k in --shells (default 4, 8, 12; "none" only scores EQ):
+       objective    VacuumBoundaryError(eq, coils, field_fixed=True): B_out.n and
+                    B_out^2 - B_in^2 on rho = 1, LinearGrid(M_grid, N_grid) (DESC
+                    default), area-weighted; coil source composite Gauss-Legendre
+                    64 nodes per arc
+       constraints  ForceBalance, FixCurrent (0), FixPressure (0), FixPsi (Psi of EQ:
+                    it fixes which coil-field surface becomes the boundary), and every
+                    boundary mode with max(|m|, |n|) > k fixed
+       solver       proximal-lsq-exact, --maxiter, ftol 1e-8, xtol 1e-10, gtol 1e-8;
+                    inner equilibrium solves at --solve-tol / --solve-maxiter if given
+     --repair: before every shell, paper/lib/bdry_repair re-labels a creased boundary
+     poloidal angle and re-solves the interior; each repair is logged (one REPAIR line,
+     and "repairs" in score.json). A failed shell keeps the last good one.
+  2. Scores (score.json "free_boundary"): A, a, R0; Boozer QS |B_nonsym| / <|B|>_vol at
+     rho .25/.5/.75/1 (--helicity, LinearGrid(2 M_grid, 2 N_grid)); iota on 21 surfaces;
+     bn_rms = area-weighted rms of the coils' B.n over their area-weighted mean |B| on
+     the boundary, LinearGrid(2 M_grid, 2 N_grid); the fraction of negative sqrt(g) at
+     rho 0.8 and 1 (64 x 64). --bounds adds the dense coil check (lib/dense_check.py).
+  3. OUT/poincare.png: the coils' field lines (150 transits from 11 starts at rho
+     0.1..1.1) over the equilibrium's surfaces.
+Writes OUT/eq_fb.h5 and OUT/score.json; a rerun continues after the finished shells.
+Ported from coil_sandbox/from_axis/ss/fb_rescore.py (js/qa-poster).
 """
 
 import argparse
@@ -71,7 +91,7 @@ hel = tuple(int(v) for v in a.helicity.split(","))
 
 
 def bn_rms(eq):
-    """Area-weighted rms of B.n / <|B|> of the coils on the boundary."""
+    """Area-weighted rms of the coils' B.n over their area-weighted mean |B|."""
     g = LinearGrid(M=2 * eq.M_grid, N=2 * eq.N_grid, NFP=eq.NFP, sym=False)
     d = eq.compute(["x", "n_rho", "|e_theta x e_zeta|"], grid=g, basis="xyz")
     B = np.asarray(

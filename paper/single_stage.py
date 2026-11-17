@@ -5,25 +5,51 @@
         --A-min 6.8 --A-max 7.6 --iota-min 0.35 --qs-rho 0.25,0.5,0.75,1.0 \
         --tau-bn 5e-4 --tau-qs-rel 0.15 --pc-gap 0.002 --kmin 1 --kmax 6 --repair-steps
 
-``proximal-lsq-composite`` on things = [eq, coils]: ForceBalance, Psi, pressure,
-current, the boundary modes outside |m|, |n| <= k (and R_00), the coil current sum and
-the hinge joint plane are proximal constraints; everything else is one weighted least-
-squares objective whose bounded rows are kept exact as hinges in the model. Each
-term's weight is 1 / (tau x its scale): a term whose rows all equal their tolerance
-tau costs 1/2.
+UNKNOWNS: the equilibrium (vacuum, fixed boundary at each step) and the coils.
+For k = kmin..kmax (continuation) one ``proximal-lsq-composite`` solve:
 
-  physics   VacuumBoundaryBn (B.n on the moving boundary, normalization frozen at the
-            start); QuasisymmetryBoozer on each --qs-rho surface (tau_qs = tau-qs-rel x
-            the start's rms); AspectRatio in [A-min, A-max]; |iota| >= iota-min on 20
-            surfaces; volume within +-vol-band of the start.
-  coils     CoilLength, CoilCurvature at the bounds; CoilSetDistanceRows and
-            PlasmaCoilSetDistanceRows (the plasma rows follow the moving boundary);
-            optional ArcFold, HingeTurningAngle, CoilCurrentBand.
+  proximal constraints (held exactly; the equilibrium is re-solved to force balance at
+  every step, perturbation order 2, inner tolerance --solve-tol):
+    ForceBalance, fixed Psi, p = 0, current = 0, R_00 and every boundary mode with
+    max(|m|, |n|) > k fixed, the sum of the coil currents fixed, and with --fix-hinge-z
+    every hinge at that height (``FixHingeHeight``; the start is snapped onto it).
+  objective: min 1/2 sum r^2, one weighted least-squares problem whose bounded rows
+    enter as max(0, violation) and are kept exact as hinges in the model. Each term is
+    scaled by 1 / (tau x scale), so a term AT its tolerance costs 1/2: for the rms-type
+    terms (marked rms) that is the rms over the rows, for the others each row alone.
+
+  Terms, as "name: residual; tau and scale":
+  - B.n (rms): VacuumBoundaryBn, B_coils.n on the moving boundary, LinearGrid(--eval-mn)
+    on rho = 1, coil source GL --src-gl per arc; rows are the area-weighted B.n / <|B|>
+    with <|B|> frozen at the start. --tau-bn.
+  - QS (rms): QuasisymmetryBoozer (--helicity), unnormalized Boozer symmetry-breaking
+    |B| modes, one term per --qs-rho surface on LinearGrid(2 M_grid, 2 N_grid),
+    M_booz = 2M, N_booz = 2N. tau_qs = --tau-qs-rel x the START's rms over the surfaces
+    (frozen in anchors.json); the weight also carries 1 / sqrt(number of surfaces).
+  - aspect ratio: A outside [--A-min, --A-max]. --tau-A x the window's mean.
+  - iota floor (rms): |iota| below --iota-min on 20 surfaces rho 0.05..1. --tau-iota x
+    iota-min.
+  - volume: V outside V0 (1 -+ --vol-band), V0 at the start. --tau-V x V0.
+  - coil length: L_i above L (composite GL 24 per arc). --tau-L x L.
+  - curvature (rms): |kappa| above kappa on LinearGrid(--coil-grid-n). --tau-kappa x
+    kappa.
+  - coil-coil: CoilSetDistanceRows below d_cc (rows within --rows-select x d_cc,
+    --cc-rows slots, node grid chosen at build). --tau-rows x d_cc.
+  - plasma-coil: PlasmaCoilSetDistanceRows below d_pc against the MOVING boundary,
+    LinearGrid(--plasma-mn), --pc-rows slots, gap --pc-gap (default computed at build).
+    --tau-rows x d_pc.
+  - fold (optional): ArcFold, cos(fold) below cos(--fold-max). --tau-shape x
+    fold_max sin(fold_max), i.e. tau-shape x fold_max in angle.
+  - turning (optional): HingeTurningAngle, the same form with --turn-max.
+  - current band (optional): I_i / <I> outside 1 -+ --current-band. --tau-shape x band.
+
+  Solver per k: maxiter --maxiter, ftol 1e-6, xtol 1e-6, gtol 1e-8, --hessian (secant).
 
 The coil bounds are weighted, not hard: the single stage is a physics refinement, and
-the stage-2 polish (paper/stage2.py on the free-boundary equilibrium) restores hard
-coil feasibility. Every step writes eq_kK.h5 and coils_kK.h5 and appends physics, the
-dense coil check and the repair record to result.json; a rerun of the same command
+the stage-2 polish (paper/stage2.py) restores hard coil feasibility. --repair-steps
+repairs the boundary before every k (paper/lib/bdry_repair; logged). Every step writes
+eq_kK.h5 and coils_kK.h5 and appends physics, the dense coil check and the repair record
+to result.json; a rerun of the same command
 continues after the last finished k. Ported from coil_sandbox/single_stage.py
 (js/qa-poster), cut to the terms designs B and F used.
 """

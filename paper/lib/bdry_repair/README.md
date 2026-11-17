@@ -5,7 +5,7 @@ element `|e_theta x e_zeta|` goes to zero there, the largest curvature jumps fro
 turns negative near the edge, and B.n shows a spike of 10-20% at a mm-scale kink. B.n and QS cannot see a
 re-parametrization, so nothing in the objective stops the drift.
 
-**Use** (any script that has `coil_sandbox/sandbox` on `sys.path`, i.e. after `import boot`; depends only on `desc`):
+**Use** (with `paper/lib` on `sys.path`, as the paper scripts set it; depends only on `desc`):
 
 ```python
 from bdry_repair import repair, reparametrize, needs_repair, displacement
@@ -16,8 +16,14 @@ bad, health = needs_repair(eq)           # the gate alone
 displacement(old, new, NFP)              # parametrization-independent distance between two surfaces, mm (rms, p99, max)
 ```
 
+**Gate** (`core.HEALTHY`, `needs_repair`): a repair fires when the boundary's smallest area element
+`|e_theta x e_zeta|` is below 0.30 of its median, or its largest curvature exceeds 300 /m, or the smallest `sqrt(g)`
+at rho 0.8, 0.95 or 1 is below 0.05 of its median there (each on a 64 x 64 grid of the surface; curvature =
+the larger principal curvature).
+
 `repair` returns `eq` itself, untouched, when the boundary is healthy (`info["action"] == "none"`); pass `force=True`
-to refit anyway. Command line with before/after B.n, QS, Jacobian: `from_axis/ss/repair_eq.py EQ COILS OUT`.
+to refit anyway. In the paper scripts it runs through `free_boundary.py --repair`, `near_axis/score_fb.py --repair` and
+`single_stage.py --repair-steps`, each logging every repair.
 
 ## How it works
 

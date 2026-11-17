@@ -93,7 +93,18 @@ class NearAxis:
         return dict(x=x0, dl=dl, kappa=kappa, tors=tors, t=t, n=n, b=b, R=R, Z=Z)
 
     def solve(self, rc, zs, etabar, hel, iota0=0.4, sigma0=None):
-        """Returns dict with x, t, n, b, B (nphi,3), G (nphi,3,3) with G[q,i,j] = d_i B_j, iota, ..."""
+        """First-order QS near-axis solution on the nphi axis nodes of one field period.
+
+        Solves the sigma equation (sigma(0) = 0, stellarator symmetry) for sigma(phi) and iota by Newton from
+        iota0; the final Newton step carries gradients, so d(iota, sigma)/d(axis, eta_bar) is the exact
+        implicit-function derivative.
+
+        Returns a dict with the axis geometry (x, dl = |dx/dphi|, kappa, tors, Frenet t, n, b, R, Z), the
+        first-order shape X1c = eta_bar / kappa, Y1s = kappa / eta_bar, Y1c = kappa sigma / eta_bar, iota and
+        iotaN = iota + hel nfp (hel = the axis helicity, as pyQSC), and the target field on the axis: B = B0 t, shape (nphi, 3),
+        and its gradient G, shape (nphi, 3, 3), G[q, i, j] = d_i B_j (Giuliani et al. JCP 2022 eq. (3)), in
+        Cartesian components.
+        """
         g = self.geometry(rc, zs)
         B0 = self.B0
         abs_G0 = jnp.mean(g["dl"]) * B0  # |G0| = B0 L / (2 pi)

@@ -1,17 +1,31 @@
-"""Phase 2 scorer: the coils' OWN flux surface, by a vacuum free-boundary DESC solve (no NAE term).
+"""Near-axis state -> DESC: coils, a starting equilibrium, and the coils' own vacuum free boundary.
 
-    python score_fb.py runs/NAME [--LMN 10] [--a A] [--kmax K] [--out DIR]     (from na/, GPU)
+    python score_fb.py runs/NAME --LMN 12 --a 0.12 --shells 2,4,6,8 --maxiter 60 --repair [--out DIR]
+    (from paper/near_axis, GPU; writes OUT/coils.h5, eq_nae_fixed.h5, eq_fb_k<k>.h5, eq_fb.h5, score.json)
 
-1. Coils: exact conversion to DESC PiecewisePlanarArcCoil (B = 2) CoilSets (convert.py), saved as coils.h5.
-2. Initial guess only: pyQSC (vendored) at r = a -> Equilibrium.from_near_axis -> fixed-boundary vacuum solve.
-3. Free boundary (DESC's vacuum recipe, docs/notebooks/tutorials/free_boundary_equilibrium.ipynb):
-   objective VacuumBoundaryError(eq, coils, field_fixed=True); constraints ForceBalance, FixCurrent (0),
-   FixPressure (0), FixPsi; boundary modes released in shells |m|,|n| <= k = 2, 4, ...; proximal-lsq-exact.
-   Psi = pi a^2 B0 (from the NAE) selects which coil-field surface becomes the boundary.
-4. Score: Boozer QS (|B_nonsym| / <|B|>, rho .25/.5/.75/1, as single_stage.py Physics), iota profile, A, a, R0;
-   B.n / <B> of the coils on the final boundary (GL 64 per arc: 24 is too coarse for these arcs);
-   axis and iota vs the NAE prediction (diagnostic); dense_check.evaluate (d_pc against the real boundary, etc.);
-   a Poincare plot of the COILS' field with the free-boundary surfaces overlaid (fake-surface check).
+The pipeline's step from the near-axis stage to DESC (EXPERIMENTS.md 2.1 step 2). The near-axis model only supplies
+the coils and a first guess; the plasma is then whatever flux surface the coils' own field makes.
+
+1. Coils: the near-axis folded coils converted exactly to DESC PiecewisePlanarArcCoil (B = 2, M = K) by
+   convert.to_desc_coils, saved as a MixedCoilSet (flatten before CoilSetDistanceRows). Biot-Savart source grid:
+   composite Gauss-Legendre --gl (64) nodes per arc (24 is too coarse for these arcs).
+2. First guess: pyQSC (vendored, nphi 101) surface at r = --a (default: the near-axis run's --a) ->
+   Equilibrium.from_near_axis at basis L = M = N = --LMN, which also sets Psi = pi a^2 B0 -> fixed-boundary
+   vacuum solve (ForceBalance; maxiter 200, ftol 1e-8, xtol 1e-10, gtol 1e-8). Checks that the equilibrium and coil
+   fields point the same way.
+3. Free boundary, one shell per k in --shells (default 2, 4, ..., LMN):
+     objective    VacuumBoundaryError(eq, coils, field_fixed=True): residuals B_out.n and B_out^2 - B_in^2 on
+                  rho = 1, LinearGrid(M_grid, N_grid) (DESC default), area-weighted; the coils are fixed
+     constraints  ForceBalance, FixCurrent (0), FixPressure (0), FixPsi (Psi fixes which coil-field surface
+                  becomes the boundary), and the boundary modes with max(|m|, |n|) > k fixed
+     solver       proximal-lsq-exact, --maxiter per shell, ftol 1e-8, xtol 1e-10, gtol 1e-8
+   --repair: before every shell after the first, paper/lib/bdry_repair re-labels a creased boundary poloidal angle
+   (equal arclength) and re-solves the interior; each repair is logged in score.json. A failed shell (e.g. out of
+   memory) stops the ladder and the previous shell is scored.
+4. Score (score.json): Boozer QS (|B_nonsym| / <|B|>_vol, rho .25/.5/.75/1, `physics`), iota profile, A, a, R0;
+   area-weighted rms and max |B.n| of the coils on the boundary over their area-weighted mean |B| there
+   (`bn_rms`, LinearGrid(2 M_grid, 2 N_grid)); axis and iota against the near-axis prediction (diagnostic); dense_check.evaluate; and a Poincare
+   plot of the coils' field (--ntransit) with the free-boundary surfaces overlaid.
 """
 import os, sys, json, time, argparse
 HERE = os.path.dirname(os.path.abspath(__file__))

@@ -3,18 +3,47 @@
     python paper/stage2.py --eq EQ --start COILS.h5 --bounds BOUNDS.json --out DIR \
         [--vacuum] [--fold-max 60] [--fix-hinge-z 0] [--current-band 0.5] ...
 
-Minimize QuadraticFlux on a fixed equilibrium subject to the engineering bounds, all as
-hard constraints of the slack-free augmented Lagrangian ``lsq-auglag-composite``:
+The equilibrium is FIXED; the coils (FourierPlanar, FourierXYZ, or arc coils) are
+optimized. Bounds come from BOUNDS.json (paper/lib/dense_check.load_bounds: absolute, or
+Gil's reactor set scaled by a / 1.7). Solver ``lsq-auglag-composite``: slack-free
+augmented Lagrangian, every constraint below exact at convergence (AL settings in
+desc/optimize/aug_lagrangian_composite.py; --gtol, --ctol, --maxiter = total inner
+iterations).
 
-* coil length (composite Gauss-Legendre per arc) and |curvature| at their bounds;
-* coil-coil distance: ``CoilSetDistanceRows`` (unsigned top-k node-pair rows, gap from
-  the bounds by ``node_gap_estimate`` or from the coils at build);
-* plasma-coil distance: ``PlasmaCoilSetDistanceRows`` with the boundary held fixed;
-* the sum of the coil currents fixed; optionally each current within a band;
-* arc coils: optional fold cap, hinge turning-angle cap, joint plane
-  (``FixHingeHeight`` at z, or level hinges per coil), hinge height above the axis,
-  hinge tilt, polar radius floor;
-* optionally a pointwise cap on B.n/|B| (vacuum only).
+Objective: QuadraticFlux (area-weighted B.n on the boundary, normalized by B R0 a),
+weight 1, on LinearGrid(--eval-mn) on rho = 1; Biot-Savart source composite
+Gauss-Legendre 24 nodes per arc for arc coils, LinearGrid(--field-n) otherwise.
+--vacuum: coil field only (else the plasma field by virtual casing is added).
+
+Constraints (hard):
+* sum of the coil currents fixed; gauges: FourierPlanar largest normal component pinned;
+  FourierXYZ phase pinned and relative speed within 1 -+ --speed-tol on
+  LinearGrid(N=100);
+* coil length <= L (composite GL 24 per arc; LinearGrid(N=400) for smooth coils);
+* |curvature| <= kappa on --curv-n nodes per arc (--curv-grid arc) or LinearGrid(N=
+  --curv-n) (--curv-grid linear);
+* coil-coil distance >= d_cc: ``CoilSetDistanceRows``, unsigned top-k node-pair rows
+  within --cc-sel x d_cc in --cc-k slots, each row a node distance minus a gap so it is
+  a lower bound; --cc-gap coils: node grid chosen at build so the gap is <= 2% of d_cc;
+  --cc-gap bounds: 2 --row-n + 1 nodes per coil, gap from ``node_gap_estimate``;
+* plasma-coil distance >= d_pc, boundary fixed: --pc-mode min (default) upstream
+  ``PlasmaCoilSetMinDistance`` (hard minimum, one row per coil) on plasma
+  LinearGrid(--pc-plasma-mn, default 32 x 32, full surface) and 2 --pc-row-n + 1 coil
+  nodes; --pc-mode rows ``PlasmaCoilSetDistanceRows`` (smooth top-k rows within --pc-sel
+  x d_pc, --pc-k slots, default 128 x 128 half surface), for problems where the minimum
+  stalls;
+* --current-band f: each current within (1 -+ f) x the average at build;
+* arc coils: --fold-max (``ArcFold``, cos(fold) >= cos(fold_max), arc orientation from
+  the start or --fold-sides-from); --turn-max (``HingeTurningAngle``, cos(turn) >=
+  cos(turn_max) at every hinge); --fix-hinge-z (``FixHingeHeight``: every hinge at that
+  z; the start is snapped onto it) or --horizontal-hinges (``HingeLevel``: each coil's
+  hinges at one free height); --hinge-zmax-rel (``HingeMidHeightRelative``: each coil's
+  mean hinge height within +- that many m of the axis height at its phi);
+  --hinge-tilt-max (``HingeTilt``: |sin(chord elevation)| <= sin(tilt_max));
+  --polar-rmin (``PolarArcRadius``, polar arcs);
+* --bn-max c: ``PointwiseBn``, |B.n| / |B| <= c at every node of LinearGrid(
+  --bn-max-grid) on the boundary (vacuum only).
+Experimental (paper/lib/experimental.py, off): --exp-pair-rows, --link-mu (link guard).
 
 Every run writes to DIR: cmd.txt, commit.txt, run.log, outer.json (one record per outer
 iteration: per-group penalties, multipliers, violations, and a dense check), x_last.npy,
