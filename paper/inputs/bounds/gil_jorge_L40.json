@@ -1,0 +1,11 @@
+{
+  "_note": "Paper convention (decided 2026-11-17) for Jorge 2022 (vacuum, NFP 1, 12 unique coils per half period): Gil et al. PRE 114, 025202 (2026), Table III scaled by f = a/1.7 with DESC's a = 0.124981 m; EXCEPTION (option (i)): the per-coil length is Gil's 4-coils-per-half-period value, 40 m x f, because 160 m x f split over 12 coils (0.98 m) cannot enclose the plasma. kappa_MS not used. ABSOLUTE. To be confirmed with the user before use.",
+  "scale": "absolute",
+  "L": 2.9407184097326384,
+  "kappa": 13.602118403317876,
+  "kappa_MS": null,
+  "d_cc": 0.05881436819465277,
+  "d_pc": 0.11027694036497393,
+  "convex_excess": null,
+  "planar_max": null
+}
