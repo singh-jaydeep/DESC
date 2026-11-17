@@ -101,6 +101,22 @@ ap.add_argument(
     "--pc-sel", type=float, default=1.2, help="pc select distance / d_pc bound"
 )
 ap.add_argument("--jac-chunk", type=int, default=16, help="jac_chunk_size")
+ap.add_argument(
+    "--exp-pair-rows",
+    nargs="?",
+    const="unsigned",
+    choices=["unsigned", "signed"],
+    default=None,
+    help="EXPERIMENTAL: add the branch's per-pair closest-node rows "
+    "(paper/lib/experimental.py); 'signed' negates linked pairs (the link guard)",
+)
+ap.add_argument(
+    "--link-mu",
+    type=float,
+    default=None,
+    help="EXPERIMENTAL link guard: initial AL penalty on the signed per-pair rows, "
+    "e.g. 1e8 (needs --exp-pair-rows signed)",
+)
 # piecewise-planar constraints
 ap.add_argument("--fold-max", type=float, default=None, help="fold cap (deg)")
 ap.add_argument(
@@ -359,6 +375,12 @@ else:
         jac_chunk_size=jcs,
     )
 cons += [cc, pc]
+if a.exp_pair_rows:
+    from experimental import PairClosestRows
+
+    cc.build(verbose=0)
+    cons.append(PairClosestRows(cc, signed=a.exp_pair_rows == "signed"))
+    info["experimental"] = f"per-pair closest-node rows ({a.exp_pair_rows})"
 
 # piecewise-planar constraints
 if a.fix_hinge_z is not None:
@@ -541,6 +563,16 @@ def save_x(x):
 
 
 options = {"outer_callback": report, "callback": save_x, **json.loads(a.options)}
+if a.link_mu is not None:
+    if a.exp_pair_rows != "signed":
+        raise SystemExit("--link-mu needs --exp-pair-rows signed")
+    j = next(
+        i for i, c in enumerate(nonlinear) if type(c).__name__ == "PairClosestRows"
+    )
+    link_ids = offsets[j] + np.arange(nonlinear[j].dim_f)
+    options["initial_penalty_rows"] = {"ids": link_ids, "mu": a.link_mu}
+    info["link_guard"] = f"initial mu {a.link_mu:g} on {link_ids.size} signed pair rows"
+    print(f"LINK GUARD: {info['link_guard']}", flush=True)
 (cs1,), res = Optimizer("lsq-auglag-composite").optimize(
     cs0,
     objective=obj,
