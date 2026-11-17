@@ -46,7 +46,7 @@ compute) -> optional experiments. Sections 1 and 4 can start whenever their to-d
 | `jorge/chain.sh` cut to ladder -> C per seed + planar/free per seed + trace; new r/a starts | 4 | agent |
 | confirm every bounds file with the user before its first use (section 0 bounds row) | all | agent + user |
 | near-axis continuation of B's and F's states under the new bounds (2.1 step 1) | 2 | agent |
-| compare with the modular coils of the Jorge 2022 paper (4.2) | 4 | agent; user if the coil data is not available |
+| render Jorge starts / R0 against the bounds; user confirms they look reasonable (4.2) | 4 | agent + user |
 | flatten the near-axis MixedCoilSet before the single stage (2.1 step 2) | 2 | agent |
 | faces figure layout | 1 | deferred (user) |
 
@@ -381,7 +381,7 @@ comparison, not a target.
 Status: **READY once the bounds file is confirmed with the user and the starts and cut-down driver exist** (decided
 2026-11-17). Keep it simple: the quickest path to the result.
 
-Equilibrium `inputs/equilibria/jorge_vac.h5` (Jorge 2022 one-period QI, vacuum, NFP 1), 12 coils, bounds
+Equilibrium `inputs/equilibria/jorge_vac.h5` (Jorge 2022 one-period QI, vacuum, NFP 1), 12 unique coils per half period (24 in all), bounds
 bounds `gil_jorge_L40.json` (4.2). Driver
 `paper/jorge/chain.sh` (to be cut down to the path below). Poster record: memory `paper-scope-decisions` and
 PORT_PLAN 9.4 (relax_vs_cap).
@@ -411,13 +411,17 @@ PORT_PLAN 9.4 (relax_vs_cap).
   reactor set. Against the poster's `qi_jorge2022.json` (retired; L 2.9495, kappa 13.594, d_cc 0.04, d_pc 0.1106)
   the change is mainly d_cc 0.04 -> 0.0588 m (+47%). Confirm the file with the user before use; results are not
   expected to match the poster's; regressions are discussed with the user (section 0).
-- **Reference: the modular coils of the original Jorge 2022 paper.** The paper's QI configuration comes with its own
-  (free 3D, modular) coils. The agent compares the production coilsets against them: number of coils, per-coil
-  length, max curvature, coil-coil and plasma-coil distances (in m and in units of a), and B.n on the same boundary
-  with the dense-check metric (i), plus whether their field holds nested surfaces at the edge. If the coil data is
-  not available to the agent (paper, supplementary data or a public repository), it asks the user for it or asks
-  the user to make the comparison. The comparison goes in the section's findings note and tells the reader how
-  restrictive our bounds are relative to the published coils.
+- **No published-coil reference (decided 2026-11-17).** The Jorge 2022 paper's coil figure shows 30 coils, and the
+  authors' public data (`paper/jorge/reference/QI_NFP1_Jorge2022`, copied by the user, not committed) has no coil
+  files; its two coil paths (REGCOIL cut into 20 coils per field period; a simsopt stage-2 tutorial with 12 unique
+  coils, a soft length cost, a 0.1 m distance penalty and no curvature term) were switched off for the published run.
+  So there is nothing to match. Instead:
+  - **Bounds reasonable by eye**: before the first production run, render the starts and the R0 result against
+    `gil_jorge_L40.json`, mainly the per-coil length (2.94 m) and coil-coil distance (0.0588 m): coils of that length
+    should wrap the plasma without slack loops, and the clearance should look like a real gap between neighbours at
+    12 coils per half period. Show the renders to the user and confirm before running the chain.
+  - **One bound set for every arm**: hinged, planar and free all run with `gil_jorge_L40.json` (and the same current
+    band, distances, grids and maxiter), so the comparison is at equal bounds.
 
 ### 4.3 Settings
 Common (from `chain.sh` BASE): `--vacuum --current-band 0.5 --maxiter 800 --cc-gap bounds --row-n 512
@@ -453,8 +457,7 @@ best hinged run. Drop A3, the 4% step and the P cap ladder.
 ### 4.6 Metrics and acceptance
 Per arm: best-of-4 mean and max B.n with the spread, margins; recovery `R = log(planar/hinged) / log(planar/free)`
 as in section 3. Every run KKT, feasible on the dense check, unlinked, rendered; >= 3 converged seeds per arm. The
-best hinged run's zoomed trace nested to the plasma edge (poster: to offset ~0.18 m). Comparison with the Jorge 2022
-modular coils (4.2) in the findings note. Poster references: R0
+best hinged run's zoomed trace nested to the plasma edge (poster: to offset ~0.18 m). Poster references: R0
 1.41e-2 / 17.5%, C_bn002 5.30e-3 / 2.3%, planar P0c 3.34e-2 / 22.4%; the poster has no free-coil reference on Jorge.
 
 ---
