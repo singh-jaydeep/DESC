@@ -70,4 +70,8 @@ What needs runs or a decision: `OPEN_ITEMS.md`.
 11. **`stage2.py` select distances are relative** (`--cc-sel 2.5` x d_cc, `--pc-sel 1.2` x d_pc) and the plasma
     grid defaults to 128 x 128 (Jorge: 128 x 512); FourierXYZ coils get the phase pin and speed bounds.
 12. **Single stage drops the backoffs** and is weighted (as the poster); stage 2 restores hard feasibility.
+14. **Row slots keep the closest candidates on overflow** (2026-11-17). The branch kept the first K in id order,
+    so an overflow dropped whole coil pairs' contacts; in the first 8a run (plasma rows on 128 x 128: ~1.4M
+    candidates in band against 20k slots, then coil-coil 53k against 30k) two symmetric pairs passed through
+    each other. Without overflow the selected rows are unchanged (bit-identical to the branch on design F).
 13. **`coil_curvature_grid` needed quadrature spacing** to be usable by `CoilCurvature` (fixed, tested).

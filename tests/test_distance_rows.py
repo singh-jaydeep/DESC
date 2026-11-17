@@ -219,3 +219,30 @@ def test_coil_rows_with_auglag():
     # the node discretization, as the gap is 0 here)
     np.testing.assert_allclose(r.sum(), 9, rtol=1e-2)
     assert np.all(r > 4.4)
+
+
+@pytest.mark.unit
+@pytest.mark.filterwarnings("ignore:.*Raise max_active_rows")
+def test_coil_rows_overflow_keeps_closest():
+    """With too few slots, the rows kept are the closest candidates."""
+    coils = _arc_coils()
+    grid = _coil_node_grid(coils, 101)
+    kw = dict(select_distance=0.45, bounds=(0.2, np.inf), normalize=False, gap=0.0)
+    full = CoilSetDistanceRows(coils, grid=grid, max_active_rows=20000, **kw)
+    small = CoilSetDistanceRows(
+        coils, grid=grid, max_active_rows=50, scan_block_size=500, **kw
+    )
+    full.build(verbose=0)
+    small.build(verbose=0)
+    p = coils.params_dict
+    f = np.asarray(full.compute(p))[np.asarray(full.compute_row_ids(p)) >= 0]
+    assert f.size > 50
+    g = np.asarray(small.compute(p))
+    ids = np.asarray(small.compute_row_ids(p))
+    assert np.all(ids >= 0) and np.all(np.diff(ids) > 0)  # full, in id order
+    np.testing.assert_allclose(np.sort(g), np.sort(f)[:50])
+    # kept rows stay selected even when far
+    far = np.setdiff1d(np.asarray(full.compute_row_ids(p)), ids)[-3:]
+    small.keep_rows(far)
+    kept = np.asarray(small.compute_row_ids(p))
+    assert set(far) <= set(kept)

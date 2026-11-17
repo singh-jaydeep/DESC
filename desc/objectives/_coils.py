@@ -1771,21 +1771,23 @@ def _keep_array(ids, size):
 
 
 def _select_rows(dist, n_units, n_rows, n_cols, block_rows, select, keep, K):
-    """Candidates within ``select`` (or kept), the first ``K`` in id order.
+    """The ``K`` closest candidates within ``select`` (and every kept one), in id order.
 
     Candidate ``(u, r, c)`` has id ``(u * n_rows + r) * n_cols + c`` and distance
     ``dist(u, r)[., c]``, where ``dist(u, r)`` returns the ``(len(r), n_cols)``
     distances of rows ``r`` of unit ``u`` (no derivative needed). Units are scanned
     ``block_rows`` rows at a time, so at most ``block_rows * n_cols`` distances exist
-    at once; each block keeps its first ``K`` selected ids, and since blocks are in id
-    order the result equals ``jnp.nonzero`` over every candidate with ``size=K``.
+    at once; each block keeps its ``K`` closest selected candidates and the merge
+    keeps the ``K`` closest of those, so when more than ``K`` candidates are within
+    ``select`` the most distant ones are dropped (kept candidates always stay). When
+    at most ``K`` are, the result is every selected candidate, in id order.
 
     Returns
     -------
     ids : ndarray of int, shape(K,)
-        Selected candidate ids, -1 in unused slots.
+        Selected candidate ids in increasing order, -1 in unused slots.
     count : int
-        Number of selected candidates (may exceed K).
+        Number of candidates within ``select`` or kept (may exceed K).
 
     """
     nb = -(-n_rows // block_rows)  # blocks per unit
@@ -1799,15 +1801,22 @@ def _select_rows(dist, n_units, n_rows, n_cols, block_rows, select, keep, K):
         r = jnp.minimum(r, n_rows - 1)
         ids = (u * n_rows + r)[:, None] * n_cols + jnp.arange(n_cols)[None]
         pos = jnp.clip(jnp.searchsorted(keep, ids), 0, keep.size - 1)
-        mask = valid & ((dist(u, r) < select) | (keep[pos] == ids))
-        (sel,) = jnp.nonzero(mask.reshape(-1), size=size, fill_value=0)
-        return jnp.sum(mask), ids.reshape(-1)[sel]
+        kept = valid & (keep[pos] == ids)
+        d = dist(u, r)
+        mask = valid & ((d < select) | kept)
+        # priority: kept rows first, then by distance; unselected rows last (+inf)
+        pri = jnp.where(kept, -jnp.inf, jnp.where(mask, d, jnp.inf)).reshape(-1)
+        neg, sel = jax.lax.top_k(-pri, size)
+        return jnp.sum(mask), ids.reshape(-1)[sel], -neg
 
-    counts, ids = jax.lax.map(scan, jnp.arange(n_units * nb))
-    valid = jnp.arange(size)[None, :] < counts[:, None]
-    (pos,) = jnp.nonzero(valid.reshape(-1), size=K, fill_value=0)
-    count = jnp.sum(counts)
-    return jnp.where(jnp.arange(K) < count, ids.reshape(-1)[pos], -1), count
+    counts, ids, pri = jax.lax.map(scan, jnp.arange(n_units * nb))
+    ids, pri = ids.reshape(-1), pri.reshape(-1)
+    neg, sel = jax.lax.top_k(-pri, min(K, pri.size))
+    ids, used = ids[sel], -neg < jnp.inf
+    order = jnp.argsort(jnp.where(used, ids, jnp.iinfo(ids.dtype).max))
+    out = jnp.where(used[order], ids[order], -1)
+    out = jnp.concatenate([out, jnp.full(K - out.size, -1, dtype=out.dtype)])
+    return out, jnp.sum(counts)
 
 
 def _block_rows(n_rows, n_cols, block_size):
