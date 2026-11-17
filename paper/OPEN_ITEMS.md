@@ -1,38 +1,41 @@
-# Open items for the experimental agent
+# Experimental plan (open items after the port)
 
-The port (library in `desc/`, scripts in `paper/`) is complete and checked without long runs
-(`PORT_STATUS.md`). What remains needs GPU runs or a research decision. Rules of the machine: one heavy
+The port (library in `desc/`, scripts in `paper/`) is complete (`PORT_SUMMARY.md`, `PORT_STATUS.md`). What
+remains are the paper's experiments and method decisions: they need GPU runs or the user's call. Rules of the machine: one heavy
 job at a time under `systemd-run --user --scope -q -p MemoryMax=12G -p MemorySwapMax=0`, report progress,
 confirm run settings with the user before launching, look at every coilset before calling it better.
 
-## 1. Acceptance runs (PORT_CHECKLIST step 8), in this order
+## 1. First experiments: the Jorge chain (also the end-to-end check of the Jorge-specific pieces)
 
-| id | what | command | compare against (poster) |
-|---|---|---|---|
-| 8a | design F, AL solver row | `paper/stage2.py --eq paper/inputs/references/designF/eq.h5 --bounds paper/inputs/bounds/fa_qa2_a0167.json --start paper/inputs/starts/F/F_z0_c25_p07.h5 --fix-hinge-z 0 --fold-max 60 --current-band 0.5 --vacuum --cc-gap bounds --row-n 512 --cc-k 30000 --fold-sides-from paper/inputs/starts/F/F10_fold_sides.json --maxiter 800 --out paper/runs/8a_F_AL` | gtol KKT, B.n 6.0e-5, folds 20/50/60/60/60, L and kappa active, unlinked. Differences by design: plasma rows replace the stock hard min; kappa on 1000 nodes per arc (`--curv-grid linear --curv-n 300` reproduces the poster's grid). B.n should not be worse |
-| 8b | Jorge chain | `bash paper/jorge/chain.sh ladder A3 C` | R0 1.41e-2 / 17.5%, A3 6.43e-3 / 11.0%, C_bn004 5.52e-3 / 3.9%, C_bn002 5.30e-3 / 2.3%; every step unlinked, gtol |
-| 8c | Jorge planar control | `bash paper/jorge/chain.sh P` | every AL subproblem converges (`outer.json` inner_converged), B.n ~3.34e-2, feasible. The regression test for the plasma rows |
-| 8d | memory | 8b's C steps and an 8c cap step on the 8 GB GPU | must fit at `row_n 512` with the chunked scan; the poster OOMed |
-| 8e | field lines | `bash paper/jorge/chain.sh trace`, then `paper/jorge/zoom_poincare.py` on C_bn002 | nested to start offset ~0.18 m |
+Design F (acceptance run 8a) is done: `findings/8a_basins.md`. The port is correct; stage 2 from F's lens start
+has two KKT optima 15x apart in B.n, chosen by the variable scaling. Expect the same kind of path dependence below,
+so judge each step by KKT, feasibility on the dense check, no links and tidy coils, and treat B.n differences
+from the poster as possible basin differences, not port errors.
 
-**8a done (2026-11-17): `findings/8a_basins.md`.** The port is correct; the problem has two KKT optima 15x apart
-in B.n (6.0e-5 poster, 9.3e-4 port), chosen by the variable scaling and separated by a coil-coil clearance barrier.
+| step | command | poster reference |
+|---|---|---|
+| Jorge ladder, A3, cap | `bash paper/jorge/chain.sh ladder A3 C` | R0 1.41e-2 / 17.5%, A3 6.43e-3 / 11.0%, C_bn004 5.52e-3 / 3.9%, C_bn002 5.30e-3 / 2.3% |
+| planar control | `bash paper/jorge/chain.sh P` | every AL subproblem converges, B.n ~3.34e-2, feasible (plasma rows, where the hard minimum stalled) |
+| memory | the C steps and a P cap step on the 8 GB GPU | must fit at `row_n 512` with `XLA_PYTHON_CLIENT_MEM_FRACTION=0.92` |
+| field lines | `bash paper/jorge/chain.sh trace`, `paper/jorge/zoom_poincare.py` on C_bn002 | nested to start offset ~0.18 m |
 
-## 2. Questions the runs must answer
+Recommended: add the link guard to every chain step (`--exp-pair-rows signed --link-mu 1e8` in `BASE` of
+`jorge/chain.sh`); two of six 8a runs without it linked a coil pair in one step. Whether the guard is part of
+the paper's method is the user's decision.
 
-1. **Plasma-coil gap is conservative.** The gap uses the boundary's global maximum principal curvature
-   (design F 51 /m, Jorge 100 /m), so on Jorge the d_pc constraint is ~5% conservative at a 128 x 512 plasma
-   grid (5.8 mm of 111 mm); the poster's C06 coils read as violating it. Options: accept and state it, refine
-   the plasma grid further (cost: active rows, 24.6k on C06 at 128 x 512), or a gap from the LOCAL surface
-   curvature near each row (a method change in `PlasmaCoilSetDistanceRows`). Decide after 8b/8c.
-2. **Plasma-coil distance: hard min unless it stalls** (decided 2026-11-17). `stage2.py --pc-mode min` (default,
-   upstream PlasmaCoilSetMinDistance, one row per coil, as the poster's `--dist hybrid`) everywhere it converges;
-   `--pc-mode rows` (top-k rows: 128 x 128 half grid, 20k slots; Jorge 128 x 512, 40k) where it stalls, so far
-   only the Jorge planar control. The rows cost ~4x per inner iteration on design F (the first 8a attempt).
-3. **Inner Hessian.** The composite AL defaults to `{"hessian": "secant", "finish_steps": 5}` (every poster
-   run). The poster session was testing how load-bearing secant is; if `gn` does as well, switch the
-   default (`desc/optimize/aug_lagrangian_composite.py`) and state it in the paper.
-4. **Curvature rows.** 1000 nodes per arc is ~3x the poster's curvature rows; check the cost in 8a.
+## 2. Method questions
+
+1. **Basins and variable scaling (8a).** `x_scale="jac"` takes column norms over all constraint rows, active or
+   not, so rows with no constraint role steer the path. Options: report best-of-several starts/scalings with the
+   spread (cheap, honest); a scaling from the objective and active rows only (reproducible; a method change);
+   both. A small multistart on design F would show how many basins there are.
+2. **Plasma-coil gap is conservative.** The rows' gap uses the boundary's global maximum principal curvature
+   (design F 51 /m, Jorge 100 /m): ~5% of d_pc on Jorge at a 128 x 512 plasma grid. Only matters where the rows
+   are used (`--pc-mode rows`). Options: accept and state it, refine the grid, or a gap from the local curvature.
+3. **Plasma-coil distance: hard min unless it stalls** (decided 2026-11-17; `stage2.py --pc-mode`).
+4. **Inner Hessian.** Default `{"hessian": "secant", "finish_steps": 5}` (every poster run). If `gn` does as well,
+   switch the default and state it.
+5. **Curvature rows.** 1000 nodes per arc (default) cost ~1.3x the poster's `N=300` grid on 8a (572 s vs 448 s).
 
 ## 3. Pipeline rebuilds (PORT_PLAN 9.1)
 
@@ -62,8 +65,6 @@ in B.n (6.0e-5 poster, 9.3e-4 port), chosen by the variable scaling and separate
 ## 5. Housekeeping
 
 - Full test suite on this branch (only the touched suites have run).
-- Move `paper/` to `publications/<name>/` (upstream's convention, excluded from flake8) and update the
-  `paper/...` paths in the scripts.
 - `paper/lib/bdry_repair/_surface_fit_pr2337.py` is vendored from DESC PR #2337 (open): delete it and import
   `desc.geometry._surface_fit` once merged.
 - Upstream PRs for the library pieces: the user decides later.

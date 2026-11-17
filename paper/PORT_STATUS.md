@@ -70,8 +70,26 @@ What needs runs or a decision: `OPEN_ITEMS.md`.
 11. **`stage2.py` select distances are relative** (`--cc-sel 2.5` x d_cc, `--pc-sel 1.2` x d_pc) and the plasma
     grid defaults to 128 x 128 (Jorge: 128 x 512); FourierXYZ coils get the phase pin and speed bounds.
 12. **Single stage drops the backoffs** and is weighted (as the poster); stage 2 restores hard feasibility.
+13. **`coil_curvature_grid` needed quadrature spacing** to be usable by `CoilCurvature` (fixed, tested).
 14. **Row slots keep the closest candidates on overflow** (2026-11-17). The branch kept the first K in id order,
     so an overflow dropped whole coil pairs' contacts; in the first 8a run (plasma rows on 128 x 128: ~1.4M
     candidates in band against 20k slots, then coil-coil 53k against 30k) two symmetric pairs passed through
     each other. Without overflow the selected rows are unchanged (bit-identical to the branch on design F).
-13. **`coil_curvature_grid` needed quadrature spacing** to be usable by `CoilCurvature` (fixed, tested).
+15. **Plasma-coil distance: upstream hard minimum by default** (`stage2.py --pc-mode min`, decision 2026-11-17),
+    the top-k rows (`--pc-mode rows`) where the minimum stalls (so far only the Jorge planar control). The rows on a
+    fine plasma grid cost ~4x per inner iteration on design F.
+16. **Link guard restored, experimental and off by default** (2026-11-17): `lsq_auglag_composite`'s
+    `initial_penalty_rows` and `lsq_composite`'s jac-scale exclusion of inactive guard rows, as on the branch, plus
+    the signed per-pair rows in `paper/lib/experimental.py` (`stage2.py --exp-pair-rows signed --link-mu 1e8`).
+    Two of six 8a runs without it linked a coil pair in one accepted step. Whether it becomes part of the method
+    is the user's call.
+
+## End-to-end check (acceptance run 8a, 2026-11-17)
+
+Design F stage 2 from the z = 0 lens start: every port run that stayed unlinked converged (gtol KKT) to B.n 9.3e-4;
+the poster run converged to 6.0e-5. Both coilsets are KKT points of the same ported problem (warm starts from each
+stay put), and the two codebases build identical problems (to 1e-15) apart from inactive rows that change the
+variable scaling. With those rows restored the port follows the poster's iterates to 2e-10. So the port is correct
+and the problem has (at least) two basins: `findings/8a_basins.md`. The Jorge-specific pieces (pointwise B.n cap,
+hinge tilt and mid-height, plasma rows in a solve) are checked at the objective level (bit-identical to the
+sandbox) but have not yet run end to end; the first Jorge chain does that.
