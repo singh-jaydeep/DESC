@@ -59,7 +59,7 @@ interpax 0.3.14 (environment). The full suite has not been run on this branch ye
    density does. `coil_curvature_grid` with 1000 nodes per arc (< 0.01%) is the driver default.
 9. **`select_distance` limitation** (paper methods): a row exists only inside the selection band, so a step
    longer than the band can jump coils through each other unseen; unsigned rows cannot separate crossed
-   coils. Starts must be feasible and the band wider than one step (`stage2.py`: 0.1 m coil-coil,
+   coils. Starts must be feasible and the band wider than one step (`stage2.py`: 2.5 d_cc coil-coil,
    1.2 d_pc plasma-coil).
 10. **`CoilArclengthResidual` ported** (decision 2026-11-16) for the free FourierXYZ arm of the
     planar/hinged/free comparison; `CoilMeanSquaredCurvature` not ported.

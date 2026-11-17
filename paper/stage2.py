@@ -57,7 +57,7 @@ ap.add_argument(
 )
 ap.add_argument("--row-n", type=int, default=256, help="cc rows: ~2 N + 1 nodes/coil")
 ap.add_argument("--cc-k", type=int, default=10000, help="cc row slots")
-ap.add_argument("--cc-sel", type=float, default=0.1, help="cc select distance (m)")
+ap.add_argument("--cc-sel", type=float, default=2.5, help="cc select distance / d_cc")
 ap.add_argument(
     "--cc-gap",
     choices=["bounds", "coils"],
@@ -65,6 +65,12 @@ ap.add_argument(
     help="cc gap from the bounds (node_gap_estimate) or the coils at build",
 )
 ap.add_argument("--speed-ratio", type=float, default=2.0, help="for the bounds gap")
+ap.add_argument(
+    "--speed-tol",
+    type=float,
+    default=0.5,
+    help="FourierXYZ: node speed within (1 -+ this) x the mean (gap ratio 1 + this)",
+)
 ap.add_argument(
     "--pc-row-n", type=int, default=256, help="pc rows: ~2 N + 1 nodes/coil"
 )
@@ -142,6 +148,7 @@ import numpy as np  # noqa: E402
 import desc  # noqa: E402
 from desc.coils import (  # noqa: E402
     FourierPlanarCoil,
+    FourierXYZCoil,
     PolarPlanarArcCoil,
     coil_curvature_grid,
     coil_quad_grid,
@@ -151,6 +158,7 @@ from desc.grid import LinearGrid  # noqa: E402
 from desc.io import load  # noqa: E402
 from desc.objectives import (  # noqa: E402
     ArcFold,
+    CoilArclengthResidual,
     CoilCurrentBand,
     CoilCurvature,
     CoilLength,
@@ -192,8 +200,9 @@ P = D.load_bounds(a.bounds, eq, len(coils), a.a)
 arc = hasattr(coils[0], "B")
 polar = isinstance(coils[0], PolarPlanarArcCoil)
 kind = type(coils[0]).__name__
-if not arc and not isinstance(coils[0], FourierPlanarCoil):
-    raise SystemExit(f"arc or FourierPlanar coils only, got {kind}")
+xyz = isinstance(coils[0], FourierXYZCoil)
+if not arc and not xyz and not isinstance(coils[0], FourierPlanarCoil):
+    raise SystemExit(f"arc, FourierPlanar or FourierXYZ coils only, got {kind}")
 if (a.fold_max or a.fix_hinge_z is not None or a.horizontal_hinges) and not arc:
     raise SystemExit("fold and hinge options need arc coils")
 if not a.pc_plasma_full and not getattr(cs0, "sym", False):
@@ -247,6 +256,39 @@ if isinstance(coils[0], FourierPlanarCoil):  # scaling the normal is an exact ga
     pins = [{"normal": np.array([np.argmax(np.abs(c.normal))])} for c in coils]
     cons.append(FixParameters(cs0, pins))
     info["gauge"] = "largest normal component pinned"
+if xyz:  # s -> s + c is a gauge: pin the n = +-1 coefficient most aligned with it
+
+    def phase_tangent(p, modes):
+        """d/dc of the X, Y, Z coefficients under s -> s + c."""
+        t = {}
+        for key in ("X_n", "Y_n", "Z_n"):
+            v = np.asarray(p[key])
+            out = np.zeros_like(v)
+            for i, n in enumerate(modes):
+                if n:
+                    j = int(np.where(modes == -n)[0][0])
+                    out[j] += (-abs(n) if n > 0 else abs(n)) * v[i]
+            t[key] = out
+        return t
+
+    modes = coils[0].X_basis.modes[:, 2]
+    pins = []
+    for c in coils:
+        t = phase_tangent(c.params_dict, modes)
+        k, i = max(
+            ((k, i) for k in t for i in np.where(np.abs(modes) == 1)[0]),
+            key=lambda ki: abs(t[ki[0]][ki[1]]),
+        )
+        pins.append({k: np.array([i])})
+    cons.append(FixParameters(cs0, pins))
+    st_ = a.speed_tol
+    cons.append(
+        CoilArclengthResidual(
+            cs0, relative=True, bounds=(-st_, st_), grid=LinearGrid(N=100)
+        )
+    )
+    a.speed_ratio = 1 + st_
+    info["gauge"] = f"phase pinned, relative speed within +-{st_}"
 if P["L"] is not None:
     cons.append(
         CoilLength(
@@ -269,7 +311,7 @@ n_nodes = row_grid.num_nodes
 gap = node_gap_estimate(n_nodes, P["L"], P["kappa"], P["dcc"], a.speed_ratio)
 cc = CoilSetDistanceRows(
     cs0,
-    select_distance=a.cc_sel,
+    select_distance=a.cc_sel * P["dcc"],
     bounds=(P["dcc"], np.inf),
     grid=row_grid if a.cc_gap == "bounds" else None,
     gap=gap if a.cc_gap == "bounds" else None,
