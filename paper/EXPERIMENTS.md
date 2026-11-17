@@ -21,7 +21,7 @@ Decided with the user 2026-11-17.
 | run-to-run spread | report best-of-starts with the spread where the experiment's claim depends on it: the faces sweep and the Jorge QI stage 2 (comparison with planar). Each section states its starts |
 | bounds (decided 2026-11-17) | **one convention for the paper**: Gil et al., PRE 114, 025202 (2026), Table III (reactor a = 1.7 m: 160 m of coil per half period, kappa 1 /m, d_cc 0.8 m, d_pc 1.5 m) scaled by f = a / 1.7 with the plasma's own a, the length split evenly over the unique coils of a half period; kappa_MS not used. Every bound scales, d_cc included. Faces sweep: `rr02_precise_{QA,QH}.json` (DESC's a); designs B, F: `gil_a0p12_nc{4,5}.json` (a = 0.12 m, where the plasma is placed; absolute values, so the plasma's later a does not move them); Jorge: `gil_jorge_L40.json` (DESC's a, with a stated per-coil length exception, 4.2). The poster's near-axis set (`fa_qa2_a0167`, `qi_jorge2022`) is retired. **Because of this the production results are not expected to match the poster's** (the designs' coils get 28-42% less length and ~40% more coil-coil clearance); the agent confirms each bounds file with the user before the first run that uses it, and discusses any major performance regression (B.n, QS, iota, nested surfaces) with the user before going on |
 | grids | moderate, what a practitioner would pick, not convergence-driven densities: curvature on `LinearGrid(N=300)` (`--curv-grid linear --curv-n 300`; misses interior |kappa| peaks by up to 0.12%, accepted); the dense check stays the judge of feasibility. Every section states its grids |
-| hinge turning-angle cap | **TO-DO (not implemented; deferred until the rest of this doc is done, 2026-11-17)**. New constraint: per hinge, the angle between the incoming and outgoing arc tangents, capped through its cosine (smooth), like `ArcFold`. **Off by default**; an experiment uses it only after it has been discussed for that experiment (2026-11-17). Its value is reported as `corner_deg` in every arc run regardless |
+| hinge turning-angle cap | **implemented 2026-11-17**: `HingeTurningAngle` (`desc/objectives/_piecewise_planar.py`): per hinge, the angle between the tangent arriving from one arc and the tangent leaving into the next, from the closed-form arc end tangents (transverse and polar arcs), bounded through its cosine; B rows per coil; no frozen orientation. `stage2.py --turn-max deg`, optional weighted term `single_stage.py --turn-max` (tolerance 2% of the cap). **Off by default**; an experiment uses it only after it has been discussed for that experiment (so far: the faces sweep). Always reported: `turn_deg` per coil in every arc run's logs and `result.json`, `corner_deg` in `faces/score.py` (equal to RR-02's corner_deg on its 98 arc optima to 6e-6 deg). Tests in `tests/test_piecewise_planar.py` |
 | coil-coil distance | `CoilSetDistanceRows` (unsigned top-k node-pair rows, each a lower bound: node distance minus a gap). Rows exist within `--cc-sel` x d_cc (2.5). `--cc-gap coils`: the node grid is chosen at build so the gap is <= 2% of d_cc (`--row-n` unused); `--cc-gap bounds`: 2 `--row-n` + 1 nodes per coil, gap from `node_gap_estimate`. Every section states `--cc-gap`, `--row-n` where used, `--cc-k` (starting k) |
 | plasma-coil distance | upstream hard minimum first (`--pc-mode min`: `PlasmaCoilSetMinDistance`, plasma `LinearGrid(M, N, NFP)` from `--pc-plasma-mn`, default 32 x 32 over the full surface, coil nodes 2 `--pc-row-n` + 1 per coil, default 513). Switch to top-k rows (`--pc-mode rows`) **only with user approval**, after evidence of a stall (inner subproblems ending non-KKT while d_pc is active). Every section states the starting `--pc-k` and plasma grid it would use |
 | top-k slot rule | the starting k must hold every in-band candidate at the start with margin; `run.log` prints `active X of k` at build and the dense check flags overflow. On overflow the closest rows are kept, but raise k and rerun rather than accept it |
@@ -39,8 +39,8 @@ compute) -> optional experiments. Sections 1 and 4 can start whenever their to-d
 
 | to-do | for | who |
 |---|---|---|
-| turning-angle constraint (section 0): library class, `stage2.py --turn-max`, tests | 1 | **deferred**: discuss with the user first |
-| `faces/score.py` reports `corner_deg`; `run_sweep.sh` loops over caps, per-class seed lists, N = 300 curvature, QH maxiter 1600 | 1 | agent |
+| turning-angle constraint (section 0) | 1 | **done** 2026-11-17 |
+| `run_sweep.sh` loops over caps (`--turn-max`), per-class seed lists, N = 300 curvature, QH maxiter 1600 | 1 | agent |
 | 5 new QH r/a starts (planar1, modular) | 1 | agent |
 | `compare/run.sh` without `pQA`, on the rebuilt F; cold starts on the rebuilt equilibrium (maybe `make_z0_start.py` runnable) | 3 | agent, after 2 |
 | `jorge/chain.sh` cut to ladder -> C per seed + planar/free per seed + trace; new r/a starts | 4 | agent |
@@ -132,11 +132,9 @@ Differences from RR-02 to state in the paper: link guard off (RR-02: `--link-mu 
 on an A100). Run count: QA 7 arc classes x 4 seeds x 4 caps + 2 x 4 = 120; QH 7 x 8 x 4 + 2 x 8 = 240; 360 runs,
 ~70 A100-h at RR-02's rate (the capped runs may be slower).
 
-Before launch (code): the turning-angle constraint (section 0) with a `stage2.py --turn-max deg` flag and tests;
-`run_sweep.sh` must loop over the caps and take the seed list per class (arcs and planar/modular use different seed
-folders) and pass the curvature grid, QH maxiter; `score.py` must report the **tangent turning angle** at each
-hinge (`corner_deg`: max over hinges of the angle between the incoming and outgoing tangents, as RR-02) next to
-`fold_deg_max`.
+Before launch (code): `run_sweep.sh` must loop over the caps (`stage2.py --turn-max deg`; done in the library and
+driver) and take the seed list per class (arcs and planar/modular use different seed folders) and pass the curvature
+grid, QH maxiter. `score.py` already reports `corner_deg` (the largest turning angle) next to `fold_deg_max`.
 
 ### 1.6 Outputs and metrics
 `paper/runs/faces/<cfg>_s<seed>/<class>/` with `score.json`: B.n metric (i) of section 0 (bn_mean / bn_max, plus
@@ -156,8 +154,9 @@ which collapses faces for B >= 3). No fold cap (measurement below). For each arc
     multistart seeds (QA 4, QH 8)  x  turning-angle cap in {none, 90, 60, 30} deg
 
 planar1 and modular: multistart only (no hinges). The cap values are the same for every N. The starts are the
-uncapped ones; each run reports the start's `corner_deg` (chord fits to circles start with small corners, so the
-caps should hold at the start: check). Figure layout deferred; it shows the caps and the multistart spread together.
+uncapped ones. Measured 2026-11-17, the starts' largest corners (same for every seed and both configurations):
+arc2 31.7, arc3 12.5, arc4 7.7, arc5 5.6, arc6 4.5, arc7 3.7, arc8 3.2 deg. So every start satisfies the 90 and 60 deg
+caps, and only arc2 starts 1.7 deg over the 30 deg cap (the AL starts from an infeasible point there; note it). Figure layout deferred; it shows the caps and the multistart spread together.
 
 Measurement 2026-11-17 (RR-02 arc optima, `fold_cos` on the ported code; corners from RR-02's `score.json`), medians
 over seeds:

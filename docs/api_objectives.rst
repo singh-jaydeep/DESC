@@ -150,6 +150,7 @@ Coil Optimization
     desc.objectives.HingeLevel
     desc.objectives.HingeMidHeightRelative
     desc.objectives.HingeTilt
+    desc.objectives.HingeTurningAngle
     desc.objectives.PolarArcRadius
 
 

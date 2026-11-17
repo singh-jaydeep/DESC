@@ -11,8 +11,9 @@ hard constraints of the slack-free augmented Lagrangian ``lsq-auglag-composite``
   the bounds by ``node_gap_estimate`` or from the coils at build);
 * plasma-coil distance: ``PlasmaCoilSetDistanceRows`` with the boundary held fixed;
 * the sum of the coil currents fixed; optionally each current within a band;
-* arc coils: optional fold cap, joint plane (``FixHingeHeight`` at z, or level hinges
-  per coil), hinge height above the axis, hinge tilt, polar radius floor;
+* arc coils: optional fold cap, hinge turning-angle cap, joint plane
+  (``FixHingeHeight`` at z, or level hinges per coil), hinge height above the axis,
+  hinge tilt, polar radius floor;
 * optionally a pointwise cap on B.n/|B| (vacuum only).
 
 Every run writes to DIR: cmd.txt, commit.txt, run.log, outer.json (one record per outer
@@ -120,6 +121,12 @@ ap.add_argument(
 # piecewise-planar constraints
 ap.add_argument("--fold-max", type=float, default=None, help="fold cap (deg)")
 ap.add_argument(
+    "--turn-max",
+    type=float,
+    default=None,
+    help="cap on the turning angle at every hinge (deg); off by default",
+)
+ap.add_argument(
     "--fold-sides-from",
     default=None,
     help="result.json of an earlier run: reuse its arc orientation for the fold",
@@ -195,6 +202,7 @@ from desc.objectives import (  # noqa: E402
     HingeLevel,
     HingeMidHeightRelative,
     HingeTilt,
+    HingeTurningAngle,
     ObjectiveFunction,
     PlasmaCoilSetDistanceRows,
     PlasmaCoilSetMinDistance,
@@ -204,7 +212,11 @@ from desc.objectives import (  # noqa: E402
     node_gap_estimate,
 )
 from desc.objectives._coils import _coil_node_grid  # noqa: E402
-from desc.objectives._piecewise_planar import fold_angles, side_signs  # noqa: E402
+from desc.objectives._piecewise_planar import (  # noqa: E402
+    fold_angles,
+    side_signs,
+    turning_angles,
+)
 from desc.optimize import Optimizer  # noqa: E402
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "lib"))
@@ -230,7 +242,9 @@ kind = type(coils[0]).__name__
 xyz = isinstance(coils[0], FourierXYZCoil)
 if not arc and not xyz and not isinstance(coils[0], FourierPlanarCoil):
     raise SystemExit(f"arc, FourierPlanar or FourierXYZ coils only, got {kind}")
-if (a.fold_max or a.fix_hinge_z is not None or a.horizontal_hinges) and not arc:
+if (
+    a.fold_max or a.turn_max or a.fix_hinge_z is not None or a.horizontal_hinges
+) and not arc:
     raise SystemExit("fold and hinge options need arc coils")
 a.pc_plasma_mn = a.pc_plasma_mn or ("32,32" if a.pc_mode == "min" else "128,128")
 a.pc_plasma_sym = a.pc_plasma_sym or ("full" if a.pc_mode == "min" else "half")
@@ -399,6 +413,9 @@ if a.polar_rmin is not None:
 if a.fold_max is not None:
     cmin = float(np.cos(np.radians(a.fold_max)))
     cons.append(ArcFold(cs0, bounds=(cmin, np.inf), sides=sides))
+if a.turn_max is not None:
+    cmin = float(np.cos(np.radians(a.turn_max)))
+    cons.append(HingeTurningAngle(cs0, bounds=(cmin, np.inf)))
 if arc:
     info["fold_sides"] = sides.tolist()
 if a.current_band is not None:
@@ -471,6 +488,7 @@ def shape(cs_or_params):
     if arc:
         fold = fold_angles(cs_or_params, sides=sides)
         out["fold_deg"] = np.round(fold, 2).tolist()
+        out["turn_deg"] = np.round(turning_angles(cs_or_params), 2).tolist()
     return out
 
 

@@ -18,7 +18,7 @@ tau costs 1/2.
             surfaces; volume within +-vol-band of the start.
   coils     CoilLength, CoilCurvature at the bounds; CoilSetDistanceRows and
             PlasmaCoilSetDistanceRows (the plasma rows follow the moving boundary);
-            optional ArcFold, CoilCurrentBand.
+            optional ArcFold, HingeTurningAngle, CoilCurrentBand.
 
 The coil bounds are weighted, not hard: the single stage is a physics refinement, and
 the stage-2 polish (paper/stage2.py on the free-boundary equilibrium) restores hard
@@ -52,6 +52,7 @@ g.add_argument("--a", type=float, default=None, help="minor radius for the bound
 g.add_argument("--device", default="gpu", choices=["gpu", "cpu"])
 g.add_argument("--fix-hinge-z", type=float, default=None, help="joint plane z (m)")
 g.add_argument("--fold-max", type=float, default=None, help="fold cap (deg)")
+g.add_argument("--turn-max", type=float, default=None, help="hinge turning cap (deg)")
 g.add_argument("--fold-sides-from", default=None, help="stage-2 result.json")
 g.add_argument("--current-band", type=float, default=None)
 g.add_argument("--repair-steps", action="store_true", help="repair before every k")
@@ -72,7 +73,7 @@ g.add_argument("--tau-iota", type=float, default=0.01)
 g.add_argument("--tau-L", type=float, default=0.01)
 g.add_argument("--tau-kappa", type=float, default=0.01)
 g.add_argument("--tau-rows", type=float, default=0.01)
-g.add_argument("--tau-shape", type=float, default=0.02, help="fold, current band")
+g.add_argument("--tau-shape", type=float, default=0.02, help="fold, turn, current band")
 g = ap.add_argument_group("grids and rows")
 g.add_argument("--eval-mn", default="25,25", help="B.n grid M,N")
 g.add_argument("--src-gl", type=int, default=64, help="Biot-Savart GL nodes per arc")
@@ -245,6 +246,15 @@ def terms(eq, cs, A):
                 bounds=(float(np.cos(fr)), np.inf),
                 sides=A["sides"],
                 weight=1 / (ts * np.sin(fr) * fr),
+            )
+        )
+    if a.turn_max is not None:
+        tr = np.radians(a.turn_max)  # tolerance tau-shape x the cap, in angle
+        t.append(
+            O.HingeTurningAngle(
+                cs,
+                bounds=(float(np.cos(tr)), np.inf),
+                weight=1 / (ts * np.sin(tr) * tr),
             )
         )
     if a.current_band is not None:

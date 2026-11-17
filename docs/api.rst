@@ -280,6 +280,7 @@ Objective Functions
     desc.objectives.HingeLevel
     desc.objectives.HingeMidHeightRelative
     desc.objectives.HingeTilt
+    desc.objectives.HingeTurningAngle
     desc.objectives.Isodynamicity
     desc.objectives.LinearObjectiveFromUser
     desc.objectives.LinkingCurrentConsistency

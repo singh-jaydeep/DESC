@@ -66,6 +66,7 @@ from ._piecewise_planar import (
     HingeLevel,
     HingeMidHeightRelative,
     HingeTilt,
+    HingeTurningAngle,
     PointwiseBn,
     PolarArcRadius,
 )
@@ -187,6 +188,7 @@ __all__ = [
     "HingeLevel",
     "HingeMidHeightRelative",
     "HingeTilt",
+    "HingeTurningAngle",
     "Isodynamicity",
     "LinearObjectiveFromUser",
     "LinkingCurrentConsistency",

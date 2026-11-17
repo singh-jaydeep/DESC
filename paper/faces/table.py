@@ -47,6 +47,7 @@ for f in sorted(glob.glob(os.path.join(runs, "*_s*", "*", "score.json"))):
             dpc_over_bound=sc["dpc_over_bound"],
             linked=sc["linked"],
             fold_deg_max=sc.get("fold_deg_max", ""),
+            corner_deg=sc.get("corner_deg", ""),
             dof_per_coil=sc["dof_per_coil"],
             outer_iterations=sv.get("n_outer", ""),
             inner_iterations=sv.get("nit", ""),

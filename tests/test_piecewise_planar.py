@@ -22,13 +22,14 @@ from desc.objectives import (
     HingeLevel,
     HingeMidHeightRelative,
     HingeTilt,
+    HingeTurningAngle,
     ObjectiveFunction,
     PointwiseBn,
     PolarArcRadius,
     VacuumBoundaryBn,
     VacuumBoundaryError,
 )
-from desc.objectives._piecewise_planar import axis_coeffs, fold_angles
+from desc.objectives._piecewise_planar import axis_coeffs, fold_angles, turning_angles
 from desc.optimize import Optimizer
 
 
@@ -82,6 +83,103 @@ def test_arc_fold_jacobian_finite_difference():
         ],
         axis=1,
     )
+    np.testing.assert_allclose(J, fd, atol=1e-7)
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize("B", [3, 4, 6])
+def test_turning_angle_polygon(B):
+    """Straight arcs on a regular planar polygon turn by 2 pi / B at every hinge."""
+    ang = 2 * np.pi * np.arange(B) / B
+    H = np.stack([3 + np.cos(ang), np.zeros(B), np.sin(ang)], axis=1)
+    coil = PiecewisePlanarArcCoil(1e5, H, shape=np.zeros((B, 2)))
+    np.testing.assert_allclose(
+        _value(HingeTurningAngle(coil), coil), np.cos(2 * np.pi / B), atol=1e-12
+    )
+    np.testing.assert_allclose(
+        turning_angles(CoilSet(coil), deg=False), 2 * np.pi / B, atol=1e-12
+    )
+
+
+@pytest.mark.unit
+def test_turning_angle_polar_circle():
+    """Two semicircles on one chord: a circle (no corner) or folded back (cusps)."""
+    H = np.array([[4.0, 0, 0], [2.0, 0, 0]])
+    # opposite sides of the chord, in one plane: a circle
+    coil = PolarPlanarArcCoil(1e5, H, tilts=[0, np.pi], shape=np.zeros((2, 1)))
+    np.testing.assert_allclose(_value(HingeTurningAngle(coil), coil), 1, atol=1e-12)
+    # the same side: the second arc retraces the first, a cusp at both hinges
+    coil = PolarPlanarArcCoil(1e5, H, tilts=np.zeros(2), shape=np.zeros((2, 1)))
+    np.testing.assert_allclose(_value(HingeTurningAngle(coil), coil), -1, atol=1e-12)
+
+
+def _sampled_turning(coil, eps=1e-7):
+    """Turning angles from sampled tangents either side of each hinge (RR-02's way).
+
+    The tangents come from the curve itself, in the lab frame.
+    """
+    from desc.grid import Grid
+
+    B = int(coil.B)
+    brk = 2 * np.pi * np.arange(B) / B
+    s = np.concatenate([[(b - eps) % (2 * np.pi), b + eps] for b in brk])
+    g = Grid(np.stack([0 * s, 0 * s, s], 1), sort=False, jitable=False)
+    t = np.asarray(coil.compute("x_s", grid=g, basis="xyz")["x_s"])
+    t = t / np.linalg.norm(t, axis=1)[:, None]
+    return np.arccos(np.clip(np.sum(t[0::2] * t[1::2], axis=1), -1, 1))
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize("cls", [PiecewisePlanarArcCoil, PolarPlanarArcCoil])
+@pytest.mark.parametrize("B", [2, 3, 5])
+def test_turning_angle_matches_sampled_tangents(cls, B):
+    """Closed form equals the angle between sampled tangents, under a rigid rotation."""
+    rng = np.random.default_rng(B)
+    ang = 2 * np.pi * np.arange(B) / B + 0.2 * rng.standard_normal(B)
+    H = np.stack(
+        [3 + np.cos(ang), 0.3 * rng.standard_normal(B), 1.2 * np.sin(ang)], axis=1
+    )
+    coil = cls(
+        1e5,
+        H,
+        tilts=0.5 * rng.standard_normal(B),
+        shape=0.15 * rng.standard_normal((B, 3)),
+    )
+    ref = np.asarray(turning_angles(coil, deg=False, per_hinge=True))[0]
+    np.testing.assert_allclose(_sampled_turning(coil), ref, atol=1e-6)
+    # a rigid rotation moves the coil, not its corners
+    th = 0.7
+    coil.rotmat = np.array(
+        [[np.cos(th), -np.sin(th), 0], [np.sin(th), np.cos(th), 0], [0, 0, 1]]
+    ).ravel()
+    np.testing.assert_allclose(_sampled_turning(coil), ref, atol=1e-6)
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize("cls", [PiecewisePlanarArcCoil, PolarPlanarArcCoil])
+def test_turning_angle_jacobian_finite_difference(cls):
+    """Jacobian of HingeTurningAngle matches central differences."""
+    rng = np.random.default_rng(0)
+    coil = _circle_arcs(B=3, M=2)
+    coil = cls(
+        1e5,
+        coil.hinges,
+        tilts=np.asarray(coil.tilts) + np.array([0.2, -0.3, 0.4]),
+        shape=0.1 * rng.standard_normal((3, 2)),
+    )
+    o = ObjectiveFunction(HingeTurningAngle(CoilSet(coil, coil.copy())))
+    o.build(verbose=0)
+    x = np.asarray(o.x(*o.things))
+    J = np.asarray(o.jac_unscaled(x))
+    h = 1e-6
+    fd = np.stack(
+        [
+            (o.compute_unscaled(x + h * e) - o.compute_unscaled(x - h * e)) / (2 * h)
+            for e in np.eye(x.size)
+        ],
+        axis=1,
+    )
+    assert J.shape == (6, x.size)
     np.testing.assert_allclose(J, fd, atol=1e-7)
 
 

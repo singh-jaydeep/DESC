@@ -261,6 +261,192 @@ class ArcFold(_Objective):
         )
 
 
+# ---------------------------------------------------------------- turning angle
+
+
+def _end_tangents(params, B, M, polar):
+    """Tangents of every arc at its start (t = 0) and end (t = 1), unnormalized.
+
+    Closed form from the arc kernels: a transverse arc ``x = H + t c + w(t) p`` has
+    ``x_t = c + w'(t) p`` with ``w'(0) = sum pi m a_m`` and ``w'(1) = sum pi m (-1)^m
+    a_m``; a polar arc ``x = C + r(phi) (-cos(pi phi) e + sin(pi phi) p)`` has
+    ``x_phi = -r' e + pi r p`` at phi = 0 and ``r' e - pi r p`` at phi = 1, with
+    ``r = |c| / 2`` at both ends. Returns start, end of shape (B, 3), in the coil's own
+    frame (a rigid transform rotates both alike).
+    """
+    from desc.compute._curve import _ppa_arc_frame, _ppolar_arc_frame
+
+    hinges = jnp.asarray(params["hinges"]).reshape(B, 3)
+    tilts = jnp.asarray(params["tilts"]).reshape(B)
+    a = jnp.asarray(params["shape"]).reshape(B, M)
+    km = jnp.pi * jnp.arange(1, M + 1)
+    sign = (-1.0) ** jnp.arange(1, M + 1)
+    d0 = a @ km  # w'(0) or r'(0)
+    d1 = a @ (km * sign)  # w'(1) or r'(1)
+    if polar:
+        chord, e, p, _, Lc = _ppolar_arc_frame(
+            hinges, tilts, B, jnp.asarray(params["arc_ref"])
+        )
+        r = 0.5 * Lc[:, None]
+        start = -d0[:, None] * e + jnp.pi * r * p
+        end = d1[:, None] * e - jnp.pi * r * p
+    else:
+        chord, _, p = _ppa_arc_frame(hinges, tilts, B, jnp.asarray(params["arc_ref"]))
+        start = chord + d0[:, None] * p
+        end = chord + d1[:, None] * p
+    return start, end
+
+
+def turning_cos(params, B, M, polar):
+    """Cosine of the turning angle at every hinge of one coil, shape (B,).
+
+    Row j is hinge ``H[j]``: the angle between the tangent arriving at the end of arc
+    ``j - 1`` and the tangent leaving at the start of arc ``j``. 1 at a smooth joint,
+    -1 at a cusp.
+    """
+    start, end = _end_tangents(params, B, M, polar)
+    arrive = jnp.roll(end, 1, axis=0)
+    num = jnp.sum(arrive * start, axis=1)
+    return num / (jnp.linalg.norm(arrive, axis=1) * jnp.linalg.norm(start, axis=1))
+
+
+def turning_angles(coilset, deg=True, per_hinge=False):
+    """Turning angle at the hinges of every independent arc coil, for reporting.
+
+    Parameters
+    ----------
+    coilset : CoilSet or Coil
+        Arc coils.
+    deg : bool
+        Degrees (default) or radians.
+    per_hinge : bool
+        Return every hinge's angle, shape (num_coils, B), instead of each coil's
+        largest, shape (num_coils,).
+
+    Returns
+    -------
+    angle : ndarray
+
+    """
+    out = []
+    for c in _leaf_coils(coilset):
+        cos = turning_cos(c.params_dict, int(c.B), int(c.M), _is_polar(c))
+        ang = np.arccos(np.clip(np.asarray(cos), -1, 1))
+        out.append(ang if per_hinge else ang.max())
+    out = np.array(out)
+    return np.degrees(out) if deg else out
+
+
+class HingeTurningAngle(_Objective):
+    """cos of the turning angle of each arc coil at each of its hinges.
+
+    The turning angle at a hinge is the angle between the tangent arriving from one arc
+    and the tangent leaving into the next: 0 at a smooth joint, 180 degrees at a cusp.
+    It is the curvature a C0 coil concentrates at its corner, which no curvature bound
+    sees (curvature is bounded inside the arcs). Bound it below, ``bounds=(cos(
+    turn_max), np.inf)``, for every turning angle <= turn_max. B rows per coil, one per
+    hinge (also for B = 2, whose two hinges are two corners).
+
+    The tangents are closed-form functions of the hinges, tilts and arc shapes, and
+    their direction follows the curve parameter, so unlike ``ArcFold`` no arc
+    orientation has to be frozen. Works for both arc classes.
+
+    Parameters
+    ----------
+    coil : CoilSet
+        Arc coils of one class, all with the same B and M.
+
+    """
+
+    __doc__ = __doc__.rstrip() + collect_docs(
+        target_default="``bounds=(-1, np.inf)``, i.e. no constraint.",
+        bounds_default="``bounds=(-1, np.inf)``, i.e. no constraint.",
+        normalize_detail=" Note: Has no effect for this objective.",
+        normalize_target_detail=" Note: Has no effect for this objective.",
+    )
+
+    _scalar = False
+    _units = "(dimensionless)"
+    _print_value_fmt = "Hinge turning cos(angle): "
+    _static_attrs = _Objective._static_attrs + ["_B", "_M", "_polar"]
+
+    def __init__(
+        self,
+        coil,
+        target=None,
+        bounds=None,
+        weight=1,
+        normalize=False,
+        normalize_target=False,
+        loss_function=None,
+        deriv_mode="auto",
+        name="hinge turning angle",
+        jac_chunk_size=None,
+    ):
+        if target is None and bounds is None:
+            bounds = (-1.0, np.inf)
+        super().__init__(
+            things=[coil],
+            target=target,
+            bounds=bounds,
+            weight=weight,
+            normalize=normalize,
+            normalize_target=normalize_target,
+            loss_function=loss_function,
+            deriv_mode=deriv_mode,
+            name=name,
+            jac_chunk_size=jac_chunk_size,
+        )
+
+    def build(self, use_jit=True, verbose=1):
+        """Build constant arrays.
+
+        Parameters
+        ----------
+        use_jit : bool, optional
+            Whether to just-in-time compile the objective and derivatives.
+        verbose : int, optional
+            Level of output.
+
+        """
+        coils = _arc_coils(self.things[0], type(self).__name__)
+        errorif(
+            len({_is_polar(c) for c in coils}) != 1
+            or len({int(c.M) for c in coils}) != 1,
+            ValueError,
+            "HingeTurningAngle needs arc coils of one class with one M.",
+        )
+        self._B, self._M = int(coils[0].B), int(coils[0].M)
+        self._polar = _is_polar(coils[0])
+        self._dim_f = len(coils) * self._B
+        self._constants = {"quad_weights": 1.0}
+        super().build(use_jit=use_jit, verbose=verbose)
+
+    def compute(self, params, constants=None):
+        """Compute cos(turning angle) at every hinge of every coil.
+
+        Parameters
+        ----------
+        params : dict
+            Dictionary of coilset degrees of freedom, eg CoilSet.params_dict
+        constants : dict
+            Dictionary of constant data, eg transforms, profiles etc.
+            Defaults to self._constants. (Deprecated)
+
+        Returns
+        -------
+        f : ndarray
+            cos(turning angle), coil by coil, hinge by hinge.
+
+        """
+        return jnp.concatenate(
+            [
+                turning_cos(p, self._B, self._M, self._polar)
+                for p in _leaf_params(params)
+            ]
+        )
+
+
 # ------------------------------------------------------------------------ hinges
 
 

@@ -8,6 +8,9 @@ period, 72 (phi) x 96 (theta), unweighted, coil field only; bn_mean = mean|B.n| 
 mean|B|, bn_max = max|B.n| / mean|B|, bn_rms = sqrt(mean (B.n)^2) / mean|B|.
 dof_per_coil counts one coil's optimizable parameters without rotmat, shift and
 arc_ref, current included.
+Arc coils also get fold_deg_max (ArcFold's plane angle) and corner_deg, the largest
+turning angle between the arc tangents at a hinge (RR-02's corner measure,
+`turning_angles`).
 Ported from coil_sandbox/from_axis/rr02/score.py (js/qa-poster).
 """
 
@@ -77,9 +80,12 @@ rec = dict(
     bounds=P,
 )
 if hasattr(c0, "B"):
-    from desc.objectives._piecewise_planar import fold_angles
+    from desc.objectives._piecewise_planar import fold_angles, turning_angles
 
     rec["fold_deg_max"] = float(np.max(fold_angles(cs)))
+    # RR-02's corner measure: largest turning angle between arc tangents at a hinge
+    rec["corner_deg"] = float(np.max(turning_angles(cs)))
+    rec["corner_deg_per_coil"] = turning_angles(cs).tolist()
 json.dump(rec, open(out, "w"), indent=1, default=str)
 print(
     f"SCORE {path}: bn mean {mean:.4e} rms {rms:.4e} max {mx:.4e}  {D.report(m, P)}"
