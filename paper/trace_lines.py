@@ -2,14 +2,25 @@
 
     python paper/trace_lines.py COILS.h5 EQ.h5 OUT [--offsets 0.02,...] [--ntransit 150]
 
-1. The magnetic axis of the coil field at phi = 0 (Z = 0 by symmetry): iterate the
-   centroid of a nearby line, starting from the equilibrium's axis.
-2. Field lines from the outboard midplane at R = R_axis + offset.
-3. Each line is fitted by a surface in a straight-field-line angle,
-   theta = iota phi, R = sum R_mn cos(m theta - n NFP phi), Z = sum Z_mn sin(...).
-   The rms fit residual over the line's mean radius says whether the line lies on a
-   smooth surface: islands and chaos give a large residual.
-Writes OUT/score.json (axis, per-line iota, residual, mirror ratio) and OUT/lines.png.
+Coil field only; Biot-Savart source composite Gauss-Legendre --gl (32) nodes per arc;
+integration rtol = atol = --rtol (1e-10), --nplane (160) samples per toroidal turn.
+1. Magnetic axis at phi = 0 (Z = 0 by stellarator symmetry): start at the equilibrium's
+   axis R, trace 40 toroidal turns, replace R by the mean R of the phi = 0 punctures;
+   up to 4 times, stopping when R moves < 1e-6 m.
+2. Lines from the outboard midplane at R = R_axis + offset, Z = 0, phi = 0, for each
+   --offsets value (m), --ntransit toroidal turns each; a line that leaves the
+   integration domain is "lost".
+3. Each kept line is fitted by a surface in a straight-field-line angle
+   theta = iota phi: R = sum R_mn cos(m theta - n NFP phi),
+   Z = sum Z_mn sin(m theta - n NFP phi), m = 0..--Mfit (16), n = -Nfit..Nfit (16),
+   linear least squares in (R_mn, Z_mn) for each trial iota, iota minimized over
+   (winding estimate -+ 2 pi / total angle). residual = rms distance (m) from the line
+   to its fitted surface; "nested" = residual / the line's mean distance from the axis
+   < --tol (5e-3). Islands and chaos give a large residual.
+   Also per line: the winding-number iota and the mirror ratio (Bmax - Bmin) / (Bmax +
+   Bmin) of |B| along its first 40 turns.
+Writes OUT/score.json (axis, per-line iota, residual, nested, mirror ratio, the largest
+nested offset) and OUT/lines.png. Zoomed sections: paper/jorge/zoom_poincare.py.
 Ported from the --trace-only path of coil_sandbox/1012_QI/score_trace.py (js/qa-poster).
 """
 

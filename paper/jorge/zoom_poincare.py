@@ -6,6 +6,8 @@ TRACE_DIR is a paper/trace_lines.py output (coils.h5, score.json with axis_R_phi
 Lines start on the outboard midplane at R = R_axis + offset, Z = 0. Per band: the R-Z
 section, and the same points as (poloidal angle about the axis, distance from the axis),
 where an island chain shows as a row of O's. Writes a PNG and an npz of the crossings.
+Coil field only (GL --gl 32 nodes per arc), --ntransit (600) toroidal turns per line,
+rtol = atol = --rtol (1e-10); one start every `step` metres from lo to hi in each band.
 Ported from coil_sandbox/paper_min/jorge/zoom_poincare.py (js/qa-poster).
 """
 

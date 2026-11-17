@@ -1,25 +1,48 @@
 """Regenerate a design's metrics.json, METRICS.md and figures/ from its data/ folder.
 
     python paper/metrics/make_metrics.py DESIGN_DIR [--stages eq,coils,trace,transport,figures,md] [--device gpu|cpu]
-    python paper/metrics/make_metrics.py --ref precise_QA --out ref_precise_QA.json     (equilibrium metrics only)
+    python paper/metrics/make_metrics.py --ref precise_QA --out ref_precise_QA.json   (eq metrics + transport "hi")
 
-DESIGN_DIR holds data/eq.h5, data/coils.h5, data/bounds.json and design.json ({"name", "helicity", ...}).
+DESIGN_DIR holds data/eq.h5, data/coils.h5, data/bounds.json and design.json ({"name", "helicity", ...}). Every
+stage updates its own key of metrics.json, so stages can be run separately. Default: every stage. Vacuum throughout.
 
-Stages (each one updates its own key of metrics.json, so they can be run separately):
-  eq         geometry, iota and shear, magnetic well, mirror ratio, elongation, Jacobian, QS (Boozer, literature
-             convention) and the two-term measure, eps_eff (low resolution)                     ~3 min (GPU)
-  coils      the dense coil check (paper/lib/dense_check) against data/bounds.json, hinges, faces, currents,
-             B.n and coil-plasma distance on the boundary                                       ~2 min
-  trace      field-line tracing of the coil field: magnetic axis, rotation number per line, punctures mapped into
-             the equilibrium (are its surfaces the coils' surfaces?), resonance flags.  TRACE=dense (default) is
-             80 lines x 2000 field periods (~5-8 min); TRACE=quick is 30 x 500 (~1 min)
-  transport  eps_eff, Gamma_c (Nemov) and Gamma_c (Velasco) at two bounce-integral resolutions   ~15 min
-             (sets XLA_PYTHON_CLIENT_MEM_FRACTION=0.5 itself: cuFFT plan memory)
-  figures    figures/*.png from data/ and the cached work/ files
-  md         METRICS.md from metrics.json
-Default: every stage. GPU jobs on the laptop go under a memory cap (REPRODUCE.md).
+eq (~3 min, GPU), from data/eq.h5:
+  R0, a, A = R0/a, V, <|B|>_vol, <|B|>_axis (DESC definitions).
+  Profiles on 21 surfaces rho = 0.001, 0.05, ..., 1: iota; shear -(rho / iota) d iota / d rho; DESC "magnetic well"
+    (> 0 = well); "mirror ratio" (Bmax - Bmin) / (Bmax + Bmin); V''(psi) with psi = toroidal flux / 2 pi (< 0 = well).
+  Elongation: per boundary cross-section at 9 planes zeta = 0 .. pi / NFP, sqrt of the ratio of the principal
+    second moments of area (the equivalent ellipse's axis ratio), polygon of 360 points; plus DESC's max
+    a_major / a_minor.
+  Jacobian: min sqrt(g) / median and the negative fraction at rho .5, .8, .9, 1 (LinearGrid(2 M_grid, 2 N_grid)).
+  QS at rho .25, .5, .75, 1: Boozer spectrum of |B| (M_booz = 2M, N_booz = 2N, LinearGrid(2 M_grid, 2 N_grid)),
+    written as cos/sin(m theta_B - n zeta_B) amplitudes (the QuasisymmetryBoozer convention) over |B_00|; the
+    symmetry-breaking modes (every mode off design.json's helicity) give "l2" (their 2-norm), "max" and the five
+    largest; "two_term" = sqrt(<(f_C / |B|^3)^2>) with the |sqrt(g)|-weighted surface average.
+coils (~2 min), from data/coils.h5 against data/bounds.json:
+  The dense check (paper/lib/dense_check.evaluate: L, kappa, d_cc, d_pc, linking, margins, verdict).
+  Per coil: current, length, max |kappa|, and for arc coils the hinges, hinge-line tilt from horizontal, each face's
+    length, height off the hinge line and planarity rms, and (B = 2) the fold between the faces' best-fit planes.
+  B.n: area-weighted rms and max of the coils' B.n over their area-weighted mean |B| on the boundary,
+    LinearGrid(2 M_grid, 2 N_grid) (the free-boundary scripts' metric); coil source GL 64 per arc / LinearGrid(N=400).
+  Boundary maps (96 theta x 128 zeta, one period): B.n / mean |B| and the distance to the nearest coil node
+    (2001 nodes per coil): min and median.
+trace (TRACE=dense: 80 lines x 2000 field periods, ~5-8 min; TRACE=quick: 30 x 500), coil field only:
+  Axis: fixed point of the one-period map at phi = 0 (Newton from the equilibrium's axis); its offset from it.
+  Lines start at Z = axis Z, phi = 0, R = axis R + s (R_boundary - axis R), s = 0.03 .. 1.08; integration rtol =
+    atol = 1e-10; a line leaving 0.3 < R < 1.4 m, |Z| < 0.6 m counts as lost (bounds set for the QA designs).
+  Per line: confined or not; rotation number iota = Birkhoff-weighted average of the poloidal angle advance about the
+    traced axis per field period, and iota_err = |first half - second half| (flagged if > 1e-4: island or chaos);
+    punctures mapped into the equilibrium's coordinates: mean and std of rho, and the equilibrium's iota there.
+  Summary: all confined, traced iota at axis and edge, max |iota_traced - iota_eq|, max rho std, and the rationals
+    p/q inside the traced iota range whose resonance (n a multiple of NFP) has <= 24 islands.
+transport (~15 min; sets XLA_PYTHON_CLIENT_MEM_FRACTION=0.5 for cuFFT plans):
+  eps_eff (DESC "effective ripple"), Gamma_c (Nemov) and Gamma_c (Velasco) at rho .25, .5, .75, Bounce2D at two
+  resolutions as a convergence check: lo X 32, Y 32, Y_B 128, 20 transits, 45 pitch angles; hi X 48, Y 64, Y_B 256,
+  40 transits, 90 pitch angles; num_well = 30 x transits, num_quad 32.
+figures: figures/*.png from data/ and the cached work/ files.   md: METRICS.md from metrics.json.
 
-Ported from coil_sandbox/from_axis/final/designF/make_figures.py (js/qa-poster).
+GPU jobs on the laptop go under a memory cap. Ported from coil_sandbox/from_axis/final/designF/make_figures.py
+(js/qa-poster).
 """
 import argparse
 import json

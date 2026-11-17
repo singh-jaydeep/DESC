@@ -1,4 +1,7 @@
 #!/bin/bash
+# STATUS (2026-11-17): superseded by paper/EXPERIMENTS.md section 3, which governs: run on the REBUILT design F
+# (fold-60 rung) with bounds gil_a0p12_nc5.json, cold starts on that equilibrium, 4 seeds per arm, the pQA set
+# retired. The paths and bounds below are the poster-era ones (fa_qa2_a0167 is retired).
 # Planar vs hinged vs free coils at equal bounds (PORT_PLAN 9.2), stage 2 on paper/stage2.py.
 #
 #   bash paper/compare/run.sh [F] [pQA]        (default both)

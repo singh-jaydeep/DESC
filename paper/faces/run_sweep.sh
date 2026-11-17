@@ -1,4 +1,8 @@
 #!/bin/bash
+# STATUS (2026-11-17): superseded in part by paper/EXPERIMENTS.md section 1, which governs. To change before a
+# production run: turning-angle caps {none, 90, 60, 30} via stage2.py --turn-max (TURN) instead of FOLD; per-class
+# seed lists (arcs: hinge rotations; planar1/modular: r/a, 5 new QH starts); --curv-grid linear --curv-n 300;
+# --maxiter 1600 on QH. Bounds rr02_precise_{QA,QH}.json (kappa_MS in them is not enforced).
 # Faces sweep (RR-02 style): field error vs number of planar faces per coil on precise_QA and precise_QH, stage 2 on
 # paper/stage2.py from the starts in paper/inputs/starts/faces, then the one scoring function per run.
 #

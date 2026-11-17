@@ -1,8 +1,23 @@
 """Equilibria, bounds and the dense check of a coilset against its engineering bounds.
 
-The dense check is independent of the optimization's own grids: lengths by composite
-Gauss-Legendre, curvature on 2000 nodes per arc, distances between dense polylines and
-the full plasma boundary, linking numbers, and B.n on one field period.
+The dense check (``evaluate``) is independent of the optimization's own grids:
+  L      per-coil length, composite Gauss-Legendre 48 nodes per arc (LinearGrid(N=400)
+         for smooth coils); the max over coils is checked
+  kappa  max |curvature|, 2000 nodes per arc (coil_curvature_grid; smooth coils
+         LinearGrid(N=2000))
+  d_cc   smallest distance between the nodes of any two coils of the full set, 2001
+         nodes per coil (LinearGrid(N=1000))
+  d_pc   smallest distance from those nodes to the full plasma boundary sampled at 256
+         (theta) x 1024 (zeta) points
+  linked coil pairs with |Gauss linking integral| > 0.5 (129-node polylines)
+  bn     mean |B.n| / mean |B| and max |B.n| / mean |B| over one field period,
+         unweighted, on a uniform grid of max(96, 4 M_grid + 1) theta x max(72,
+         4 N_grid + 1) zeta (``bn_stats``; plus the plasma field by virtual casing
+         unless vacuum)
+``margins`` = value / bound; ``verdict`` is STRICT (any margin past 1, or a link,
+fails).
+The paper reads feasibility at 1% (paper/EXPERIMENTS.md section 0) and reports the
+strict margins.
 """
 
 import itertools

@@ -1,4 +1,8 @@
 #!/bin/bash
+# STATUS (2026-11-17): superseded by paper/EXPERIMENTS.md section 4, which governs: bounds gil_jorge_L40.json
+# (qi_jorge2022.json is retired); hinged path = ladder -> tilt <= 20 + 2% cap in ONE step (no A3, no 4% step);
+# planar and free controls uncapped, 4 r/a seeds per arm; --curv-grid linear --curv-n 300. Settings below are the
+# poster-era chain.
 # Jorge 2022 QI (vacuum, NFP 1) stage-2 chain of the paper (PORT_PLAN 9.4), on paper/stage2.py.
 #
 #   bash paper/jorge/chain.sh [PHASE ...]      phases: ladder A3 C P trace (default: all, in order)
