@@ -2,6 +2,9 @@
 
 - `inputs/`: coil starts, near-axis states, equilibria and bounds of every example, copied
   unchanged from the poster-era branch (`inputs/README.md`, `inputs/MANIFEST.sha256`).
+- `PORT_STATUS.md`: what was ported and how it was checked; `OPEN_ITEMS.md`: what needs runs or decisions.
+- `near_axis/`, `free_boundary.py`, `single_stage.py`, `metrics/`: the design pipeline (PORT_PLAN 9);
+  `jorge/`, `faces/`, `compare/`: the other examples; `trace_lines.py`: field-line nesting check.
 - `stage2.py`: stage-2 driver (fixed equilibrium, every engineering bound a hard constraint of
   `lsq-auglag-composite`). `python paper/stage2.py --help`.
 - `lib/dense_check.py`: bounds files, equilibrium loading, and the dense check every run reports

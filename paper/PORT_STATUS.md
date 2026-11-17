@@ -26,15 +26,18 @@ interpax 0.3.14 (environment). The full suite has not been run on this branch ye
 
 ## Scripts (paper/)
 
-| stage (PORT_PLAN 9) | script | status |
+| stage (PORT_PLAN 9) | script | checked (no long runs) |
 |---|---|---|
-| stage 2 (fixed eq, hard bounds) | `stage2.py`, `lib/dense_check.py` | ported; build-only check on design F reproduces the start metrics |
-| 4 single stage | `single_stage.py` | see below |
-| 3 free boundary, 3b repair | `free_boundary.py`, `lib/bdry_repair.py`, `lib/surface_fit.py` | see below |
-| Jorge chain (9.4) | `jorge/` | see below |
-| 1-2 near-axis | `near_axis/` | see below |
-| 6 metrics | `metrics/` | see below |
-| faces sweep | `faces/` | see below |
+| 1-2 near-axis, to DESC | `near_axis/` (README) | test_nae identical to poster; B's state continues at gtol; to_desc on B |
+| 3 free boundary, 3b repair | `free_boundary.py`, `lib/bdry_repair/` (PR #2337 fit vendored) | design F scores reproduced; repair gate |
+| 4 single stage | `single_stage.py` | `--dry` on F; 2 iterations at basis 4 with repair |
+| 5 stage-2 polish | `stage2.py`, `lib/dense_check.py` | build on F, Jorge (arc, planar), faces (arc, FourierXYZ) |
+| 6 metrics | `metrics/make_metrics.py` | design F metrics reproduced (eq, coils, md) |
+| Jorge chain (9.4) | `jorge/chain.sh`, `trace_lines.py`, `jorge/zoom_poincare.py` | builds; tracer on C06 |
+| faces sweep | `faces/run_sweep.sh`, `faces/score.py`, `faces/table.py` | score + table on a start |
+| planar/hinged/free | `compare/run.sh` | builds of each arm |
+
+What needs runs or a decision: `OPEN_ITEMS.md`.
 
 ## Departures from the plan
 
@@ -64,8 +67,7 @@ interpax 0.3.14 (environment). The full suite has not been run on this branch ye
 10. **`CoilArclengthResidual` ported** (decision 2026-11-16) for the free FourierXYZ arm of the
     planar/hinged/free comparison; `CoilMeanSquaredCurvature` not ported.
 
-## Not done
-
-- Acceptance runs (checklist step 8): 8a design F solver row, 8b Jorge chain, 8c planar control, 8d
-  memory, 8e field lines. Run with the scripts above once the GPU is free.
-- Full test suite.
+11. **`stage2.py` select distances are relative** (`--cc-sel 2.5` x d_cc, `--pc-sel 1.2` x d_pc) and the plasma
+    grid defaults to 128 x 128 (Jorge: 128 x 512); FourierXYZ coils get the phase pin and speed bounds.
+12. **Single stage drops the backoffs** and is weighted (as the poster); stage 2 restores hard feasibility.
+13. **`coil_curvature_grid` needed quadrature spacing** to be usable by `CoilCurvature` (fixed, tested).
