@@ -3,6 +3,8 @@
 #
 #   bash paper/jorge/chain.sh [PHASE ...]      phases: ladder A3 C P trace (default: all, in order)
 #
+# Plasma-coil distance: the hard minimum (stage2.py --pc-mode min, as the poster's --dist hybrid) except in the
+# planar control P, where it stalls and the smooth rows are used.
 # ladder  level hinges near the axis (+-0.025 m), fold cap 10 -> 60 deg, from inputs/starts/jorge/J_arc90.h5;
 #         F60 is R0 (poster: mean B.n 1.41e-2, max 17.5%)
 # A3      tilt <= 20 deg, mid-height +-0.025 m, fold <= 60, from R0 (poster: 6.43e-3 / 11.0%)
@@ -25,7 +27,10 @@ EQ=$IN/equilibria/jorge_vac.h5
 BND=$IN/bounds/qi_jorge2022.json
 OUT=${RUNS:-paper/runs/jorge}
 BASE="--eq $EQ --bounds $BND --current-band 0.5 --vacuum --maxiter 800 --cc-gap bounds --row-n 512 --cc-k 30000
---pc-plasma-mn ${PCMN:-128,512} --pc-k ${PCK:-40000}"
+--pc-plasma-mn 48,96 --pc-plasma-sym half --pc-row-n 128"
+# the planar control stalls on the hard plasma-coil minimum (poster P0/P0b): smooth top-k rows there; the 128 x 512
+# plasma grid keeps the rows' gap at 5.8 mm on Jorge's boundary (curvature up to 100 /m)
+PROWS="--pc-mode rows --pc-plasma-mn ${PCMN:-128,512} --pc-k ${PCK:-40000}"
 PHASES=${*:-ladder A3 C P trace}
 
 run() {  # run NAME START "FLAGS": 0 converged and unlinked, 1 not converged, 2 crashed, 3 linked
@@ -78,11 +83,11 @@ fi
 
 if has P; then
   start=$IN/starts/jorge/J_planar_r3.6.h5
-  run P0 "$start" "--row-n ${PROWN:-384}" || [ $? -eq 1 ] || exit 1
+  run P0 "$start" "--row-n ${PROWN:-384} $PROWS" || [ $? -eq 1 ] || exit 1
   start=$OUT/P0/result.h5
   for c in ${P_CAPS:-}; do
     n=P_bn$(echo $c | tr -d .)
-    run $n "$start" "--row-n ${PROWN:-384} --bn-max $c --bn-max-grid 48,96 --jac-chunk ${JC:-16}" || [ $? -eq 1 ] || exit 1
+    run $n "$start" "--row-n ${PROWN:-384} $PROWS --bn-max $c --bn-max-grid 48,96 --jac-chunk ${JC:-16}" || [ $? -eq 1 ] || exit 1
     start=$OUT/$n/result.h5
   done
 fi

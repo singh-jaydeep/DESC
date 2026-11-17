@@ -22,8 +22,10 @@ confirm run settings with the user before launching, look at every coilset befor
    grid (5.8 mm of 111 mm); the poster's C06 coils read as violating it. Options: accept and state it, refine
    the plasma grid further (cost: active rows, 24.6k on C06 at 128 x 512), or a gap from the LOCAL surface
    curvature near each row (a method change in `PlasmaCoilSetDistanceRows`). Decide after 8b/8c.
-2. **Plasma-row slots.** Defaults: `--pc-plasma-mn 128,128 --pc-k 20000 --pc-sel 1.2` (QA); the Jorge chain
-   sets 128,512 and 40000. Watch for the overflow warning in `run.log` and raise `--pc-k`.
+2. **Plasma-coil distance: hard min unless it stalls** (decided 2026-11-17). `stage2.py --pc-mode min` (default,
+   upstream PlasmaCoilSetMinDistance, one row per coil, as the poster's `--dist hybrid`) everywhere it converges;
+   `--pc-mode rows` (top-k rows: 128 x 128 half grid, 20k slots; Jorge 128 x 512, 40k) where it stalls, so far
+   only the Jorge planar control. The rows cost ~4x per inner iteration on design F (the first 8a attempt).
 3. **Inner Hessian.** The composite AL defaults to `{"hessian": "secant", "finish_steps": 5}` (every poster
    run). The poster session was testing how load-bearing secant is; if `gn` does as well, switch the
    default (`desc/optimize/aug_lagrangian_composite.py`) and state it in the paper.

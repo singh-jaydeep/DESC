@@ -72,19 +72,29 @@ ap.add_argument(
     help="FourierXYZ: node speed within (1 -+ this) x the mean (gap ratio 1 + this)",
 )
 ap.add_argument(
-    "--pc-row-n", type=int, default=256, help="pc rows: ~2 N + 1 nodes/coil"
+    "--pc-mode",
+    choices=["min", "rows"],
+    default="min",
+    help="plasma-coil distance: min = upstream PlasmaCoilSetMinDistance (hard minimum, "
+    "one row per coil); rows = PlasmaCoilSetDistanceRows (smooth top-k rows), for "
+    "problems where the hard minimum stalls",
+)
+ap.add_argument(
+    "--pc-row-n", type=int, default=256, help="pc coil nodes: ~2 N + 1 per coil"
 )
 ap.add_argument(
     "--pc-plasma-mn",
-    default="128,128",
-    help="pc plasma grid M,N; the gap grows as (cell size)^2 x surface curvature "
-    "(design F: 47 mm at 32,32, 5 mm at 128,128)",
+    default=None,
+    help="pc plasma grid M,N (default 32,32 for min, 128,128 for rows; the rows' gap "
+    "grows as (cell size)^2 x surface curvature: design F 47 mm at 32,32, 5 mm at "
+    "128,128)",
 )
 ap.add_argument(
-    "--pc-plasma-full",
-    action="store_true",
-    help="full plasma grid (default: stellarator-symmetric half, valid for "
-    "symmetric coilsets only)",
+    "--pc-plasma-sym",
+    choices=["half", "full"],
+    default=None,
+    help="plasma grid over the stellarator-symmetric half (symmetric coilsets only) "
+    "or the full surface (default: full for min, half for rows)",
 )
 ap.add_argument("--pc-k", type=int, default=20000, help="pc row slots")
 ap.add_argument(
@@ -171,6 +181,7 @@ from desc.objectives import (  # noqa: E402
     HingeTilt,
     ObjectiveFunction,
     PlasmaCoilSetDistanceRows,
+    PlasmaCoilSetMinDistance,
     PointwiseBn,
     PolarArcRadius,
     QuadraticFlux,
@@ -205,8 +216,12 @@ if not arc and not xyz and not isinstance(coils[0], FourierPlanarCoil):
     raise SystemExit(f"arc, FourierPlanar or FourierXYZ coils only, got {kind}")
 if (a.fold_max or a.fix_hinge_z is not None or a.horizontal_hinges) and not arc:
     raise SystemExit("fold and hinge options need arc coils")
-if not a.pc_plasma_full and not getattr(cs0, "sym", False):
-    raise SystemExit("the half plasma grid needs a symmetric coilset: --pc-plasma-full")
+a.pc_plasma_mn = a.pc_plasma_mn or ("32,32" if a.pc_mode == "min" else "128,128")
+a.pc_plasma_sym = a.pc_plasma_sym or ("full" if a.pc_mode == "min" else "half")
+if a.pc_plasma_sym == "half" and not getattr(cs0, "sym", False):
+    raise SystemExit(
+        "the half plasma grid needs a symmetric coilset: --pc-plasma-sym full"
+    )
 if a.polar_rmin is not None and not polar:
     raise SystemExit("--polar-rmin needs polar arc coils")
 print(
@@ -320,17 +335,29 @@ cc = CoilSetDistanceRows(
 )
 pM, pN = (int(v) for v in a.pc_plasma_mn.split(","))
 pc_grid = _coil_node_grid(cs0, 2 * a.pc_row_n + 1) if arc else LinearGrid(N=a.pc_row_n)
-pc = PlasmaCoilSetDistanceRows(
-    eq,
-    cs0,
-    select_distance=a.pc_sel * P["dpc"],
-    bounds=(P["dpc"], np.inf),
-    plasma_grid=LinearGrid(M=pM, N=pN, NFP=eq.NFP, sym=not a.pc_plasma_full),
-    coil_grid=pc_grid,
-    eq_fixed=True,
-    max_active_rows=a.pc_k,
-    jac_chunk_size=jcs,
-)
+pc_plasma = LinearGrid(M=pM, N=pN, NFP=eq.NFP, sym=a.pc_plasma_sym == "half")
+if a.pc_mode == "min":
+    pc = PlasmaCoilSetMinDistance(
+        eq,
+        cs0,
+        bounds=(P["dpc"], np.inf),
+        plasma_grid=pc_plasma,
+        coil_grid=pc_grid,
+        eq_fixed=True,
+        jac_chunk_size=jcs,
+    )
+else:
+    pc = PlasmaCoilSetDistanceRows(
+        eq,
+        cs0,
+        select_distance=a.pc_sel * P["dpc"],
+        bounds=(P["dpc"], np.inf),
+        plasma_grid=pc_plasma,
+        coil_grid=pc_grid,
+        eq_fixed=True,
+        max_active_rows=a.pc_k,
+        jac_chunk_size=jcs,
+    )
 cons += [cc, pc]
 
 # piecewise-planar constraints
@@ -375,18 +402,27 @@ nonlinear = [c for c in cons if not c.linear]
 for c in nonlinear:
     c.build(verbose=0)
 params0 = cs0.params_dict
+if a.pc_mode == "rows":
+    pc_line = (
+        f"pc rows: gap {1e3 * float(np.max(pc._constants['gap'])):.3f} mm on "
+        f"{pc._n_nodes} nodes/coil x {pc._n_points} plasma points, active "
+        f"{pc.active_row_count(params0)} of {a.pc_k}"
+    )
+else:
+    pc_line = (
+        f"pc hard min: {pc_grid.num_nodes} nodes/coil x {pc_plasma.num_nodes} "
+        f"plasma nodes ({a.pc_plasma_sym}), {pc.dim_f} rows"
+    )
 print(
     f"BUILD {time.time() - t0:.1f} s; "
     f"cc gap {1e3 * float(np.max(cc._constants['gap'])):.3f}"
     f" mm on {cc._n_nodes} nodes/coil, active {cc.active_row_count(params0)} of "
-    f"{a.cc_k}; pc gap {1e3 * float(np.max(pc._constants['gap'])):.3f} mm on "
-    f"{pc._n_nodes} nodes/coil x {pc._n_points} plasma points, active "
-    f"{pc.active_row_count(params0)} of {a.pc_k}",
+    f"{a.cc_k}; {pc_line}",
     flush=True,
 )
 for c in nonlinear:
     print(f"  {c.name:32s} rows {getattr(c, 'num_row_ids', c.dim_f)}", flush=True)
-if float(np.max(pc._constants["gap"])) > 0.05 * P["dpc"]:
+if a.pc_mode == "rows" and float(np.max(pc._constants["gap"])) > 0.05 * P["dpc"]:
     print(
         "WARNING: the plasma-coil gap exceeds 5% of d_pc, so the constraint is that "
         "much conservative; refine --pc-plasma-mn (the gap goes as cell size^2 x "
@@ -395,9 +431,11 @@ if float(np.max(pc._constants["gap"])) > 0.05 * P["dpc"]:
     )
 info.update(
     cc_gap=float(np.max(cc._constants["gap"])),
-    pc_gap=float(np.max(pc._constants["gap"])),
+    pc_mode=a.pc_mode,
+    pc_plasma=f"{a.pc_plasma_mn} {a.pc_plasma_sym}",
+    pc_gap=float(np.max(pc._constants["gap"])) if a.pc_mode == "rows" else 0.0,
     cc_nodes=cc._n_nodes,
-    pc_nodes=pc._n_nodes,
+    pc_nodes=pc_grid.num_nodes,
 )
 print(f"INFO {info}", flush=True)
 
